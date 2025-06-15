@@ -1,0 +1,4 @@
+# Core dependencies for StockBook
+streamlit==1.45.1
+pandas==2.3.0
+plotly==6.1.2
