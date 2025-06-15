@@ -2,3 +2,9 @@
 streamlit==1.45.1
 pandas==2.3.0
 plotly==6.1.2
+
+# Testing dependencies
+pytest==8.4.0          # Core testing framework
+pytest-cov==6.2.1      # Code coverage reporting
+pytest-watch==4.2.0    # Auto-run tests on file changes
+freezegun==1.5.2       # Mock datetime for consistent time-based tests
