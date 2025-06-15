@@ -135,12 +135,16 @@ def assert_datetime_recent(dt, seconds=5):
         seconds: Maximum age in seconds (default: 5)
     """
     if isinstance(dt, str):
-        # Parse string timestamps
-        dt = datetime.fromisoformat(dt.replace('Z', '+00:00'))
+        # Parse string timestamps without timezone conversion for SQLite consistency
+        dt = datetime.fromisoformat(dt.replace('Z', ''))
 
-    time_diff = datetime.now() - dt
-    assert time_diff.total_seconds() < seconds, \
-        f"Datetime {dt} is not recent (more than {seconds} seconds old)"
+    # Use UTC time for consistency since SQLite CURRENT_TIMESTAMP is UTC
+    from datetime import timezone
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+
+    time_diff = abs((now - dt).total_seconds())
+    assert time_diff < seconds, \
+        f"Datetime {dt} is not recent (difference: {time_diff} seconds, limit: {seconds})"
 
 
 def count_db_rows(table_name, test_db_path):
