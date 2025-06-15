@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS target (
 );
 
 -- Buy/Sell transactions
-CREATE TABLE IF NOT EXISTS transaction (
+CREATE TABLE IF NOT EXISTS stock_transaction (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     portfolio_id INTEGER NOT NULL,
     stock_id INTEGER NOT NULL,
@@ -80,37 +80,37 @@ CREATE TABLE IF NOT EXISTS journal_entry (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (stock_id) REFERENCES stock(id),
     FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
-    FOREIGN KEY (transaction_id) REFERENCES transaction(id)
+    FOREIGN KEY (transaction_id) REFERENCES stock_transaction(id)
 );
 
 -- Indexes for performance
-CREATE INDEX idx_transaction_portfolio ON transaction(portfolio_id);
-CREATE INDEX idx_transaction_stock ON transaction(stock_id);
-CREATE INDEX idx_transaction_date ON transaction(transaction_date);
-CREATE INDEX idx_stock_target_status ON stock_target(status);
-CREATE INDEX idx_portfolio_balance_date ON portfolio_balance(balance_date);
-CREATE INDEX idx_journal_entry_date ON journal_entry(entry_date);
+CREATE INDEX IF NOT EXISTS idx_transaction_portfolio ON stock_transaction(portfolio_id);
+CREATE INDEX IF NOT EXISTS idx_transaction_stock ON stock_transaction(stock_id);
+CREATE INDEX IF NOT EXISTS idx_transaction_date ON stock_transaction(transaction_date);
+CREATE INDEX IF NOT EXISTS idx_target_status ON target(status);
+CREATE INDEX IF NOT EXISTS idx_portfolio_balance_date ON portfolio_balance(balance_date);
+CREATE INDEX IF NOT EXISTS idx_journal_entry_date ON journal_entry(entry_date);
 
 -- Trigger to update timestamps
-CREATE TRIGGER update_stock_timestamp
+CREATE TRIGGER IF NOT EXISTS update_stock_timestamp
 AFTER UPDATE ON stock
 BEGIN
     UPDATE stock SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
 
-CREATE TRIGGER update_portfolio_timestamp
+CREATE TRIGGER IF NOT EXISTS update_portfolio_timestamp
 AFTER UPDATE ON portfolio
 BEGIN
     UPDATE portfolio SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
 
-CREATE TRIGGER update_stock_target_timestamp
-AFTER UPDATE ON stock_target
+CREATE TRIGGER IF NOT EXISTS update_target_timestamp
+AFTER UPDATE ON target
 BEGIN
-    UPDATE stock_target SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+    UPDATE target SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
 END;
 
-CREATE TRIGGER update_journal_entry_timestamp
+CREATE TRIGGER IF NOT EXISTS update_journal_entry_timestamp
 AFTER UPDATE ON journal_entry
 BEGIN
     UPDATE journal_entry SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;

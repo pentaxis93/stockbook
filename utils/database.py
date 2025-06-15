@@ -39,10 +39,7 @@ def init_database():
     with open(SCHEMA_PATH, 'r') as f:
         schema = f.read()
 
-    # Fix the schema index reference
-    schema = schema.replace('CREATE INDEX idx_stock_target_status ON stock_target(status);',
-                            'CREATE INDEX idx_target_status ON target(status);')
-
+    # Execute the schema to create all tables, indexes, and triggers
     with get_db_connection() as conn:
         conn.executescript(schema)
         conn.commit()
@@ -150,7 +147,7 @@ class PortfolioDB:
 
 
 # Transaction operations
-class TransactionDB:
+class StockTransactionDB:
     @staticmethod
     def create(portfolio_id: int, stock_id: int, transaction_type: str,
                quantity: int, price: float, transaction_date: date,
@@ -158,7 +155,7 @@ class TransactionDB:
         """Create a new transaction."""
         with get_db_connection() as conn:
             cursor = conn.execute(
-                """INSERT INTO transaction (portfolio_id, stock_id, type,
+                """INSERT INTO stock_transaction (portfolio_id, stock_id, type,
                    quantity, price, transaction_date, notes)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 (portfolio_id, stock_id, transaction_type, quantity, price,
@@ -176,7 +173,7 @@ class TransactionDB:
         with get_db_connection() as conn:
             rows = conn.execute(
                 """SELECT t.*, s.symbol, s.name as stock_name
-                   FROM transaction t
+                   FROM stock_transaction t
                    JOIN stock s ON t.stock_id = s.id
                    WHERE t.portfolio_id = ?
                    ORDER BY t.transaction_date DESC""",
@@ -198,7 +195,7 @@ class TransactionDB:
                              WHEN t.type = 'sell' THEN -t.quantity END) as shares,
                     SUM(CASE WHEN t.type = 'buy' THEN t.quantity * t.price
                              WHEN t.type = 'sell' THEN -(t.quantity * t.price) END) as cost_basis
-                   FROM transaction t
+                   FROM stock_transaction t
                    JOIN stock s ON t.stock_id = s.id
                    WHERE t.portfolio_id = ?
                    GROUP BY s.id

@@ -19,11 +19,12 @@ def test_pytest_is_working():
 def test_imports_work():
     """Verify we can import project modules."""
     # These imports should work thanks to the path setup in conftest.py
-    from utils.database import StockDB, PortfolioDB
+    from utils.database import StockDB, PortfolioDB, StockTransactionDB
 
     # If we get here without ImportError, our imports are configured correctly
     assert StockDB is not None
     assert PortfolioDB is not None
+    assert StockTransactionDB is not None
 
 
 def test_test_database_fixture(test_db):
