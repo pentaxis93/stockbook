@@ -10,19 +10,25 @@ from typing import List, Optional, Dict, Any
 from datetime import date
 from decimal import Decimal
 
-from models import Stock, Portfolio, Transaction, Target, PortfolioBalance, JournalEntry
+# Import domain entities and value objects
+from domain.entities.stock_entity import StockEntity
+from domain.value_objects.stock_symbol import StockSymbol
+
+# Note: Other domain entities (Portfolio, Transaction, etc.) will be added in future commits
+# For now, we'll use the old models for non-Stock entities as placeholders
+from models import Portfolio, Transaction, Target, PortfolioBalance, JournalEntry
 
 
 class IStockRepository(ABC):
     """Abstract interface for stock data operations."""
     
     @abstractmethod
-    def create(self, stock: Stock) -> int:
+    def create(self, stock: StockEntity) -> int:
         """
         Create a new stock record.
         
         Args:
-            stock: Stock domain model
+            stock: StockEntity domain model
             
         Returns:
             ID of the created stock
@@ -34,7 +40,7 @@ class IStockRepository(ABC):
         pass
     
     @abstractmethod
-    def get_by_id(self, stock_id: int) -> Optional[Stock]:
+    def get_by_id(self, stock_id: int) -> Optional[StockEntity]:
         """
         Retrieve stock by ID.
         
@@ -42,41 +48,41 @@ class IStockRepository(ABC):
             stock_id: Stock identifier
             
         Returns:
-            Stock domain model or None if not found
+            StockEntity domain model or None if not found
         """
         pass
     
     @abstractmethod
-    def get_by_symbol(self, symbol: str) -> Optional[Stock]:
+    def get_by_symbol(self, symbol: StockSymbol) -> Optional[StockEntity]:
         """
         Retrieve stock by symbol.
         
         Args:
-            symbol: Stock symbol (e.g., 'AAPL')
+            symbol: Stock symbol value object
             
         Returns:
-            Stock domain model or None if not found
+            StockEntity domain model or None if not found
         """
         pass
     
     @abstractmethod
-    def get_all(self) -> List[Stock]:
+    def get_all(self) -> List[StockEntity]:
         """
         Retrieve all stocks.
         
         Returns:
-            List of Stock domain models
+            List of StockEntity domain models
         """
         pass
     
     @abstractmethod
-    def update(self, stock_id: int, stock: Stock) -> bool:
+    def update(self, stock_id: int, stock: StockEntity) -> bool:
         """
         Update existing stock.
         
         Args:
             stock_id: Stock identifier
-            stock: Updated stock domain model
+            stock: Updated StockEntity domain model
             
         Returns:
             True if update successful, False otherwise
@@ -105,12 +111,12 @@ class IStockRepository(ABC):
         pass
     
     @abstractmethod
-    def exists_by_symbol(self, symbol: str) -> bool:
+    def exists_by_symbol(self, symbol: StockSymbol) -> bool:
         """
         Check if stock exists by symbol.
         
         Args:
-            symbol: Stock symbol to check
+            symbol: Stock symbol value object to check
             
         Returns:
             True if stock exists, False otherwise
