@@ -10,6 +10,10 @@ from datetime import datetime, date
 from contextlib import contextmanager
 import logging
 
+# Configure SQLite to handle dates properly in Python 3.12+
+sqlite3.register_adapter(date, lambda d: d.isoformat())
+sqlite3.register_converter("DATE", lambda s: date.fromisoformat(s.decode()))
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,6 +28,10 @@ def get_db_connection():
     """Context manager for database connections."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row  # Enable column access by name
+
+    # Enable foreign key constraints - SQLite doesn't enforce them by default
+    conn.execute("PRAGMA foreign_keys = ON")
+
     try:
         yield conn
     finally:
