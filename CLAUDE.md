@@ -1,0 +1,6 @@
+- Always use the TDD approach when possible.
+  - Write tests first to define the expected behavior.
+  - The tests should fail. At this point, simply allow the tests to fail, rather than skipping them or commenting them out.
+  - Implement the code to make the tests pass.
+  - Refactor the code to make it more readable.
+- When writing git commit messages, omit all references to authorship, and especially omit references to Claude.
