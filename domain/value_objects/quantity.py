@@ -21,6 +21,9 @@ class Quantity:
     # Maximum allowed quantity (1 million shares)
     MAX_QUANTITY = 1_000_000
     
+    # Private attributes for type checking
+    _value: int
+    
     def __init__(self, value: Union[int, str]):
         """
         Initialize Quantity with validation.

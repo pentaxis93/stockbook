@@ -23,6 +23,9 @@ class StockSymbol:
     # Validation pattern: 1-5 uppercase letters only
     SYMBOL_PATTERN = re.compile(r'^[A-Z]{1,5}$')
     
+    # Private attributes for type checking
+    _value: str
+    
     def __init__(self, symbol: str):
         """
         Initialize StockSymbol with validation and normalization.

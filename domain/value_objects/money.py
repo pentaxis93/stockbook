@@ -21,6 +21,10 @@ class Money:
     # Valid currency codes (simplified set for now)
     VALID_CURRENCIES = {"USD", "CAD", "EUR", "GBP", "JPY"}
     
+    # Private attributes for type checking
+    _amount: Decimal
+    _currency: str
+    
     def __init__(self, amount: Union[Decimal, str, int, float], currency: str):
         """
         Initialize Money with amount and currency.
