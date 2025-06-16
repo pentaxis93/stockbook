@@ -5,19 +5,28 @@ Provides type-safe data models with validation for all entities
 
 from datetime import date, datetime
 from decimal import Decimal
-from typing import Optional, Literal
+from typing import Optional, Literal, get_args
 from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
 import re
+from config import config
 
 
 class Stock(BaseModel):
     """Stock model with symbol validation and grade constraints"""
     
-    symbol: str = Field(..., min_length=1, max_length=5, description="Stock symbol (1-5 uppercase letters)")
+    symbol: str = Field(..., min_length=1, max_length=config.stock_symbol_max_length, description="Stock symbol")
     name: str = Field(..., min_length=1, max_length=200, description="Company name")
     industry_group: Optional[str] = Field(None, max_length=100, description="Industry classification")
-    grade: Optional[Literal["A", "B", "C"]] = Field(None, description="Stock grade (A/B/C)")
+    grade: Optional[str] = Field(None, description="Stock grade")
     notes: Optional[str] = Field(None, max_length=1000, description="Additional notes")
+    
+    @field_validator('grade')
+    @classmethod
+    def validate_grade(cls, v):
+        """Validate stock grade against configured options"""
+        if v is not None and v not in config.valid_grades:
+            raise ValueError(f'Grade must be one of {config.valid_grades}')
+        return v
     
     @field_validator('symbol')
     @classmethod
@@ -26,8 +35,8 @@ class Stock(BaseModel):
         if not v:
             raise ValueError('Symbol cannot be empty')
         
-        # Check if symbol contains only uppercase letters
-        if not re.match(r'^[A-Z]{1,5}$', v):
+        # Check if symbol matches configured pattern
+        if not re.match(config.stock_symbol_pattern, v):
             raise ValueError('Symbol must be 1-5 uppercase letters only')
         
         return v
@@ -56,9 +65,9 @@ class Stock(BaseModel):
 class Portfolio(BaseModel):
     """Portfolio model with name validation and risk percentage limits"""
     
-    name: str = Field(..., min_length=1, max_length=100, description="Portfolio name")
-    max_positions: int = Field(10, ge=1, le=100, description="Maximum number of positions")
-    max_risk_per_trade: float = Field(2.0, ge=0.1, le=25.0, description="Maximum risk percentage per trade")
+    name: str = Field(..., min_length=1, max_length=config.portfolio_name_max_length, description="Portfolio name")
+    max_positions: int = Field(config.portfolio_defaults['max_positions'], ge=1, le=100, description="Maximum number of positions")
+    max_risk_per_trade: float = Field(config.portfolio_defaults['max_risk_per_trade'], ge=0.1, le=config.max_risk_per_trade_limit, description="Maximum risk percentage per trade")
     is_active: bool = Field(True, description="Whether portfolio is active")
     
     @field_validator('name')
@@ -86,11 +95,19 @@ class Transaction(BaseModel):
     
     portfolio_id: int = Field(..., ge=1, description="Portfolio ID")
     stock_id: int = Field(..., ge=1, description="Stock ID")
-    type: Literal["buy", "sell"] = Field(..., description="Transaction type")
-    quantity: int = Field(..., ge=1, description="Number of shares")
-    price: Decimal = Field(..., gt=0, decimal_places=2, description="Price per share")
+    type: str = Field(..., description="Transaction type")
+    quantity: int = Field(..., ge=config.min_quantity, description="Number of shares")
+    price: Decimal = Field(..., ge=config.min_price, decimal_places=config.decimal_places, description="Price per share")
     transaction_date: date = Field(..., description="Transaction date")
     notes: Optional[str] = Field(None, max_length=500, description="Transaction notes")
+    
+    @field_validator('type')
+    @classmethod
+    def validate_type(cls, v):
+        """Validate transaction type against configured options"""
+        if v not in config.valid_transaction_types:
+            raise ValueError(f'Transaction type must be one of {config.valid_transaction_types}')
+        return v
     
     @field_validator('transaction_date')
     @classmethod

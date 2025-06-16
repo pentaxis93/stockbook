@@ -6,14 +6,10 @@ Main Streamlit application entry point
 import streamlit as st
 import pandas as pd
 from datetime import datetime
+from config import config
 
-# Page configuration
-st.set_page_config(
-    page_title="StockBook",
-    page_icon="📈",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# Page configuration from centralized config
+st.set_page_config(**config.streamlit_config)
 
 # Initialize session state
 if 'initialized' not in st.session_state:

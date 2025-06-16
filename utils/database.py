@@ -9,6 +9,7 @@ from typing import List, Dict, Optional, Any
 from datetime import datetime, date
 from contextlib import contextmanager
 import logging
+from config import config
 
 # Configure SQLite to handle dates properly in Python 3.12+
 sqlite3.register_adapter(date, lambda d: d.isoformat())
@@ -18,15 +19,15 @@ sqlite3.register_converter("DATE", lambda s: date.fromisoformat(s.decode()))
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Database configuration
-DB_PATH = Path("database/stockbook.db")
-SCHEMA_PATH = Path("database/schema.sql")
+# Database paths from centralized config
+DB_PATH = config.db_path
+SCHEMA_PATH = config.schema_path
 
 
 @contextmanager
 def get_db_connection():
     """Context manager for database connections."""
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=config.db_connection_timeout)
     conn.row_factory = sqlite3.Row  # Enable column access by name
 
     # Enable foreign key constraints - SQLite doesn't enforce them by default
@@ -41,7 +42,7 @@ def get_db_connection():
 def init_database():
     """Initialize database with schema."""
     # Create database directory if it doesn't exist
-    DB_PATH.parent.mkdir(exist_ok=True)
+    config.ensure_directories()
 
     # Read schema file
     with open(SCHEMA_PATH, 'r') as f:
@@ -120,9 +121,15 @@ class StockDB:
 # Portfolio operations
 class PortfolioDB:
     @staticmethod
-    def create(name: str, max_positions: int = 10,
-               max_risk_per_trade: float = 2.0) -> int:
+    def create(name: str, max_positions: int = None,
+               max_risk_per_trade: float = None) -> int:
         """Create a new portfolio."""
+        # Use config defaults if not provided
+        if max_positions is None:
+            max_positions = config.portfolio_defaults['max_positions']
+        if max_risk_per_trade is None:
+            max_risk_per_trade = config.portfolio_defaults['max_risk_per_trade']
+            
         with get_db_connection() as conn:
             cursor = conn.execute(
                 """INSERT INTO portfolio (name, max_positions, max_risk_per_trade)

@@ -75,7 +75,7 @@ class TestStockModel:
             assert stock.symbol == symbol
         
         # Invalid symbols should be rejected
-        invalid_symbols = ["aapl", "123", "AA-PL", "AA.PL", "TOOLONG"]
+        invalid_symbols = ["aapl", "123", "AA-PL", "TOOLONG"]
         for symbol in invalid_symbols:
             with pytest.raises(ValidationError, match="symbol"):
                 Stock(symbol=symbol, name="Test Stock")

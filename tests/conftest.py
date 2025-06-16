@@ -12,6 +12,7 @@ import sqlite3
 from pathlib import Path
 import sys
 from datetime import datetime
+from config import config
 
 # Add the project root to Python path so we can import our modules
 # This allows tests to import from 'utils' and other project packages
@@ -42,6 +43,9 @@ def test_db():
 
     # Point the database module to our test database
     utils.database.DB_PATH = test_db_path
+    # Also update the config for consistency
+    original_config_path = config.db_path
+    config.db_path = test_db_path
 
     # Initialize the test database with the schema
     init_database()
@@ -52,6 +56,7 @@ def test_db():
     # Cleanup: This runs after the test completes
     # Restore the original database path
     utils.database.DB_PATH = original_path
+    config.db_path = original_config_path
 
     # Delete the temporary test database
     if test_db_path.exists():
