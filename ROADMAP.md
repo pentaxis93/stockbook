@@ -30,17 +30,17 @@ This roadmap outlines the structured development approach for StockBook, priorit
 **Problem**: Currently using raw dictionaries for data handling
 **Goal**: Type-safe data models with validation
 
-- [ ] Create Pydantic models for all entities:
+- [x] Create Pydantic models for all entities:
   - `Stock` - Symbol validation, grade constraints
   - `Portfolio` - Name validation, risk percentage limits
   - `Transaction` - Price/quantity validation, date handling
   - `Target` - Price relationship validation (pivot vs failure)
   - `PortfolioBalance` - Balance validation, date constraints
   - `JournalEntry` - Content validation, optional relationships
-- [ ] Add data validation methods (stock symbol format, date ranges)
-- [ ] Implement type conversion utilities
-- [ ] Create model factories for database row conversion
-- [ ] Add comprehensive validation error messages
+- [x] Add data validation methods (stock symbol format, date ranges)
+- [x] Implement type conversion utilities
+- [x] Create model factories for database row conversion
+- [x] Add comprehensive validation error messages
 
 ### 1.2 Configuration Management
 **Problem**: Hardcoded paths and constants scattered throughout code
