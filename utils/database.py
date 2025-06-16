@@ -121,8 +121,8 @@ class StockDB:
 # Portfolio operations
 class PortfolioDB:
     @staticmethod
-    def create(name: str, max_positions: int = None,
-               max_risk_per_trade: float = None) -> int:
+    def create(name: str, max_positions: Optional[int] = None,
+               max_risk_per_trade: Optional[float] = None) -> int:
         """Create a new portfolio."""
         # Use config defaults if not provided
         if max_positions is None:
