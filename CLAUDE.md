@@ -4,3 +4,4 @@
   - Implement the code to make the tests pass.
   - Refactor the code to make it more readable.
 - When writing git commit messages, omit all references to authorship, and especially omit references to Claude.
+- Always update the ROADMAP.md and README.md files in the project root with the latest changes.
