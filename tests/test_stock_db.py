@@ -263,8 +263,8 @@ class TestStockDB:
         # Initially, created_at and updated_at should be the same
         assert created == updated
 
-        # Wait a moment then update
-        time.sleep(0.1)
+        # Wait a moment then update (need enough time for timestamp precision)
+        time.sleep(1.1)
         StockDB.update(stock_id, notes="Updated notes")
 
         # Check timestamps again
