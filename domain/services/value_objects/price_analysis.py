@@ -16,6 +16,7 @@ from domain.value_objects.stock_symbol import StockSymbol
 
 class TrendDirection(Enum):
     """Price trend direction enumeration."""
+
     UPWARD = "upward"
     DOWNWARD = "downward"
     SIDEWAYS = "sideways"
@@ -23,6 +24,7 @@ class TrendDirection(Enum):
 
 class AlertType(Enum):
     """Price alert type enumeration."""
+
     PRICE_THRESHOLD = "price_threshold"
     PERCENTAGE_CHANGE = "percentage_change"
     HIGH_VOLATILITY = "high_volatility"
@@ -32,22 +34,24 @@ class AlertType(Enum):
 @dataclass(frozen=True)
 class PriceTrend:
     """Represents price trend analysis."""
-    
+
     direction: TrendDirection
     strength: Decimal  # 0-1 scale
     duration_days: int
     confidence_level: Decimal  # 0-1 scale
-    
+
     @property
     def is_strong_trend(self) -> bool:
         """Check if trend is considered strong."""
-        return self.strength >= Decimal('0.7') and self.confidence_level >= Decimal('0.8')
+        return self.strength >= Decimal("0.7") and self.confidence_level >= Decimal(
+            "0.8"
+        )
 
 
 @dataclass(frozen=True)
 class PriceAlert:
     """Represents a price-related alert."""
-    
+
     symbol: StockSymbol
     alert_type: AlertType
     message: str
@@ -55,16 +59,16 @@ class PriceAlert:
     trigger_value: Optional[Money] = None
     timestamp: Optional[datetime] = None
     severity: str = "medium"  # low, medium, high
-    
+
     def __post_init__(self):
         if self.timestamp is None:
-            object.__setattr__(self, 'timestamp', datetime.now())
+            object.__setattr__(self, "timestamp", datetime.now())
 
 
 @dataclass(frozen=True)
 class PriceAnalysis:
     """Comprehensive price analysis results."""
-    
+
     symbol: StockSymbol
     current_price: Money
     trend_analysis: PriceTrend
@@ -73,15 +77,15 @@ class PriceAnalysis:
     volatility_score: Decimal  # 0-1 scale
     momentum_indicators: Dict[str, Decimal]
     alerts: List[PriceAlert]
-    
+
     @property
     def is_overbought(self) -> bool:
         """Check if stock appears overbought."""
-        rsi = self.momentum_indicators.get('rsi', Decimal('50'))
-        return rsi >= Decimal('70')
-    
+        rsi = self.momentum_indicators.get("rsi", Decimal("50"))
+        return rsi >= Decimal("70")
+
     @property
     def is_oversold(self) -> bool:
         """Check if stock appears oversold."""
-        rsi = self.momentum_indicators.get('rsi', Decimal('50'))
-        return rsi <= Decimal('30')
+        rsi = self.momentum_indicators.get("rsi", Decimal("50"))
+        return rsi <= Decimal("30")

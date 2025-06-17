@@ -7,4 +7,4 @@ handling patterns across all domains.
 
 from .base import DomainEvent
 
-__all__ = ['DomainEvent']
+__all__ = ["DomainEvent"]

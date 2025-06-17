@@ -11,14 +11,14 @@ from .domain_exceptions import (
     BusinessRuleViolationError,
     CalculationError,
     InsufficientDataError,
-    AnalysisError
+    AnalysisError,
 )
 
 __all__ = [
-    'DomainServiceError',
-    'ValidationError', 
-    'BusinessRuleViolationError',
-    'CalculationError',
-    'InsufficientDataError',
-    'AnalysisError'
+    "DomainServiceError",
+    "ValidationError",
+    "BusinessRuleViolationError",
+    "CalculationError",
+    "InsufficientDataError",
+    "AnalysisError",
 ]

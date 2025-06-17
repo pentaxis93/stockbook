@@ -8,4 +8,4 @@ building blocks for any financial or business domain.
 from .money import Money
 from .quantity import Quantity
 
-__all__ = ['Money', 'Quantity']
+__all__ = ["Money", "Quantity"]

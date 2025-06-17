@@ -32,7 +32,7 @@ def test_db():
         Path: Path to the temporary database file
     """
     # Create a temporary file for the test database
-    with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as f:
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         test_db_path = Path(f.name)
 
     # Import here to avoid circular imports
@@ -72,27 +72,27 @@ def sample_stock_data():
     to create consistent test data across different tests.
     """
     return {
-        'AAPL': {
-            'symbol': 'AAPL',
-            'name': 'Apple Inc.',
-            'industry_group': 'Technology',
-            'grade': 'A',
-            'notes': 'Strong fundamentals, market leader'
+        "AAPL": {
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+            "industry_group": "Technology",
+            "grade": "A",
+            "notes": "Strong fundamentals, market leader",
         },
-        'MSFT': {
-            'symbol': 'MSFT',
-            'name': 'Microsoft Corporation',
-            'industry_group': 'Technology',
-            'grade': 'A',
-            'notes': 'Cloud growth, stable earnings'
+        "MSFT": {
+            "symbol": "MSFT",
+            "name": "Microsoft Corporation",
+            "industry_group": "Technology",
+            "grade": "A",
+            "notes": "Cloud growth, stable earnings",
         },
-        'JPM': {
-            'symbol': 'JPM',
-            'name': 'JPMorgan Chase & Co.',
-            'industry_group': 'Financials',
-            'grade': 'B',
-            'notes': 'Leading bank, interest rate sensitive'
-        }
+        "JPM": {
+            "symbol": "JPM",
+            "name": "JPMorgan Chase & Co.",
+            "industry_group": "Financials",
+            "grade": "B",
+            "notes": "Leading bank, interest rate sensitive",
+        },
     }
 
 
@@ -114,16 +114,14 @@ def sample_portfolio(test_db):
     from utils.database import PortfolioDB
 
     portfolio_id = PortfolioDB.create(
-        name="Test Portfolio",
-        max_positions=10,
-        max_risk_per_trade=2.0
+        name="Test Portfolio", max_positions=10, max_risk_per_trade=2.0
     )
 
     return {
-        'id': portfolio_id,
-        'name': 'Test Portfolio',
-        'max_positions': 10,
-        'max_risk_per_trade': 2.0
+        "id": portfolio_id,
+        "name": "Test Portfolio",
+        "max_positions": 10,
+        "max_risk_per_trade": 2.0,
     }
 
 
@@ -141,15 +139,17 @@ def assert_datetime_recent(dt, seconds=5):
     """
     if isinstance(dt, str):
         # Parse string timestamps without timezone conversion for SQLite consistency
-        dt = datetime.fromisoformat(dt.replace('Z', ''))
+        dt = datetime.fromisoformat(dt.replace("Z", ""))
 
     # Use UTC time for consistency since SQLite CURRENT_TIMESTAMP is UTC
     from datetime import timezone
+
     now = datetime.now(timezone.utc).replace(tzinfo=None)
 
     time_diff = abs((now - dt).total_seconds())
-    assert time_diff < seconds, \
-        f"Datetime {dt} is not recent (difference: {time_diff} seconds, limit: {seconds})"
+    assert (
+        time_diff < seconds
+    ), f"Datetime {dt} is not recent (difference: {time_diff} seconds, limit: {seconds})"
 
 
 def count_db_rows(table_name, test_db_path):

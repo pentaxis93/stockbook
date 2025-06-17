@@ -10,8 +10,11 @@ to specific stocks, portfolios, or transactions.
 import pytest
 from datetime import date, timedelta
 from utils.database import (
-    JournalDB, StockDB, PortfolioDB, StockTransactionDB,
-    get_db_connection
+    JournalDB,
+    StockDB,
+    PortfolioDB,
+    StockTransactionDB,
+    get_db_connection,
 )
 
 
@@ -27,32 +30,25 @@ class TestJournalDB:
         demonstrating the flexible relationship model.
         """
         # Create a stock
-        stock_id = StockDB.create(
-            symbol="AAPL",
-            name="Apple Inc.",
-            grade="A"
-        )
+        stock_id = StockDB.create(symbol="AAPL", name="Apple Inc.", grade="A")
 
         # Create a portfolio
-        portfolio_id = PortfolioDB.create(
-            name="Main Portfolio",
-            max_positions=10
-        )
+        portfolio_id = PortfolioDB.create(name="Main Portfolio", max_positions=10)
 
         # Create a transaction
         transaction_id = StockTransactionDB.create(
             portfolio_id=portfolio_id,
             stock_id=stock_id,
-            transaction_type='buy',
+            transaction_type="buy",
             quantity=100,
             price=150.00,
-            transaction_date=date.today()
+            transaction_date=date.today(),
         )
 
         return {
-            'stock_id': stock_id,
-            'portfolio_id': portfolio_id,
-            'transaction_id': transaction_id
+            "stock_id": stock_id,
+            "portfolio_id": portfolio_id,
+            "transaction_id": transaction_id,
         }
 
     def test_create_general_entry(self, test_db):
@@ -65,7 +61,7 @@ class TestJournalDB:
         entry_date = date.today()
         entry_id = JournalDB.create(
             entry_date=entry_date,
-            content="Market showing signs of sector rotation. Tech weakening, financials strengthening."
+            content="Market showing signs of sector rotation. Tech weakening, financials strengthening.",
         )
 
         assert isinstance(entry_id, int)
@@ -76,13 +72,16 @@ class TestJournalDB:
         assert len(entries) == 1
 
         entry = entries[0]
-        assert entry['content'] == "Market showing signs of sector rotation. Tech weakening, financials strengthening."
-        assert entry['stock_id'] is None
-        assert entry['portfolio_id'] is None
-        assert entry['transaction_id'] is None
+        assert (
+            entry["content"]
+            == "Market showing signs of sector rotation. Tech weakening, financials strengthening."
+        )
+        assert entry["stock_id"] is None
+        assert entry["portfolio_id"] is None
+        assert entry["transaction_id"] is None
         # The LEFT JOINs should result in None for symbol and portfolio_name
-        assert entry['symbol'] is None
-        assert entry['portfolio_name'] is None
+        assert entry["symbol"] is None
+        assert entry["portfolio_name"] is None
 
     def test_create_stock_specific_entry(self, test_db, setup_related_data):
         """
@@ -96,17 +95,17 @@ class TestJournalDB:
         entry_id = JournalDB.create(
             entry_date=date.today(),
             content="AAPL breaking out of consolidation pattern. Volume confirming move.",
-            stock_id=data['stock_id']
+            stock_id=data["stock_id"],
         )
 
         # Verify the entry includes stock information
         entries = JournalDB.get_recent_entries(limit=1)
         entry = entries[0]
 
-        assert entry['stock_id'] == data['stock_id']
-        assert entry['symbol'] == 'AAPL'  # Joined from stock table
-        assert entry['portfolio_id'] is None
-        assert entry['transaction_id'] is None
+        assert entry["stock_id"] == data["stock_id"]
+        assert entry["symbol"] == "AAPL"  # Joined from stock table
+        assert entry["portfolio_id"] is None
+        assert entry["transaction_id"] is None
 
     def test_create_transaction_entry(self, test_db, setup_related_data):
         """
@@ -120,20 +119,20 @@ class TestJournalDB:
         entry_id = JournalDB.create(
             entry_date=date.today(),
             content="Bought AAPL on breakout above 150 resistance. Stop loss at 145.",
-            stock_id=data['stock_id'],
-            portfolio_id=data['portfolio_id'],
-            transaction_id=data['transaction_id']
+            stock_id=data["stock_id"],
+            portfolio_id=data["portfolio_id"],
+            transaction_id=data["transaction_id"],
         )
 
         # Verify all relationships are preserved
         entries = JournalDB.get_recent_entries(limit=1)
         entry = entries[0]
 
-        assert entry['stock_id'] == data['stock_id']
-        assert entry['portfolio_id'] == data['portfolio_id']
-        assert entry['transaction_id'] == data['transaction_id']
-        assert entry['symbol'] == 'AAPL'
-        assert entry['portfolio_name'] == 'Main Portfolio'
+        assert entry["stock_id"] == data["stock_id"]
+        assert entry["portfolio_id"] == data["portfolio_id"]
+        assert entry["transaction_id"] == data["transaction_id"]
+        assert entry["symbol"] == "AAPL"
+        assert entry["portfolio_name"] == "Main Portfolio"
 
     def test_get_recent_entries_ordering(self, test_db):
         """
@@ -148,22 +147,17 @@ class TestJournalDB:
             date.today() - timedelta(days=5),
             date.today() - timedelta(days=3),
             date.today() - timedelta(days=1),
-            date.today()
+            date.today(),
         ]
 
         for i, entry_date in enumerate(dates):
-            JournalDB.create(
-                entry_date=entry_date,
-                content=f"Entry for {entry_date}"
-            )
+            JournalDB.create(entry_date=entry_date, content=f"Entry for {entry_date}")
 
         # Also create multiple entries for today to test secondary ordering
         import time
+
         for i in range(3):
-            JournalDB.create(
-                entry_date=date.today(),
-                content=f"Today entry {i+1}"
-            )
+            JournalDB.create(entry_date=date.today(), content=f"Today entry {i+1}")
             # Small delay to ensure different created_at times
             time.sleep(0.01)
 
@@ -174,13 +168,12 @@ class TestJournalDB:
         assert len(entries) == 7
 
         # First 4 should be today's entries in reverse creation order
-        today_entries = [
-            e for e in entries if e['entry_date'] == str(date.today())]
+        today_entries = [e for e in entries if e["entry_date"] == str(date.today())]
         assert len(today_entries) == 4
-        assert today_entries[0]['content'] == "Today entry 3"  # Most recent
-        assert today_entries[1]['content'] == "Today entry 2"
-        assert today_entries[2]['content'] == "Today entry 1"
-        assert today_entries[3]['content'] == f"Entry for {date.today()}"
+        assert today_entries[0]["content"] == "Today entry 3"  # Most recent
+        assert today_entries[1]["content"] == "Today entry 2"
+        assert today_entries[2]["content"] == "Today entry 1"
+        assert today_entries[3]["content"] == f"Entry for {date.today()}"
 
     def test_get_recent_entries_limit(self, test_db):
         """
@@ -192,10 +185,7 @@ class TestJournalDB:
         # Create 30 entries
         for i in range(30):
             entry_date = date.today() - timedelta(days=i)
-            JournalDB.create(
-                entry_date=entry_date,
-                content=f"Entry {i+1}"
-            )
+            JournalDB.create(entry_date=entry_date, content=f"Entry {i+1}")
 
         # Test default limit of 20
         entries = JournalDB.get_recent_entries()
@@ -203,8 +193,7 @@ class TestJournalDB:
 
         # Test custom limits
         assert len(JournalDB.get_recent_entries(limit=5)) == 5
-        assert len(JournalDB.get_recent_entries(
-            limit=50)) == 30  # Only 30 exist
+        assert len(JournalDB.get_recent_entries(limit=50)) == 30  # Only 30 exist
 
     def test_mixed_entry_types(self, test_db, setup_related_data):
         """
@@ -219,30 +208,30 @@ class TestJournalDB:
         # 1. General market observation
         JournalDB.create(
             entry_date=date.today() - timedelta(days=3),
-            content="Fed meeting minutes suggest hawkish stance"
+            content="Fed meeting minutes suggest hawkish stance",
         )
 
         # 2. Stock-specific entry
         JournalDB.create(
             entry_date=date.today() - timedelta(days=2),
             content="AAPL showing relative strength",
-            stock_id=data['stock_id']
+            stock_id=data["stock_id"],
         )
 
         # 3. Portfolio-specific entry
         JournalDB.create(
             entry_date=date.today() - timedelta(days=1),
             content="Portfolio rebalancing completed",
-            portfolio_id=data['portfolio_id']
+            portfolio_id=data["portfolio_id"],
         )
 
         # 4. Full transaction entry
         JournalDB.create(
             entry_date=date.today(),
             content="Executed planned AAPL purchase",
-            stock_id=data['stock_id'],
-            portfolio_id=data['portfolio_id'],
-            transaction_id=data['transaction_id']
+            stock_id=data["stock_id"],
+            portfolio_id=data["portfolio_id"],
+            transaction_id=data["transaction_id"],
         )
 
         # Get all entries
@@ -253,21 +242,21 @@ class TestJournalDB:
 
         # Verify each entry type has appropriate fields
         transaction_entry = entries[0]  # Most recent
-        assert transaction_entry['symbol'] == 'AAPL'
-        assert transaction_entry['portfolio_name'] == 'Main Portfolio'
-        assert transaction_entry['transaction_id'] is not None
+        assert transaction_entry["symbol"] == "AAPL"
+        assert transaction_entry["portfolio_name"] == "Main Portfolio"
+        assert transaction_entry["transaction_id"] is not None
 
         portfolio_entry = entries[1]
-        assert portfolio_entry['symbol'] is None
-        assert portfolio_entry['portfolio_name'] == 'Main Portfolio'
+        assert portfolio_entry["symbol"] is None
+        assert portfolio_entry["portfolio_name"] == "Main Portfolio"
 
         stock_entry = entries[2]
-        assert stock_entry['symbol'] == 'AAPL'
-        assert stock_entry['portfolio_name'] is None
+        assert stock_entry["symbol"] == "AAPL"
+        assert stock_entry["portfolio_name"] is None
 
         general_entry = entries[3]
-        assert general_entry['symbol'] is None
-        assert general_entry['portfolio_name'] is None
+        assert general_entry["symbol"] is None
+        assert general_entry["portfolio_name"] is None
 
     def test_long_content(self, test_db):
         """
@@ -299,13 +288,12 @@ class TestJournalDB:
         """
 
         entry_id = JournalDB.create(
-            entry_date=date.today(),
-            content=long_content.strip()
+            entry_date=date.today(), content=long_content.strip()
         )
 
         # Verify the full content is stored and retrieved
         entries = JournalDB.get_recent_entries(limit=1)
-        assert entries[0]['content'] == long_content.strip()
+        assert entries[0]["content"] == long_content.strip()
 
     def test_entry_date_flexibility(self, test_db):
         """
@@ -319,16 +307,15 @@ class TestJournalDB:
 
         entry_id = JournalDB.create(
             entry_date=past_date,
-            content="Retrospective: This trade worked out well due to proper position sizing."
+            content="Retrospective: This trade worked out well due to proper position sizing.",
         )
 
         # Verify it was created with the correct date
         with get_db_connection() as conn:
             row = conn.execute(
-                "SELECT entry_date FROM journal_entry WHERE id = ?",
-                (entry_id,)
+                "SELECT entry_date FROM journal_entry WHERE id = ?", (entry_id,)
             ).fetchone()
-            assert row['entry_date'] == str(past_date)
+            assert row["entry_date"] == str(past_date)
 
     def test_update_timestamp_trigger(self, test_db):
         """
@@ -341,23 +328,20 @@ class TestJournalDB:
         from datetime import datetime
 
         # Create an entry
-        entry_id = JournalDB.create(
-            entry_date=date.today(),
-            content="Original content"
-        )
+        entry_id = JournalDB.create(entry_date=date.today(), content="Original content")
 
         # Get the initial timestamps
         with get_db_connection() as conn:
             row = conn.execute(
                 "SELECT created_at, updated_at FROM journal_entry WHERE id = ?",
-                (entry_id,)
+                (entry_id,),
             ).fetchone()
 
             # Parse timestamps without timezone conversion for consistency
-            created_at = datetime.fromisoformat(
-                row['created_at'].replace('Z', ''))
+            created_at = datetime.fromisoformat(row["created_at"].replace("Z", ""))
             initial_updated_at = datetime.fromisoformat(
-                row['updated_at'].replace('Z', ''))
+                row["updated_at"].replace("Z", "")
+            )
 
             # Initially, created_at and updated_at should be the same
             assert created_at == initial_updated_at
@@ -367,18 +351,17 @@ class TestJournalDB:
 
             conn.execute(
                 "UPDATE journal_entry SET content = ? WHERE id = ?",
-                ("Updated content", entry_id)
+                ("Updated content", entry_id),
             )
             conn.commit()
 
             # Check updated_at again
             row = conn.execute(
                 "SELECT created_at, updated_at FROM journal_entry WHERE id = ?",
-                (entry_id,)
+                (entry_id,),
             ).fetchone()
 
-            new_updated_at = datetime.fromisoformat(
-                row['updated_at'].replace('Z', ''))
+            new_updated_at = datetime.fromisoformat(row["updated_at"].replace("Z", ""))
 
             # updated_at should be newer than created_at
             assert new_updated_at > created_at

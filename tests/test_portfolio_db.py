@@ -26,10 +26,10 @@ class TestPortfolioDB:
         # Verify defaults were applied
         portfolio = PortfolioDB.get_by_id(portfolio_id)
         assert portfolio is not None
-        assert portfolio['name'] == "My Portfolio"
-        assert portfolio['max_positions'] == 10
-        assert portfolio['max_risk_per_trade'] == 2.0
-        assert portfolio['is_active'] == 1  # SQLite uses 1 for True
+        assert portfolio["name"] == "My Portfolio"
+        assert portfolio["max_positions"] == 10
+        assert portfolio["max_risk_per_trade"] == 2.0
+        assert portfolio["is_active"] == 1  # SQLite uses 1 for True
 
     def test_create_portfolio_custom_values(self, test_db):
         """
@@ -38,16 +38,14 @@ class TestPortfolioDB:
         This verifies we can override the default values.
         """
         portfolio_id = PortfolioDB.create(
-            name="Aggressive Portfolio",
-            max_positions=20,
-            max_risk_per_trade=5.0
+            name="Aggressive Portfolio", max_positions=20, max_risk_per_trade=5.0
         )
 
         portfolio = PortfolioDB.get_by_id(portfolio_id)
         assert portfolio is not None
-        assert portfolio['name'] == "Aggressive Portfolio"
-        assert portfolio['max_positions'] == 20
-        assert portfolio['max_risk_per_trade'] == 5.0
+        assert portfolio["name"] == "Aggressive Portfolio"
+        assert portfolio["max_positions"] == 20
+        assert portfolio["max_risk_per_trade"] == 5.0
 
     def test_get_by_id_not_found(self, test_db):
         """
@@ -76,8 +74,7 @@ class TestPortfolioDB:
         # Deactivate one portfolio
         with get_db_connection() as conn:
             conn.execute(
-                "UPDATE portfolio SET is_active = FALSE WHERE id = ?",
-                (p2_id,)
+                "UPDATE portfolio SET is_active = FALSE WHERE id = ?", (p2_id,)
             )
             conn.commit()
 
@@ -88,11 +85,11 @@ class TestPortfolioDB:
         assert len(active_portfolios) == 2
 
         # Verify they're ordered by name
-        assert active_portfolios[0]['name'] == "Portfolio A"
-        assert active_portfolios[1]['name'] == "Portfolio C"
+        assert active_portfolios[0]["name"] == "Portfolio A"
+        assert active_portfolios[1]["name"] == "Portfolio C"
 
         # Verify the deactivated portfolio is not included
-        portfolio_ids = [p['id'] for p in active_portfolios]
+        portfolio_ids = [p["id"] for p in active_portfolios]
         assert p2_id not in portfolio_ids
 
     def test_multiple_portfolios_allowed(self, test_db):
@@ -117,14 +114,11 @@ class TestPortfolioDB:
 
         The schema defines DECIMAL(3,1) which allows values like 2.5, 10.0.
         """
-        portfolio_id = PortfolioDB.create(
-            name="Test Portfolio",
-            max_risk_per_trade=2.5
-        )
+        portfolio_id = PortfolioDB.create(name="Test Portfolio", max_risk_per_trade=2.5)
 
         portfolio = PortfolioDB.get_by_id(portfolio_id)
         assert portfolio is not None
-        assert portfolio['max_risk_per_trade'] == 2.5
+        assert portfolio["max_risk_per_trade"] == 2.5
 
     def test_portfolio_timestamps(self, test_db):
         """
@@ -139,13 +133,12 @@ class TestPortfolioDB:
         # Check timestamps
         portfolio = PortfolioDB.get_by_id(portfolio_id)
         assert portfolio is not None
-        assert portfolio['created_at'] is not None
-        assert portfolio['updated_at'] is not None
+        assert portfolio["created_at"] is not None
+        assert portfolio["updated_at"] is not None
 
         # Verify timestamps are recent
-        created = datetime.fromisoformat(
-            portfolio['created_at'].replace('Z', '+00:00'))
-        assert_datetime_recent(portfolio['created_at'])
+        created = datetime.fromisoformat(portfolio["created_at"].replace("Z", "+00:00"))
+        assert_datetime_recent(portfolio["created_at"])
 
     def test_create_portfolio_with_invalid_risk(self, test_db):
         """
@@ -154,19 +147,13 @@ class TestPortfolioDB:
         DECIMAL(3,1) means max value is 99.9.
         """
         # This should work - within range
-        portfolio_id = PortfolioDB.create(
-            name="High Risk",
-            max_risk_per_trade=99.9
-        )
+        portfolio_id = PortfolioDB.create(name="High Risk", max_risk_per_trade=99.9)
         assert portfolio_id > 0
 
         # Values over 99.9 might be truncated or cause error depending on SQLite mode
         # Let's verify reasonable values work
         for risk in [0.5, 1.0, 2.0, 5.0, 10.0]:
-            pid = PortfolioDB.create(
-                name=f"Portfolio {risk}",
-                max_risk_per_trade=risk
-            )
+            pid = PortfolioDB.create(name=f"Portfolio {risk}", max_risk_per_trade=risk)
             portfolio = PortfolioDB.get_by_id(pid)
             assert portfolio is not None
-            assert portfolio['max_risk_per_trade'] == risk
+            assert portfolio["max_risk_per_trade"] == risk

@@ -7,6 +7,7 @@ entity or value object but represents important business concepts and processes.
 
 from .stock_validation_service import StockValidationService
 from .portfolio_calculation_service import PortfolioCalculationService
+
 # from .stock_pricing_service import StockPricingService
 # from .diversification_analysis_service import DiversificationAnalysisService
 # from .risk_assessment_service import RiskAssessmentService
@@ -17,20 +18,20 @@ from .exceptions import (
     CalculationError,
     InsufficientDataError,
     PricingError,
-    RiskAnalysisError
+    RiskAnalysisError,
 )
 
 __all__ = [
-    'StockValidationService',
-    'PortfolioCalculationService', 
+    "StockValidationService",
+    "PortfolioCalculationService",
     # 'StockPricingService',
     # 'DiversificationAnalysisService',
     # 'RiskAssessmentService',
-    'DomainServiceError',
-    'ValidationError',
-    'BusinessRuleViolationError',
-    'CalculationError',
-    'InsufficientDataError',
-    'PricingError',
-    'RiskAnalysisError'
+    "DomainServiceError",
+    "ValidationError",
+    "BusinessRuleViolationError",
+    "CalculationError",
+    "InsufficientDataError",
+    "PricingError",
+    "RiskAnalysisError",
 ]

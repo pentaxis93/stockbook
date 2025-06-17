@@ -51,14 +51,14 @@ def test_test_database_fixture(test_db):
 def test_sample_data_fixtures(sample_stock_data, sample_portfolio):
     """Verify our sample data fixtures are working."""
     # Check sample_stock_data structure
-    assert 'AAPL' in sample_stock_data
-    assert sample_stock_data['AAPL']['symbol'] == 'AAPL'
-    assert sample_stock_data['AAPL']['name'] == 'Apple Inc.'
+    assert "AAPL" in sample_stock_data
+    assert sample_stock_data["AAPL"]["symbol"] == "AAPL"
+    assert sample_stock_data["AAPL"]["name"] == "Apple Inc."
 
     # Check sample_portfolio structure
-    assert 'id' in sample_portfolio
-    assert sample_portfolio['name'] == 'Test Portfolio'
-    assert sample_portfolio['max_positions'] == 10
+    assert "id" in sample_portfolio
+    assert sample_portfolio["name"] == "Test Portfolio"
+    assert sample_portfolio["max_positions"] == 10
 
 
 @pytest.mark.slow

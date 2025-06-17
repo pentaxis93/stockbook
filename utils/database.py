@@ -45,7 +45,7 @@ def init_database():
     config.ensure_directories()
 
     # Read schema file
-    with open(SCHEMA_PATH, 'r') as f:
+    with open(SCHEMA_PATH, "r") as f:
         schema = f.read()
 
     # Execute the schema to create all tables, indexes, and triggers
@@ -64,14 +64,19 @@ def dict_from_row(row: sqlite3.Row) -> Dict[str, Any]:
 # Stock operations
 class StockDB:
     @staticmethod
-    def create(symbol: str, name: str, industry_group: Optional[str] = None,
-               grade: Optional[str] = None, notes: Optional[str] = None) -> int:
+    def create(
+        symbol: str,
+        name: str,
+        industry_group: Optional[str] = None,
+        grade: Optional[str] = None,
+        notes: Optional[str] = None,
+    ) -> int:
         """Create a new stock record."""
         with get_db_connection() as conn:
             cursor = conn.execute(
                 """INSERT INTO stock (symbol, name, industry_group, grade, notes)
                    VALUES (?, ?, ?, ?, ?)""",
-                (symbol, name, industry_group, grade, notes)
+                (symbol, name, industry_group, grade, notes),
             )
             conn.commit()
             stock_id = cursor.lastrowid
@@ -92,16 +97,14 @@ class StockDB:
     def get_all() -> List[Dict[str, Any]]:
         """Get all stocks."""
         with get_db_connection() as conn:
-            rows = conn.execute(
-                "SELECT * FROM stock ORDER BY symbol").fetchall()
+            rows = conn.execute("SELECT * FROM stock ORDER BY symbol").fetchall()
             return [dict_from_row(row) for row in rows]
 
     @staticmethod
     def update(stock_id: int, **kwargs) -> bool:
         """Update stock fields."""
-        allowed_fields = ['name', 'industry_group', 'grade', 'notes']
-        fields_to_update = {k: v for k,
-                            v in kwargs.items() if k in allowed_fields}
+        allowed_fields = ["name", "industry_group", "grade", "notes"]
+        fields_to_update = {k: v for k, v in kwargs.items() if k in allowed_fields}
 
         if not fields_to_update:
             return False
@@ -110,10 +113,7 @@ class StockDB:
         values = list(fields_to_update.values()) + [stock_id]
 
         with get_db_connection() as conn:
-            conn.execute(
-                f"UPDATE stock SET {set_clause} WHERE id = ?",
-                values
-            )
+            conn.execute(f"UPDATE stock SET {set_clause} WHERE id = ?", values)
             conn.commit()
             return True
 
@@ -121,20 +121,23 @@ class StockDB:
 # Portfolio operations
 class PortfolioDB:
     @staticmethod
-    def create(name: str, max_positions: Optional[int] = None,
-               max_risk_per_trade: Optional[float] = None) -> int:
+    def create(
+        name: str,
+        max_positions: Optional[int] = None,
+        max_risk_per_trade: Optional[float] = None,
+    ) -> int:
         """Create a new portfolio."""
         # Use config defaults if not provided
         if max_positions is None:
-            max_positions = config.portfolio_defaults['max_positions']
+            max_positions = config.portfolio_defaults["max_positions"]
         if max_risk_per_trade is None:
-            max_risk_per_trade = config.portfolio_defaults['max_risk_per_trade']
-            
+            max_risk_per_trade = config.portfolio_defaults["max_risk_per_trade"]
+
         with get_db_connection() as conn:
             cursor = conn.execute(
                 """INSERT INTO portfolio (name, max_positions, max_risk_per_trade)
                    VALUES (?, ?, ?)""",
-                (name, max_positions, max_risk_per_trade)
+                (name, max_positions, max_risk_per_trade),
             )
             conn.commit()
             portfolio_id = cursor.lastrowid
@@ -164,17 +167,30 @@ class PortfolioDB:
 # Transaction operations
 class StockTransactionDB:
     @staticmethod
-    def create(portfolio_id: int, stock_id: int, transaction_type: str,
-               quantity: int, price: float, transaction_date: date,
-               notes: Optional[str] = None) -> int:
+    def create(
+        portfolio_id: int,
+        stock_id: int,
+        transaction_type: str,
+        quantity: int,
+        price: float,
+        transaction_date: date,
+        notes: Optional[str] = None,
+    ) -> int:
         """Create a new transaction."""
         with get_db_connection() as conn:
             cursor = conn.execute(
                 """INSERT INTO stock_transaction (portfolio_id, stock_id, type,
                    quantity, price, transaction_date, notes)
                    VALUES (?, ?, ?, ?, ?, ?, ?)""",
-                (portfolio_id, stock_id, transaction_type, quantity, price,
-                 transaction_date, notes)
+                (
+                    portfolio_id,
+                    stock_id,
+                    transaction_type,
+                    quantity,
+                    price,
+                    transaction_date,
+                    notes,
+                ),
             )
             conn.commit()
             transaction_id = cursor.lastrowid
@@ -192,7 +208,7 @@ class StockTransactionDB:
                    JOIN stock s ON t.stock_id = s.id
                    WHERE t.portfolio_id = ?
                    ORDER BY t.transaction_date DESC""",
-                (portfolio_id,)
+                (portfolio_id,),
             ).fetchall()
             return [dict_from_row(row) for row in rows]
 
@@ -215,7 +231,7 @@ class StockTransactionDB:
                    WHERE t.portfolio_id = ?
                    GROUP BY s.id
                    HAVING shares > 0""",
-                (portfolio_id,)
+                (portfolio_id,),
             ).fetchall()
             return [dict_from_row(row) for row in rows]
 
@@ -223,15 +239,20 @@ class StockTransactionDB:
 # Target operations
 class TargetDB:
     @staticmethod
-    def create(stock_id: int, portfolio_id: int, pivot_price: float,
-               failure_price: float, notes: Optional[str] = None) -> int:
+    def create(
+        stock_id: int,
+        portfolio_id: int,
+        pivot_price: float,
+        failure_price: float,
+        notes: Optional[str] = None,
+    ) -> int:
         """Create a new stock target."""
         with get_db_connection() as conn:
             cursor = conn.execute(
                 """INSERT INTO target (stock_id, portfolio_id,
                    pivot_price, failure_price, notes)
                    VALUES (?, ?, ?, ?, ?)""",
-                (stock_id, portfolio_id, pivot_price, failure_price, notes)
+                (stock_id, portfolio_id, pivot_price, failure_price, notes),
             )
             conn.commit()
             target_id = cursor.lastrowid
@@ -264,8 +285,7 @@ class TargetDB:
         """Update target status."""
         with get_db_connection() as conn:
             conn.execute(
-                "UPDATE target SET status = ? WHERE id = ?",
-                (status, target_id)
+                "UPDATE target SET status = ? WHERE id = ?", (status, target_id)
             )
             conn.commit()
             return True
@@ -274,9 +294,14 @@ class TargetDB:
 # Portfolio Balance operations
 class PortfolioBalanceDB:
     @staticmethod
-    def create(portfolio_id: int, balance_date: date, final_balance: float,
-               withdrawals: float = 0, deposits: float = 0,
-               index_change: Optional[float] = None) -> int:
+    def create(
+        portfolio_id: int,
+        balance_date: date,
+        final_balance: float,
+        withdrawals: float = 0,
+        deposits: float = 0,
+        index_change: Optional[float] = None,
+    ) -> int:
         """Create or update portfolio balance for a date."""
         with get_db_connection() as conn:
             cursor = conn.execute(
@@ -284,8 +309,14 @@ class PortfolioBalanceDB:
                    (portfolio_id, balance_date, withdrawals, deposits,
                     final_balance, index_change)
                    VALUES (?, ?, ?, ?, ?, ?)""",
-                (portfolio_id, balance_date, withdrawals, deposits,
-                 final_balance, index_change)
+                (
+                    portfolio_id,
+                    balance_date,
+                    withdrawals,
+                    deposits,
+                    final_balance,
+                    index_change,
+                ),
             )
             conn.commit()
             balance_id = cursor.lastrowid
@@ -302,7 +333,7 @@ class PortfolioBalanceDB:
                    WHERE portfolio_id = ?
                    ORDER BY balance_date DESC
                    LIMIT ?""",
-                (portfolio_id, limit)
+                (portfolio_id, limit),
             ).fetchall()
             return [dict_from_row(row) for row in rows]
 
@@ -310,16 +341,20 @@ class PortfolioBalanceDB:
 # Journal operations
 class JournalDB:
     @staticmethod
-    def create(entry_date: date, content: str, stock_id: Optional[int] = None,
-               portfolio_id: Optional[int] = None,
-               transaction_id: Optional[int] = None) -> int:
+    def create(
+        entry_date: date,
+        content: str,
+        stock_id: Optional[int] = None,
+        portfolio_id: Optional[int] = None,
+        transaction_id: Optional[int] = None,
+    ) -> int:
         """Create a journal entry."""
         with get_db_connection() as conn:
             cursor = conn.execute(
                 """INSERT INTO journal_entry (entry_date, content, stock_id,
                    portfolio_id, transaction_id)
                    VALUES (?, ?, ?, ?, ?)""",
-                (entry_date, content, stock_id, portfolio_id, transaction_id)
+                (entry_date, content, stock_id, portfolio_id, transaction_id),
             )
             conn.commit()
             entry_id = cursor.lastrowid
@@ -338,7 +373,7 @@ class JournalDB:
                    LEFT JOIN portfolio p ON j.portfolio_id = p.id
                    ORDER BY j.entry_date DESC, j.created_at DESC
                    LIMIT ?""",
-                (limit,)
+                (limit,),
             ).fetchall()
             return [dict_from_row(row) for row in rows]
 

@@ -14,122 +14,108 @@ from domain.value_objects.stock_symbol import StockSymbol
 
 class TestDomainEvent:
     """Test suite for base DomainEvent."""
-    
+
     def test_domain_event_has_timestamp(self):
         """Should automatically set timestamp when created."""
         event = DomainEvent()
-        
+
         assert event.occurred_at is not None
         assert isinstance(event.occurred_at, datetime)
-        
+
         # Should be recent (within last second)
         now = datetime.now(timezone.utc)
         assert (now - event.occurred_at).total_seconds() < 1
-    
+
     def test_domain_event_with_custom_timestamp(self):
         """Should allow setting custom timestamp."""
         custom_time = datetime(2024, 1, 15, 10, 30, 0)
         event = DomainEvent(occurred_at=custom_time)
-        
+
         assert event.occurred_at == custom_time
-    
+
     def test_domain_event_has_event_id(self):
         """Should have unique event ID."""
         event1 = DomainEvent()
         event2 = DomainEvent()
-        
+
         assert event1.event_id is not None
         assert event2.event_id is not None
         assert event1.event_id != event2.event_id
-    
+
     def test_domain_event_equality(self):
         """Should compare events by event_id."""
         event1 = DomainEvent()
         event2 = DomainEvent()
-        
+
         # Same event should equal itself
         assert event1 == event1
-        
+
         # Different events should not be equal
         assert event1 != event2
-    
+
     def test_domain_event_hash(self):
         """Should be hashable by event_id."""
         event1 = DomainEvent()
         event2 = DomainEvent()
-        
+
         # Can be used in set
         event_set = {event1, event2}
         assert len(event_set) == 2
-    
+
     def test_domain_event_string_representation(self):
         """Should have meaningful string representation."""
         event = DomainEvent()
         str_repr = str(event)
-        
+
         assert "DomainEvent" in str_repr
         assert str(event.event_id) in str_repr
 
 
 class TestStockAddedEvent:
     """Test suite for StockAddedEvent."""
-    
+
     def test_create_stock_added_event(self):
         """Should create StockAddedEvent with stock information."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
-            stock_symbol=symbol,
-            stock_name="Apple Inc.",
-            stock_id=123
+            stock_symbol=symbol, stock_name="Apple Inc.", stock_id=123
         )
-        
+
         assert event.stock_symbol == symbol
         assert event.stock_name == "Apple Inc."
         assert event.stock_id == 123
         assert event.occurred_at is not None
         assert event.event_id is not None
-    
+
     def test_stock_added_event_validation(self):
         """Should validate required fields."""
         symbol = StockSymbol("AAPL")
-        
+
         with pytest.raises(ValueError, match="Stock name cannot be empty"):
-            StockAddedEvent(
-                stock_symbol=symbol,
-                stock_name="",
-                stock_id=123
-            )
-        
+            StockAddedEvent(stock_symbol=symbol, stock_name="", stock_id=123)
+
         with pytest.raises(ValueError, match="Stock ID must be positive"):
-            StockAddedEvent(
-                stock_symbol=symbol,
-                stock_name="Apple Inc.",
-                stock_id=0
-            )
-    
+            StockAddedEvent(stock_symbol=symbol, stock_name="Apple Inc.", stock_id=0)
+
     def test_stock_added_event_string_representation(self):
         """Should have meaningful string representation."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
-            stock_symbol=symbol,
-            stock_name="Apple Inc.",
-            stock_id=123
+            stock_symbol=symbol, stock_name="Apple Inc.", stock_id=123
         )
-        
+
         str_repr = str(event)
         assert "StockAddedEvent" in str_repr
         assert "AAPL" in str_repr
         assert "Apple Inc." in str_repr
-    
+
     def test_stock_added_event_repr(self):
         """Should have detailed repr representation."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
-            stock_symbol=symbol,
-            stock_name="Apple Inc.",
-            stock_id=123
+            stock_symbol=symbol, stock_name="Apple Inc.", stock_id=123
         )
-        
+
         repr_str = repr(event)
         assert "StockAddedEvent" in repr_str
         assert "stock_symbol=StockSymbol('AAPL')" in repr_str

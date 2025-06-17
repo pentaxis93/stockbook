@@ -1,7 +1,7 @@
 """
 Database connection abstraction for SQLite.
 
-Provides connection management, schema initialization, and 
+Provides connection management, schema initialization, and
 transaction support for the infrastructure layer.
 """
 
@@ -14,15 +14,15 @@ from contextlib import contextmanager
 class DatabaseConnection:
     """
     Manages SQLite database connections and schema initialization.
-    
+
     Provides a clean abstraction over SQLite connections with proper
     configuration for the application's needs.
     """
-    
+
     def __init__(self, database_path: Union[str, Path], timeout: float = 30.0):
         """
         Initialize database connection manager.
-        
+
         Args:
             database_path: Path to SQLite database file
             timeout: Connection timeout in seconds
@@ -31,11 +31,11 @@ class DatabaseConnection:
         self.timeout = timeout
         self._connection: Optional[sqlite3.Connection] = None
         self._active_connections: List[sqlite3.Connection] = []
-    
+
     def initialize_schema(self) -> None:
         """
         Initialize database schema with all required tables.
-        
+
         Creates tables, indexes, and constraints if they don't exist.
         Safe to call multiple times (idempotent).
         """
@@ -132,39 +132,39 @@ class DatabaseConnection:
             FOREIGN KEY (transaction_id) REFERENCES stock_transaction(id)
         );
         """
-        
+
         with self.get_connection() as conn:
             conn.executescript(schema_sql)
             conn.commit()
-    
+
     def get_connection(self) -> sqlite3.Connection:
         """
         Get a database connection with proper configuration.
-        
+
         Returns:
             Configured SQLite connection
         """
         connection = sqlite3.connect(
             self.database_path,
             timeout=self.timeout,
-            check_same_thread=False  # Allow connections across threads
+            check_same_thread=False,  # Allow connections across threads
         )
-        
+
         # Configure connection
         connection.row_factory = sqlite3.Row  # Enable column access by name
         connection.execute("PRAGMA foreign_keys = ON")  # Enable foreign keys
         connection.execute("PRAGMA journal_mode = WAL")  # Better concurrency
-        
+
         # Track this connection
         self._active_connections.append(connection)
-        
+
         return connection
-    
+
     @contextmanager
     def transaction(self):
         """
         Context manager for database transactions.
-        
+
         Automatically commits on success, rolls back on exception.
         """
         conn = self.get_connection()
@@ -176,11 +176,11 @@ class DatabaseConnection:
             raise
         finally:
             conn.close()
-    
+
     def close(self) -> None:
         """
         Close all active database connections.
-        
+
         Closes both the persistent connection (if any) and all tracked
         connections created by get_connection().
         """
@@ -188,7 +188,7 @@ class DatabaseConnection:
         if self._connection:
             self._connection.close()
             self._connection = None
-        
+
         # Close all tracked connections
         for conn in self._active_connections:
             try:
@@ -196,13 +196,13 @@ class DatabaseConnection:
             except sqlite3.ProgrammingError:
                 # Connection already closed
                 pass
-        
+
         self._active_connections.clear()
-    
+
     def __str__(self) -> str:
         """String representation of the database connection."""
         return f"DatabaseConnection(path='{self.database_path}')"
-    
+
     def __repr__(self) -> str:
         """Developer representation."""
         return f"DatabaseConnection(database_path='{self.database_path}', timeout={self.timeout})"

@@ -5,7 +5,7 @@ The shared kernel contains foundational components that are reused across
 multiple bounded contexts in the stockbook application. This includes:
 
 - Common value objects (Money, Quantity)
-- Base domain events infrastructure  
+- Base domain events infrastructure
 - Common domain exceptions
 - Common interfaces (Unit of Work pattern)
 
@@ -26,7 +26,7 @@ from .exceptions import (
     BusinessRuleViolationError,
     CalculationError,
     InsufficientDataError,
-    AnalysisError
+    AnalysisError,
 )
 
 # Interfaces
@@ -34,20 +34,17 @@ from .interfaces import IUnitOfWork
 
 __all__ = [
     # Value Objects
-    'Money',
-    'Quantity',
-    
+    "Money",
+    "Quantity",
     # Domain Events
-    'DomainEvent',
-    
+    "DomainEvent",
     # Domain Exceptions
-    'DomainServiceError',
-    'ValidationError',
-    'BusinessRuleViolationError', 
-    'CalculationError',
-    'InsufficientDataError',
-    'AnalysisError',
-    
+    "DomainServiceError",
+    "ValidationError",
+    "BusinessRuleViolationError",
+    "CalculationError",
+    "InsufficientDataError",
+    "AnalysisError",
     # Interfaces
-    'IUnitOfWork'
+    "IUnitOfWork",
 ]

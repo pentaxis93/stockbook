@@ -21,10 +21,7 @@ class TestStockDB:
         This tests the simplest case - just symbol and name.
         """
         # Create a stock with minimal information
-        stock_id = StockDB.create(
-            symbol="AAPL",
-            name="Apple Inc."
-        )
+        stock_id = StockDB.create(symbol="AAPL", name="Apple Inc.")
 
         # Verify the stock was created with a valid ID
         assert isinstance(stock_id, int)
@@ -33,12 +30,12 @@ class TestStockDB:
         # Verify we can retrieve it
         stock = StockDB.get_by_symbol("AAPL")
         assert stock is not None
-        assert stock['symbol'] == "AAPL"
-        assert stock['name'] == "Apple Inc."
+        assert stock["symbol"] == "AAPL"
+        assert stock["name"] == "Apple Inc."
         # Should be None when not provided
-        assert stock['industry_group'] is None
-        assert stock['grade'] is None
-        assert stock['notes'] is None
+        assert stock["industry_group"] is None
+        assert stock["grade"] is None
+        assert stock["notes"] is None
 
     def test_create_stock_complete(self, test_db):
         """
@@ -51,17 +48,17 @@ class TestStockDB:
             name="Microsoft Corporation",
             industry_group="Technology",
             grade="A",
-            notes="Strong cloud growth, consistent earnings"
+            notes="Strong cloud growth, consistent earnings",
         )
 
         # Retrieve and verify all fields
         stock = StockDB.get_by_symbol("MSFT")
         assert stock is not None
-        assert stock['symbol'] == "MSFT"
-        assert stock['name'] == "Microsoft Corporation"
-        assert stock['industry_group'] == "Technology"
-        assert stock['grade'] == "A"
-        assert stock['notes'] == "Strong cloud growth, consistent earnings"
+        assert stock["symbol"] == "MSFT"
+        assert stock["name"] == "Microsoft Corporation"
+        assert stock["industry_group"] == "Technology"
+        assert stock["grade"] == "A"
+        assert stock["notes"] == "Strong cloud growth, consistent earnings"
 
     def test_create_duplicate_symbol_fails(self, test_db):
         """
@@ -105,11 +102,11 @@ class TestStockDB:
         # Create multiple stocks from our sample data
         for symbol, data in sample_stock_data.items():
             StockDB.create(
-                symbol=data['symbol'],
-                name=data['name'],
-                industry_group=data['industry_group'],
-                grade=data['grade'],
-                notes=data['notes']
+                symbol=data["symbol"],
+                name=data["name"],
+                industry_group=data["industry_group"],
+                grade=data["grade"],
+                notes=data["notes"],
             )
 
         # Retrieve all stocks
@@ -119,12 +116,12 @@ class TestStockDB:
         assert len(stocks) == len(sample_stock_data)
 
         # Verify alphabetical ordering by symbol
-        symbols = [stock['symbol'] for stock in stocks]
+        symbols = [stock["symbol"] for stock in stocks]
         assert symbols == sorted(symbols)
 
         # Verify first stock details (AAPL should be first alphabetically)
-        assert stocks[0]['symbol'] == 'AAPL'
-        assert stocks[0]['name'] == 'Apple Inc.'
+        assert stocks[0]["symbol"] == "AAPL"
+        assert stocks[0]["name"] == "Apple Inc."
 
     def test_update_stock_single_field(self, test_db):
         """
@@ -133,11 +130,7 @@ class TestStockDB:
         This verifies partial updates work correctly.
         """
         # Create a stock
-        stock_id = StockDB.create(
-            symbol="GOOGL",
-            name="Alphabet Inc.",
-            grade="B"
-        )
+        stock_id = StockDB.create(symbol="GOOGL", name="Alphabet Inc.", grade="B")
 
         # Update just the grade
         success = StockDB.update(stock_id, grade="A")
@@ -146,8 +139,8 @@ class TestStockDB:
         # Verify the update
         stock = StockDB.get_by_symbol("GOOGL")
         assert stock is not None
-        assert stock['grade'] == "A"
-        assert stock['name'] == "Alphabet Inc."  # Should be unchanged
+        assert stock["grade"] == "A"
+        assert stock["name"] == "Alphabet Inc."  # Should be unchanged
 
     def test_update_stock_multiple_fields(self, test_db):
         """
@@ -163,16 +156,16 @@ class TestStockDB:
             stock_id,
             industry_group="Automotive",
             grade="B",
-            notes="EV leader, high volatility"
+            notes="EV leader, high volatility",
         )
         assert success is True
 
         # Verify all updates
         stock = StockDB.get_by_symbol("TSLA")
         assert stock is not None
-        assert stock['industry_group'] == "Automotive"
-        assert stock['grade'] == "B"
-        assert stock['notes'] == "EV leader, high volatility"
+        assert stock["industry_group"] == "Automotive"
+        assert stock["grade"] == "B"
+        assert stock["notes"] == "EV leader, high volatility"
 
     def test_update_invalid_field_ignored(self, test_db):
         """
@@ -189,7 +182,7 @@ class TestStockDB:
             stock_id,
             symbol="CHANGED",  # Should be ignored - symbol is immutable
             invalid_field="test",  # Should be ignored - doesn't exist
-            grade="A"  # This should work
+            grade="A",  # This should work
         )
 
         # The update should still succeed (returns True if any valid field was updated)
@@ -198,8 +191,8 @@ class TestStockDB:
         # Verify only valid field was updated
         stock = StockDB.get_by_symbol("AMZN")
         assert stock is not None
-        assert stock['symbol'] == "AMZN"  # Should be unchanged
-        assert stock['grade'] == "A"  # Should be updated
+        assert stock["symbol"] == "AMZN"  # Should be unchanged
+        assert stock["grade"] == "A"  # Should be updated
 
     def test_update_nonexistent_stock(self, test_db):
         """
@@ -221,11 +214,11 @@ class TestStockDB:
         The schema defines CHECK constraint for grades A, B, C, or NULL.
         """
         # Valid grades should work
-        for grade in ['A', 'B', 'C', None]:
+        for grade in ["A", "B", "C", None]:
             stock_id = StockDB.create(
                 symbol=f"TEST{grade or 'NULL'}",
                 name=f"Test Stock {grade or 'NULL'}",
-                grade=grade
+                grade=grade,
             )
             assert stock_id > 0
 
@@ -246,19 +239,17 @@ class TestStockDB:
 
         # Both timestamps should be set and recent
         assert stock is not None
-        assert stock['created_at'] is not None
-        assert stock['updated_at'] is not None
+        assert stock["created_at"] is not None
+        assert stock["updated_at"] is not None
 
         # Parse timestamps and verify they're recent (within last 5 seconds)
         # Note: SQLite stores timestamps in UTC, so we need to be timezone-aware
-        created = datetime.fromisoformat(
-            stock['created_at'].replace('Z', '+00:00'))
-        updated = datetime.fromisoformat(
-            stock['updated_at'].replace('Z', '+00:00'))
+        created = datetime.fromisoformat(stock["created_at"].replace("Z", "+00:00"))
+        updated = datetime.fromisoformat(stock["updated_at"].replace("Z", "+00:00"))
 
         # Verify timestamps are recent
-        assert_datetime_recent(stock['created_at'])
-        assert_datetime_recent(stock['updated_at'])
+        assert_datetime_recent(stock["created_at"])
+        assert_datetime_recent(stock["updated_at"])
 
         # Initially, created_at and updated_at should be the same
         assert created == updated
@@ -270,8 +261,7 @@ class TestStockDB:
         # Check timestamps again
         stock = StockDB.get_by_symbol("META")
         assert stock is not None
-        new_updated = datetime.fromisoformat(
-            stock['updated_at'].replace('Z', '+00:00'))
+        new_updated = datetime.fromisoformat(stock["updated_at"].replace("Z", "+00:00"))
 
         # updated_at should be newer than created_at
         assert new_updated > created

@@ -7,4 +7,4 @@ across all domains for infrastructure concerns.
 
 from .unit_of_work import IUnitOfWork
 
-__all__ = ['IUnitOfWork']
+__all__ = ["IUnitOfWork"]

@@ -12,18 +12,18 @@ from .exceptions import (
     DependencyResolutionError,
     CircularDependencyError,
     DuplicateRegistrationError,
-    InvalidRegistrationError
+    InvalidRegistrationError,
 )
 from .lifetimes import Lifetime
 
 __all__ = [
-    'DIContainer',
-    'RegistrationInfo', 
-    'CompositionRoot',
-    'DependencyInjectionError',
-    'DependencyResolutionError',
-    'CircularDependencyError',
-    'DuplicateRegistrationError',
-    'InvalidRegistrationError',
-    'Lifetime'
+    "DIContainer",
+    "RegistrationInfo",
+    "CompositionRoot",
+    "DependencyInjectionError",
+    "DependencyResolutionError",
+    "CircularDependencyError",
+    "DuplicateRegistrationError",
+    "InvalidRegistrationError",
+    "Lifetime",
 ]

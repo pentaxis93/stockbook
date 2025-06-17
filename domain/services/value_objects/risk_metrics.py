@@ -15,6 +15,7 @@ from domain.value_objects.stock_symbol import StockSymbol
 
 class RiskLevel(Enum):
     """Risk level enumeration."""
+
     VERY_LOW = "very_low"
     LOW = "low"
     MEDIUM = "medium"
@@ -24,6 +25,7 @@ class RiskLevel(Enum):
 
 class ConcentrationLevel(Enum):
     """Concentration risk level enumeration."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -33,7 +35,7 @@ class ConcentrationLevel(Enum):
 @dataclass(frozen=True)
 class RiskFactor:
     """Represents a specific risk factor."""
-    
+
     name: str
     description: str
     risk_level: RiskLevel
@@ -44,7 +46,7 @@ class RiskFactor:
 @dataclass(frozen=True)
 class RiskProfile:
     """Individual stock risk profile."""
-    
+
     symbol: StockSymbol
     overall_risk_level: RiskLevel
     volatility_risk: RiskLevel
@@ -53,7 +55,7 @@ class RiskProfile:
     sector_risk: RiskLevel
     risk_factors: List[RiskFactor]
     risk_score: Decimal  # 0-100 scale
-    
+
     @property
     def is_high_risk(self) -> bool:
         """Check if stock is considered high risk."""
@@ -63,7 +65,7 @@ class RiskProfile:
 @dataclass(frozen=True)
 class ConcentrationRisk:
     """Represents concentration risk in portfolio."""
-    
+
     type: str  # "position", "sector", "geography", etc.
     category: str  # Specific category (e.g., "Technology", "AAPL")
     concentration_level: ConcentrationLevel
@@ -75,7 +77,7 @@ class ConcentrationRisk:
 @dataclass(frozen=True)
 class RiskMetrics:
     """Portfolio-level risk metrics."""
-    
+
     overall_risk_level: RiskLevel
     weighted_beta: Decimal
     portfolio_volatility: Decimal
@@ -85,20 +87,27 @@ class RiskMetrics:
     maximum_drawdown: Optional[Decimal]
     concentration_risks: List[ConcentrationRisk]
     risk_score: Decimal  # 0-100 scale
-    
+
     @property
     def requires_attention(self) -> bool:
         """Check if portfolio risk requires immediate attention."""
         return (
-            self.overall_risk_level in [RiskLevel.HIGH, RiskLevel.VERY_HIGH] or
-            len([r for r in self.concentration_risks if r.concentration_level == ConcentrationLevel.CRITICAL]) > 0
+            self.overall_risk_level in [RiskLevel.HIGH, RiskLevel.VERY_HIGH]
+            or len(
+                [
+                    r
+                    for r in self.concentration_risks
+                    if r.concentration_level == ConcentrationLevel.CRITICAL
+                ]
+            )
+            > 0
         )
 
 
 @dataclass(frozen=True)
 class PortfolioRisk:
     """Comprehensive portfolio risk assessment."""
-    
+
     portfolio_metrics: RiskMetrics
     individual_stock_risks: List[RiskProfile]
     sector_risks: Dict[str, RiskLevel]
@@ -107,11 +116,9 @@ class PortfolioRisk:
     stress_test_results: Dict[str, Decimal]  # Scenario -> loss percentage
     risk_warnings: List[str]
     mitigation_strategies: List[str]
-    
+
     def get_highest_risk_stocks(self, limit: int = 5) -> List[RiskProfile]:
         """Get the highest risk stocks in portfolio."""
         return sorted(
-            self.individual_stock_risks,
-            key=lambda x: x.risk_score,
-            reverse=True
+            self.individual_stock_risks, key=lambda x: x.risk_score, reverse=True
         )[:limit]

@@ -10,17 +10,23 @@ from typing import List, Type, Any, Optional
 
 class DependencyInjectionError(Exception):
     """Base exception for all dependency injection errors."""
+
     pass
 
 
 class DependencyResolutionError(DependencyInjectionError):
     """Raised when a dependency cannot be resolved."""
-    
-    def __init__(self, service_type: Type, message: str, resolution_chain: Optional[List[str]] = None):
+
+    def __init__(
+        self,
+        service_type: Type,
+        message: str,
+        resolution_chain: Optional[List[str]] = None,
+    ):
         self.service_type = service_type
         self.resolution_chain = resolution_chain or []
         super().__init__(message)
-    
+
     def __str__(self) -> str:
         base_message = super().__str__()
         if self.resolution_chain:
@@ -31,7 +37,7 @@ class DependencyResolutionError(DependencyInjectionError):
 
 class CircularDependencyError(DependencyInjectionError):
     """Raised when a circular dependency is detected."""
-    
+
     def __init__(self, dependency_chain: List[str]):
         self.dependency_chain = dependency_chain
         chain_str = " -> ".join(dependency_chain)
@@ -41,7 +47,7 @@ class CircularDependencyError(DependencyInjectionError):
 
 class DuplicateRegistrationError(DependencyInjectionError):
     """Raised when attempting to register a service that's already registered."""
-    
+
     def __init__(self, service_type: Type, message: str):
         self.service_type = service_type
         super().__init__(message)
@@ -49,7 +55,7 @@ class DuplicateRegistrationError(DependencyInjectionError):
 
 class InvalidRegistrationError(DependencyInjectionError):
     """Raised when registration parameters are invalid."""
-    
+
     def __init__(self, service_type: Type, message: str):
         self.service_type = service_type
         super().__init__(message)
