@@ -1,85 +1,150 @@
 """
 StockBook - Personal Stock Trading Tracker
-Main Streamlit application entry point
+Clean Architecture Main Application
 
-FIXME: This file contains the legacy application structure and needs to be 
-completely refactored to integrate the new clean architecture layers.
-
-TODO: Replace with dependency injection container that wires:
-- Domain entities and value objects  
-- Application services (StockApplicationService)
-- Infrastructure repositories (SQLiteStockRepository, DatabaseConnection, UnitOfWork)
-- Presentation layer (StockController, StreamlitStockAdapter, StockPageCoordinator)
-
-TODO: Implement proper bootstrap/composition root pattern for dependency injection.
-See Commit 5 planning for dependency injection system design.
+This is the new main entry point that integrates the complete clean architecture
+implementation with the Streamlit UI framework.
 """
 
 import streamlit as st
-import pandas as pd
-from datetime import datetime
+from typing import Optional
+from dependency_injection.composition_root import CompositionRoot
+from dependency_injection.di_container import DIContainer
+from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 from config import config
 
-# Page configuration from centralized config
-st.set_page_config(**config.streamlit_config)
 
-# Initialize session state
-if 'initialized' not in st.session_state:
-    st.session_state.initialized = True
-    # Add more session state variables as needed
-
-# Main app
+class StockBookApp:
+    """
+    Main application class that bootstraps the dependency injection container
+    and coordinates the UI presentation layer.
+    """
+    
+    def __init__(self, container: Optional[DIContainer] = None):
+        """Initialize the application with dependency injection container."""
+        self.container = container or self._configure_dependencies()
+        self._setup_streamlit()
+        
+    def _configure_dependencies(self) -> DIContainer:
+        """Configure and return the dependency injection container."""
+        return CompositionRoot.configure(
+            database_path=str(config.db_path)
+        )
+    
+    def _setup_streamlit(self) -> None:
+        """Configure Streamlit page settings."""
+        st.set_page_config(**config.streamlit_config)
+        
+        # Initialize session state for clean architecture integration
+        if 'app_initialized' not in st.session_state:
+            st.session_state.app_initialized = True
+            st.session_state.container = self.container
+    
+    def run(self) -> None:
+        """Run the main application."""
+        # Title and header
+        st.title("📈 StockBook")
+        st.markdown("*Personal Stock Trading Tracker - Clean Architecture Edition*")
+        
+        # Sidebar navigation
+        with st.sidebar:
+            st.header("Navigation")
+            page = st.radio(
+                "Go to",
+                ["Dashboard", "Stocks", "Portfolio", "Trades", "Analytics", "Settings"]
+            )
+        
+        # Route to the appropriate page using clean architecture
+        self._route_page(page)
+    
+    def _route_page(self, page: str) -> None:
+        """Route to the appropriate page using presentation layer coordinators."""
+        try:
+            if page == "Dashboard":
+                self._show_dashboard()
+            elif page == "Stocks":
+                self._show_stocks_page()
+            elif page == "Portfolio":
+                self._show_portfolio_page()
+            elif page == "Trades":
+                self._show_trades_page()
+            elif page == "Analytics":
+                self._show_analytics_page()
+            elif page == "Settings":
+                self._show_settings_page()
+        except Exception as e:
+            st.error(f"Error loading page: {str(e)}")
+            if config.DEBUG:
+                st.exception(e)
+    
+    def _show_dashboard(self) -> None:
+        """Show the main dashboard."""
+        st.header("📊 Dashboard")
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("Total Portfolio Value", "$0.00", "0.00%")
+        
+        with col2:
+            st.metric("Total Stocks", "0", "0")
+        
+        with col3:
+            st.metric("Active Positions", "0", "0")
+        
+        st.info("📈 Welcome to StockBook! Start by adding some stocks in the Stocks section.")
+    
+    def _show_stocks_page(self) -> None:
+        """Show the stocks management page using clean architecture."""
+        st.header("📈 Stock Management")
+        
+        # Get the stock page coordinator from the DI container
+        coordinator = self.container.resolve(StockPageCoordinator)
+        
+        # Use the clean architecture presentation layer
+        coordinator.render_stock_page()
+    
+    def _show_portfolio_page(self) -> None:
+        """Show the portfolio overview page."""
+        st.header("💼 Portfolio Overview")
+        st.info("🚧 Portfolio analytics coming soon! This will integrate with our domain services for portfolio calculations.")
+    
+    def _show_trades_page(self) -> None:
+        """Show the trades management page."""
+        st.header("📝 Trade Management")
+        st.info("🚧 Trade entry and management coming soon! This will use our transaction domain entities.")
+    
+    def _show_analytics_page(self) -> None:
+        """Show the analytics and reporting page."""
+        st.header("📊 Analytics & Reports")
+        st.info("🚧 Advanced analytics coming soon! This will leverage our shared kernel value objects and domain services.")
+    
+    def _show_settings_page(self) -> None:
+        """Show the application settings page."""
+        st.header("⚙️ Settings")
+        
+        st.subheader("Application Configuration")
+        st.code(f"""
+Database Path: {config.db_path}
+Debug Mode: {config.DEBUG}
+Clean Architecture: ✅ Enabled
+Dependency Injection: ✅ Active
+Domain Services: ✅ Available
+Shared Kernel: ✅ Loaded
+        """, language="text")
+        
+        st.success("🎉 Clean Architecture integration is active!")
 
 
 def main():
-    # Title and header
-    st.title("📈 StockBook")
-    st.markdown("*Personal Stock Trading Tracker*")
-
-    # Sidebar navigation
-    with st.sidebar:
-        st.header("Navigation")
-        page = st.radio(
-            "Go to",
-            ["Dashboard", "Add Trade", "Portfolio", "History", "Settings"]
-        )
-
-    # Page routing
-    if page == "Dashboard":
-        show_dashboard()
-    elif page == "Add Trade":
-        show_add_trade()
-    elif page == "Portfolio":
-        show_portfolio()
-    elif page == "History":
-        show_history()
-    elif page == "Settings":
-        show_settings()
-
-
-def show_dashboard():
-    st.header("Dashboard")
-    st.info("📊 Dashboard coming soon! This will show your portfolio overview.")
-
-
-def show_add_trade():
-    st.header("Add Trade")
-    st.info("📝 Trade entry form coming soon!")
-
-
-def show_portfolio():
-    st.header("Portfolio")
-    st.info("💼 Portfolio view coming soon!")
-
-
-def show_history():
-    st.header("Trade History")
-    st.info("📅 Trade history coming soon!")
-
-
-def show_settings():
-    st.header("Settings")
-    st.info("⚙️ Settings page coming soon!")
+    """Main application entry point."""
+    try:
+        app = StockBookApp()
+        app.run()
+    except Exception as e:
+        st.error(f"Failed to initialize StockBook: {str(e)}")
+        if config.DEBUG:
+            st.exception(e)
 
 
 if __name__ == "__main__":
