@@ -6,6 +6,5 @@
   - Refactor the code to make it more readable.
 - When you implement a temporary fix or defer a task in your code—like simplifying a class or postponing tests—document it with a clear TODO or FIXME comment that explains what needs to be done and why. This ensures the task isn’t forgotten and can be revisited during code reviews or sprint planning.
 - When writing git commit messages, omit all references to authorship, and especially omit references to Claude.
-- Always run `pytest` and fix all failures before making a commit.
-- Always run `pyright` and fix all warnings before making a commit.
+- Always run `pytest`, `pylint`, `pyright`, `black`, and `isort` and fix all issues before making a commit.
 - Always update the ROADMAP.md, TECHNICAL_DEBT.md, and README.md files in the project root with the latest changes.
