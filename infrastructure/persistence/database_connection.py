@@ -66,6 +66,7 @@ class DatabaseConnection:
         CREATE TABLE IF NOT EXISTS portfolio (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
+            description TEXT,
             max_positions INTEGER NOT NULL,
             max_risk_per_trade REAL NOT NULL,
             is_active BOOLEAN DEFAULT TRUE,

@@ -28,11 +28,10 @@ class PortfolioBalanceEntity:
     # Core attributes
     portfolio_id: int = 0
     balance_date: Optional[date] = None
-    total_value: Optional[Money] = None
-    cash_balance: Optional[Money] = None
-    stock_value: Optional[Money] = None
-    daily_change: Optional[Money] = None
-    daily_change_percent: Optional[float] = None
+    withdrawals: Optional[Money] = None
+    deposits: Optional[Money] = None
+    final_balance: Optional[Money] = None
+    index_change: Optional[float] = None  # Percentage change
     
     def __post_init__(self):
         """Validate balance data after initialization."""
@@ -41,10 +40,13 @@ class PortfolioBalanceEntity:
         
         if self.balance_date is None:
             raise ValueError("Balance date cannot be None")
+        
+        if self.final_balance is None:
+            raise ValueError("Final balance cannot be None")
     
     def __str__(self) -> str:
         """String representation."""
-        return f"Balance({self.balance_date}: {self.total_value})"
+        return f"Balance({self.balance_date}: {self.final_balance})"
     
     def __repr__(self) -> str:
         """Developer representation."""

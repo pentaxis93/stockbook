@@ -16,8 +16,12 @@ from domain.repositories.interfaces import (IJournalRepository,
                                             ITransactionRepository,
                                             IStockBookUnitOfWork)
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_stock_repository import \
-    SqliteStockRepository
+from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
+from infrastructure.repositories.sqlite_portfolio_repository import SqlitePortfolioRepository
+from infrastructure.repositories.sqlite_transaction_repository import SqliteTransactionRepository
+from infrastructure.repositories.sqlite_target_repository import SqliteTargetRepository
+from infrastructure.repositories.sqlite_balance_repository import SqlitePortfolioBalanceRepository
+from infrastructure.repositories.sqlite_journal_repository import SqliteJournalRepository
 
 
 class TransactionalDatabaseConnection:
@@ -186,25 +190,65 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
 
     @property
     def portfolios(self) -> IPortfolioRepository:
-        """Get portfolio repository instance (placeholder)."""
-        raise NotImplementedError("Portfolio repository not yet implemented")
+        """Get portfolio repository instance."""
+        if self._portfolios is None:
+            if self._connection is None:
+                self._portfolios = SqlitePortfolioRepository(self.db_connection)
+            else:
+                connection_wrapper = TransactionalDatabaseConnection(
+                    self._connection, self.db_connection
+                )
+                self._portfolios = SqlitePortfolioRepository(connection_wrapper)
+        return self._portfolios
 
     @property
     def transactions(self) -> ITransactionRepository:
-        """Get transaction repository instance (placeholder)."""
-        raise NotImplementedError("Transaction repository not yet implemented")
+        """Get transaction repository instance."""
+        if self._transactions is None:
+            if self._connection is None:
+                self._transactions = SqliteTransactionRepository(self.db_connection)
+            else:
+                connection_wrapper = TransactionalDatabaseConnection(
+                    self._connection, self.db_connection
+                )
+                self._transactions = SqliteTransactionRepository(connection_wrapper)
+        return self._transactions
 
     @property
     def targets(self) -> ITargetRepository:
-        """Get target repository instance (placeholder)."""
-        raise NotImplementedError("Target repository not yet implemented")
+        """Get target repository instance."""
+        if self._targets is None:
+            if self._connection is None:
+                self._targets = SqliteTargetRepository(self.db_connection)
+            else:
+                connection_wrapper = TransactionalDatabaseConnection(
+                    self._connection, self.db_connection
+                )
+                self._targets = SqliteTargetRepository(connection_wrapper)
+        return self._targets
 
     @property
     def balances(self) -> IPortfolioBalanceRepository:
-        """Get balance repository instance (placeholder)."""
-        raise NotImplementedError("Balance repository not yet implemented")
+        """Get balance repository instance."""
+        if self._balances is None:
+            if self._connection is None:
+                self._balances = SqlitePortfolioBalanceRepository(self.db_connection)
+            else:
+                connection_wrapper = TransactionalDatabaseConnection(
+                    self._connection, self.db_connection
+                )
+                self._balances = SqlitePortfolioBalanceRepository(connection_wrapper)
+        return self._balances
 
     @property
     def journal(self) -> IJournalRepository:
-        """Get journal repository instance (placeholder)."""
-        raise NotImplementedError("Journal repository not yet implemented")
+        """Get journal repository instance."""
+        if self._journal is None:
+            if self._connection is None:
+                self._journal = SqliteJournalRepository(self.db_connection)
+            else:
+                connection_wrapper = TransactionalDatabaseConnection(
+                    self._connection, self.db_connection
+                )
+                self._journal = SqliteJournalRepository(connection_wrapper)
+        return self._journal

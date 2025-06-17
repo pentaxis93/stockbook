@@ -15,7 +15,7 @@ from shared_kernel.value_objects import Money
 @dataclass
 class TargetEntity:
     """
-    Target aggregate root representing investment goals or price targets.
+    Target aggregate root representing investment price targets.
     
     TODO: Implement full domain entity with business logic, validation,
     and rich behavior. This is currently a placeholder to remove 
@@ -28,18 +28,14 @@ class TargetEntity:
     # Core attributes
     portfolio_id: int = 0
     stock_id: int = 0
-    target_type: str = ""  # 'price', 'percentage', etc.
-    target_value: Optional[Money] = None
+    pivot_price: Optional[Money] = None  # Target price for entry/exit
+    failure_price: Optional[Money] = None  # Stop-loss price
     status: str = "active"  # 'active', 'hit', 'failed', 'cancelled'
     created_date: Optional[date] = None
-    target_date: Optional[date] = None
     notes: Optional[str] = None
     
     def __post_init__(self):
         """Validate target data after initialization."""
-        if not self.target_type:
-            raise ValueError("Target type cannot be empty")
-        
         if self.status not in ['active', 'hit', 'failed', 'cancelled']:
             raise ValueError("Invalid target status")
         
@@ -48,11 +44,17 @@ class TargetEntity:
         
         if self.stock_id <= 0:
             raise ValueError("Stock ID must be positive")
+        
+        if self.pivot_price is None:
+            raise ValueError("Pivot price cannot be None")
+        
+        if self.failure_price is None:
+            raise ValueError("Failure price cannot be None")
     
     def __str__(self) -> str:
         """String representation."""
-        return f"Target({self.target_type}: {self.target_value}, status={self.status})"
+        return f"Target(pivot: {self.pivot_price}, failure: {self.failure_price}, status={self.status})"
     
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"TargetEntity(id={self.id}, type='{self.target_type}', status='{self.status}')"
+        return f"TargetEntity(id={self.id}, pivot={self.pivot_price}, status='{self.status}')"

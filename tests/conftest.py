@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from config import config
-from utils.database import get_db_connection, init_database
+from infrastructure.persistence.database_connection import DatabaseConnection
 
 # Add the project root to Python path so we can import our modules
 # This allows tests to import from 'utils' and other project packages
@@ -37,27 +37,19 @@ def test_db():
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         test_db_path = Path(f.name)
 
-    # Import here to avoid circular imports
-    import utils.database
-
-    # Save the original database path so we can restore it later
-    original_path = utils.database.DB_PATH
-
-    # Point the database module to our test database
-    utils.database.DB_PATH = test_db_path
     # Also update the config for consistency
     original_config_path = config.db_path
     config.db_path = test_db_path
 
-    # Initialize the test database with the schema
-    init_database()
+    # Initialize the test database with the schema using clean architecture
+    db_connection = DatabaseConnection(str(test_db_path))
+    db_connection.initialize_schema()
 
     # Yield control back to the test
     yield test_db_path
 
     # Cleanup: This runs after the test completes
     # Restore the original database path
-    utils.database.DB_PATH = original_path
     config.db_path = original_config_path
 
     # Delete the temporary test database
@@ -113,17 +105,32 @@ def sample_portfolio(test_db):
     Returns:
         dict: Portfolio information including ID
     """
-    from utils.database import PortfolioDB
+    from domain.entities import PortfolioEntity
+    from infrastructure.persistence.database_connection import DatabaseConnection
+    from infrastructure.repositories.sqlite_portfolio_repository import SqlitePortfolioRepository
+    from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
-    portfolio_id = PortfolioDB.create(
-        name="Test Portfolio", max_positions=10, max_risk_per_trade=2.0
+    # Create portfolio using clean architecture
+    db_connection = DatabaseConnection(str(test_db))
+    portfolio_repo = SqlitePortfolioRepository(db_connection)
+    uow = SqliteUnitOfWork(db_connection)
+    
+    portfolio = PortfolioEntity(
+        name="Test Portfolio",
+        description="Test portfolio for testing",
+        is_active=True
     )
+    
+    with uow:
+        uow.portfolio_repository = portfolio_repo
+        saved_portfolio = uow.portfolio_repository.add(portfolio)
+        uow.commit()
 
     return {
-        "id": portfolio_id,
-        "name": "Test Portfolio",
-        "max_positions": 10,
-        "max_risk_per_trade": 2.0,
+        "id": saved_portfolio.id,
+        "name": saved_portfolio.name,
+        "description": saved_portfolio.description,
+        "is_active": saved_portfolio.is_active,
     }
 
 

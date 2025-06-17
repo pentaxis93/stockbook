@@ -36,3 +36,4 @@ refactor: extract data processing into separate module
 - Start with lowercase letter
 - No period at the end
 - Aim for 50 characters or less when possible
+- Omit lines like 'Generated with [Claude Code]' and 'Co-Authored-By: Claude <claude@claude.com>' from the commit message
