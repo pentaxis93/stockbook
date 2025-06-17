@@ -1,4 +1,5 @@
-- Always use the TDD approach when possible.
+- Always use the TDD approach by building comprehensive test coverage defining all expected behavior before writing a
+  single line of implementation code.
   - Write tests first to define the expected behavior.
   - The tests should fail. At this point, simply allow the tests to fail, rather than skipping them or commenting them out.
   - Implement the code to make the tests pass.
