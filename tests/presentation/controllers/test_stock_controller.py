@@ -5,24 +5,22 @@ Following TDD approach - these tests define the expected behavior
 of the stock controller that coordinates between UI and application services.
 """
 
-import pytest
-from unittest.mock import Mock, patch
-from decimal import Decimal
 from datetime import datetime
+from decimal import Decimal
+from unittest.mock import Mock, patch
 
-from presentation.controllers.stock_controller import StockController
-from presentation.view_models.stock_view_models import (
-    CreateStockRequest,
-    StockListResponse,
-    StockDetailResponse,
-    CreateStockResponse,
-    ValidationErrorResponse,
-)
-from application.services.stock_application_service import StockApplicationService
+import pytest
+
 from application.commands.stock_commands import CreateStockCommand
 from application.dto.stock_dto import StockDto
-from domain.value_objects.stock_symbol import StockSymbol
+from application.services.stock_application_service import \
+    StockApplicationService
 from domain.entities.stock_entity import StockEntity
+from domain.value_objects.stock_symbol import StockSymbol
+from presentation.controllers.stock_controller import StockController
+from presentation.view_models.stock_view_models import (
+    CreateStockRequest, CreateStockResponse, StockDetailResponse,
+    StockListResponse, ValidationErrorResponse)
 
 
 class TestStockController:

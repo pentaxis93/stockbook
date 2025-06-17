@@ -5,10 +5,12 @@ This module tests the portfolio balance tracking functionality, which is
 crucial for performance measurement and historical tracking.
 """
 
-import pytest
 from datetime import date, timedelta
-from utils.database import PortfolioBalanceDB, PortfolioDB
 from sqlite3 import IntegrityError
+
+import pytest
+
+from utils.database import PortfolioBalanceDB, PortfolioDB
 
 
 class TestPortfolioBalanceDB:

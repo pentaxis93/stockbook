@@ -6,6 +6,7 @@ and contain all necessary data for the operation.
 """
 
 from typing import Optional
+
 from domain.value_objects.stock_symbol import StockSymbol
 
 

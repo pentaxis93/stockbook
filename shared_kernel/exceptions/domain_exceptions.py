@@ -5,7 +5,7 @@ Provides foundational exception types that all bounded contexts can build upon
 for consistent error handling across the entire domain.
 """
 
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 
 class DomainServiceError(Exception):

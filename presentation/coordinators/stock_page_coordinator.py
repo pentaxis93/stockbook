@@ -5,19 +5,16 @@ Orchestrates stock-related page flows, managing multiple controllers
 and adapters to deliver complete user experiences.
 """
 
-import streamlit as st
-from typing import Dict, Any, List, Optional, Union
 import logging
+from typing import Any, Dict, List, Optional, Union
 
-from presentation.controllers.stock_controller import StockController
+import streamlit as st
+
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
-    StockListResponse,
-    CreateStockResponse,
-    StockDetailResponse,
-    ValidationErrorResponse,
-    StockViewModel,
-)
+    CreateStockResponse, StockDetailResponse, StockListResponse,
+    StockViewModel, ValidationErrorResponse)
 
 logger = logging.getLogger(__name__)
 

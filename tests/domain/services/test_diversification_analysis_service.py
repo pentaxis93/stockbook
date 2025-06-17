@@ -5,13 +5,15 @@ Tests business logic for portfolio diversification analysis, including
 sector allocation, correlation analysis, and diversification scoring.
 """
 
-import pytest
 from decimal import Decimal
-from typing import List, Dict
+from typing import Dict, List
+
+import pytest
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
 from domain.value_objects.money import Money
 from domain.value_objects.quantity import Quantity
+from domain.value_objects.stock_symbol import StockSymbol
 
 # These imports will exist after implementation
 # from domain.services.diversification_analysis_service import DiversificationAnalysisService

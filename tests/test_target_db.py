@@ -5,9 +5,11 @@ This module tests the watchlist/target functionality including creating
 targets, updating their status, and filtering active targets.
 """
 
-import pytest
-from utils.database import TargetDB, StockDB, PortfolioDB
 from sqlite3 import IntegrityError
+
+import pytest
+
+from utils.database import PortfolioDB, StockDB, TargetDB
 
 
 class TestTargetDB:

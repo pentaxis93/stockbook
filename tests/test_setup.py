@@ -7,8 +7,9 @@ This file contains basic tests that verify:
 3. Database operations can be tested in isolation
 """
 
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 def test_pytest_is_working():
@@ -19,7 +20,7 @@ def test_pytest_is_working():
 def test_imports_work():
     """Verify we can import project modules."""
     # These imports should work thanks to the path setup in conftest.py
-    from utils.database import StockDB, PortfolioDB, StockTransactionDB
+    from utils.database import PortfolioDB, StockDB, StockTransactionDB
 
     # If we get here without ImportError, our imports are configured correctly
     assert StockDB is not None

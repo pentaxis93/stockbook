@@ -7,7 +7,7 @@ Provides foundational event system that all bounded contexts can build upon.
 import json
 import uuid
 from datetime import datetime, timedelta
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 
 class DomainEvent:

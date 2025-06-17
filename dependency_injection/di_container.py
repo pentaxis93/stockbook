@@ -6,16 +6,13 @@ using dependency-injector library internally for robust functionality.
 """
 
 import inspect
-from typing import Type, TypeVar, Callable, Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
+
 from dependency_injector import containers, providers
 from dependency_injector.errors import Error as DIError
 
-from .exceptions import (
-    DependencyResolutionError,
-    CircularDependencyError,
-    DuplicateRegistrationError,
-    InvalidRegistrationError,
-)
+from .exceptions import (CircularDependencyError, DependencyResolutionError,
+                         DuplicateRegistrationError, InvalidRegistrationError)
 from .lifetimes import Lifetime
 
 T = TypeVar("T")

@@ -5,7 +5,7 @@ Provides clear, helpful error messages for common DI configuration
 and usage mistakes.
 """
 
-from typing import List, Type, Any, Optional
+from typing import Any, List, Optional, Type
 
 
 class DependencyInjectionError(Exception):

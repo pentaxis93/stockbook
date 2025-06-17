@@ -5,14 +5,16 @@ Following TDD approach - these tests define the expected behavior
 of transaction management and repository coordination.
 """
 
-import pytest
-import tempfile
 import os
-from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from infrastructure.persistence.database_connection import DatabaseConnection
+import tempfile
+
+import pytest
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
 from domain.repositories.interfaces import IStockRepository
+from domain.value_objects.stock_symbol import StockSymbol
+from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
 
 class TestSqliteUnitOfWork:

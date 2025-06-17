@@ -6,10 +6,11 @@ and pricing service operations.
 """
 
 from dataclasses import dataclass, field
+from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-from typing import List, Optional, Dict
-from datetime import datetime
+from typing import Dict, List, Optional
+
 from domain.value_objects.money import Money
 from domain.value_objects.stock_symbol import StockSymbol
 

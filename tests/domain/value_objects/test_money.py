@@ -5,8 +5,10 @@ Following TDD approach - these tests define the expected behavior
 before implementation.
 """
 
-import pytest
 from decimal import Decimal
+
+import pytest
+
 from domain.value_objects.money import Money
 
 

@@ -5,21 +5,15 @@ Handles stock-related user interactions, coordinating between the UI
 and application services while managing validation and error handling.
 """
 
-from typing import Dict, Any, List, Optional, Union
 import logging
+from typing import Any, Dict, List, Optional, Union
 
-from application.services.stock_application_service import StockApplicationService
+from application.services.stock_application_service import \
+    StockApplicationService
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest,
-    UpdateStockRequest,
-    StockViewModel,
-    StockListResponse,
-    StockDetailResponse,
-    CreateStockResponse,
-    UpdateStockResponse,
-    ValidationErrorResponse,
-    StockSearchRequest,
-)
+    CreateStockRequest, CreateStockResponse, StockDetailResponse,
+    StockListResponse, StockSearchRequest, StockViewModel, UpdateStockRequest,
+    UpdateStockResponse, ValidationErrorResponse)
 
 logger = logging.getLogger(__name__)
 

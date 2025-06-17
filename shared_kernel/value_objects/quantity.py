@@ -6,7 +6,7 @@ operations and business rules consistently across all domains.
 """
 
 import decimal
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from typing import List, Union
 

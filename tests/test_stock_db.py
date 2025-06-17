@@ -5,10 +5,12 @@ This module tests all CRUD operations and queries for the stock table,
 ensuring data integrity and proper error handling.
 """
 
-import pytest
-from utils.database import StockDB, get_db_connection
 from sqlite3 import IntegrityError
+
+import pytest
+
 from tests.conftest import assert_datetime_recent
+from utils.database import StockDB, get_db_connection
 
 
 class TestStockDB:
@@ -228,8 +230,8 @@ class TestStockDB:
 
         This verifies our timestamp triggers are working.
         """
-        from datetime import datetime, timezone
         import time
+        from datetime import datetime, timezone
 
         # Create a stock
         stock_id = StockDB.create(symbol="META", name="Meta Platforms Inc.")

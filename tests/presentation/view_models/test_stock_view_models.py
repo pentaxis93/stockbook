@@ -5,23 +5,17 @@ Following TDD approach - these tests define the expected behavior
 of view models for data transfer between UI and controllers.
 """
 
-import pytest
 from datetime import datetime
 from decimal import Decimal
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 
-from presentation.view_models.stock_view_models import (
-    CreateStockRequest,
-    UpdateStockRequest,
-    StockViewModel,
-    StockListResponse,
-    StockDetailResponse,
-    CreateStockResponse,
-    UpdateStockResponse,
-    ValidationErrorResponse,
-    StockSearchRequest,
-)
+import pytest
+
 from application.dto.stock_dto import StockDto
+from presentation.view_models.stock_view_models import (
+    CreateStockRequest, CreateStockResponse, StockDetailResponse,
+    StockListResponse, StockSearchRequest, StockViewModel, UpdateStockRequest,
+    UpdateStockResponse, ValidationErrorResponse)
 
 
 class TestCreateStockRequest:

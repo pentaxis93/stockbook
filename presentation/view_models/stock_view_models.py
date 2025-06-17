@@ -7,8 +7,8 @@ handling validation, transformation, and display logic.
 
 import re
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional, Union
 from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
 
 from application.commands.stock_commands import CreateStockCommand
 from application.dto.stock_dto import StockDto

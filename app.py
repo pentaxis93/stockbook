@@ -6,12 +6,15 @@ This is the new main entry point that integrates the complete clean architecture
 implementation with the Streamlit UI framework.
 """
 
-import streamlit as st
 from typing import Optional
+
+import streamlit as st
+
+from config import config
 from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
-from config import config
+from presentation.coordinators.stock_page_coordinator import \
+    StockPageCoordinator
 
 
 class StockBookApp:

@@ -10,26 +10,20 @@ This module tests the reusable Streamlit UI components that provide:
 Following TDD approach - tests are written first to define expected behavior.
 """
 
-import pytest
-import streamlit as st
-import pandas as pd
 from datetime import date, datetime, timedelta
 from decimal import Decimal
-from unittest.mock import patch, MagicMock, call
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, call, patch
+
+import pandas as pd
+import pytest
+import streamlit as st
 
 # Import the components module (will fail initially - that's expected in TDD)
 try:
-    from components import (
-        StockSymbolInput,
-        DatePicker,
-        PriceInput,
-        QuantityInput,
-        MessageDisplay,
-        DataTable,
-        FormLayout,
-        ComponentTestingUtils,
-    )
+    from components import (ComponentTestingUtils, DataTable, DatePicker,
+                            FormLayout, MessageDisplay, PriceInput,
+                            QuantityInput, StockSymbolInput)
 except ImportError:
     # This is expected during TDD - we haven't created the module yet
     pytest.skip("Components module not yet implemented", allow_module_level=True)

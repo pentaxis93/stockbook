@@ -5,8 +5,10 @@ Tests the Quantity value object as a reusable component across all bounded conte
 This follows TDD approach by defining all expected behavior before implementation.
 """
 
-import pytest
 from decimal import Decimal
+
+import pytest
+
 from shared_kernel.value_objects.quantity import Quantity
 
 

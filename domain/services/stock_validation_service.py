@@ -6,10 +6,12 @@ belong in the StockEntity itself.
 """
 
 from decimal import Decimal
-from typing import List, Dict, Optional, Callable
+from typing import Callable, Dict, List, Optional
+
 from domain.entities.stock_entity import StockEntity
 from domain.value_objects.money import Money
-from .exceptions import ValidationError, BusinessRuleViolationError
+
+from .exceptions import BusinessRuleViolationError, ValidationError
 
 
 class ValidationConfiguration:

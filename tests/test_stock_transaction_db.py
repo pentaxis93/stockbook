@@ -5,10 +5,12 @@ This module tests transaction creation, retrieval, and the complex
 holdings calculation logic.
 """
 
-import pytest
 from datetime import date, datetime, timedelta
-from utils.database import StockTransactionDB, StockDB, PortfolioDB
 from sqlite3 import IntegrityError
+
+import pytest
+
+from utils.database import PortfolioDB, StockDB, StockTransactionDB
 
 
 class TestStockTransactionDB:

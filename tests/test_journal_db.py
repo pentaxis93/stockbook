@@ -7,15 +7,12 @@ The journal is flexible - entries can be general observations or linked
 to specific stocks, portfolios, or transactions.
 """
 
-import pytest
 from datetime import date, timedelta
-from utils.database import (
-    JournalDB,
-    StockDB,
-    PortfolioDB,
-    StockTransactionDB,
-    get_db_connection,
-)
+
+import pytest
+
+from utils.database import (JournalDB, PortfolioDB, StockDB,
+                            StockTransactionDB, get_db_connection)
 
 
 class TestJournalDB:

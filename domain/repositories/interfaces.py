@@ -6,17 +6,17 @@ following the Repository pattern and Interface Segregation Principle.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any
 from datetime import date
 from decimal import Decimal
+from typing import Any, Dict, List, Optional
 
 # Import domain entities and value objects
 from domain.entities.stock_entity import StockEntity
 from domain.value_objects.stock_symbol import StockSymbol
-
 # Note: Other domain entities (Portfolio, Transaction, etc.) will be added in future commits
 # For now, we'll use the old models for non-Stock entities as placeholders
-from models import Portfolio, Transaction, Target, PortfolioBalance, JournalEntry
+from models import (JournalEntry, Portfolio, PortfolioBalance, Target,
+                    Transaction)
 
 
 class IStockRepository(ABC):

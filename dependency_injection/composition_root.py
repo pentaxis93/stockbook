@@ -5,24 +5,25 @@ Configures the entire application's dependency graph in one central location,
 following clean architecture principles.
 """
 
-from typing import Optional, Dict, Any, Callable
-from .di_container import DIContainer
+from typing import Any, Callable, Dict, Optional
 
+# Application layer imports
+from application.services.stock_application_service import \
+    StockApplicationService
+# Domain layer imports
+from domain.repositories.interfaces import IStockRepository, IUnitOfWork
 # Infrastructure layer imports
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
-
-# Domain layer imports
-from domain.repositories.interfaces import IUnitOfWork, IStockRepository
-
-# Application layer imports
-from application.services.stock_application_service import StockApplicationService
-
+from infrastructure.repositories.sqlite_stock_repository import \
+    SqliteStockRepository
+from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 # Presentation layer imports
 from presentation.controllers.stock_controller import StockController
-from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
+from presentation.coordinators.stock_page_coordinator import \
+    StockPageCoordinator
+
+from .di_container import DIContainer
 
 
 class CompositionRoot:

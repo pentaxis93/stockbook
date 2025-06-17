@@ -5,8 +5,10 @@ Following TDD approach - these tests define the expected behavior
 of domain events used for inter-aggregate communication.
 """
 
-import pytest
 from datetime import datetime, timezone
+
+import pytest
+
 from domain.events.base import DomainEvent
 from domain.events.stock_events import StockAddedEvent
 from domain.value_objects.stock_symbol import StockSymbol

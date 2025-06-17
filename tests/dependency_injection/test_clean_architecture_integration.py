@@ -5,17 +5,19 @@ Tests that dependency injection correctly wires our domain, application,
 infrastructure, and presentation layers following clean architecture principles.
 """
 
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
+
+from application.commands.stock_commands import CreateStockCommand
+from application.dto.stock_dto import StockDto
+# Clean architecture imports - these exist
+from domain.entities.stock_entity import StockEntity
+from domain.value_objects.stock_symbol import StockSymbol
 
 # These imports will exist after implementation
 # from dependency_injection.composition_root import CompositionRoot
 
-# Clean architecture imports - these exist
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
-from application.commands.stock_commands import CreateStockCommand
-from application.dto.stock_dto import StockDto
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")

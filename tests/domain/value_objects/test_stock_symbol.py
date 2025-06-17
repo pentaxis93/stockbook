@@ -6,6 +6,7 @@ before implementation.
 """
 
 import pytest
+
 from domain.value_objects.stock_symbol import StockSymbol
 
 

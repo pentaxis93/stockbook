@@ -6,9 +6,11 @@ across all bounded contexts. This follows TDD approach by defining
 all expected behavior before implementation.
 """
 
-import pytest
 from datetime import datetime, timedelta
 from uuid import UUID
+
+import pytest
+
 from shared_kernel.events.base import DomainEvent
 
 

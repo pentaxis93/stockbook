@@ -6,9 +6,9 @@ transaction support for the infrastructure layer.
 """
 
 import sqlite3
-from pathlib import Path
-from typing import Union, Optional, List
 from contextlib import contextmanager
+from pathlib import Path
+from typing import List, Optional, Union
 
 
 class DatabaseConnection:

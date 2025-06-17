@@ -5,21 +5,17 @@ Following TDD approach - these tests define the expected behavior
 of the Streamlit adapter that bridges controllers with Streamlit UI.
 """
 
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, patch, MagicMock
 import streamlit as st
-from typing import Dict, Any, List, Optional
 
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest,
-    StockListResponse,
-    StockDetailResponse,
-    CreateStockResponse,
-    ValidationErrorResponse,
-    StockViewModel,
-)
+    CreateStockRequest, CreateStockResponse, StockDetailResponse,
+    StockListResponse, StockViewModel, ValidationErrorResponse)
 
 
 class TestStreamlitStockAdapter:

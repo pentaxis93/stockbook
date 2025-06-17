@@ -6,8 +6,10 @@ across all bounded contexts. This follows TDD approach by defining
 all expected behavior before implementation.
 """
 
-import pytest
 from abc import ABC
+
+import pytest
+
 from shared_kernel.interfaces.unit_of_work import IUnitOfWork
 
 

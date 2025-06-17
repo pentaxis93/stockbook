@@ -7,17 +7,17 @@ within a transactional context.
 
 import sqlite3
 from typing import Optional
-from domain.repositories.interfaces import (
-    IUnitOfWork,
-    IStockRepository,
-    IPortfolioRepository,
-    ITransactionRepository,
-    ITargetRepository,
-    IPortfolioBalanceRepository,
-    IJournalRepository,
-)
+
+from domain.repositories.interfaces import (IJournalRepository,
+                                            IPortfolioBalanceRepository,
+                                            IPortfolioRepository,
+                                            IStockRepository,
+                                            ITargetRepository,
+                                            ITransactionRepository,
+                                            IUnitOfWork)
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
+from infrastructure.repositories.sqlite_stock_repository import \
+    SqliteStockRepository
 
 
 class TransactionalDatabaseConnection:

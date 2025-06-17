@@ -6,6 +6,7 @@ of command objects used for stock operations.
 """
 
 import pytest
+
 from application.commands.stock_commands import CreateStockCommand
 
 

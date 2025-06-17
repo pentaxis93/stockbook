@@ -5,11 +5,13 @@ Following TDD approach - these tests define the expected behavior
 of the database connection management.
 """
 
-import pytest
-import tempfile
 import os
 import sqlite3
+import tempfile
 from pathlib import Path
+
+import pytest
+
 from infrastructure.persistence.database_connection import DatabaseConnection
 
 

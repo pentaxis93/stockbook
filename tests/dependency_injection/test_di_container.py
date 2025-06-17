@@ -5,17 +5,16 @@ Following TDD approach - these tests define the expected behavior
 of our DI container before implementation.
 """
 
-import pytest
 from abc import ABC, abstractmethod
-from typing import Type, Any
+from typing import Any, Type
+
+import pytest
 
 # These imports now exist after implementation
 from dependency_injection.di_container import DIContainer
-from dependency_injection.exceptions import (
-    DependencyResolutionError,
-    CircularDependencyError,
-    DuplicateRegistrationError,
-)
+from dependency_injection.exceptions import (CircularDependencyError,
+                                             DependencyResolutionError,
+                                             DuplicateRegistrationError)
 from dependency_injection.lifetimes import Lifetime
 
 

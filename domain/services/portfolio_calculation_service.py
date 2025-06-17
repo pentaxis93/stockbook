@@ -6,17 +6,17 @@ across multiple stocks and provide aggregated insights.
 """
 
 from decimal import Decimal
-from typing import List, Tuple, Dict, Optional
+from typing import Dict, List, Optional, Tuple
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.quantity import Quantity
 from domain.value_objects.money import Money
+from domain.value_objects.quantity import Quantity
+
 from .exceptions import CalculationError, InsufficientDataError
-from .value_objects.portfolio_metrics import (
-    PortfolioMetrics,
-    PortfolioAllocation,
-    PositionAllocation,
-    PortfolioSummary,
-)
+from .value_objects.portfolio_metrics import (PortfolioAllocation,
+                                              PortfolioMetrics,
+                                              PortfolioSummary,
+                                              PositionAllocation)
 
 
 class PortfolioCalculationConfig:

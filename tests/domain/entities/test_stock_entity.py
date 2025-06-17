@@ -5,12 +5,14 @@ Following TDD approach - these tests define the expected behavior
 of the rich Stock entity with business logic.
 """
 
-import pytest
 from decimal import Decimal
+
+import pytest
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
 from domain.value_objects.money import Money
 from domain.value_objects.quantity import Quantity
+from domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestStockEntity:

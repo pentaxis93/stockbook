@@ -3,12 +3,13 @@ Database utilities for StockBook
 Handles all database operations including initialization, CRUD operations, and queries
 """
 
-import sqlite3
-from pathlib import Path
-from typing import List, Dict, Optional, Any
-from datetime import datetime, date
-from contextlib import contextmanager
 import logging
+import sqlite3
+from contextlib import contextmanager
+from datetime import date, datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 from config import config
 
 # Configure SQLite to handle dates properly in Python 3.12+

@@ -12,13 +12,14 @@ This module tests the centralized configuration system that provides:
 Following TDD approach - tests are written first to define expected behavior.
 """
 
-import pytest
-import tempfile
-from pathlib import Path
-from datetime import datetime
 import os
-from typing import Dict, Any
+import tempfile
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict
 from unittest.mock import patch
+
+import pytest
 
 # Import the config module (will fail initially - that's expected in TDD)
 try:

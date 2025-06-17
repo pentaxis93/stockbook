@@ -6,11 +6,12 @@ domain entities and repositories.
 """
 
 from typing import List, Optional
+
 from application.commands.stock_commands import CreateStockCommand
 from application.dto.stock_dto import StockDto
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
 from domain.repositories.interfaces import IUnitOfWork
+from domain.value_objects.stock_symbol import StockSymbol
 
 
 class StockApplicationService:

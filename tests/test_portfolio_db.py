@@ -5,8 +5,9 @@ This module tests portfolio creation, retrieval, and management operations.
 """
 
 import pytest
-from utils.database import PortfolioDB, get_db_connection
+
 from tests.conftest import assert_datetime_recent
+from utils.database import PortfolioDB, get_db_connection
 
 
 class TestPortfolioDB:
@@ -124,8 +125,8 @@ class TestPortfolioDB:
         """
         Test that created_at and updated_at are set correctly.
         """
-        from datetime import datetime
         import time
+        from datetime import datetime
 
         # Create portfolio
         portfolio_id = PortfolioDB.create(name="Test Portfolio")

@@ -5,14 +5,16 @@ Tests business logic for comprehensive risk assessment of individual stocks
 and portfolios, including various risk metrics and risk management strategies.
 """
 
-import pytest
-from decimal import Decimal
 from datetime import datetime, timedelta
-from typing import List, Dict
+from decimal import Decimal
+from typing import Dict, List
+
+import pytest
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
 from domain.value_objects.money import Money
 from domain.value_objects.quantity import Quantity
+from domain.value_objects.stock_symbol import StockSymbol
 
 # These imports will exist after implementation
 # from domain.services.risk_assessment_service import RiskAssessmentService

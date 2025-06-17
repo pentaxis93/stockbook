@@ -6,20 +6,16 @@ including various risk metrics and risk management analysis.
 """
 
 from decimal import Decimal
-from typing import List, Tuple, Dict, Optional
+from typing import Dict, List, Optional, Tuple
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.quantity import Quantity
 from domain.value_objects.money import Money
-from .exceptions import RiskAnalysisError, InsufficientDataError
-from .value_objects.risk_metrics import (
-    RiskProfile,
-    RiskLevel,
-    RiskMetrics,
-    PortfolioRisk,
-    ConcentrationRisk,
-    ConcentrationLevel,
-    RiskFactor,
-)
+from domain.value_objects.quantity import Quantity
+
+from .exceptions import InsufficientDataError, RiskAnalysisError
+from .value_objects.risk_metrics import (ConcentrationLevel, ConcentrationRisk,
+                                         PortfolioRisk, RiskFactor, RiskLevel,
+                                         RiskMetrics, RiskProfile)
 
 
 class RiskAssessmentConfig:

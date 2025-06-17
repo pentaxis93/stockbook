@@ -5,7 +5,7 @@ Provides specialized exceptions for different types of domain service errors
 with clear error messages and appropriate error handling context.
 """
 
-from typing import List, Optional, Any
+from typing import Any, List, Optional
 
 
 class DomainServiceError(Exception):

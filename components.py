@@ -14,17 +14,18 @@ Design principles:
 - Easy to test and maintain
 """
 
-import streamlit as st
-import pandas as pd
+import re
 import time
+from contextlib import contextmanager
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation
-from typing import Dict, Any, List, Optional, Union, Callable
-from contextlib import contextmanager
-import re
+from typing import Any, Callable, Dict, List, Optional, Union
+
+import pandas as pd
+import streamlit as st
 
 from config import config
-from error_handling import ValidationError, ErrorMessageMapper, MessageSystem
+from error_handling import ErrorMessageMapper, MessageSystem, ValidationError
 
 
 class StockSymbolInput:

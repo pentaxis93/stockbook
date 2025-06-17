@@ -12,28 +12,22 @@ This module tests the comprehensive error handling system that provides:
 Following TDD approach - tests are written first to define expected behavior.
 """
 
-import pytest
 import logging
 import tempfile
-from pathlib import Path
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, patch
+
+import pytest
 import streamlit as st
-from typing import Dict, Any, Optional, List
 
 # Import the error handling module (will fail initially - that's expected in TDD)
 try:
-    from error_handling import (
-        StockBookError,
-        ValidationError,
-        DatabaseError,
-        BusinessLogicError,
-        ErrorLogger,
-        ErrorMessageMapper,
-        StreamlitErrorBoundary,
-        MessageSystem,
-        ErrorRecovery,
-    )
+    from error_handling import (BusinessLogicError, DatabaseError, ErrorLogger,
+                                ErrorMessageMapper, ErrorRecovery,
+                                MessageSystem, StockBookError,
+                                StreamlitErrorBoundary, ValidationError)
 except ImportError:
     # This is expected during TDD - we haven't created the module yet
     pytest.skip("Error handling module not yet implemented", allow_module_level=True)

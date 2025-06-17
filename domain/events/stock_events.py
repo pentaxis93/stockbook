@@ -6,6 +6,7 @@ Events that represent significant occurrences in the stock subdomain.
 
 from datetime import datetime
 from typing import Optional
+
 from domain.events.base import DomainEvent
 from domain.value_objects.stock_symbol import StockSymbol
 

@@ -15,9 +15,9 @@ validates all settings on initialization.
 
 import os
 import re
-from pathlib import Path
-from typing import Dict, Any, List, Optional, Union
 from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
 
 
 class ConfigError(Exception):

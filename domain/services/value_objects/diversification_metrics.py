@@ -8,6 +8,7 @@ analysis and correlation calculations.
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict, List, Optional
+
 from domain.value_objects.money import Money
 from domain.value_objects.stock_symbol import StockSymbol
 

@@ -6,9 +6,10 @@ and validation rules encapsulated within the entity.
 """
 
 from typing import Optional
-from domain.value_objects.stock_symbol import StockSymbol
+
 from domain.value_objects.money import Money
 from domain.value_objects.quantity import Quantity
+from domain.value_objects.stock_symbol import StockSymbol
 
 
 class StockEntity:

@@ -5,20 +5,18 @@ Following TDD approach - these tests define the expected behavior
 of the page coordinator that orchestrates stock-related page flows.
 """
 
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, Mock, patch
 
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
-from presentation.controllers.stock_controller import StockController
+import pytest
+
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from presentation.controllers.stock_controller import StockController
+from presentation.coordinators.stock_page_coordinator import \
+    StockPageCoordinator
 from presentation.view_models.stock_view_models import (
-    StockListResponse,
-    CreateStockResponse,
-    StockDetailResponse,
-    ValidationErrorResponse,
-    StockViewModel,
-)
+    CreateStockResponse, StockDetailResponse, StockListResponse,
+    StockViewModel, ValidationErrorResponse)
 
 
 class TestStockPageCoordinator:

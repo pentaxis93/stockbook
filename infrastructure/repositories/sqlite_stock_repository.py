@@ -7,9 +7,10 @@ while fulfilling the domain repository contract.
 
 import sqlite3
 from typing import List, Optional
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
 from domain.repositories.interfaces import IStockRepository
+from domain.value_objects.stock_symbol import StockSymbol
 from infrastructure.persistence.database_connection import DatabaseConnection
 
 

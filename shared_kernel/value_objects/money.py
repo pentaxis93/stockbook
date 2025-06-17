@@ -5,11 +5,11 @@ Provides a robust, immutable money representation that handles currency,
 arithmetic operations, and business rules consistently across all domains.
 """
 
+import decimal
 import json
 import re
-import decimal
-from decimal import Decimal, ROUND_HALF_UP
-from typing import List, Optional, Union, Dict
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Dict, List, Optional, Union
 
 
 class Money:

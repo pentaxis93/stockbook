@@ -5,21 +5,21 @@ Tests business logic for portfolio-level calculations that operate
 across multiple stocks and provide aggregated insights.
 """
 
-import pytest
 from decimal import Decimal
 from typing import List
+
+import pytest
+
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
+from domain.services.exceptions import CalculationError, InsufficientDataError
+# These imports now exist after implementation
+from domain.services.portfolio_calculation_service import \
+    PortfolioCalculationService
+from domain.services.value_objects.portfolio_metrics import (
+    PortfolioAllocation, PortfolioMetrics)
 from domain.value_objects.money import Money
 from domain.value_objects.quantity import Quantity
-
-# These imports now exist after implementation
-from domain.services.portfolio_calculation_service import PortfolioCalculationService
-from domain.services.value_objects.portfolio_metrics import (
-    PortfolioMetrics,
-    PortfolioAllocation,
-)
-from domain.services.exceptions import CalculationError, InsufficientDataError
+from domain.value_objects.stock_symbol import StockSymbol
 
 
 # Test data helpers

@@ -3,12 +3,14 @@ Tests for Pydantic data models
 Following TDD approach - these tests will initially fail until models are implemented
 """
 
-import pytest
 from datetime import date, datetime
 from decimal import Decimal
+
+import pytest
 from pydantic import ValidationError
 
-from models import Stock, Portfolio, Transaction, Target, PortfolioBalance, JournalEntry
+from models import (JournalEntry, Portfolio, PortfolioBalance, Stock, Target,
+                    Transaction)
 
 
 class TestStockModel:

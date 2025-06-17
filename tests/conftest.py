@@ -5,14 +5,16 @@ This file is automatically loaded by pytest and provides common test utilities
 that can be used across all test files without explicit imports.
 """
 
-from utils.database import init_database, get_db_connection
-import pytest
-import tempfile
 import sqlite3
-from pathlib import Path
 import sys
+import tempfile
 from datetime import datetime
+from pathlib import Path
+
+import pytest
+
 from config import config
+from utils.database import get_db_connection, init_database
 
 # Add the project root to Python path so we can import our modules
 # This allows tests to import from 'utils' and other project packages

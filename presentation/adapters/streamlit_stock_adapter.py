@@ -5,21 +5,17 @@ Bridges between stock controllers and Streamlit UI framework,
 handling form rendering, data display, and user interactions.
 """
 
-import streamlit as st
-import pandas as pd
-from typing import Dict, Any, List, Optional, Union
 import logging
+from typing import Any, Dict, List, Optional, Union
+
+import pandas as pd
+import streamlit as st
 
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest,
-    StockListResponse,
-    StockDetailResponse,
-    CreateStockResponse,
-    ValidationErrorResponse,
-    StockViewModel,
-    StockSearchRequest,
-)
+    CreateStockRequest, CreateStockResponse, StockDetailResponse,
+    StockListResponse, StockSearchRequest, StockViewModel,
+    ValidationErrorResponse)
 
 logger = logging.getLogger(__name__)
 

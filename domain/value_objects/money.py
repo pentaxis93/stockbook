@@ -5,9 +5,9 @@ Represents monetary amounts with currency, ensuring type safety
 and proper precision handling for financial operations.
 """
 
-from decimal import Decimal, ROUND_HALF_UP
-from typing import Union
 import re
+from decimal import ROUND_HALF_UP, Decimal
+from typing import Union
 
 
 class Money:

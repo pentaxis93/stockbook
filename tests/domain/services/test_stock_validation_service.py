@@ -5,15 +5,17 @@ Tests complex business validation rules that apply to stocks but don't
 belong in the StockEntity itself.
 """
 
-import pytest
 from decimal import Decimal
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
-from domain.value_objects.money import Money
 
+import pytest
+
+from domain.entities.stock_entity import StockEntity
+from domain.services.exceptions import (BusinessRuleViolationError,
+                                        ValidationError)
 # These imports now exist after implementation
 from domain.services.stock_validation_service import StockValidationService
-from domain.services.exceptions import ValidationError, BusinessRuleViolationError
+from domain.value_objects.money import Money
+from domain.value_objects.stock_symbol import StockSymbol
 
 
 # Test data helper

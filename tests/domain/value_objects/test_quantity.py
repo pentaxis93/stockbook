@@ -6,6 +6,7 @@ before implementation.
 """
 
 import pytest
+
 from domain.value_objects.quantity import Quantity
 
 
