@@ -122,6 +122,19 @@ class IStockRepository(ABC):
             True if stock exists, False otherwise
         """
         pass
+    
+    @abstractmethod
+    def get_by_grade(self, grade: str) -> List[StockEntity]:
+        """
+        Retrieve stocks by grade.
+        
+        Args:
+            grade: Stock grade to filter by (A, B, or C)
+            
+        Returns:
+            List of StockEntity domain models with the specified grade
+        """
+        pass
 
 
 class IPortfolioRepository(ABC):
