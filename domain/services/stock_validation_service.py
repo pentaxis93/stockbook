@@ -147,17 +147,19 @@ class StockValidationService:
                     context={"price": str(price), "grade": stock.grade}
                 )
     
-    def is_blue_chip_candidate(self, stock: StockEntity) -> BluechipEligibilityResult:
+    def is_blue_chip_candidate(self, stock: StockEntity, current_price: Optional[Money] = None) -> BluechipEligibilityResult:
         """Assess if stock meets blue chip criteria."""
         reasons = []
         is_eligible = True
         
         # Price criteria (simplified - normally would include market cap)
-        if stock.current_price.amount < Decimal("50.00"):
+        if current_price and current_price.amount < Decimal("50.00"):
             is_eligible = False
             reasons.append("Price below typical blue chip range")
-        else:
+        elif current_price:
             reasons.append("Price indicates large market cap potential")
+        else:
+            reasons.append("No current price available for price analysis")
         
         # Grade criteria
         if stock.grade not in ["A+", "A", "A-"]:
@@ -262,7 +264,7 @@ class StockValidationService:
                     field="custom_rule"
                 )
     
-    def validate(self, stock: StockEntity, severity: str = ValidationSeverity.WARNING) -> List[ValidationWarning]:
+    def validate(self, stock: StockEntity, current_price: Optional[Money] = None, severity: str = ValidationSeverity.WARNING) -> List[ValidationWarning]:
         """
         Perform comprehensive stock validation.
         
@@ -273,10 +275,11 @@ class StockValidationService:
         try:
             # Always run core validations
             self.validate_data_completeness(stock)
-            self.validate_price_reasonableness(stock)
+            if current_price:
+                self.validate_price_reasonableness(stock, current_price)
             self.validate_industry_classification(stock)
-            self.validate_grade_price_consistency(stock)
-            self.validate_penny_stock_rules(stock)
+            self.validate_grade_price_consistency(stock, current_price)
+            self.validate_penny_stock_rules(stock, current_price)
             
             # Add consistency warnings
             warnings.extend(self.validate_field_consistency(stock))

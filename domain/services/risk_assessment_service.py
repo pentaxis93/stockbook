@@ -73,7 +73,7 @@ class RiskAssessmentService:
             risk_score=risk_score
         )
     
-    def assess_portfolio_risk(self, portfolio: List[Tuple[StockEntity, Quantity]]) -> PortfolioRisk:
+    def assess_portfolio_risk(self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]) -> PortfolioRisk:
         """Calculate overall portfolio risk level."""
         if not portfolio:
             raise InsufficientDataError(
@@ -89,13 +89,13 @@ class RiskAssessmentService:
             individual_risks.append(risk_profile)
         
         # Calculate portfolio-level metrics
-        portfolio_metrics = self._calculate_portfolio_risk_metrics(portfolio)
+        portfolio_metrics = self._calculate_portfolio_risk_metrics(portfolio, prices)
         
         # Identify concentration risks
-        concentration_risks = self._identify_concentration_risks(portfolio)
+        concentration_risks = self._identify_concentration_risks(portfolio, prices)
         
         # Assess sector and geographic risks
-        sector_risks = self._assess_portfolio_sector_risks(portfolio)
+        sector_risks = self._assess_portfolio_sector_risks(portfolio, prices)
         geographic_risks = {}  # Simplified for now
         
         # Generate risk warnings and mitigation strategies
@@ -245,7 +245,7 @@ class RiskAssessmentService:
         
         return factors
     
-    def _calculate_portfolio_risk_metrics(self, portfolio: List[Tuple[StockEntity, Quantity]]) -> RiskMetrics:
+    def _calculate_portfolio_risk_metrics(self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]) -> RiskMetrics:
         """Calculate portfolio-level risk metrics."""
         # Simplified implementation
         total_positions = len(portfolio)
@@ -259,7 +259,7 @@ class RiskAssessmentService:
         # Simple VaR calculation (5% of portfolio value)
         from .portfolio_calculation_service import PortfolioCalculationService
         calc_service = PortfolioCalculationService()
-        total_value = calc_service.calculate_total_value(portfolio)
+        total_value = calc_service.calculate_total_value(portfolio, prices)
         var_95 = Money(total_value.amount * Decimal('0.05'), total_value.currency)
         cvar_95 = Money(total_value.amount * Decimal('0.08'), total_value.currency)
         
@@ -274,7 +274,7 @@ class RiskAssessmentService:
             overall_risk = RiskLevel.LOW
         
         # Calculate concentration risks
-        concentration_risks = self._identify_concentration_risks(portfolio)
+        concentration_risks = self._identify_concentration_risks(portfolio, prices)
         
         # Overall risk score
         risk_score = Decimal('50')  # Simplified
@@ -291,12 +291,12 @@ class RiskAssessmentService:
             risk_score=risk_score
         )
     
-    def _identify_concentration_risks(self, portfolio: List[Tuple[StockEntity, Quantity]]) -> List[ConcentrationRisk]:
+    def _identify_concentration_risks(self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]) -> List[ConcentrationRisk]:
         """Identify concentration risks in portfolio."""
         from .portfolio_calculation_service import PortfolioCalculationService
         calc_service = PortfolioCalculationService()
         
-        position_allocations = calc_service.calculate_position_allocations(portfolio)
+        position_allocations = calc_service.calculate_position_allocations(portfolio, prices)
         concentration_risks = []
         
         for allocation in position_allocations:
@@ -323,12 +323,12 @@ class RiskAssessmentService:
         
         return concentration_risks
     
-    def _assess_portfolio_sector_risks(self, portfolio: List[Tuple[StockEntity, Quantity]]) -> Dict[str, RiskLevel]:
+    def _assess_portfolio_sector_risks(self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]) -> Dict[str, RiskLevel]:
         """Assess sector concentration risks."""
         from .portfolio_calculation_service import PortfolioCalculationService
         calc_service = PortfolioCalculationService()
         
-        industry_allocation = calc_service.calculate_industry_allocations(portfolio)
+        industry_allocation = calc_service.calculate_industry_allocations(portfolio, prices)
         sector_risks = {}
         
         for sector, percentage in industry_allocation.allocations.items():

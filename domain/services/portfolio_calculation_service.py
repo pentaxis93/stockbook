@@ -221,7 +221,7 @@ class PortfolioCalculationService:
         else:
             return "C"
     
-    def generate_portfolio_summary(self, portfolio: List[Tuple[StockEntity, Quantity]]) -> PortfolioSummary:
+    def generate_portfolio_summary(self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]) -> PortfolioSummary:
         """Generate comprehensive portfolio summary."""
         if not portfolio:
             return PortfolioSummary(
@@ -234,11 +234,11 @@ class PortfolioCalculationService:
                 diversification_grade="N/A"
             )
         
-        total_value = self.calculate_total_value(portfolio)
-        position_allocations = self.calculate_position_allocations(portfolio)
-        industry_allocation = self.calculate_industry_allocations(portfolio)
-        grade_allocation = self.calculate_grade_allocations(portfolio)
-        diversity_score = self.calculate_diversity_score(portfolio)
+        total_value = self.calculate_total_value(portfolio, prices)
+        position_allocations = self.calculate_position_allocations(portfolio, prices)
+        industry_allocation = self.calculate_industry_allocations(portfolio, prices)
+        grade_allocation = self.calculate_grade_allocations(portfolio, prices)
+        diversity_score = self.calculate_diversity_score(portfolio, prices)
         
         # Find top holding
         top_holding = max(position_allocations, key=lambda x: x.percentage) if position_allocations else None
