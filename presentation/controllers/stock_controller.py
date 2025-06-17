@@ -184,8 +184,10 @@ class StockController:
             if validation_errors:
                 return ValidationErrorResponse(validation_errors)
             
-            # TODO: Implement update functionality when application service supports it
-            # For now, return success for testing
+            # FIXME: Implement stock update functionality  
+            # Need to add update methods to application service and domain layer.
+            # TODO: Add StockApplicationService.update_stock() and StockEntity.update() methods
+            # Currently returns mock success for testing purposes only.
             return UpdateStockResponse.success(
                 request.stock_id,
                 "Stock updated successfully"
@@ -215,8 +217,10 @@ class StockController:
             if not search_request.has_filters:
                 return self.get_stock_list()
             
-            # For now, implement simple grade filtering
-            # TODO: Extend application service for complex search
+            # FIXME: Implement comprehensive search functionality
+            # Currently only supports grade filtering. Need to extend application 
+            # service to support symbol, name, and industry filtering with SQL LIKE queries.
+            # TODO: Add StockApplicationService.search_stocks(symbol_filter, name_filter, etc.)
             if search_request.grade_filter:
                 return self.get_stocks_by_grade(search_request.grade_filter)
             

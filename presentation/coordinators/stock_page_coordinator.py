@@ -110,7 +110,9 @@ class StockPageCoordinator:
                 st.header("🔍 Search Stocks")
                 search_result = self.adapter.render_advanced_search_form()
                 if search_result:
-                    # TODO: Implement search results display
+                    # FIXME: Implement search results display and filtering UI
+                    # Need to connect search form to controller.search_stocks() and display results.
+                    # TODO: Add search results rendering with filtering feedback
                     st.info("Search functionality coming soon!")
                 return search_result
             

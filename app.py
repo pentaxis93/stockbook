@@ -1,6 +1,18 @@
 """
 StockBook - Personal Stock Trading Tracker
 Main Streamlit application entry point
+
+FIXME: This file contains the legacy application structure and needs to be 
+completely refactored to integrate the new clean architecture layers.
+
+TODO: Replace with dependency injection container that wires:
+- Domain entities and value objects  
+- Application services (StockApplicationService)
+- Infrastructure repositories (SQLiteStockRepository, DatabaseConnection, UnitOfWork)
+- Presentation layer (StockController, StreamlitStockAdapter, StockPageCoordinator)
+
+TODO: Implement proper bootstrap/composition root pattern for dependency injection.
+See Commit 5 planning for dependency injection system design.
 """
 
 import streamlit as st

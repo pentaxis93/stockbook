@@ -1,6 +1,18 @@
 """
 Pydantic data models for StockBook application
 Provides type-safe data models with validation for all entities
+
+FIXME: These legacy Pydantic models duplicate functionality now provided by 
+the clean architecture domain entities and value objects. 
+
+TODO: Phase out these models in favor of:
+- domain/entities/stock_entity.py for Stock behavior
+- domain/value_objects/ for validated value types
+- application/dto/ for data transfer between layers
+- presentation/view_models/ for UI data binding
+
+TODO: Migrate remaining references in components.py and legacy code to use
+the new clean architecture layers instead of these models.
 """
 
 from datetime import date, datetime

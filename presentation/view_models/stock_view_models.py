@@ -179,7 +179,14 @@ class StockViewModel:
 
 
 class StockListResponse:
-    """Response model for stock list operations."""
+    """Response model for stock list operations.
+    
+    NOTE: Temporarily implemented as regular class instead of @dataclass
+    due to complex field ordering requirements with Optional[List[StockViewModel]].
+    TODO: Convert back to @dataclass when Python dataclass field ordering
+    with complex generic types is resolved, or use dataclasses with explicit
+    field() ordering.
+    """
     
     def __init__(
         self,
@@ -230,7 +237,12 @@ class StockListResponse:
 
 
 class StockDetailResponse:
-    """Response model for stock detail operations."""
+    """Response model for stock detail operations.
+    
+    NOTE: Temporarily implemented as regular class instead of @dataclass
+    due to complex field ordering requirements with Optional fields.
+    TODO: Convert back to @dataclass with proper field() ordering.
+    """
     
     def __init__(
         self,
@@ -264,7 +276,12 @@ class StockDetailResponse:
 
 
 class CreateStockResponse:
-    """Response model for stock creation operations."""
+    """Response model for stock creation operations.
+    
+    NOTE: Temporarily implemented as regular class instead of @dataclass
+    due to complex field ordering requirements with Optional fields.
+    TODO: Convert back to @dataclass with proper field() ordering.
+    """
     
     def __init__(
         self,
@@ -302,7 +319,12 @@ class CreateStockResponse:
 
 
 class UpdateStockResponse:
-    """Response model for stock update operations."""
+    """Response model for stock update operations.
+    
+    NOTE: Temporarily implemented as regular class instead of @dataclass
+    due to complex field ordering requirements with Optional fields.
+    TODO: Convert back to @dataclass with proper field() ordering.
+    """
     
     def __init__(
         self,
@@ -336,7 +358,12 @@ class UpdateStockResponse:
 
 
 class ValidationErrorResponse:
-    """Response model for validation errors."""
+    """Response model for validation errors.
+    
+    NOTE: Temporarily implemented as regular class instead of @dataclass
+    due to computed field requirements in __init__.
+    TODO: Convert back to @dataclass with __post_init__ when field ordering is resolved.
+    """
     
     def __init__(self, errors: Dict[str, str]):
         self.errors = errors
