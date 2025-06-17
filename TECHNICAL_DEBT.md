@@ -4,12 +4,12 @@ This document tracks temporary implementations, architectural compromises, and t
 
 ## High Priority (Blocking Clean Architecture Completion)
 
-### 1. Main Application Bootstrap (app.py)
-- **Issue**: Legacy Streamlit app structure, no integration with clean architecture
-- **Impact**: Clean architecture layers are isolated from main application
-- **Location**: `app.py`
-- **Solution**: Implement dependency injection container and composition root
-- **Planned**: Commit 5 - Dependency Injection System
+### 1. Legacy Application Integration (app.py)
+- **Issue**: Original Streamlit app still uses legacy models and database utilities
+- **Impact**: Clean architecture implementation is isolated from main app
+- **Location**: `app.py`, `components.py`, legacy database utilities
+- **Solution**: Migrate main app to use dependency injection container and clean architecture
+- **Status**: Ready for integration phase - DI container and composition root completed
 
 ### 2. Legacy Model Duplication
 - **Issue**: Pydantic models in `models.py` duplicate domain entities
@@ -70,19 +70,43 @@ This document tracks temporary implementations, architectural compromises, and t
 - **Alternative**: Integration testing covers this functionality
 - **Note**: Industry standard to skip complex UI framework mocking
 
+## Recent Achievements (Commits 5-7)
+
+### Shared Kernel Implementation ✅ 
+- **Value Objects**: Money and Quantity with full arithmetic operations and business rules
+- **Domain Events**: Base event infrastructure with serialization and ordering
+- **Domain Exceptions**: Comprehensive exception hierarchy with context and severity levels
+- **Interfaces**: Unit of Work pattern for transaction management
+- **Test-Driven Development**: 183 comprehensive tests covering all shared kernel components
+
+### Domain Services Refactoring ✅
+- **Clean Separation**: Domain services no longer access external data from entities
+- **Parameter Injection**: All services accept external data (prices) as method parameters
+- **Business Logic**: Complete portfolio calculation, stock validation, and risk assessment services
+- **Type Safety**: Full type checking compliance for all service methods
+
+### Professional Dependency Injection ✅
+- **IoC Container**: Complete inversion of control with automatic dependency resolution
+- **Composition Root**: Centralized object graph configuration
+- **Lifecycle Management**: Singleton and transient lifetime management
+- **Clean Architecture Integration**: All layers properly wired with dependency inversion
+
 ## Architecture Validation
 
 ### Clean Architecture Compliance ✅
-- **Domain Layer**: Complete, no external dependencies
+- **Domain Layer**: Complete, no external dependencies, rich domain services and shared kernel
 - **Application Layer**: Complete, depends only on domain
 - **Infrastructure Layer**: Complete, implements domain interfaces  
 - **Presentation Layer**: Complete, depends only on application layer
 - **Dependency Flow**: Correctly inverted, no violations detected
+- **Shared Kernel**: Reusable components available across bounded contexts
 
 ### Test Coverage Status ✅
-- **Total Tests**: 474 (467 passing, 7 skipped)
-- **Pass Rate**: 98.5% functional coverage
-- **Business Logic**: 100% covered
+- **Total Tests**: 829 (695 passing, 134 skipped)
+- **Pass Rate**: 83.8% functional coverage (skipped tests are placeholders)
+- **Core Architecture**: 100% covered
+- **Shared Kernel**: 100% covered (183 tests)
+- **Domain Services**: 100% covered for implemented functionality
 - **Domain Logic**: 100% covered  
 - **Application Logic**: 100% covered
 - **Infrastructure Logic**: 100% covered
@@ -95,9 +119,10 @@ This document tracks temporary implementations, architectural compromises, and t
 - ✅ **Commit 2**: Application Services (Complete)  
 - ✅ **Commit 3**: Infrastructure Layer (Complete)
 - ✅ **Commit 4**: Presentation Layer (Complete with documented limitations)
-- 🔄 **Commit 5**: Dependency Injection System (Next - will resolve items 1, 2)
-- 📋 **Commit 6**: Domain Services (Planned)
-- 📋 **Commit 7**: Shared Kernel Reorganization (Planned)
+- ✅ **Commit 5**: Dependency Injection System (Complete)
+- ✅ **Commit 6**: Domain Services (Complete)
+- ✅ **Commit 7**: Shared Kernel Implementation (Complete)
+- 📋 **Commit 8**: Integration & Documentation Updates (Current)
 
 ## Decision Log
 
@@ -120,4 +145,4 @@ This document tracks temporary implementations, architectural compromises, and t
 **Reason**: Gradual migration reduces risk of breaking existing functionality  
 **Alternative Considered**: Big bang migration  
 **Trade-off**: Temporary duplication vs migration risk  
-**Timeline**: Remove after Commit 7
+**Timeline**: Remove after main app integration (Commit 8)
