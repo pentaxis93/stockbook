@@ -9,3 +9,4 @@ pytest==8.4.0          # Core testing framework
 pytest-cov==6.2.1      # Code coverage reporting
 pytest-watch==4.2.0    # Auto-run tests on file changes
 freezegun==1.5.2       # Mock datetime for consistent time-based tests
+dependency-injector==4.48.0

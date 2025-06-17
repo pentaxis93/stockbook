@@ -7,9 +7,9 @@ our clean architecture layers together.
 
 import pytest
 
-# These imports will exist after implementation
-# from dependency_injection.composition_root import CompositionRoot
-# from dependency_injection.di_container import DIContainer
+# These imports now exist after implementation
+from dependency_injection.composition_root import CompositionRoot
+from dependency_injection.di_container import DIContainer
 
 # Application imports - these exist
 from domain.repositories.interfaces import IUnitOfWork, IStockRepository
@@ -22,19 +22,17 @@ from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 
-@pytest.mark.skip(reason="TDD - implementation pending")
 class TestCompositionRoot:
     """Test application dependency composition."""
     
     def test_configure_returns_container(self):
         """Should return configured DI container."""
         # Act
-        # container = CompositionRoot.configure()
+        container = CompositionRoot.configure()
         
         # Assert
-        # assert container is not None
-        # assert isinstance(container, DIContainer)
-        pass
+        assert container is not None
+        assert isinstance(container, DIContainer)
     
     def test_configure_database_layer(self):
         """Should configure database and infrastructure layer correctly."""
