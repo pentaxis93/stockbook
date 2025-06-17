@@ -10,6 +10,8 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
+from presentation.adapters.stock_presentation_adapter import \
+    StockPresentationAdapter
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.controllers.stock_controller import StockController
 from presentation.coordinators.stock_page_coordinator import \
@@ -26,16 +28,42 @@ class TestStockPageCoordinator:
         """Set up test fixtures."""
         self.mock_controller = Mock(spec=StockController)
         self.mock_adapter = Mock(spec=StreamlitStockAdapter)
-        self.coordinator = StockPageCoordinator(self.mock_controller, self.mock_adapter)
+        self.mock_presentation_adapter = Mock(spec=StockPresentationAdapter)
+        self.coordinator = StockPageCoordinator(
+            self.mock_controller, self.mock_adapter, self.mock_presentation_adapter
+        )
 
     def test_coordinator_initialization(self):
         """Should initialize coordinator with required dependencies."""
         # Act & Assert
         assert self.coordinator.controller == self.mock_controller
         assert self.coordinator.adapter == self.mock_adapter
+        assert self.coordinator.presentation_adapter == self.mock_presentation_adapter
         assert hasattr(self.coordinator, "render_stock_dashboard")
         assert hasattr(self.coordinator, "render_stock_management_page")
         assert hasattr(self.coordinator, "render_stock_detail_page")
+        assert hasattr(self.coordinator, "render_stock_page")
+
+    def test_get_active_adapter_prefers_presentation_adapter(self):
+        """Should prefer presentation adapter over legacy adapter."""
+        # Act
+        active_adapter = self.coordinator._get_active_adapter()
+
+        # Assert
+        assert active_adapter == self.mock_presentation_adapter
+
+    def test_get_active_adapter_fallback_to_legacy(self):
+        """Should fallback to legacy adapter when presentation adapter is None."""
+        # Arrange
+        coordinator_no_presentation = StockPageCoordinator(
+            self.mock_controller, self.mock_adapter, None  # No presentation adapter
+        )
+
+        # Act
+        active_adapter = coordinator_no_presentation._get_active_adapter()
+
+        # Assert
+        assert active_adapter == self.mock_adapter
 
     @patch("streamlit.header")
     @pytest.mark.skip(
@@ -124,28 +152,28 @@ class TestStockPageCoordinator:
 
     def test_render_stock_management_page_action_routing(self):
         """Should route to correct action based on navigation selection."""
-        # Test "list" action
+        # Test "list" action - should use the active adapter (presentation adapter)
         self.mock_adapter.render_sidebar_navigation.return_value = "list"
-        self.mock_adapter.render_stock_list.return_value = StockListResponse.success(
-            [], "No stocks"
+        self.mock_presentation_adapter.render_stock_list.return_value = (
+            StockListResponse.success([], "No stocks")
         )
 
         result = self.coordinator.render_stock_management_page()
-        self.mock_adapter.render_stock_list.assert_called_once()
+        self.mock_presentation_adapter.render_stock_list.assert_called_once()
 
-        # Test "create" action
+        # Test "create" action - should use the active adapter (presentation adapter)
         self.mock_adapter.render_sidebar_navigation.return_value = "create"
-        self.mock_adapter.render_create_stock_form.return_value = None
+        self.mock_presentation_adapter.render_create_stock_form.return_value = None
 
         result = self.coordinator.render_stock_management_page()
-        self.mock_adapter.render_create_stock_form.assert_called()
+        self.mock_presentation_adapter.render_create_stock_form.assert_called()
 
-        # Test "search" action
+        # Test "search" action - should use the active adapter (presentation adapter)
         self.mock_adapter.render_sidebar_navigation.return_value = "search"
-        self.mock_adapter.render_advanced_search_form.return_value = None
+        self.mock_presentation_adapter.render_advanced_search_form.return_value = None
 
         result = self.coordinator.render_stock_management_page()
-        self.mock_adapter.render_advanced_search_form.assert_called()
+        self.mock_presentation_adapter.render_advanced_search_form.assert_called()
 
     @patch("streamlit.header")
     @patch("streamlit.columns")
@@ -331,6 +359,37 @@ class TestStockPageCoordinator:
         # Assert
         # Verify state initialization
         assert mock_session_state.__setitem__.called
+
+    def test_render_stock_page_delegates_to_management_page(self):
+        """Should delegate stock page rendering to management page."""
+        # Arrange
+        expected_response = StockListResponse.success([], "No stocks")
+        self.mock_adapter.render_sidebar_navigation.return_value = "list"
+        self.mock_presentation_adapter.render_stock_list.return_value = (
+            expected_response
+        )
+
+        # Act
+        result = self.coordinator.render_stock_page()
+
+        # Assert
+        assert result == expected_response
+        self.mock_adapter.render_sidebar_navigation.assert_called_once()
+        self.mock_presentation_adapter.render_stock_list.assert_called_once()
+
+    def test_render_stock_page_error_handling(self):
+        """Should handle errors gracefully in stock page rendering."""
+        # Arrange
+        self.mock_adapter.render_sidebar_navigation.side_effect = Exception(
+            "Navigation error"
+        )
+
+        # Act & Assert - Should not raise exception
+        with patch("streamlit.error") as mock_error:
+            result = self.coordinator.render_stock_page()
+            mock_error.assert_called_once()
+            assert "An unexpected error occurred" in mock_error.call_args[0][0]
+            assert result is None
 
     def test_coordinator_page_navigation_flow(self):
         """Should coordinate navigation between different page sections."""

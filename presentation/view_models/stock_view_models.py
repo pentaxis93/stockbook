@@ -93,24 +93,72 @@ class UpdateStockRequest:
     """Request model for updating an existing stock."""
 
     stock_id: int
-    name: str
+    name: Optional[str] = field(default=None)
     industry_group: Optional[str] = field(default=None)
     grade: Optional[str] = field(default=None)
-    notes: str = field(default="")
+    notes: Optional[str] = field(default=None)
 
     def validate(self) -> Dict[str, str]:
         """Validate the update request data."""
         errors = {}
 
-        if not self.name or not self.name.strip():
-            errors["name"] = "Stock name cannot be empty"
-        elif len(self.name.strip()) > 200:
-            errors["name"] = "Name cannot exceed 200 characters"
+        # Validate stock_id
+        if not isinstance(self.stock_id, int) or self.stock_id <= 0:
+            errors["stock_id"] = "Stock ID must be a positive integer"
 
-        if self.grade and self.grade.upper() not in ["A", "B", "C"]:
-            errors["grade"] = "Grade must be A, B, C, or empty"
+        # Only validate name if it's being updated
+        if self.name is not None:
+            if not self.name or not self.name.strip():
+                errors["name"] = "Stock name cannot be empty"
+            elif len(self.name.strip()) > 200:
+                errors["name"] = "Name cannot exceed 200 characters"
+
+        # Only validate grade if it's being updated
+        if self.grade is not None and self.grade.upper() not in ["A", "B", "C"]:
+            errors["grade"] = "Grade must be A, B, or C"
+
+        # Validate industry group length if being updated
+        if self.industry_group is not None and len(self.industry_group) > 100:
+            errors["industry_group"] = "Industry group cannot exceed 100 characters"
+
+        # Validate notes length if being updated
+        if self.notes is not None and len(self.notes) > 1000:
+            errors["notes"] = "Notes cannot exceed 1000 characters"
 
         return errors
+
+    def sanitize(self) -> "UpdateStockRequest":
+        """Sanitize input data."""
+        return UpdateStockRequest(
+            stock_id=self.stock_id,
+            name=self.name.strip().title() if self.name else None,
+            industry_group=self.industry_group.strip() if self.industry_group else None,
+            grade=self.grade.upper() if self.grade else None,
+            notes=self.notes.strip() if self.notes else None,
+        )
+
+    def to_command(self) -> "UpdateStockCommand":
+        """Convert to application command."""
+        from application.commands.stock_commands import UpdateStockCommand
+
+        return UpdateStockCommand(
+            stock_id=self.stock_id,
+            name=self.name,
+            industry_group=self.industry_group,
+            grade=self.grade,
+            notes=self.notes,
+        )
+
+    def has_updates(self) -> bool:
+        """Check if any fields are being updated."""
+        return any(
+            [
+                self.name is not None,
+                self.industry_group is not None,
+                self.grade is not None,
+                self.notes is not None,
+            ]
+        )
 
 
 @dataclass

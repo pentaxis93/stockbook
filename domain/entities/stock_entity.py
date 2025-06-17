@@ -7,8 +7,7 @@ and validation rules encapsulated within the entity.
 
 from typing import Optional
 
-from domain.value_objects.money import Money
-from domain.value_objects.quantity import Quantity
+from shared_kernel.value_objects import Money, Quantity
 from domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -177,6 +176,66 @@ class StockEntity:
         """
         self._validate_notes(new_notes)
         self._notes = new_notes.strip()
+
+    def update_name(self, new_name: str) -> None:
+        """
+        Update the company name.
+
+        Args:
+            new_name: New company name
+
+        Raises:
+            ValueError: If name is invalid
+        """
+        self._validate_name(new_name)
+        self._name = new_name.strip()
+
+    def update_industry_group(self, new_industry_group: Optional[str]) -> None:
+        """
+        Update the industry group.
+
+        Args:
+            new_industry_group: New industry group (or None to clear)
+
+        Raises:
+            ValueError: If industry group is invalid
+        """
+        self._validate_industry_group(new_industry_group)
+        self._industry_group = (
+            new_industry_group.strip() if new_industry_group else None
+        )
+
+    def update_fields(self, **kwargs) -> None:
+        """
+        Update multiple fields at once.
+
+        Args:
+            **kwargs: Field names and values to update.
+                     Supported fields: name, industry_group, grade, notes
+
+        Raises:
+            ValueError: If any field is invalid
+        """
+        # Validate all fields first before updating any
+        if "name" in kwargs:
+            self._validate_name(kwargs["name"])
+        if "industry_group" in kwargs:
+            self._validate_industry_group(kwargs["industry_group"])
+        if "grade" in kwargs:
+            self._validate_grade(kwargs["grade"])
+        if "notes" in kwargs:
+            self._validate_notes(kwargs["notes"])
+
+        # Update fields after validation passes
+        if "name" in kwargs:
+            self._name = kwargs["name"].strip()
+        if "industry_group" in kwargs:
+            industry_group = kwargs["industry_group"]
+            self._industry_group = industry_group.strip() if industry_group else None
+        if "grade" in kwargs:
+            self._grade = kwargs["grade"]
+        if "notes" in kwargs:
+            self._notes = kwargs["notes"].strip()
 
     def set_id(self, stock_id: int) -> None:
         """

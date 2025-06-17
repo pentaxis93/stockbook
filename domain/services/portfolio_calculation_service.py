@@ -9,8 +9,7 @@ from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.money import Money
-from domain.value_objects.quantity import Quantity
+from shared_kernel.value_objects import Money, Quantity
 
 from .exceptions import CalculationError, InsufficientDataError
 from .value_objects.portfolio_metrics import (PortfolioAllocation,

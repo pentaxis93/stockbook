@@ -14,7 +14,7 @@ from domain.services.exceptions import (BusinessRuleViolationError,
                                         ValidationError)
 # These imports now exist after implementation
 from domain.services.stock_validation_service import StockValidationService
-from domain.value_objects.money import Money
+from shared_kernel.value_objects import Money
 from domain.value_objects.stock_symbol import StockSymbol
 
 

@@ -14,7 +14,7 @@ from domain.repositories.interfaces import (IJournalRepository,
                                             IStockRepository,
                                             ITargetRepository,
                                             ITransactionRepository,
-                                            IUnitOfWork)
+                                            IStockBookUnitOfWork)
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.repositories.sqlite_stock_repository import \
     SqliteStockRepository
@@ -72,7 +72,7 @@ class _TransactionContext:
         pass
 
 
-class SqliteUnitOfWork(IUnitOfWork):
+class SqliteUnitOfWork(IStockBookUnitOfWork):
     """
     SQLite-based implementation of the Unit of Work pattern.
 

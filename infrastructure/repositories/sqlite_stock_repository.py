@@ -246,6 +246,68 @@ class SqliteStockRepository(IStockRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
+    def search_stocks(
+        self,
+        symbol_filter: Optional[str] = None,
+        name_filter: Optional[str] = None,
+        industry_filter: Optional[str] = None,
+        grade_filter: Optional[str] = None,
+    ) -> List[StockEntity]:
+        """
+        Search stocks with multiple filter criteria.
+
+        Args:
+            symbol_filter: Filter by symbols containing this string (case-insensitive)
+            name_filter: Filter by names containing this string (case-insensitive)
+            industry_filter: Filter by industry group containing this string (case-insensitive)
+            grade_filter: Filter by exact grade match (A, B, or C)
+
+        Returns:
+            List of StockEntity domain models matching the criteria
+        """
+        conn = self.db_connection.get_connection()
+        try:
+            # Build dynamic query based on provided filters
+            where_clauses = []
+            parameters = []
+
+            if symbol_filter:
+                where_clauses.append("UPPER(symbol) LIKE UPPER(?)")
+                parameters.append(f"%{symbol_filter}%")
+
+            if name_filter:
+                where_clauses.append("UPPER(name) LIKE UPPER(?)")
+                parameters.append(f"%{name_filter}%")
+
+            if industry_filter:
+                where_clauses.append("UPPER(industry_group) LIKE UPPER(?)")
+                parameters.append(f"%{industry_filter}%")
+
+            if grade_filter:
+                where_clauses.append("grade = ?")
+                parameters.append(grade_filter)
+
+            # Build the complete query
+            base_query = (
+                "SELECT id, symbol, name, industry_group, grade, notes FROM stock"
+            )
+
+            if where_clauses:
+                query = (
+                    f"{base_query} WHERE {' AND '.join(where_clauses)} ORDER BY symbol"
+                )
+            else:
+                query = f"{base_query} ORDER BY symbol"
+
+            cursor = conn.execute(query, parameters)
+            rows = cursor.fetchall()
+
+            return [self._row_to_entity(row) for row in rows]
+        finally:
+            # Only close if not in a transactional context
+            if not getattr(self.db_connection, "is_transactional", False):
+                conn.close()
+
     def _row_to_entity(self, row: sqlite3.Row) -> StockEntity:
         """
         Convert database row to domain entity.

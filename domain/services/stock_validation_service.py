@@ -9,7 +9,7 @@ from decimal import Decimal
 from typing import Callable, Dict, List, Optional
 
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.money import Money
+from shared_kernel.value_objects import Money
 
 from .exceptions import BusinessRuleViolationError, ValidationError
 

@@ -20,6 +20,9 @@ class Money:
     in a way that's safe and consistent across all bounded contexts.
     """
 
+    # Valid currency codes for trading (can be extended)
+    VALID_CURRENCIES = {"USD", "CAD", "EUR", "GBP", "JPY"}
+
     def __init__(self, amount: Union[int, float, str, Decimal], currency: str):
         """
         Initialize Money with amount and currency.
@@ -51,6 +54,13 @@ class Money:
         # Validate currency code format (3 letters)
         if not re.match(r"^[A-Z]{3}$", self._currency):
             raise ValueError("Currency code must be 3 letters")
+
+        # Validate against known currencies for trading context
+        if self._currency not in self.VALID_CURRENCIES:
+            raise ValueError(f"Currency must be one of {sorted(self.VALID_CURRENCIES)}")
+
+        # Round to currency precision (2 decimal places)
+        self._amount = self._amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
     @property
     def amount(self) -> Decimal:
@@ -228,6 +238,15 @@ class Money:
         """Create money from cents (smallest currency unit)."""
         amount = Decimal(cents) / Decimal("100")
         return cls(amount, currency)
+
+    def to_cents(self) -> int:
+        """
+        Convert Money to cents/smallest currency unit.
+
+        Returns:
+            Amount in cents as integer
+        """
+        return int(self._amount * 100)
 
     @classmethod
     def from_string(cls, money_str: str) -> "Money":

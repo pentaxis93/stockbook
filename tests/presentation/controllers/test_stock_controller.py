@@ -20,7 +20,7 @@ from domain.value_objects.stock_symbol import StockSymbol
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
     CreateStockRequest, CreateStockResponse, StockDetailResponse,
-    StockListResponse, ValidationErrorResponse)
+    StockListResponse, UpdateStockResponse, ValidationErrorResponse)
 
 
 class TestStockController:
@@ -439,3 +439,277 @@ class TestStockController:
         assert response1.success is True
         assert response2.success is False
         assert "Stock already exists" in response2.message
+
+    def test_search_stocks_success(self):
+        """Should search stocks successfully with filters."""
+        # Arrange
+        from presentation.view_models.stock_view_models import \
+            StockSearchRequest
+
+        search_request = StockSearchRequest(
+            symbol_filter="APP",
+            name_filter="Apple",
+            grade_filter="A",
+        )
+
+        mock_stocks = [
+            StockDto(
+                id=1,
+                symbol="AAPL",
+                name="Apple Inc.",
+                industry_group="Technology",
+                grade="A",
+                notes="",
+            ),
+        ]
+
+        self.mock_stock_service.search_stocks.return_value = mock_stocks
+
+        # Act
+        response = self.controller.search_stocks(search_request)
+
+        # Assert
+        assert isinstance(response, StockListResponse)
+        assert response.success is True
+        assert len(response.stocks) == 1
+        assert response.stocks[0].symbol == "AAPL"
+        assert response.filters_applied == {
+            "symbol": "APP",
+            "name": "Apple",
+            "grade": "A",
+        }
+        assert "Retrieved 1 stock" in response.message
+
+        # Verify service was called with correct parameters
+        self.mock_stock_service.search_stocks.assert_called_once_with(
+            symbol_filter="APP",
+            name_filter="Apple",
+            industry_filter=None,
+            grade_filter="A",
+        )
+
+    def test_search_stocks_no_filters_fallback(self):
+        """Should fallback to get_stock_list when no filters are provided."""
+        # Arrange
+        from presentation.view_models.stock_view_models import \
+            StockSearchRequest
+
+        search_request = StockSearchRequest()  # No filters
+
+        mock_stocks = [
+            StockDto(
+                id=1,
+                symbol="AAPL",
+                name="Apple Inc.",
+                industry_group="Technology",
+                grade="A",
+                notes="",
+            ),
+            StockDto(
+                id=2,
+                symbol="GOOGL",
+                name="Alphabet Inc.",
+                industry_group="Technology",
+                grade="A",
+                notes="",
+            ),
+        ]
+
+        self.mock_stock_service.get_all_stocks.return_value = mock_stocks
+
+        # Act
+        response = self.controller.search_stocks(search_request)
+
+        # Assert
+        assert isinstance(response, StockListResponse)
+        assert response.success is True
+        assert len(response.stocks) == 2
+        assert response.message == "Retrieved 2 stocks"
+
+        # Verify get_all_stocks was called instead of search_stocks
+        self.mock_stock_service.get_all_stocks.assert_called_once()
+        self.mock_stock_service.search_stocks.assert_not_called()
+
+    def test_search_stocks_validation_error(self):
+        """Should handle validation errors in search request."""
+        # Arrange
+        from presentation.view_models.stock_view_models import \
+            StockSearchRequest
+
+        search_request = StockSearchRequest(
+            grade_filter="Z",  # Invalid grade
+        )
+
+        # Act
+        response = self.controller.search_stocks(search_request)
+
+        # Assert
+        assert isinstance(response, ValidationErrorResponse)
+        assert response.success is False
+        assert "grade_filter" in response.errors
+        assert "Grade must be A, B, or C" in response.errors["grade_filter"]
+
+        # Service should not be called
+        self.mock_stock_service.search_stocks.assert_not_called()
+
+    def test_search_stocks_empty_results(self):
+        """Should handle empty search results gracefully."""
+        # Arrange
+        from presentation.view_models.stock_view_models import \
+            StockSearchRequest
+
+        search_request = StockSearchRequest(symbol_filter="NOTFOUND")
+
+        self.mock_stock_service.search_stocks.return_value = []
+
+        # Act
+        response = self.controller.search_stocks(search_request)
+
+        # Assert
+        assert isinstance(response, StockListResponse)
+        assert response.success is True
+        assert len(response.stocks) == 0
+        assert "Retrieved 0 stocks" in response.message
+        assert response.filters_applied == {"symbol": "NOTFOUND"}
+
+    def test_search_stocks_service_error(self):
+        """Should handle application service errors in search."""
+        # Arrange
+        from presentation.view_models.stock_view_models import \
+            StockSearchRequest
+
+        search_request = StockSearchRequest(symbol_filter="AAPL")
+
+        self.mock_stock_service.search_stocks.side_effect = Exception("Database error")
+
+        # Act
+        response = self.controller.search_stocks(search_request)
+
+        # Assert
+        assert isinstance(response, StockListResponse)
+        assert response.success is False
+        assert response.message == "Database error"
+
+    def test_search_stocks_filter_message_formatting(self):
+        """Should format filter messages correctly based on filter count."""
+        # Arrange
+        from presentation.view_models.stock_view_models import \
+            StockSearchRequest
+
+        # Test single filter
+        search_request_single = StockSearchRequest(symbol_filter="AAPL")
+        self.mock_stock_service.search_stocks.return_value = [
+            StockDto(id=1, symbol="AAPL", name="Apple Inc.", grade="A")
+        ]
+
+        response_single = self.controller.search_stocks(search_request_single)
+        assert "symbol containing 'AAPL'" in response_single.message
+
+        # Test multiple filters
+        search_request_multi = StockSearchRequest(symbol_filter="A", grade_filter="A")
+        self.mock_stock_service.search_stocks.return_value = [
+            StockDto(id=1, symbol="AAPL", name="Apple Inc.", grade="A")
+        ]
+
+        response_multi = self.controller.search_stocks(search_request_multi)
+        assert "matching 2 filters" in response_multi.message
+
+    def test_update_stock_with_valid_request(self):
+        """Should update stock successfully with valid request."""
+        # Arrange
+        from presentation.view_models.stock_view_models import UpdateStockRequest
+
+        request = UpdateStockRequest(
+            stock_id=1,
+            name="Apple Inc. (Updated)",
+            industry_group="Consumer Electronics",
+            grade="A",
+            notes="Updated notes",
+        )
+
+        expected_dto = StockDto(
+            id=1,
+            symbol="AAPL",
+            name="Apple Inc. (Updated)",
+            industry_group="Consumer Electronics",
+            grade="A",
+            notes="Updated notes",
+        )
+
+        self.mock_stock_service.update_stock.return_value = expected_dto
+
+        # Act
+        response = self.controller.update_stock(request)
+
+        # Assert
+        assert isinstance(response, UpdateStockResponse)
+        assert response.success is True
+        assert response.stock_id == 1
+        assert "Stock updated successfully" in response.message
+
+    def test_update_stock_with_validation_errors(self):
+        """Should return validation errors for invalid update request."""
+        # Arrange
+        from presentation.view_models.stock_view_models import UpdateStockRequest
+
+        request = UpdateStockRequest(
+            stock_id=1,
+            name="",  # Invalid empty name
+            grade="Z",  # Invalid grade
+        )
+
+        # Act
+        response = self.controller.update_stock(request)
+
+        # Assert
+        assert isinstance(response, ValidationErrorResponse)
+        assert "name" in response.errors
+        assert "grade" in response.errors
+
+    def test_update_stock_with_nonexistent_stock(self):
+        """Should handle update of nonexistent stock."""
+        # Arrange
+        from presentation.view_models.stock_view_models import UpdateStockRequest
+
+        request = UpdateStockRequest(stock_id=999, grade="A")
+
+        self.mock_stock_service.update_stock.side_effect = ValueError("Stock with ID 999 not found")
+
+        # Act
+        response = self.controller.update_stock(request)
+
+        # Assert
+        assert isinstance(response, UpdateStockResponse)
+        assert response.success is False
+        assert "Stock with ID 999 not found" in response.message
+
+    def test_update_stock_with_no_fields_to_update(self):
+        """Should handle update request with no fields to update."""
+        # Arrange
+        from presentation.view_models.stock_view_models import UpdateStockRequest
+
+        request = UpdateStockRequest(stock_id=1)  # No fields to update
+
+        # Act
+        response = self.controller.update_stock(request)
+
+        # Assert
+        assert isinstance(response, ValidationErrorResponse)
+        assert "No fields to update" in response.errors.get("general", "")
+
+    def test_update_stock_with_service_error(self):
+        """Should handle application service errors during update."""
+        # Arrange
+        from presentation.view_models.stock_view_models import UpdateStockRequest
+
+        request = UpdateStockRequest(stock_id=1, grade="A")
+
+        self.mock_stock_service.update_stock.side_effect = Exception("Database error")
+
+        # Act
+        response = self.controller.update_stock(request)
+
+        # Assert
+        assert isinstance(response, UpdateStockResponse)
+        assert response.success is False
+        assert "Unexpected error: Database error" in response.message

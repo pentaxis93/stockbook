@@ -11,7 +11,7 @@ from decimal import Decimal
 import pytest
 
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.money import Money
+from shared_kernel.value_objects import Money
 from domain.value_objects.stock_symbol import StockSymbol
 
 # These imports will exist after implementation

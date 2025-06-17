@@ -11,13 +11,17 @@ from typing import Any, Callable, Dict, Optional
 from application.services.stock_application_service import \
     StockApplicationService
 # Domain layer imports
-from domain.repositories.interfaces import IStockRepository, IUnitOfWork
+from domain.repositories.interfaces import IStockRepository, IStockBookUnitOfWork
 # Infrastructure layer imports
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 from infrastructure.repositories.sqlite_stock_repository import \
     SqliteStockRepository
+from presentation.adapters.stock_presentation_adapter import \
+    StockPresentationAdapter
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from presentation.adapters.streamlit_ui_operations import \
+    StreamlitUIOperationsFacade
 # Presentation layer imports
 from presentation.controllers.stock_controller import StockController
 from presentation.coordinators.stock_page_coordinator import \
@@ -85,7 +89,7 @@ class CompositionRoot:
         )
 
         # Unit of Work - singleton to ensure transaction consistency
-        container.register_singleton(IUnitOfWork, SqliteUnitOfWork)
+        container.register_singleton(IStockBookUnitOfWork, SqliteUnitOfWork)
 
         # Repositories - transient since they're lightweight
         container.register_transient(IStockRepository, SqliteStockRepository)
@@ -104,8 +108,33 @@ class CompositionRoot:
         # Controllers - transient for request isolation
         container.register_transient(StockController)
 
-        # Adapters - transient for UI state isolation
+        # UI Operations - singleton for shared UI state
+        container.register_singleton(StreamlitUIOperationsFacade)
+
+        # Legacy Streamlit Adapter - transient for UI state isolation
         container.register_transient(StreamlitStockAdapter)
 
+        # Framework-agnostic adapter - transient for UI state isolation
+        container.register_factory(
+            StockPresentationAdapter,
+            lambda: StockPresentationAdapter(
+                controller=container.resolve(StockController),
+                ui_operations=container.resolve(StreamlitUIOperationsFacade).operations,
+                layout_operations=container.resolve(
+                    StreamlitUIOperationsFacade
+                ).layout_operations,
+                validation_operations=container.resolve(
+                    StreamlitUIOperationsFacade
+                ).validation_operations,
+            ),
+        )
+
         # Coordinators - transient for page-level state management
-        container.register_transient(StockPageCoordinator)
+        container.register_factory(
+            StockPageCoordinator,
+            lambda: StockPageCoordinator(
+                controller=container.resolve(StockController),
+                adapter=container.resolve(StreamlitStockAdapter),
+                presentation_adapter=container.resolve(StockPresentationAdapter),
+            ),
+        )

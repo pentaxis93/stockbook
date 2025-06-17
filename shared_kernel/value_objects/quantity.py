@@ -19,6 +19,9 @@ class Quantity:
     in a way that's safe and consistent across all bounded contexts.
     """
 
+    # Maximum allowed quantity for stock shares (1 million shares)
+    MAX_STOCK_QUANTITY = 1_000_000
+
     def __init__(
         self, value: Union[int, float, str, Decimal], allow_negative: bool = False
     ):
@@ -334,6 +337,41 @@ class Quantity:
         fraction = Fraction(numerator, denominator)
         value = Decimal(fraction.numerator) / Decimal(fraction.denominator)
         return cls(value, allow_negative=allow_negative)
+
+    @classmethod
+    def for_shares(cls, value: Union[int, str]) -> "Quantity":
+        """
+        Create quantity for stock shares with trading-specific validation.
+
+        Args:
+            value: Share quantity (integer or string representation)
+
+        Returns:
+            Quantity instance with share-specific validation
+
+        Raises:
+            ValueError: If quantity is invalid for shares
+        """
+        # Convert string to int if needed
+        if isinstance(value, str):
+            try:
+                value = int(value)
+            except ValueError:
+                raise ValueError("Share quantity must be an integer")
+
+        # Validate type
+        if not isinstance(value, int):
+            raise ValueError("Share quantity must be an integer")
+
+        # Validate positive
+        if value <= 0:
+            raise ValueError("Share quantity must be positive")
+
+        # Validate maximum
+        if value > cls.MAX_STOCK_QUANTITY:
+            raise ValueError(f"Share quantity cannot exceed {cls.MAX_STOCK_QUANTITY:,}")
+
+        return cls(Decimal(value))
 
     @classmethod
     def sum(

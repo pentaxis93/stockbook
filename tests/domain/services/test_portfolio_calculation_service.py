@@ -17,8 +17,7 @@ from domain.services.portfolio_calculation_service import \
     PortfolioCalculationService
 from domain.services.value_objects.portfolio_metrics import (
     PortfolioAllocation, PortfolioMetrics)
-from domain.value_objects.money import Money
-from domain.value_objects.quantity import Quantity
+from shared_kernel.value_objects import Money, Quantity
 from domain.value_objects.stock_symbol import StockSymbol
 
 

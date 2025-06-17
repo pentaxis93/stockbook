@@ -10,6 +10,8 @@ from typing import Any, Dict, List, Optional, Union
 
 import streamlit as st
 
+from presentation.adapters.stock_presentation_adapter import \
+    StockPresentationAdapter
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
@@ -27,17 +29,36 @@ class StockPageCoordinator:
     handling navigation, state management, and user feedback.
     """
 
-    def __init__(self, controller: StockController, adapter: StreamlitStockAdapter):
+    def __init__(
+        self,
+        controller: StockController,
+        adapter: StreamlitStockAdapter,
+        presentation_adapter: Optional[StockPresentationAdapter] = None,
+    ):
         """
-        Initialize coordinator with controller and adapter.
+        Initialize coordinator with controller and adapters.
 
         Args:
             controller: Stock controller for business logic
-            adapter: Streamlit adapter for UI rendering
+            adapter: Streamlit adapter for UI rendering (legacy)
+            presentation_adapter: Framework-agnostic presentation adapter (preferred)
         """
         self.controller = controller
         self.adapter = adapter
+        self.presentation_adapter = presentation_adapter
         self._initialize_page_state()
+
+    def _get_active_adapter(self):
+        """
+        Get the active adapter to use for rendering.
+
+        Prefers the framework-agnostic presentation adapter if available,
+        falls back to the legacy Streamlit adapter.
+
+        Returns:
+            The adapter to use for UI operations
+        """
+        return self.presentation_adapter if self.presentation_adapter else self.adapter
 
     def render_stock_dashboard(self) -> Optional[Dict[str, Any]]:
         """
@@ -95,34 +116,47 @@ class StockPageCoordinator:
             Page render result based on selected action
         """
         try:
-            # Render sidebar navigation
+            # Render sidebar navigation (use legacy adapter for Streamlit-specific UI)
             selected_action = self.adapter.render_sidebar_navigation()
 
             # Route to appropriate view based on selection
             if selected_action == "list":
                 st.header("📋 All Stocks")
-                return self.adapter.render_stock_list(show_metrics=True)
+                return self._get_active_adapter().render_stock_list(show_metrics=True)
 
             elif selected_action == "create":
                 st.header("➕ Add New Stock")
-                create_result = self.adapter.render_create_stock_form()
+                create_result = self._get_active_adapter().render_create_stock_form()
                 if create_result:
                     return self._handle_create_stock_result(create_result)
                 return None
 
             elif selected_action == "search":
                 st.header("🔍 Search Stocks")
-                search_result = self.adapter.render_advanced_search_form()
-                if search_result:
-                    # FIXME: Implement search results display and filtering UI
-                    # Need to connect search form to controller.search_stocks() and display results.
-                    # TODO: Add search results rendering with filtering feedback
-                    st.info("Search functionality coming soon!")
+                search_result = self._get_active_adapter().render_advanced_search_form()
+                if search_result and search_result.has_filters:
+                    # Execute search through controller
+                    search_response = self.controller.search_stocks(search_result)
+
+                    if isinstance(search_response, ValidationErrorResponse):
+                        self._handle_validation_errors(search_response)
+                    elif search_response.success:
+                        st.success(search_response.message)
+                        if search_response.stocks:
+                            # Display search results
+                            self._get_active_adapter()._render_stock_dataframe(
+                                search_response.stocks
+                            )
+                        else:
+                            st.info("No stocks found matching your criteria")
+                    else:
+                        st.error(search_response.message)
+
                 return search_result
 
             else:
                 # Default to stock list
-                return self.adapter.render_stock_list()
+                return self._get_active_adapter().render_stock_list()
 
         except Exception as e:
             logger.error(f"Error rendering stock management page: {e}")
@@ -278,6 +312,25 @@ class StockPageCoordinator:
         """Handle page refresh after successful actions."""
         if hasattr(response, "success") and response.success:
             st.rerun()
+
+    def render_stock_page(self) -> Optional[Any]:
+        """
+        Render the main stock page with management interface.
+
+        This is the primary entry point for the stock management section,
+        providing a comprehensive interface for stock operations.
+
+        Returns:
+            Page render result
+        """
+        try:
+            # Use the stock management page as the primary interface
+            return self.render_stock_management_page()
+
+        except Exception as e:
+            logger.error(f"Error rendering stock page: {e}")
+            st.error("An unexpected error occurred while loading the stock page")
+            return None
 
     def _execute_create_and_view_workflow(self, symbol: str) -> Optional[Any]:
         """Execute create stock followed by view detail workflow."""

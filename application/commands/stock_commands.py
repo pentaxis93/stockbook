@@ -182,3 +182,205 @@ class CreateStockCommand:
                 raise ValueError(
                     f"Invalid grade. Must be one of {valid_grades} or None"
                 )
+
+
+class UpdateStockCommand:
+    """
+    Command to update an existing stock in the system.
+
+    Encapsulates all data needed to update a stock, with validation
+    to ensure the command is well-formed before execution.
+    """
+
+    # Private attributes for type checking
+    _stock_id: int
+    _name: Optional[str]
+    _industry_group: Optional[str]
+    _grade: Optional[str]
+    _notes: Optional[str]
+
+    def __init__(
+        self,
+        stock_id: int,
+        name: Optional[str] = None,
+        industry_group: Optional[str] = None,
+        grade: Optional[str] = None,
+        notes: Optional[str] = None,
+    ):
+        """
+        Initialize UpdateStockCommand with validation.
+
+        Args:
+            stock_id: ID of the stock to update
+            name: New company name (None to keep unchanged)
+            industry_group: New industry classification (None to keep unchanged)
+            grade: New stock grade (A/B/C or None)
+            notes: New notes (None to keep unchanged)
+
+        Raises:
+            ValueError: If validation fails
+        """
+        # Validate stock_id
+        self._validate_stock_id(stock_id)
+
+        # Normalize and validate inputs
+        if name is not None:
+            name = self._normalize_name(name)
+            self._validate_name(name)
+
+        if industry_group is not None:
+            industry_group = self._normalize_industry_group(industry_group)
+
+        if notes is not None:
+            notes = self._normalize_notes(notes)
+
+        # Validate grade
+        self._validate_grade(grade)
+
+        # Use object.__setattr__ to bypass immutability during initialization
+        object.__setattr__(self, "_stock_id", stock_id)
+        object.__setattr__(self, "_name", name)
+        object.__setattr__(self, "_industry_group", industry_group)
+        object.__setattr__(self, "_grade", grade)
+        object.__setattr__(self, "_notes", notes)
+
+    @property
+    def stock_id(self) -> int:
+        """Get the stock ID."""
+        return self._stock_id
+
+    @property
+    def name(self) -> Optional[str]:
+        """Get the company name."""
+        return self._name
+
+    @property
+    def industry_group(self) -> Optional[str]:
+        """Get the industry group."""
+        return self._industry_group
+
+    @property
+    def grade(self) -> Optional[str]:
+        """Get the stock grade."""
+        return self._grade
+
+    @property
+    def notes(self) -> Optional[str]:
+        """Get the notes."""
+        return self._notes
+
+    def has_updates(self) -> bool:
+        """
+        Check if any fields are being updated.
+
+        Returns:
+            True if at least one field is being updated
+        """
+        return any(
+            [
+                self._name is not None,
+                self._industry_group is not None,
+                self._grade is not None,
+                self._notes is not None,
+            ]
+        )
+
+    def get_update_fields(self) -> dict:
+        """
+        Get dictionary of fields that are being updated.
+
+        Returns:
+            Dictionary with field names as keys and values as values
+        """
+        fields = {}
+        if self._name is not None:
+            fields["name"] = self._name
+        if self._industry_group is not None:
+            fields["industry_group"] = self._industry_group
+        if self._grade is not None:
+            fields["grade"] = self._grade
+        if self._notes is not None:
+            fields["notes"] = self._notes
+        return fields
+
+    def __setattr__(self, name, value):
+        """Prevent modification after initialization (immutability)."""
+        if hasattr(self, "_stock_id"):  # Object is already initialized
+            raise AttributeError(f"Cannot modify immutable UpdateStockCommand")
+        super().__setattr__(name, value)
+
+    def __eq__(self, other) -> bool:
+        """Check equality based on all properties."""
+        if not isinstance(other, UpdateStockCommand):
+            return False
+
+        return (
+            self.stock_id == other.stock_id
+            and self.name == other.name
+            and self.industry_group == other.industry_group
+            and self.grade == other.grade
+            and self.notes == other.notes
+        )
+
+    def __hash__(self) -> int:
+        """Hash based on all properties."""
+        return hash(
+            (self.stock_id, self.name, self.industry_group, self.grade, self.notes)
+        )
+
+    def __str__(self) -> str:
+        """String representation for display."""
+        update_fields = list(self.get_update_fields().keys())
+        return f"UpdateStockCommand(stock_id={self.stock_id}, updating={update_fields})"
+
+    def __repr__(self) -> str:
+        """Developer representation."""
+        return (
+            f"UpdateStockCommand(stock_id={self.stock_id}, name={self.name!r}, "
+            f"industry_group={self.industry_group!r}, grade={self.grade!r}, "
+            f"notes={self.notes!r})"
+        )
+
+    @staticmethod
+    def _validate_stock_id(stock_id: int) -> None:
+        """Validate stock ID."""
+        if not isinstance(stock_id, int) or stock_id <= 0:
+            raise ValueError("Stock ID must be a positive integer")
+
+    @staticmethod
+    def _normalize_name(name: str) -> str:
+        """Normalize company name."""
+        if not isinstance(name, str):
+            raise ValueError("Name must be a string")
+        return name.strip()
+
+    @staticmethod
+    def _normalize_industry_group(industry_group: str) -> Optional[str]:
+        """Normalize industry group."""
+        if not isinstance(industry_group, str):
+            raise ValueError("Industry group must be a string")
+        normalized = industry_group.strip()
+        return normalized if normalized else None
+
+    @staticmethod
+    def _normalize_notes(notes: str) -> str:
+        """Normalize notes."""
+        if not isinstance(notes, str):
+            raise ValueError("Notes must be a string")
+        return notes.strip()
+
+    @staticmethod
+    def _validate_name(name: str) -> None:
+        """Validate company name."""
+        if not name:
+            raise ValueError("Name cannot be empty")
+
+    @staticmethod
+    def _validate_grade(grade: Optional[str]) -> None:
+        """Validate stock grade."""
+        if grade is not None:
+            valid_grades = {"A", "B", "C"}
+            if grade not in valid_grades:
+                raise ValueError(
+                    f"Invalid grade. Must be one of {valid_grades} or None"
+                )

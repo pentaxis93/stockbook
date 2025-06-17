@@ -19,7 +19,6 @@ from domain.value_objects.stock_symbol import StockSymbol
 # from dependency_injection.composition_root import CompositionRoot
 
 
-
 @pytest.mark.skip(reason="TDD - implementation pending")
 class TestCleanArchitectureWiring:
     """Test that DI system respects clean architecture boundaries."""

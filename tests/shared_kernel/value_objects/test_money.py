@@ -72,9 +72,9 @@ class TestMoneyCreation:
         assert money.currency == "USD"
 
     def test_precision_handling(self):
-        """Should handle high-precision decimal amounts."""
+        """Should handle high-precision decimal amounts by rounding to currency precision."""
         money = Money(Decimal("100.123456789"), "USD")
-        assert money.amount == Decimal("100.123456789")
+        assert money.amount == Decimal("100.12")  # Rounded to 2 decimal places
 
 
 class TestMoneyArithmetic:
@@ -328,10 +328,10 @@ class TestMoneyEdgeCases:
         assert money.amount == large_amount
 
     def test_very_small_amounts(self):
-        """Should handle very small amounts."""
+        """Should handle very small amounts by rounding to currency precision."""
         small_amount = Decimal("0.00000001")
         money = Money(small_amount, "USD")
-        assert money.amount == small_amount
+        assert money.amount == Decimal("0.00")  # Rounded to 2 decimal places
 
     def test_currency_code_validation(self):
         """Should validate currency codes."""

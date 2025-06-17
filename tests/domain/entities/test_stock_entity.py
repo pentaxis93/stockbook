@@ -10,8 +10,7 @@ from decimal import Decimal
 import pytest
 
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects.money import Money
-from domain.value_objects.quantity import Quantity
+from shared_kernel.value_objects import Money, Quantity
 from domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -153,11 +152,11 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         stock = StockEntity(symbol=symbol, name="Apple Inc.")
 
-        # Note: Quantity doesn't allow zero, so this tests error handling
+        # Note: For stock shares, use for_shares factory which enforces positive quantities
         price = Money("150.50", "USD")
 
         with pytest.raises(ValueError):
-            Quantity(0)  # This should fail in Quantity constructor
+            Quantity.for_shares(0)  # This should fail for share quantities
 
     def test_is_high_grade(self):
         """Should identify high grade stocks."""

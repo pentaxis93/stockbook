@@ -192,17 +192,28 @@ class StockController:
             if validation_errors:
                 return ValidationErrorResponse(validation_errors)
 
-            # FIXME: Implement stock update functionality
-            # Need to add update methods to application service and domain layer.
-            # TODO: Add StockApplicationService.update_stock() and StockEntity.update() methods
-            # Currently returns mock success for testing purposes only.
+            # Check if there are any fields to update
+            if not request.has_updates():
+                return ValidationErrorResponse({"general": "No fields to update"})
+
+            # Sanitize input
+            sanitized_request = request.sanitize()
+
+            # Convert to command and call application service
+            command = sanitized_request.to_command()
+            stock_dto = self.stock_service.update_stock(command)
+
             return UpdateStockResponse.success(
-                request.stock_id, "Stock updated successfully"
+                stock_id=stock_dto.id,
+                message="Stock updated successfully",
             )
 
-        except Exception as e:
-            logger.error(f"Error updating stock: {e}")
+        except ValueError as e:
+            logger.warning(f"Stock update failed: {e}")
             return UpdateStockResponse.error(str(e))
+        except Exception as e:
+            logger.error(f"Unexpected error updating stock: {e}")
+            return UpdateStockResponse.error(f"Unexpected error: {str(e)}")
 
     def search_stocks(
         self, search_request: StockSearchRequest
@@ -226,15 +237,33 @@ class StockController:
             if not search_request.has_filters:
                 return self.get_stock_list()
 
-            # FIXME: Implement comprehensive search functionality
-            # Currently only supports grade filtering. Need to extend application
-            # service to support symbol, name, and industry filtering with SQL LIKE queries.
-            # TODO: Add StockApplicationService.search_stocks(symbol_filter, name_filter, etc.)
-            if search_request.grade_filter:
-                return self.get_stocks_by_grade(search_request.grade_filter)
+            # Use the comprehensive search functionality
+            stock_dtos = self.stock_service.search_stocks(
+                symbol_filter=search_request.symbol_filter,
+                name_filter=search_request.name_filter,
+                industry_filter=search_request.industry_filter,
+                grade_filter=search_request.grade_filter,
+            )
 
-            # Fallback to all stocks for other filters
-            return self.get_stock_list()
+            stock_view_models = [StockViewModel.from_dto(dto) for dto in stock_dtos]
+
+            # Create filter summary for response
+            active_filters = search_request.active_filters
+            filter_count = len(active_filters)
+
+            if filter_count == 0:
+                message = f"Retrieved {len(stock_view_models)} stocks"
+            elif filter_count == 1:
+                filter_name, filter_value = next(iter(active_filters.items()))
+                message = f"Retrieved {len(stock_view_models)} stocks with {filter_name} containing '{filter_value}'"
+            else:
+                message = f"Retrieved {len(stock_view_models)} stocks matching {filter_count} filters"
+
+            return StockListResponse.success(
+                stock_view_models,
+                message,
+                filters_applied=active_filters,
+            )
 
         except Exception as e:
             logger.error(f"Error searching stocks: {e}")
