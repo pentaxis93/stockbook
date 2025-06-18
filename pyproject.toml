@@ -4,17 +4,13 @@ multi_line_output = 3
 line_length = 88
 
 [tool.pylint."MESSAGES CONTROL"]
+# STRICT configuration for PRODUCTION code (non-test files)
 # Only disable rules that are genuinely problematic or handled by other tools
 disable = [
     # Code structure - these can be overly restrictive for domain models
     "too-few-public-methods",
     "too-many-public-methods", 
     "too-many-instance-attributes",
-    
-    # Testing patterns - these are common in pytest
-    "redefined-outer-name",  # pytest fixtures
-    "attribute-defined-outside-init",  # mock objects in tests
-    "duplicate-code",  # Test files often have similar setup patterns
     
     # Import organization - handled by isort
     "wrong-import-order",

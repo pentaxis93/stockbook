@@ -7,11 +7,23 @@ set -e
 
 echo "Running quality checks (formatting already handled by previous hooks)..."
 
-# Run pylint (code linter)
-echo "Running pylint..."
-if ! pylint $(find . -name "*.py" -not -path "./.*" -not -path "./venv/*" -not -path "./.venv/*"); then
-    echo "❌ Pylint check failed. Fix the linting issues before committing."
-    exit 1
+# Run pylint with different configurations for production vs test files
+echo "Running pylint with strict rules on production code..."
+PRODUCTION_FILES=$(find . -name "*.py" -not -path "./tests/*" -not -path "./.*" -not -path "./venv/*" -not -path "./.venv/*")
+if [ -n "$PRODUCTION_FILES" ]; then
+    if ! pylint $PRODUCTION_FILES; then
+        echo "❌ Pylint strict check failed on production code. Fix the issues before committing."
+        exit 1
+    fi
+fi
+
+echo "Running pylint with lenient rules on test files..."
+TEST_FILES=$(find ./tests -name "*.py" 2>/dev/null || true)
+if [ -n "$TEST_FILES" ]; then
+    if ! pylint --rcfile=.pylintrc-tests $TEST_FILES; then
+        echo "❌ Pylint lenient check failed on test files. Fix the issues before committing."
+        exit 1
+    fi
 fi
 
 # TEMPORARILY DISABLED: pyright (type checker)
