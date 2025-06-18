@@ -5,21 +5,7 @@
 
 set -e
 
-echo "Running pre-commit checks..."
-
-# Run black (code formatter)
-echo "Checking code formatting with black..."
-if ! black --check --diff .; then
-    echo "❌ Black formatting check failed. Run 'black .' to fix formatting issues."
-    exit 1
-fi
-
-# Run isort (import sorter)
-echo "Checking import sorting with isort..."
-if ! isort --check-only --diff .; then
-    echo "❌ Import sorting check failed. Run 'isort .' to fix import issues."
-    exit 1
-fi
+echo "Running quality checks (formatting already handled by previous hooks)..."
 
 # Run pylint (code linter)
 echo "Running pylint..."
