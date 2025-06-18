@@ -6,10 +6,9 @@ arithmetic operations, and business rules consistently across all domains.
 """
 
 import decimal
-import json
 import re
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 
 class Money:
@@ -203,7 +202,7 @@ class Money:
         portions = []
         remaining = self._amount
 
-        for i, ratio in enumerate(decimal_ratios[:-1]):  # All but last
+        for ratio in decimal_ratios[:-1]:  # All but last
             portion_amount = (self._amount * ratio / total_ratio).quantize(
                 Decimal("0.01"), rounding=ROUND_HALF_UP
             )

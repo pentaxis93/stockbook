@@ -6,7 +6,7 @@ while fulfilling the domain repository contract.
 """
 
 import sqlite3
-from datetime import date, datetime
+from datetime import date
 from typing import List, Optional
 
 from domain.entities.journal_entry_entity import JournalEntryEntity

@@ -6,9 +6,7 @@ between presentation logic and specific UI frameworks.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict, List, Optional, Union
-
-from presentation.view_models.stock_view_models import StockViewModel
+from typing import Any, Dict, List, Optional
 
 
 class IUIOperations(ABC):

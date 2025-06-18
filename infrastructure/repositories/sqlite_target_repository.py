@@ -6,7 +6,7 @@ while fulfilling the domain repository contract.
 """
 
 import sqlite3
-from datetime import date, datetime
+from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 

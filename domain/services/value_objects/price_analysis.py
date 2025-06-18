@@ -5,7 +5,7 @@ Immutable data structures that represent the results of price analysis
 and pricing service operations.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum

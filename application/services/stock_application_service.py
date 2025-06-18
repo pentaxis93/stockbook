@@ -74,7 +74,7 @@ class StockApplicationService:
 
                 return StockDto.from_entity(stock_entity)
 
-        except Exception as e:
+        except Exception:
             self._unit_of_work.rollback()
             raise
 
@@ -191,6 +191,6 @@ class StockApplicationService:
 
                 return StockDto.from_entity(stock_entity)
 
-        except Exception as e:
+        except Exception:
             self._unit_of_work.rollback()
             raise

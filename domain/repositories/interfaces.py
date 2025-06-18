@@ -7,8 +7,7 @@ following the Repository pattern and Interface Segregation Principle.
 
 from abc import ABC, abstractmethod
 from datetime import date
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 
 # Import domain entities and value objects
 from domain.entities import (

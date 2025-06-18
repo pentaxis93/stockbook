@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Tuple
 from domain.entities.stock_entity import StockEntity
 from shared_kernel.value_objects import Money, Quantity
 
-from .exceptions import InsufficientDataError, RiskAnalysisError
+from .exceptions import InsufficientDataError
 from .value_objects.risk_metrics import (
     ConcentrationLevel,
     ConcentrationRisk,
@@ -92,7 +92,7 @@ class RiskAssessmentService:
 
         # Assess individual stock risks
         individual_risks = []
-        for stock, quantity in portfolio:
+        for stock, _quantity in portfolio:
             risk_profile = self.assess_stock_risk(stock)
             individual_risks.append(risk_profile)
 
@@ -131,14 +131,13 @@ class RiskAssessmentService:
 
         if volatility >= Decimal("0.5"):
             return RiskLevel.VERY_HIGH
-        elif volatility >= self.config.high_volatility_threshold:
+        if volatility >= self.config.high_volatility_threshold:
             return RiskLevel.HIGH
-        elif volatility >= Decimal("0.2"):
+        if volatility >= Decimal("0.2"):
             return RiskLevel.MEDIUM
-        elif volatility >= Decimal("0.1"):
+        if volatility >= Decimal("0.1"):
             return RiskLevel.LOW
-        else:
-            return RiskLevel.VERY_LOW
+        return RiskLevel.VERY_LOW
 
     def _assess_beta_risk(self, stock: StockEntity) -> RiskLevel:
         """Assess market beta risk."""
@@ -146,26 +145,24 @@ class RiskAssessmentService:
 
         if beta >= Decimal("2.0"):
             return RiskLevel.VERY_HIGH
-        elif beta >= self.config.high_beta_threshold:
+        if beta >= self.config.high_beta_threshold:
             return RiskLevel.HIGH
-        elif beta >= Decimal("1.1"):
+        if beta >= Decimal("1.1"):
             return RiskLevel.MEDIUM
-        elif beta >= Decimal("0.8"):
+        if beta >= Decimal("0.8"):
             return RiskLevel.LOW
-        else:
-            return RiskLevel.VERY_LOW
+        return RiskLevel.VERY_LOW
 
     def _assess_fundamental_risk(self, stock: StockEntity) -> RiskLevel:
         """Assess fundamental business risk factors."""
         # Simplified assessment based on grade
         if stock.grade == "A":
             return RiskLevel.LOW
-        elif stock.grade == "B":
+        if stock.grade == "B":
             return RiskLevel.MEDIUM
-        elif stock.grade == "C":
+        if stock.grade == "C":
             return RiskLevel.HIGH
-        else:
-            return RiskLevel.MEDIUM  # Default for ungraded
+        return RiskLevel.MEDIUM  # Default for ungraded
 
     def _assess_sector_risk(self, stock: StockEntity) -> RiskLevel:
         """Assess sector-specific risks."""
@@ -177,10 +174,9 @@ class RiskAssessmentService:
 
         if sector in high_risk_sectors:
             return RiskLevel.HIGH
-        elif sector in low_risk_sectors:
+        if sector in low_risk_sectors:
             return RiskLevel.LOW
-        else:
-            return RiskLevel.MEDIUM
+        return RiskLevel.MEDIUM
 
     def _calculate_overall_risk_score(
         self,
@@ -219,17 +215,16 @@ class RiskAssessmentService:
         """Convert numeric score to risk level."""
         if score >= 80:
             return RiskLevel.VERY_HIGH
-        elif score >= 65:
+        if score >= 65:
             return RiskLevel.HIGH
-        elif score >= 45:
+        if score >= 45:
             return RiskLevel.MEDIUM
-        elif score >= 25:
+        if score >= 25:
             return RiskLevel.LOW
-        else:
-            return RiskLevel.VERY_LOW
+        return RiskLevel.VERY_LOW
 
     def _collect_risk_factors(
-        self, stock: StockEntity, volatility_risk: RiskLevel, beta_risk: RiskLevel
+        self, _stock: StockEntity, volatility_risk: RiskLevel, beta_risk: RiskLevel
     ) -> List[RiskFactor]:
         """Collect specific risk factors for a stock."""
         factors = []

@@ -6,7 +6,6 @@ used throughout the trading application.
 """
 
 import re
-from typing import Union
 
 
 class StockSymbol:

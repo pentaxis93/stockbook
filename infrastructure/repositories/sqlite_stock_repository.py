@@ -65,7 +65,7 @@ class SqliteStockRepository(IStockRepository):
             if "UNIQUE constraint failed: stock.symbol" in str(e):
                 raise ValueError(
                     f"Stock with symbol {stock.symbol.value} already exists"
-                )
+                ) from e
             raise
 
     def get_by_id(self, stock_id: int) -> Optional[StockEntity]:

@@ -4,10 +4,7 @@ Domain service for managing sector-industry group relationships.
 Provides validation and lookup capabilities for the sector-industry group hierarchy.
 """
 
-from typing import Dict, List, Set
-
-from domain.value_objects.industry_group import IndustryGroup
-from domain.value_objects.sector import Sector
+from typing import Dict, List
 
 
 class SectorIndustryService:

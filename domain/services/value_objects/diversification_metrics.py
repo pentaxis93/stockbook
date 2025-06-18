@@ -7,9 +7,8 @@ analysis and correlation calculations.
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
-from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money
 
 
@@ -38,10 +37,9 @@ class CorrelationMatrix:
 
         if key1 in self.correlations:
             return self.correlations[key1]
-        elif key2 in self.correlations:
+        if key2 in self.correlations:
             return self.correlations[key2]
-        else:
-            return Decimal("0")
+        return Decimal("0")
 
 
 @dataclass(frozen=True)
@@ -59,15 +57,14 @@ class DiversificationScore:
         """Convert score to letter grade."""
         if self.overall_score >= Decimal("0.9"):
             return "A+"
-        elif self.overall_score >= Decimal("0.8"):
+        if self.overall_score >= Decimal("0.8"):
             return "A"
-        elif self.overall_score >= Decimal("0.7"):
+        if self.overall_score >= Decimal("0.7"):
             return "B+"
-        elif self.overall_score >= Decimal("0.6"):
+        if self.overall_score >= Decimal("0.6"):
             return "B"
-        elif self.overall_score >= Decimal("0.5"):
+        if self.overall_score >= Decimal("0.5"):
             return "C+"
-        elif self.overall_score >= Decimal("0.4"):
+        if self.overall_score >= Decimal("0.4"):
             return "C"
-        else:
-            return "D"
+        return "D"

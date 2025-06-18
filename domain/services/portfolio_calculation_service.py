@@ -11,10 +11,9 @@ from typing import Dict, List, Optional, Tuple
 from domain.entities.stock_entity import StockEntity
 from shared_kernel.value_objects import Money, Quantity
 
-from .exceptions import CalculationError, InsufficientDataError
+from .exceptions import CalculationError
 from .value_objects.portfolio_metrics import (
     PortfolioAllocation,
-    PortfolioMetrics,
     PortfolioSummary,
     PositionAllocation,
 )
@@ -80,7 +79,7 @@ class PortfolioCalculationService:
         return Money(total_amount, currency or self.config.default_currency)
 
     def calculate_position_value(
-        self, stock: StockEntity, quantity: Quantity, current_price: Money
+        self, _stock: StockEntity, quantity: Quantity, current_price: Money
     ) -> Money:
         """Calculate individual position value."""
         return Money(
@@ -249,10 +248,9 @@ class PortfolioCalculationService:
         # Convert back to letter grade
         if avg_numeric >= 3.5:
             return "A"
-        elif avg_numeric >= 2.5:
+        if avg_numeric >= 2.5:
             return "B"
-        else:
-            return "C"
+        return "C"
 
     def generate_portfolio_summary(
         self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]

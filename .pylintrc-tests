@@ -27,7 +27,16 @@ disable=
     logging-fstring-interpolation,
     no-else-return,
     raise-missing-from,
-    import-outside-toplevel
+    import-outside-toplevel,
+    unnecessary-negation,
+    missing-class-docstring,
+    missing-function-docstring,
+    abstract-class-instantiated,
+    consider-using-with,
+    too-many-arguments,
+    too-many-positional-arguments,
+    fixme,
+    too-many-lines
 
 [FORMAT]
 max-line-length=88

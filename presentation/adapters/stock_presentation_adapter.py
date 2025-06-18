@@ -6,7 +6,7 @@ using dependency injection for UI operations.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from presentation.controllers.stock_controller import StockController
 from presentation.interfaces.ui_operations import (

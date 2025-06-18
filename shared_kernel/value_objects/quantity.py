@@ -240,7 +240,7 @@ class Quantity:
         quantities = []
         total_allocated = Decimal("0")
 
-        for i in range(parts - 1):
+        for _ in range(parts - 1):
             quantities.append(
                 Quantity(rounded_base, allow_negative=self._allow_negative)
             )
@@ -280,7 +280,7 @@ class Quantity:
         quantities = []
         remaining = self._value
 
-        for i, ratio in enumerate(decimal_ratios[:-1]):  # All but last
+        for ratio in decimal_ratios[:-1]:  # All but last
             portion = (self._value * ratio / total_ratio).quantize(
                 Decimal("0.01"), rounding=ROUND_HALF_UP
             )
@@ -392,8 +392,7 @@ class Quantity:
 
         max_qty = quantities[0]
         for qty in quantities[1:]:
-            if qty > max_qty:
-                max_qty = qty
+            max_qty = max(max_qty, qty)
         return max_qty
 
     @classmethod
@@ -404,6 +403,5 @@ class Quantity:
 
         min_qty = quantities[0]
         for qty in quantities[1:]:
-            if qty < min_qty:
-                min_qty = qty
+            min_qty = min(min_qty, qty)
         return min_qty

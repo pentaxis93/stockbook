@@ -16,7 +16,6 @@ from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
     CreateStockResponse,
     StockDetailResponse,
-    StockListResponse,
     StockViewModel,
     ValidationErrorResponse,
 )
@@ -127,14 +126,14 @@ class StockPageCoordinator:
                 st.header("📋 All Stocks")
                 return self._get_active_adapter().render_stock_list(show_metrics=True)
 
-            elif selected_action == "create":
+            if selected_action == "create":
                 st.header("➕ Add New Stock")
                 create_result = self._get_active_adapter().render_create_stock_form()
                 if create_result:
                     return self._handle_create_stock_result(create_result)
                 return None
 
-            elif selected_action == "search":
+            if selected_action == "search":
                 st.header("🔍 Search Stocks")
                 search_result = self._get_active_adapter().render_advanced_search_form()
                 if search_result and search_result.has_filters:
@@ -143,7 +142,7 @@ class StockPageCoordinator:
 
                     if isinstance(search_response, ValidationErrorResponse):
                         self._handle_validation_errors(search_response)
-                    elif search_response.success:
+                    if search_response.success:
                         st.success(search_response.message)
                         if search_response.stocks:
                             # Display search results
@@ -157,9 +156,8 @@ class StockPageCoordinator:
 
                 return search_result
 
-            else:
-                # Default to stock list
-                return self._get_active_adapter().render_stock_list()
+            # Default to stock list
+            return self._get_active_adapter().render_stock_list()
 
         except Exception as e:
             logger.error(f"Error rendering stock management page: {e}")
@@ -198,10 +196,9 @@ class StockPageCoordinator:
         """Handle stock creation result with appropriate user feedback."""
         if isinstance(result, ValidationErrorResponse):
             return self._handle_validation_errors(result)
-        elif result.success:
+        if result.success:
             return self._handle_stock_creation_success(result)
-        else:
-            return self._handle_stock_creation_error(result)
+        return self._handle_stock_creation_error(result)
 
     def _handle_stock_creation_success(
         self, response: CreateStockResponse

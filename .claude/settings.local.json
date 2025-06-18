@@ -145,7 +145,8 @@
       "Bash(git remote:*)",
       "Bash(git show:*)",
       "Bash(git ls-files:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Bash(pre-commit install:*)"
     ],
     "deny": []
   }

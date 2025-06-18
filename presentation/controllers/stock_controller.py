@@ -6,7 +6,7 @@ and application services while managing validation and error handling.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Union
+from typing import Union
 
 from application.services.stock_application_service import StockApplicationService
 from presentation.view_models.stock_view_models import (
