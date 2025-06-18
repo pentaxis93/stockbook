@@ -3,7 +3,7 @@ Tests for domain entities - replacing legacy Pydantic model tests.
 Following TDD approach with focus on business logic and validation.
 """
 
-from datetime import date, timedelta
+from datetime import date
 from decimal import Decimal
 
 import pytest

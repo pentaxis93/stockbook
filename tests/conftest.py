@@ -8,13 +8,18 @@ that can be used across all test files without explicit imports.
 import sqlite3
 import sys
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
 from config import config
+from domain.entities import PortfolioEntity
 from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+from infrastructure.repositories.sqlite_portfolio_repository import (
+    SqlitePortfolioRepository,
+)
 
 # Add the project root to Python path so we can import our modules
 # This allows tests to import from 'utils' and other project packages
@@ -100,22 +105,15 @@ def sample_portfolio(test_db):
     a pre-populated portfolio to work with.
 
     Args:
-        test_db: The test database fixture
+        test_database: The test database fixture
 
     Returns:
         dict: Portfolio information including ID
     """
-    from domain.entities import PortfolioEntity
-    from infrastructure.persistence.database_connection import DatabaseConnection
-    from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-    from infrastructure.repositories.sqlite_portfolio_repository import (
-        SqlitePortfolioRepository,
-    )
-
     # Create portfolio using clean architecture
-    db_connection = DatabaseConnection(str(test_db))
-    portfolio_repo = SqlitePortfolioRepository(db_connection)
-    uow = SqliteUnitOfWork(db_connection)
+    db_conn = DatabaseConnection(str(test_db))
+    portfolio_repo = SqlitePortfolioRepository(db_conn)
+    uow = SqliteUnitOfWork(db_conn)
 
     portfolio = PortfolioEntity(
         name="Test Portfolio", description="Test portfolio for testing", is_active=True
@@ -151,8 +149,6 @@ def assert_datetime_recent(dt, seconds=5):
         dt = datetime.fromisoformat(dt.replace("Z", ""))
 
     # Use UTC time for consistency since SQLite CURRENT_TIMESTAMP is UTC
-    from datetime import timezone
-
     now = datetime.now(timezone.utc).replace(tzinfo=None)
 
     time_diff = abs((now - dt).total_seconds())

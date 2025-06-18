@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the application service that orchestrates stock operations.
 """
 
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 import pytest
 
@@ -13,7 +13,6 @@ from application.commands.stock_commands import CreateStockCommand, UpdateStockC
 from application.dto.stock_dto import StockDto
 from application.services.stock_application_service import StockApplicationService
 from domain.entities.stock_entity import StockEntity
-from domain.events.stock_events import StockAddedEvent
 from domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
 from domain.value_objects.stock_symbol import StockSymbol
 

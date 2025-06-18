@@ -2,3 +2,24 @@
 profile = "black"
 multi_line_output = 3
 line_length = 88
+
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "duplicate-code",
+    "too-few-public-methods", 
+    "too-many-public-methods",
+    "attribute-defined-outside-init",
+    "redefined-outer-name",
+    "import-outside-toplevel",
+    "reimported",
+    "fixme",
+    "broad-exception-caught",
+    "no-member",
+    "unused-import", 
+    "unused-variable",
+    "singleton-comparison",
+    "line-too-long"
+]
+
+[tool.pylint.FORMAT]
+max-line-length = 120

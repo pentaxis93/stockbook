@@ -200,10 +200,7 @@ class TestStockEntity:
     def test_calculate_position_value_with_zero_quantity(self):
         """Should handle zero quantity gracefully."""
         symbol = StockSymbol("AAPL")
-        stock = StockEntity(symbol=symbol, name="Apple Inc.")
-
         # Note: For stock shares, use for_shares factory which enforces positive quantities
-        price = Money("150.50", "USD")
 
         with pytest.raises(ValueError):
             Quantity.for_shares(0)  # This should fail for share quantities
@@ -218,9 +215,9 @@ class TestStockEntity:
         stock_without_notes = StockEntity(symbol=symbol, name="Apple Inc.")
         stock_empty_notes = StockEntity(symbol=symbol, name="Apple Inc.", notes="")
 
-        assert stock_with_notes.has_notes() == True
-        assert stock_without_notes.has_notes() == False
-        assert stock_empty_notes.has_notes() == False
+        assert stock_with_notes.has_notes() is True
+        assert stock_without_notes.has_notes() is False
+        assert stock_empty_notes.has_notes() is False
 
     def test_update_fields_single_field(self):
         """Should update individual fields using update_fields method."""
