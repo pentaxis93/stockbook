@@ -28,10 +28,10 @@ fi
 # fi
 echo "⚠️  Pyright type checking TEMPORARILY DISABLED (see TECHNICAL_DEBT.md)"
 
-# Run pytest (tests)
-echo "Running tests with pytest..."
+# Run pytest with coverage (configured in pyproject.toml)
+echo "Running tests with pytest and coverage requirements..."
 if ! pytest; then
-    echo "❌ Tests failed. Fix the failing tests before committing."
+    echo "❌ Tests failed or coverage below required threshold. Fix the issues before committing."
     exit 1
 fi
 

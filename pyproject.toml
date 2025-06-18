@@ -4,22 +4,97 @@ multi_line_output = 3
 line_length = 88
 
 [tool.pylint."MESSAGES CONTROL"]
+# Only disable rules that are genuinely problematic or handled by other tools
 disable = [
-    "duplicate-code",
-    "too-few-public-methods", 
-    "too-many-public-methods",
-    "attribute-defined-outside-init",
-    "redefined-outer-name",
-    "import-outside-toplevel",
-    "reimported",
-    "fixme",
-    "broad-exception-caught",
-    "no-member",
-    "unused-import", 
-    "unused-variable",
-    "singleton-comparison",
-    "line-too-long"
+    # Code structure - these can be overly restrictive for domain models
+    "too-few-public-methods",
+    "too-many-public-methods", 
+    "too-many-instance-attributes",
+    
+    # Testing patterns - these are common in pytest
+    "redefined-outer-name",  # pytest fixtures
+    "attribute-defined-outside-init",  # mock objects in tests
+    "duplicate-code",  # Test files often have similar setup patterns
+    
+    # Import organization - handled by isort
+    "wrong-import-order",
+    "ungrouped-imports",
+    
+    # Line length - handled by black
+    "line-too-long",
+    
+    # Temporary architectural issues - TODO: remove these after DB refactor
+    "no-member",  # Due to dynamic repository creation
 ]
 
 [tool.pylint.FORMAT]
-max-line-length = 120
+max-line-length = 88  # Match black and isort
+
+[tool.pylint.DESIGN]
+# Be reasonable about complexity but not overly restrictive
+max-args = 7
+max-locals = 20
+max-returns = 8
+max-branches = 15
+max-statements = 60
+
+[tool.pylint.BASIC]
+# Good naming patterns
+good-names = ["i", "j", "k", "ex", "Run", "_", "id", "db", "ui"]
+# Require docstrings for public modules, classes, and functions
+docstring-min-length = 10
+
+[tool.pytest.ini_options]
+# Test discovery and execution
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+
+# Output and behavior
+addopts = [
+    "-v",  # verbose
+    "--tb=short",  # shorter tracebacks
+    "--strict-markers",  # ensure all markers are registered
+    "--cov=.",  # coverage for all source code
+    "--cov-report=term-missing",  # show missing lines in terminal
+    "--cov-report=html:htmlcov",  # generate HTML coverage report
+    "--cov-fail-under=80",  # fail if coverage below 80%
+]
+
+# Filter warnings
+filterwarnings = [
+    "ignore:.*PyType_Spec.*tp_new.*deprecated.*:DeprecationWarning",
+]
+
+# Test markers
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests that interact with database", 
+    "unit: marks pure unit tests with no dependencies",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/.venv/*",
+    "*/venv/*",
+    "setup.py",
+    "conftest.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
