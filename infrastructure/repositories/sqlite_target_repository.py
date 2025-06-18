@@ -12,7 +12,7 @@ from typing import List, Optional
 
 from domain.entities.target_entity import TargetEntity
 from domain.repositories.interfaces import ITargetRepository
-from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.interfaces import IDatabaseConnection
 from shared_kernel.value_objects import Money
 
 
@@ -24,7 +24,7 @@ class SqliteTargetRepository(ITargetRepository):
     the repository pattern and clean architecture boundaries.
     """
 
-    def __init__(self, db_connection: DatabaseConnection):
+    def __init__(self, db_connection: IDatabaseConnection):
         """
         Initialize repository with database connection.
 

@@ -11,7 +11,7 @@ from typing import List, Optional
 from domain.entities.stock_entity import StockEntity
 from domain.repositories.interfaces import IStockRepository
 from domain.value_objects.stock_symbol import StockSymbol
-from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.interfaces import IDatabaseConnection
 
 
 class SqliteStockRepository(IStockRepository):
@@ -22,7 +22,7 @@ class SqliteStockRepository(IStockRepository):
     the repository pattern and clean architecture boundaries.
     """
 
-    def __init__(self, db_connection: DatabaseConnection):
+    def __init__(self, db_connection: IDatabaseConnection):
         """
         Initialize repository with database connection.
 

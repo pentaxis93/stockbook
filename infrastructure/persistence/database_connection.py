@@ -10,8 +10,10 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import List, Optional, Union
 
+from infrastructure.persistence.interfaces import IDatabaseConnection
 
-class DatabaseConnection:
+
+class DatabaseConnection(IDatabaseConnection):
     """
     Manages SQLite database connections and schema initialization.
 

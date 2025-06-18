@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from domain.entities.journal_entry_entity import JournalEntryEntity
 from domain.repositories.interfaces import IJournalRepository
-from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.interfaces import IDatabaseConnection
 
 
 class SqliteJournalRepository(IJournalRepository):
@@ -22,7 +22,7 @@ class SqliteJournalRepository(IJournalRepository):
     the repository pattern and clean architecture boundaries.
     """
 
-    def __init__(self, db_connection: DatabaseConnection):
+    def __init__(self, db_connection: IDatabaseConnection):
         """
         Initialize repository with database connection.
 

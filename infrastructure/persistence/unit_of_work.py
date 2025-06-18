@@ -6,7 +6,8 @@ within a transactional context.
 """
 
 import sqlite3
-from typing import Optional
+from contextlib import contextmanager
+from typing import Generator, Optional
 
 from domain.repositories.interfaces import (
     IJournalRepository,
@@ -18,6 +19,7 @@ from domain.repositories.interfaces import (
     ITransactionRepository,
 )
 from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.interfaces import IDatabaseConnection
 from infrastructure.repositories.sqlite_balance_repository import (
     SqlitePortfolioBalanceRepository,
 )
@@ -34,7 +36,7 @@ from infrastructure.repositories.sqlite_transaction_repository import (
 )
 
 
-class TransactionalDatabaseConnection:
+class TransactionalDatabaseConnection(IDatabaseConnection):
     """
     Database connection wrapper that provides the same connection
     for all operations within a Unit of Work transaction.
@@ -58,32 +60,19 @@ class TransactionalDatabaseConnection:
         """Return the shared transaction connection."""
         return self.connection
 
-    def transaction(self):
+    @contextmanager
+    def transaction(self) -> Generator[sqlite3.Connection, None, None]:
         """
         Return a context manager that yields the same connection.
 
         Note: Since we're already in a transaction, this just yields
         the connection without creating a new transaction.
         """
-        return _TransactionContext(self.connection)
+        yield self.connection
 
     def initialize_schema(self) -> None:
         """Delegate schema initialization to original connection."""
         self.original_db_connection.initialize_schema()
-
-
-class _TransactionContext:
-    """Helper context manager for the transactional connection."""
-
-    def __init__(self, connection: sqlite3.Connection):
-        self.connection = connection
-
-    def __enter__(self) -> sqlite3.Connection:
-        return self.connection
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        # Don't commit, rollback, or close here - that's managed by the Unit of Work
-        pass
 
 
 class SqliteUnitOfWork(IStockBookUnitOfWork):

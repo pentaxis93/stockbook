@@ -11,7 +11,7 @@ from typing import List, Optional
 
 from domain.entities.portfolio_entity import PortfolioEntity
 from domain.repositories.interfaces import IPortfolioRepository
-from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.interfaces import IDatabaseConnection
 
 
 class SqlitePortfolioRepository(IPortfolioRepository):
@@ -22,7 +22,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
     the repository pattern and clean architecture boundaries.
     """
 
-    def __init__(self, db_connection: DatabaseConnection):
+    def __init__(self, db_connection: IDatabaseConnection):
         """
         Initialize repository with database connection.
 

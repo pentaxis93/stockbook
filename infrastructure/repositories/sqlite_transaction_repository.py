@@ -12,7 +12,7 @@ from typing import List, Optional
 
 from domain.entities.transaction_entity import TransactionEntity
 from domain.repositories.interfaces import ITransactionRepository
-from infrastructure.persistence.database_connection import DatabaseConnection
+from infrastructure.persistence.interfaces import IDatabaseConnection
 from shared_kernel.value_objects import Money, Quantity
 
 
@@ -24,7 +24,7 @@ class SqliteTransactionRepository(ITransactionRepository):
     the repository pattern and clean architecture boundaries.
     """
 
-    def __init__(self, db_connection: DatabaseConnection):
+    def __init__(self, db_connection: IDatabaseConnection):
         """
         Initialize repository with database connection.
 
