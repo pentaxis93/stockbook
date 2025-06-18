@@ -56,13 +56,13 @@ class SqliteTargetRepository(ITargetRepository):
                 (
                     target.stock_id,
                     target.portfolio_id,
-                    float(target.pivot_price.amount),
-                    float(target.failure_price.amount),
+                    float(target.pivot_price.amount) if target.pivot_price else 0.0,
+                    float(target.failure_price.amount) if target.failure_price else 0.0,
                     target.notes or "",
                     target.status,
                 ),
             )
-            return cursor.lastrowid
+            return cursor.lastrowid or 0
 
     def get_by_id(self, target_id: int) -> Optional[TargetEntity]:
         """
@@ -200,8 +200,8 @@ class SqliteTargetRepository(ITargetRepository):
                 (
                     target.stock_id,
                     target.portfolio_id,
-                    float(target.pivot_price.amount),
-                    float(target.failure_price.amount),
+                    float(target.pivot_price.amount) if target.pivot_price else 0.0,
+                    float(target.failure_price.amount) if target.failure_price else 0.0,
                     target.notes or "",
                     target.status,
                     target_id,

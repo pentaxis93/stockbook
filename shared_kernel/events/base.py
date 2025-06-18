@@ -137,7 +137,7 @@ class DomainEvent:
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialize event to dictionary."""
-        result = {
+        result: Dict[str, Any] = {
             "event_id": self._event_id,
             "timestamp": self._timestamp.isoformat(),
             "event_type": self.event_type(),

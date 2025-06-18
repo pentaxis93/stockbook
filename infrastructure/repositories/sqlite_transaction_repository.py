@@ -57,13 +57,17 @@ class SqliteTransactionRepository(ITransactionRepository):
                     transaction.portfolio_id,
                     transaction.stock_id,
                     transaction.transaction_type,
-                    int(transaction.quantity.value),
-                    float(transaction.price.amount),
-                    transaction.transaction_date.isoformat(),
+                    int(transaction.quantity.value) if transaction.quantity else 0,
+                    float(transaction.price.amount) if transaction.price else 0.0,
+                    (
+                        transaction.transaction_date.isoformat()
+                        if transaction.transaction_date
+                        else ""
+                    ),
                     transaction.notes or "",
                 ),
             )
-            return cursor.lastrowid
+            return cursor.lastrowid or 0
 
     def get_by_id(self, transaction_id: int) -> Optional[TransactionEntity]:
         """
@@ -238,9 +242,13 @@ class SqliteTransactionRepository(ITransactionRepository):
                     transaction.portfolio_id,
                     transaction.stock_id,
                     transaction.transaction_type,
-                    int(transaction.quantity.value),
-                    float(transaction.price.amount),
-                    transaction.transaction_date.isoformat(),
+                    int(transaction.quantity.value) if transaction.quantity else 0,
+                    float(transaction.price.amount) if transaction.price else 0.0,
+                    (
+                        transaction.transaction_date.isoformat()
+                        if transaction.transaction_date
+                        else ""
+                    ),
                     transaction.notes or "",
                     transaction_id,
                 ),

@@ -60,7 +60,7 @@ class SqliteStockRepository(IStockRepository):
                         stock.notes,
                     ),
                 )
-                return cursor.lastrowid
+                return cursor.lastrowid or 0
         except sqlite3.IntegrityError as e:
             if "UNIQUE constraint failed: stock.symbol" in str(e):
                 raise ValueError(

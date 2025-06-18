@@ -48,14 +48,14 @@ class SqliteJournalRepository(IJournalRepository):
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (
-                    entry.entry_date.isoformat(),
+                    entry.entry_date.isoformat() if entry.entry_date else "",
                     entry.content,
                     entry.stock_id,
                     entry.portfolio_id,
                     entry.transaction_id,
                 ),
             )
-            return cursor.lastrowid
+            return cursor.lastrowid or 0
 
     def get_by_id(self, entry_id: int) -> Optional[JournalEntryEntity]:
         """
@@ -266,7 +266,7 @@ class SqliteJournalRepository(IJournalRepository):
                 WHERE id = ?
                 """,
                 (
-                    entry.entry_date.isoformat(),
+                    entry.entry_date.isoformat() if entry.entry_date else "",
                     entry.content,
                     entry.stock_id,
                     entry.portfolio_id,

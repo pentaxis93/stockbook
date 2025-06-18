@@ -58,7 +58,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
                     portfolio.is_active,
                 ),
             )
-            return cursor.lastrowid
+            return cursor.lastrowid or 0
 
     def get_by_id(self, portfolio_id: int) -> Optional[PortfolioEntity]:
         """

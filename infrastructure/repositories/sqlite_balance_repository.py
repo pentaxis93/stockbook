@@ -53,14 +53,18 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 """,
                 (
                     balance.portfolio_id,
-                    balance.balance_date.isoformat(),
+                    balance.balance_date.isoformat() if balance.balance_date else "",
                     float(balance.withdrawals.amount) if balance.withdrawals else 0.0,
                     float(balance.deposits.amount) if balance.deposits else 0.0,
-                    float(balance.final_balance.amount),
+                    (
+                        float(balance.final_balance.amount)
+                        if balance.final_balance
+                        else 0.0
+                    ),
                     balance.index_change,
                 ),
             )
-            return cursor.lastrowid
+            return cursor.lastrowid or 0
 
     def get_by_id(self, balance_id: int) -> Optional[PortfolioBalanceEntity]:
         """

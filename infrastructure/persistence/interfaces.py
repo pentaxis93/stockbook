@@ -30,6 +30,7 @@ class IDatabaseConnection(Protocol):
         Returns:
             Active SQLite connection instance
         """
+        # Protocol method - implementation required by concrete classes
 
     @contextmanager
     def transaction(self) -> Generator[sqlite3.Connection, None, None]:
@@ -42,6 +43,7 @@ class IDatabaseConnection(Protocol):
         Yields:
             SQLite connection within transaction context
         """
+        yield  # type: ignore
 
     def initialize_schema(self) -> None:
         """
@@ -49,3 +51,4 @@ class IDatabaseConnection(Protocol):
 
         This method should be idempotent - safe to call multiple times.
         """
+        # Protocol method - implementation required by concrete classes
