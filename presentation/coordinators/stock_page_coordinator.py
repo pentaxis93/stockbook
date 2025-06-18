@@ -10,13 +10,16 @@ from typing import Any, Dict, List, Optional, Union
 
 import streamlit as st
 
-from presentation.adapters.stock_presentation_adapter import \
-    StockPresentationAdapter
+from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
-    CreateStockResponse, StockDetailResponse, StockListResponse,
-    StockViewModel, ValidationErrorResponse)
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockViewModel,
+    ValidationErrorResponse,
+)
 
 logger = logging.getLogger(__name__)
 

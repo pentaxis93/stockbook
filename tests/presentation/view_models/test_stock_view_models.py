@@ -13,9 +13,16 @@ import pytest
 
 from application.dto.stock_dto import StockDto
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest, CreateStockResponse, StockDetailResponse,
-    StockListResponse, StockSearchRequest, StockViewModel, UpdateStockRequest,
-    UpdateStockResponse, ValidationErrorResponse)
+    CreateStockRequest,
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockSearchRequest,
+    StockViewModel,
+    UpdateStockRequest,
+    UpdateStockResponse,
+    ValidationErrorResponse,
+)
 
 
 class TestCreateStockRequest:
@@ -100,7 +107,7 @@ class TestCreateStockRequest:
         errors = request.validate()
 
         # Assert
-        assert errors == {}
+        assert not errors
 
     def test_create_stock_request_validation_empty_symbol(self):
         """Should validate symbol is not empty."""
@@ -470,7 +477,7 @@ class TestStockSearchRequest:
         """Should validate search parameters."""
         # Valid request
         valid_request = StockSearchRequest(grade_filter="A")
-        assert valid_request.validate() == {}
+        assert not valid_request.validate()
 
         # Invalid grade
         invalid_request = StockSearchRequest(grade_filter="Z")

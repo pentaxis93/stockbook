@@ -12,9 +12,15 @@ from domain.entities.stock_entity import StockEntity
 from shared_kernel.value_objects import Money, Quantity
 
 from .exceptions import InsufficientDataError, RiskAnalysisError
-from .value_objects.risk_metrics import (ConcentrationLevel, ConcentrationRisk,
-                                         PortfolioRisk, RiskFactor, RiskLevel,
-                                         RiskMetrics, RiskProfile)
+from .value_objects.risk_metrics import (
+    ConcentrationLevel,
+    ConcentrationRisk,
+    PortfolioRisk,
+    RiskFactor,
+    RiskLevel,
+    RiskMetrics,
+    RiskProfile,
+)
 
 
 class RiskAssessmentConfig:

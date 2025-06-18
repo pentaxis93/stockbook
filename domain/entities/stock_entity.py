@@ -50,8 +50,7 @@ class StockEntity:
             ValueError: If any validation fails
         """
         # Initialize sector industry service for validation (import here to avoid circular imports)
-        from domain.services.sector_industry_service import \
-            SectorIndustryService
+        from domain.services.sector_industry_service import SectorIndustryService
 
         self._sector_industry_service = SectorIndustryService()
 

@@ -9,8 +9,13 @@ all expected behavior before implementation.
 import pytest
 
 from shared_kernel.exceptions.domain_exceptions import (
-    AnalysisError, BusinessRuleViolationError, CalculationError,
-    DomainServiceError, InsufficientDataError, ValidationError)
+    AnalysisError,
+    BusinessRuleViolationError,
+    CalculationError,
+    DomainServiceError,
+    InsufficientDataError,
+    ValidationError,
+)
 
 
 class TestDomainServiceError:

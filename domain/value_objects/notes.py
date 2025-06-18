@@ -13,6 +13,7 @@ class Notes:
     """
 
     MAX_LENGTH = 1000
+    _value: str
 
     def __init__(self, value: str):
         """

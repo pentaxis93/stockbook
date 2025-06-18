@@ -15,12 +15,20 @@ to be stable, well-tested, and reusable across different domains.
 
 # Domain Events
 from .events import DomainEvent
+
 # Domain Exceptions
-from .exceptions import (AnalysisError, BusinessRuleViolationError,
-                         CalculationError, DomainServiceError,
-                         InsufficientDataError, ValidationError)
+from .exceptions import (
+    AnalysisError,
+    BusinessRuleViolationError,
+    CalculationError,
+    DomainServiceError,
+    InsufficientDataError,
+    ValidationError,
+)
+
 # Interfaces
 from .interfaces import IUnitOfWork
+
 # Value Objects
 from .value_objects import Money, Quantity
 

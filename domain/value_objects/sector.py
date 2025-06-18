@@ -13,6 +13,7 @@ class Sector:
     """
 
     MAX_LENGTH = 100
+    _value: str
 
     def __init__(self, value: str):
         """

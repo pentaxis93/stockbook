@@ -77,7 +77,7 @@ class PortfolioSummary:
 
     total_value: Money
     position_count: int
-    top_holding: PositionAllocation
+    top_holding: Optional[PositionAllocation]
     industry_breakdown: Dict[str, Decimal]  # Industry -> percentage
     grade_breakdown: Dict[str, Decimal]  # Grade -> percentage
     risk_level: str  # "Low", "Medium", "High"

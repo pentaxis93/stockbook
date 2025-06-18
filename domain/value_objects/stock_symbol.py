@@ -45,9 +45,9 @@ class StockSymbol:
         # Validate the normalized symbol
         if not normalized:
             raise ValueError("Stock symbol cannot be empty")
-        elif len(normalized) < 1 or len(normalized) > 5:
+        if len(normalized) < 1 or len(normalized) > 5:
             raise ValueError("Stock symbol must be between 1 and 5 characters")
-        elif not self.SYMBOL_PATTERN.match(normalized):
+        if not self.SYMBOL_PATTERN.match(normalized):
             raise ValueError("Stock symbol must contain only uppercase letters")
 
         # Use object.__setattr__ to bypass immutability during initialization
@@ -61,7 +61,7 @@ class StockSymbol:
     def __setattr__(self, name, value):
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_value"):  # Object is already initialized
-            raise AttributeError(f"Cannot modify immutable StockSymbol object")
+            raise AttributeError("Cannot modify immutable StockSymbol object")
         super().__setattr__(name, value)
 
     def __eq__(self, other) -> bool:

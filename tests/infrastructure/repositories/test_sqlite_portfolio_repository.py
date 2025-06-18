@@ -14,8 +14,9 @@ import pytest
 from domain.entities.portfolio_entity import PortfolioEntity
 from domain.repositories.interfaces import IPortfolioRepository
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_portfolio_repository import \
-    SqlitePortfolioRepository
+from infrastructure.repositories.sqlite_portfolio_repository import (
+    SqlitePortfolioRepository,
+)
 
 
 @pytest.fixture

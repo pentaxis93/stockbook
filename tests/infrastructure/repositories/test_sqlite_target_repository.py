@@ -15,8 +15,7 @@ import pytest
 from domain.entities.target_entity import TargetEntity
 from domain.repositories.interfaces import ITargetRepository
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_target_repository import \
-    SqliteTargetRepository
+from infrastructure.repositories.sqlite_target_repository import SqliteTargetRepository
 from shared_kernel.value_objects import Money
 
 

@@ -14,8 +14,9 @@ import pytest
 from domain.entities.journal_entry_entity import JournalEntryEntity
 from domain.repositories.interfaces import IJournalRepository
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_journal_repository import \
-    SqliteJournalRepository
+from infrastructure.repositories.sqlite_journal_repository import (
+    SqliteJournalRepository,
+)
 
 
 @pytest.fixture

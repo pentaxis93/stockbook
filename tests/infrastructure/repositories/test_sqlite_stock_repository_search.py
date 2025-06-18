@@ -11,8 +11,7 @@ import pytest
 
 from domain.entities.stock_entity import StockEntity
 from domain.value_objects.stock_symbol import StockSymbol
-from infrastructure.repositories.sqlite_stock_repository import \
-    SqliteStockRepository
+from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
 
 
 class TestSqliteStockRepositorySearch:

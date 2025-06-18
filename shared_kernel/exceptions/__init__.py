@@ -5,9 +5,14 @@ Contains foundational exceptions that provide consistent error handling
 patterns across all domains.
 """
 
-from .domain_exceptions import (AnalysisError, BusinessRuleViolationError,
-                                CalculationError, DomainServiceError,
-                                InsufficientDataError, ValidationError)
+from .domain_exceptions import (
+    AnalysisError,
+    BusinessRuleViolationError,
+    CalculationError,
+    DomainServiceError,
+    InsufficientDataError,
+    ValidationError,
+)
 
 __all__ = [
     "DomainServiceError",

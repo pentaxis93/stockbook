@@ -103,7 +103,7 @@ class CreateStockCommand:
     def __setattr__(self, name, value):
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_symbol"):  # Object is already initialized
-            raise AttributeError(f"Cannot modify immutable CreateStockCommand")
+            raise AttributeError("Cannot modify immutable CreateStockCommand")
         super().__setattr__(name, value)
 
     def __eq__(self, other) -> bool:
@@ -218,8 +218,7 @@ class CreateStockCommand:
     ) -> None:
         """Validate sector-industry combination."""
         # Import here to avoid circular imports
-        from domain.services.sector_industry_service import \
-            SectorIndustryService
+        from domain.services.sector_industry_service import SectorIndustryService
 
         # If no industry group, sector can be anything (or None)
         if industry_group is None:
@@ -371,7 +370,7 @@ class UpdateStockCommand:
     def __setattr__(self, name, value):
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_stock_id"):  # Object is already initialized
-            raise AttributeError(f"Cannot modify immutable UpdateStockCommand")
+            raise AttributeError("Cannot modify immutable UpdateStockCommand")
         super().__setattr__(name, value)
 
     def __eq__(self, other) -> bool:

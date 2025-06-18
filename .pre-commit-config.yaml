@@ -1,0 +1,9 @@
+repos:
+  - repo: local
+    hooks:
+      - id: quality-checks
+        name: Run quality checks (pytest, pylint, pyright, black, isort)
+        entry: hooks/run-quality-checks.sh
+        language: script
+        pass_filenames: false
+        always_run: true

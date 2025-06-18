@@ -40,6 +40,11 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+### After cloning the repo:
+```bash
+pre-commit install
+```
+
 ## Usage
 
 ```bash

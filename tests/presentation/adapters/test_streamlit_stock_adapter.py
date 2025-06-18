@@ -14,8 +14,13 @@ import streamlit as st
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest, CreateStockResponse, StockDetailResponse,
-    StockListResponse, StockViewModel, ValidationErrorResponse)
+    CreateStockRequest,
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockViewModel,
+    ValidationErrorResponse,
+)
 
 
 class TestStreamlitStockAdapter:

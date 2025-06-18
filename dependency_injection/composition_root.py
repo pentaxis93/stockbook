@@ -8,25 +8,22 @@ following clean architecture principles.
 from typing import Any, Callable, Dict, Optional
 
 # Application layer imports
-from application.services.stock_application_service import \
-    StockApplicationService
+from application.services.stock_application_service import StockApplicationService
+
 # Domain layer imports
-from domain.repositories.interfaces import (IStockBookUnitOfWork,
-                                            IStockRepository)
+from domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
+
 # Infrastructure layer imports
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from infrastructure.repositories.sqlite_stock_repository import \
-    SqliteStockRepository
-from presentation.adapters.stock_presentation_adapter import \
-    StockPresentationAdapter
+from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
+from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from presentation.adapters.streamlit_ui_operations import \
-    StreamlitUIOperationsFacade
+from presentation.adapters.streamlit_ui_operations import StreamlitUIOperationsFacade
+
 # Presentation layer imports
 from presentation.controllers.stock_controller import StockController
-from presentation.coordinators.stock_page_coordinator import \
-    StockPageCoordinator
+from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 from .di_container import DIContainer
 
@@ -100,20 +97,22 @@ class CompositionRoot:
         """Configure application layer dependencies."""
 
         # Application services - transient to avoid state issues
-        container.register_transient(StockApplicationService)
+        container.register_transient(StockApplicationService, StockApplicationService)
 
     @classmethod
     def _configure_presentation_layer(cls, container: DIContainer) -> None:
         """Configure presentation layer dependencies."""
 
         # Controllers - transient for request isolation
-        container.register_transient(StockController)
+        container.register_transient(StockController, StockController)
 
         # UI Operations - singleton for shared UI state
-        container.register_singleton(StreamlitUIOperationsFacade)
+        container.register_singleton(
+            StreamlitUIOperationsFacade, StreamlitUIOperationsFacade
+        )
 
         # Legacy Streamlit Adapter - transient for UI state isolation
-        container.register_transient(StreamlitStockAdapter)
+        container.register_transient(StreamlitStockAdapter, StreamlitStockAdapter)
 
         # Framework-agnostic adapter - transient for UI state isolation
         container.register_factory(

@@ -13,6 +13,7 @@ class CompanyName:
     """
 
     MAX_LENGTH = 200
+    _value: str
 
     def __init__(self, value: str):
         """

@@ -8,12 +8,18 @@ and application services while managing validation and error handling.
 import logging
 from typing import Any, Dict, List, Optional, Union
 
-from application.services.stock_application_service import \
-    StockApplicationService
+from application.services.stock_application_service import StockApplicationService
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest, CreateStockResponse, StockDetailResponse,
-    StockListResponse, StockSearchRequest, StockViewModel, UpdateStockRequest,
-    UpdateStockResponse, ValidationErrorResponse)
+    CreateStockRequest,
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockSearchRequest,
+    StockViewModel,
+    UpdateStockRequest,
+    UpdateStockResponse,
+    ValidationErrorResponse,
+)
 
 logger = logging.getLogger(__name__)
 

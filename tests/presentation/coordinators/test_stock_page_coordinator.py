@@ -10,15 +10,17 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from presentation.adapters.stock_presentation_adapter import \
-    StockPresentationAdapter
+from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
 from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from presentation.controllers.stock_controller import StockController
-from presentation.coordinators.stock_page_coordinator import \
-    StockPageCoordinator
+from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 from presentation.view_models.stock_view_models import (
-    CreateStockResponse, StockDetailResponse, StockListResponse,
-    StockViewModel, ValidationErrorResponse)
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockViewModel,
+    ValidationErrorResponse,
+)
 
 
 class TestStockPageCoordinator:

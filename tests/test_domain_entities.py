@@ -8,9 +8,14 @@ from decimal import Decimal
 
 import pytest
 
-from domain.entities import (JournalEntryEntity, PortfolioBalanceEntity,
-                             PortfolioEntity, StockEntity, TargetEntity,
-                             TransactionEntity)
+from domain.entities import (
+    JournalEntryEntity,
+    PortfolioBalanceEntity,
+    PortfolioEntity,
+    StockEntity,
+    TargetEntity,
+    TransactionEntity,
+)
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 

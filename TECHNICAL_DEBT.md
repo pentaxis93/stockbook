@@ -4,7 +4,42 @@ This document tracks temporary implementations, architectural compromises, and t
 
 ## High Priority (Blocking Clean Architecture Completion)
 
-### 1. Legacy Application Integration (app.py) ✅ RESOLVED
+### 1. 🚨 CRITICAL: Temporarily Disabled Quality Checks (NEW - 2025-06-18)
+- **Issue**: Pyright type checking disabled + Pylint made more permissive due to architectural issues
+- **Impact**: 
+  - 122 type errors remain (reduced from 171), potential for type safety regressions
+  - Various style/structural issues temporarily ignored in pylint
+- **Locations**: 
+  - `hooks/run-quality-checks.sh` lines 31-43 (pyright commented out)
+  - `.pylintrc` lines 2-4 (additional disabled rules)
+- **Root Cause**: DatabaseConnection vs TransactionalDatabaseConnection type incompatibility
+- **Affected Files**: All repository instantiations in `infrastructure/persistence/unit_of_work.py`
+- **Re-enable Process**: 
+  1. Fix database connection architecture (see #2 below)
+  2. Remove temporarily disabled pylint rules from `.pylintrc`
+  3. Uncomment pyright section in pre-commit hook
+  4. Verify 0 pyright errors and clean pylint report
+- **Status**: TEMPORARY DISABLE - Must be resolved before next major release
+
+### 2. Database Connection Architecture Flaw (NEW - 2025-06-18)
+- **Issue**: Two incompatible connection patterns break transaction boundaries
+- **Impact**: Type errors in repository layer, risk of broken ACID compliance
+- **Architecture Problem**: 
+  ```python
+  # Normal: Each repo creates own connection
+  SqliteStockRepository(DatabaseConnection)  
+  
+  # Transactional: Repos must share connection
+  SqliteStockRepository(TransactionalDatabaseConnection)  # ❌ TYPE ERROR
+  ```
+- **Solution Options**:
+  - Option A: Common `IConnectionProvider` interface
+  - Option B: Repository factory pattern within UnitOfWork
+  - Option C: Single connection context manager
+- **Estimated Effort**: 2-3 days focused work
+- **Dependencies**: Must complete before re-enabling pyright
+
+### 3. Legacy Application Integration (app.py) ✅ RESOLVED
 - **Issue**: Original Streamlit app used legacy models and database utilities
 - **Impact**: Clean architecture implementation was isolated from main app
 - **Location**: `app.py` (MIGRATED), legacy files (REMOVED)

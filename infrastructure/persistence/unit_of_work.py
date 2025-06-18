@@ -8,26 +8,30 @@ within a transactional context.
 import sqlite3
 from typing import Optional
 
-from domain.repositories.interfaces import (IJournalRepository,
-                                            IPortfolioBalanceRepository,
-                                            IPortfolioRepository,
-                                            IStockBookUnitOfWork,
-                                            IStockRepository,
-                                            ITargetRepository,
-                                            ITransactionRepository)
+from domain.repositories.interfaces import (
+    IJournalRepository,
+    IPortfolioBalanceRepository,
+    IPortfolioRepository,
+    IStockBookUnitOfWork,
+    IStockRepository,
+    ITargetRepository,
+    ITransactionRepository,
+)
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_balance_repository import \
-    SqlitePortfolioBalanceRepository
-from infrastructure.repositories.sqlite_journal_repository import \
-    SqliteJournalRepository
-from infrastructure.repositories.sqlite_portfolio_repository import \
-    SqlitePortfolioRepository
-from infrastructure.repositories.sqlite_stock_repository import \
-    SqliteStockRepository
-from infrastructure.repositories.sqlite_target_repository import \
-    SqliteTargetRepository
-from infrastructure.repositories.sqlite_transaction_repository import \
-    SqliteTransactionRepository
+from infrastructure.repositories.sqlite_balance_repository import (
+    SqlitePortfolioBalanceRepository,
+)
+from infrastructure.repositories.sqlite_journal_repository import (
+    SqliteJournalRepository,
+)
+from infrastructure.repositories.sqlite_portfolio_repository import (
+    SqlitePortfolioRepository,
+)
+from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
+from infrastructure.repositories.sqlite_target_repository import SqliteTargetRepository
+from infrastructure.repositories.sqlite_transaction_repository import (
+    SqliteTransactionRepository,
+)
 
 
 class TransactionalDatabaseConnection:

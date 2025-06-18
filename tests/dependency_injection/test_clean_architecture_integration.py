@@ -11,6 +11,7 @@ import pytest
 
 from application.commands.stock_commands import CreateStockCommand
 from application.dto.stock_dto import StockDto
+
 # Clean architecture imports - these exist
 from domain.entities.stock_entity import StockEntity
 from domain.value_objects.stock_symbol import StockSymbol

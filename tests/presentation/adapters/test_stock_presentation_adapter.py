@@ -10,15 +10,21 @@ from unittest.mock import Mock
 
 import pytest
 
-from presentation.adapters.stock_presentation_adapter import \
-    StockPresentationAdapter
+from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
 from presentation.controllers.stock_controller import StockController
-from presentation.interfaces.ui_operations import (IUILayoutOperations,
-                                                   IUIOperations,
-                                                   IUIValidationOperations)
+from presentation.interfaces.ui_operations import (
+    IUILayoutOperations,
+    IUIOperations,
+    IUIValidationOperations,
+)
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest, CreateStockResponse, StockDetailResponse,
-    StockListResponse, StockViewModel, ValidationErrorResponse)
+    CreateStockRequest,
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockViewModel,
+    ValidationErrorResponse,
+)
 
 
 class TestStockPresentationAdapter:

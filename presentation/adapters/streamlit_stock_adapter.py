@@ -13,9 +13,14 @@ import streamlit as st
 
 from presentation.controllers.stock_controller import StockController
 from presentation.view_models.stock_view_models import (
-    CreateStockRequest, CreateStockResponse, StockDetailResponse,
-    StockListResponse, StockSearchRequest, StockViewModel,
-    ValidationErrorResponse)
+    CreateStockRequest,
+    CreateStockResponse,
+    StockDetailResponse,
+    StockListResponse,
+    StockSearchRequest,
+    StockViewModel,
+    ValidationErrorResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -215,8 +220,9 @@ class StreamlitStockAdapter:
                 apply_filter = st.button("Apply Filter", type="secondary")
 
             if apply_filter and selected_grade:
-                from presentation.view_models.stock_view_models import \
-                    StockSearchRequest
+                from presentation.view_models.stock_view_models import (
+                    StockSearchRequest,
+                )
 
                 search_request = StockSearchRequest(grade_filter=selected_grade)
                 response = self.controller.search_stocks(search_request)

@@ -12,11 +12,13 @@ import pytest
 
 from domain.entities.stock_entity import StockEntity
 from domain.services.exceptions import CalculationError, InsufficientDataError
+
 # These imports now exist after implementation
-from domain.services.portfolio_calculation_service import \
-    PortfolioCalculationService
+from domain.services.portfolio_calculation_service import PortfolioCalculationService
 from domain.services.value_objects.portfolio_metrics import (
-    PortfolioAllocation, PortfolioMetrics)
+    PortfolioAllocation,
+    PortfolioMetrics,
+)
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 

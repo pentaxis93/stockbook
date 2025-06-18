@@ -289,7 +289,7 @@ class ErrorMessageMapper:
         if isinstance(error, StockBookError) and error.error_code:
             mapper = self.message_mappings.get(error.error_code)
             if callable(mapper):
-                return mapper(error)
+                return str(mapper(error))
             elif isinstance(mapper, str):
                 return mapper
 
@@ -422,7 +422,6 @@ class StreamlitErrorBoundary:
         elif level == "info":
             st.info(user_message)
 
-    @contextmanager
     def __enter__(self):
         """Context manager entry."""
         return self

@@ -68,6 +68,7 @@ class Config:
         """Load all configuration settings."""
         # Application settings
         self.app_name = self._get_env_str("STOCKBOOK_APP_NAME", "StockBook")
+        self.DEBUG = self._get_env_bool("STOCKBOOK_DEBUG", False)
 
         # Database configuration
         self.db_path = Path(

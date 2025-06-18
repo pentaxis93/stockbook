@@ -12,9 +12,11 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 import streamlit as st
 
-from presentation.interfaces.ui_operations import (IUILayoutOperations,
-                                                   IUIOperations,
-                                                   IUIValidationOperations)
+from presentation.interfaces.ui_operations import (
+    IUILayoutOperations,
+    IUIOperations,
+    IUIValidationOperations,
+)
 
 logger = logging.getLogger(__name__)
 

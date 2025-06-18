@@ -24,10 +24,17 @@ import streamlit as st
 
 # Import the error handling module (will fail initially - that's expected in TDD)
 try:
-    from error_handling import (BusinessLogicError, DatabaseError, ErrorLogger,
-                                ErrorMessageMapper, ErrorRecovery,
-                                MessageSystem, StockBookError,
-                                StreamlitErrorBoundary, ValidationError)
+    from error_handling import (
+        BusinessLogicError,
+        DatabaseError,
+        ErrorLogger,
+        ErrorMessageMapper,
+        ErrorRecovery,
+        MessageSystem,
+        StockBookError,
+        StreamlitErrorBoundary,
+        ValidationError,
+    )
 except ImportError:
     # This is expected during TDD - we haven't created the module yet
     pytest.skip("Error handling module not yet implemented", allow_module_level=True)
@@ -151,7 +158,7 @@ class TestErrorLogger:
         logger.log_error(error)
 
         # Read log file content
-        with open(temp_log_file, "r") as f:
+        with open(temp_log_file, "r", encoding="utf-8") as f:
             log_content = f.read()
 
         assert "VALIDATION_ERROR" in log_content
@@ -166,7 +173,7 @@ class TestErrorLogger:
 
         logger.log_error(error)
 
-        with open(temp_log_file, "r") as f:
+        with open(temp_log_file, "r", encoding="utf-8") as f:
             log_content = f.read()
 
         assert "ValueError" in log_content
@@ -181,7 +188,7 @@ class TestErrorLogger:
         logger.log_error(error)
         after_time = datetime.now()
 
-        with open(temp_log_file, "r") as f:
+        with open(temp_log_file, "r", encoding="utf-8") as f:
             log_content = f.read()
 
         # Check that timestamp is in reasonable range
@@ -195,7 +202,7 @@ class TestErrorLogger:
         user_context = {"user_id": "test_user", "session_id": "abc123"}
         logger.log_error(error, user_context=user_context)
 
-        with open(temp_log_file, "r") as f:
+        with open(temp_log_file, "r", encoding="utf-8") as f:
             log_content = f.read()
 
         assert "user_id: test_user" in log_content
@@ -590,7 +597,7 @@ class TestErrorHandlingIntegration:
                 logger.log_error(error)
 
             # Check log file contains all errors
-            with open(log_path, "r") as f:
+            with open(log_path, "r", encoding="utf-8") as f:
                 log_content = f.read()
 
             assert "VALIDATION_ERROR" in log_content

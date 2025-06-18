@@ -15,8 +15,9 @@ import pytest
 from domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 from domain.repositories.interfaces import IPortfolioBalanceRepository
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_balance_repository import \
-    SqlitePortfolioBalanceRepository
+from infrastructure.repositories.sqlite_balance_repository import (
+    SqlitePortfolioBalanceRepository,
+)
 from shared_kernel.value_objects import Money
 
 

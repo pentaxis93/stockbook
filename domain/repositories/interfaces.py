@@ -11,10 +11,16 @@ from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
 # Import domain entities and value objects
-from domain.entities import (JournalEntryEntity, PortfolioBalanceEntity,
-                             PortfolioEntity, StockEntity, TargetEntity,
-                             TransactionEntity)
+from domain.entities import (
+    JournalEntryEntity,
+    PortfolioBalanceEntity,
+    PortfolioEntity,
+    StockEntity,
+    TargetEntity,
+    TransactionEntity,
+)
 from domain.value_objects.stock_symbol import StockSymbol
+
 # Import shared kernel interfaces
 from shared_kernel.interfaces.unit_of_work import IUnitOfWork
 

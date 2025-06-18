@@ -5,8 +5,7 @@ These value objects encapsulate the results and parameters of domain service
 operations, providing type-safe and immutable data structures.
 """
 
-from .portfolio_metrics import (PortfolioAllocation, PortfolioMetrics,
-                                PortfolioSummary)
+from .portfolio_metrics import PortfolioAllocation, PortfolioMetrics, PortfolioSummary
 from .risk_metrics import PortfolioRisk, RiskLevel, RiskMetrics, RiskProfile
 
 # from .diversification_metrics import DiversificationScore, SectorAllocation, CorrelationMatrix

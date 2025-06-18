@@ -15,8 +15,9 @@ import pytest
 from domain.entities.transaction_entity import TransactionEntity
 from domain.repositories.interfaces import ITransactionRepository
 from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_transaction_repository import \
-    SqliteTransactionRepository
+from infrastructure.repositories.sqlite_transaction_repository import (
+    SqliteTransactionRepository,
+)
 from shared_kernel.value_objects import Money, Quantity
 
 

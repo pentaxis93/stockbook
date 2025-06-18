@@ -7,8 +7,7 @@ domain entities and repositories.
 
 from typing import List, Optional
 
-from application.commands.stock_commands import (CreateStockCommand,
-                                                 UpdateStockCommand)
+from application.commands.stock_commands import CreateStockCommand, UpdateStockCommand
 from application.dto.stock_dto import StockDto
 from domain.entities.stock_entity import StockEntity
 from domain.repositories.interfaces import IStockBookUnitOfWork

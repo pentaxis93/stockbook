@@ -12,10 +12,12 @@ from domain.entities.stock_entity import StockEntity
 from shared_kernel.value_objects import Money, Quantity
 
 from .exceptions import CalculationError, InsufficientDataError
-from .value_objects.portfolio_metrics import (PortfolioAllocation,
-                                              PortfolioMetrics,
-                                              PortfolioSummary,
-                                              PositionAllocation)
+from .value_objects.portfolio_metrics import (
+    PortfolioAllocation,
+    PortfolioMetrics,
+    PortfolioSummary,
+    PositionAllocation,
+)
 
 
 class PortfolioCalculationConfig:
@@ -109,7 +111,7 @@ class PortfolioCalculationService:
                 symbol=stock.symbol,
                 value=position_value,
                 percentage=percentage,
-                quantity=quantity.value,
+                quantity=int(quantity.value),
             )
             allocations.append(allocation)
 
