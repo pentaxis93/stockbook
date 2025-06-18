@@ -58,10 +58,11 @@ class TestStockEntity:
             stock = StockEntity(symbol=StockSymbol("TEST"), name="Test Stock", grade=grade)
             assert stock.grade == grade
 
-    def test_empty_name_rejected(self):
-        """Test that empty name is rejected"""
-        with pytest.raises(ValueError, match="name"):
-            StockEntity(symbol=StockSymbol("TEST"), name="")
+    def test_empty_name_allowed(self):
+        """Test that empty name is now allowed (users can create stock with only symbol)"""
+        stock = StockEntity(symbol=StockSymbol("TEST"), name="")
+        assert stock.name == ""
+        assert stock.symbol.value == "TEST"
 
     def test_invalid_symbol_rejected(self):
         """Test that invalid symbols are rejected by StockSymbol value object"""

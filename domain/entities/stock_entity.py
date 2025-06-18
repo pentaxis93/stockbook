@@ -7,8 +7,9 @@ and validation rules encapsulated within the entity.
 
 from typing import Optional
 
-from shared_kernel.value_objects import Money, Quantity
+from domain.value_objects import CompanyName, IndustryGroup, Notes
 from domain.value_objects.stock_symbol import StockSymbol
+from shared_kernel.value_objects import Money, Quantity
 
 
 class StockEntity:
@@ -22,15 +23,10 @@ class StockEntity:
     # Valid grade options
     VALID_GRADES = {"A", "B", "C"}
 
-    # Constraints
-    MAX_NAME_LENGTH = 200
-    MAX_INDUSTRY_LENGTH = 100
-    MAX_NOTES_LENGTH = 1000
-
     def __init__(
         self,
         symbol: StockSymbol,
-        name: str,
+        name: str = "",
         industry_group: Optional[str] = None,
         grade: Optional[str] = None,
         notes: str = "",
@@ -50,18 +46,17 @@ class StockEntity:
         Raises:
             ValueError: If any validation fails
         """
-        # Validate inputs
-        self._validate_name(name)
-        self._validate_industry_group(industry_group)
-        self._validate_grade(grade)
-        self._validate_notes(notes)
-
-        # Set attributes
+        # Create value objects (validation delegated to them)
         self._symbol = symbol
-        self._name = name.strip()
-        self._industry_group = industry_group.strip() if industry_group else None
+        self._company_name = CompanyName(name)
+        self._industry_group_vo = (
+            IndustryGroup(industry_group) if industry_group else None
+        )
+        self._notes_vo = Notes(notes)
+
+        # Validate grade (still entity's responsibility as it's domain-specific)
+        self._validate_grade(grade)
         self._grade = grade
-        self._notes = notes.strip()
         self._id = stock_id
 
     @property
@@ -70,14 +65,24 @@ class StockEntity:
         return self._symbol
 
     @property
+    def company_name(self) -> CompanyName:
+        """Get the company name value object."""
+        return self._company_name
+
+    @property
     def name(self) -> str:
-        """Get the company name."""
-        return self._name
+        """Get the company name as string (backward compatibility)."""
+        return self._company_name.value
+
+    @property
+    def industry_group_vo(self) -> Optional[IndustryGroup]:
+        """Get the industry group value object."""
+        return self._industry_group_vo
 
     @property
     def industry_group(self) -> Optional[str]:
-        """Get the industry group."""
-        return self._industry_group
+        """Get the industry group as string (backward compatibility)."""
+        return self._industry_group_vo.value if self._industry_group_vo else None
 
     @property
     def grade(self) -> Optional[str]:
@@ -85,9 +90,14 @@ class StockEntity:
         return self._grade
 
     @property
+    def notes_vo(self) -> Notes:
+        """Get the notes value object."""
+        return self._notes_vo
+
+    @property
     def notes(self) -> str:
-        """Get the notes."""
-        return self._notes
+        """Get the notes as string (backward compatibility)."""
+        return self._notes_vo.value
 
     @property
     def id(self) -> Optional[int]:
@@ -133,15 +143,6 @@ class StockEntity:
         """
         return price * quantity.value
 
-    def is_high_grade(self) -> bool:
-        """
-        Check if this is a high-grade stock.
-
-        Returns:
-            True if grade is 'A', False otherwise
-        """
-        return self.grade == "A"
-
     def has_notes(self) -> bool:
         """
         Check if stock has notes.
@@ -149,61 +150,7 @@ class StockEntity:
         Returns:
             True if notes are present and not empty
         """
-        return bool(self.notes and self.notes.strip())
-
-    def update_grade(self, new_grade: Optional[str]) -> None:
-        """
-        Update the stock grade.
-
-        Args:
-            new_grade: New grade value (A/B/C or None)
-
-        Raises:
-            ValueError: If grade is invalid
-        """
-        self._validate_grade(new_grade)
-        self._grade = new_grade
-
-    def update_notes(self, new_notes: str) -> None:
-        """
-        Update the stock notes.
-
-        Args:
-            new_notes: New notes content
-
-        Raises:
-            ValueError: If notes are too long
-        """
-        self._validate_notes(new_notes)
-        self._notes = new_notes.strip()
-
-    def update_name(self, new_name: str) -> None:
-        """
-        Update the company name.
-
-        Args:
-            new_name: New company name
-
-        Raises:
-            ValueError: If name is invalid
-        """
-        self._validate_name(new_name)
-        self._name = new_name.strip()
-
-    def update_industry_group(self, new_industry_group: Optional[str]) -> None:
-        """
-        Update the industry group.
-
-        Args:
-            new_industry_group: New industry group (or None to clear)
-
-        Raises:
-            ValueError: If industry group is invalid
-        """
-        self._validate_industry_group(new_industry_group)
-        self._industry_group = (
-            new_industry_group.strip() if new_industry_group else None
-        )
+        return self._notes_vo.has_content()
 
     def update_fields(self, **kwargs) -> None:
         """
@@ -216,26 +163,31 @@ class StockEntity:
         Raises:
             ValueError: If any field is invalid
         """
-        # Validate all fields first before updating any
-        if "name" in kwargs:
-            self._validate_name(kwargs["name"])
-        if "industry_group" in kwargs:
-            self._validate_industry_group(kwargs["industry_group"])
-        if "grade" in kwargs:
-            self._validate_grade(kwargs["grade"])
-        if "notes" in kwargs:
-            self._validate_notes(kwargs["notes"])
+        # Create temporary value objects for validation (atomic operation)
+        temp_values = {}
 
-        # Update fields after validation passes
         if "name" in kwargs:
-            self._name = kwargs["name"].strip()
+            temp_values["company_name"] = CompanyName(kwargs["name"])
         if "industry_group" in kwargs:
             industry_group = kwargs["industry_group"]
-            self._industry_group = industry_group.strip() if industry_group else None
+            temp_values["industry_group_vo"] = (
+                IndustryGroup(industry_group) if industry_group else None
+            )
         if "grade" in kwargs:
-            self._grade = kwargs["grade"]
+            self._validate_grade(kwargs["grade"])
+            temp_values["grade"] = kwargs["grade"]
         if "notes" in kwargs:
-            self._notes = kwargs["notes"].strip()
+            temp_values["notes_vo"] = Notes(kwargs["notes"])
+
+        # All validation passed, now update the actual fields
+        if "company_name" in temp_values:
+            self._company_name = temp_values["company_name"]
+        if "industry_group_vo" in temp_values:
+            self._industry_group_vo = temp_values["industry_group_vo"]
+        if "grade" in temp_values:
+            self._grade = temp_values["grade"]
+        if "notes_vo" in temp_values:
+            self._notes_vo = temp_values["notes_vo"]
 
     def set_id(self, stock_id: int) -> None:
         """
@@ -256,32 +208,7 @@ class StockEntity:
         self._id = stock_id
 
     @classmethod
-    def _validate_name(cls, name: str) -> None:
-        """Validate company name."""
-        if not name or not name.strip():
-            raise ValueError("Company name cannot be empty")
-
-        if len(name) > cls.MAX_NAME_LENGTH:
-            raise ValueError(
-                f"Company name cannot exceed {cls.MAX_NAME_LENGTH} characters"
-            )
-
-    @classmethod
-    def _validate_industry_group(cls, industry_group: Optional[str]) -> None:
-        """Validate industry group."""
-        if industry_group is not None and len(industry_group) > cls.MAX_INDUSTRY_LENGTH:
-            raise ValueError(
-                f"Industry group cannot exceed {cls.MAX_INDUSTRY_LENGTH} characters"
-            )
-
-    @classmethod
     def _validate_grade(cls, grade: Optional[str]) -> None:
         """Validate stock grade."""
         if grade is not None and grade not in cls.VALID_GRADES:
             raise ValueError(f"Grade must be one of {cls.VALID_GRADES} or None")
-
-    @classmethod
-    def _validate_notes(cls, notes: str) -> None:
-        """Validate notes."""
-        if len(notes) > cls.MAX_NOTES_LENGTH:
-            raise ValueError(f"Notes cannot exceed {cls.MAX_NOTES_LENGTH} characters")

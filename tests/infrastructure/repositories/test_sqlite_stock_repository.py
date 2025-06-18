@@ -200,8 +200,7 @@ class TestSqliteStockRepository:
 
         # Modify the entity
         stock.set_id(stock_id)
-        stock.update_grade("A")
-        stock.update_notes("Excellent company")
+        stock.update_fields(grade="A", notes="Excellent company")
 
         # Act
         success = self.repository.update(stock_id, stock)

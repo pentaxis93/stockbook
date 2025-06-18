@@ -9,5 +9,8 @@ to avoid duplication and provide consistent behavior across all domains.
 """
 
 from .stock_symbol import StockSymbol
+from .company_name import CompanyName
+from .industry_group import IndustryGroup
+from .notes import Notes
 
-__all__ = ["StockSymbol"]
+__all__ = ["StockSymbol", "CompanyName", "IndustryGroup", "Notes"]

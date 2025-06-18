@@ -12,10 +12,8 @@ from .exceptions import (BusinessRuleViolationError, CalculationError,
                          DomainServiceError, InsufficientDataError,
                          PricingError, RiskAnalysisError, ValidationError)
 from .portfolio_calculation_service import PortfolioCalculationService
-from .stock_validation_service import StockValidationService
 
 __all__ = [
-    "StockValidationService",
     "PortfolioCalculationService",
     # 'StockPricingService',
     # 'DiversificationAnalysisService',

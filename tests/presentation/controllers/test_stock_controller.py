@@ -301,54 +301,6 @@ class TestStockController:
         # Service should not be called
         self.mock_stock_service.get_stock_by_symbol.assert_not_called()
 
-    def test_get_stocks_by_grade_success(self):
-        """Should retrieve stocks filtered by grade."""
-        # Arrange
-        grade = "A"
-        mock_stocks = [
-            StockDto(
-                id=1,
-                symbol="AAPL",
-                name="Apple Inc.",
-                industry_group="Technology",
-                grade="A",
-                notes="",
-            ),
-            StockDto(
-                id=2,
-                symbol="GOOGL",
-                name="Alphabet Inc.",
-                industry_group="Technology",
-                grade="A",
-                notes="",
-            ),
-        ]
-
-        self.mock_stock_service.get_stocks_by_grade.return_value = mock_stocks
-
-        # Act
-        response = self.controller.get_stocks_by_grade(grade)
-
-        # Assert
-        assert isinstance(response, StockListResponse)
-        assert response.success is True
-        assert len(response.stocks) == 2
-        assert all(stock.grade == "A" for stock in response.stocks)
-        assert response.message == "Retrieved 2 stocks with grade A"
-
-    def test_get_stocks_by_grade_invalid_grade(self):
-        """Should validate grade parameter."""
-        # Arrange
-        invalid_grade = "Z"
-
-        # Act
-        response = self.controller.get_stocks_by_grade(invalid_grade)
-
-        # Assert
-        assert isinstance(response, ValidationErrorResponse)
-        assert response.success is False
-        assert "grade" in response.errors
-        assert "Grade must be A, B, or C" in response.errors["grade"]
 
     def test_controller_error_handling_generic_exception(self):
         """Should handle unexpected exceptions gracefully."""

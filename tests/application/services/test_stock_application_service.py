@@ -190,50 +190,6 @@ class TestStockApplicationService:
         # Verify repository interaction
         self.mock_stock_repository.get_all.assert_called_once()
 
-    def test_update_stock_grade_success(self):
-        """Should update stock grade successfully."""
-        # Arrange
-        symbol = "AAPL"
-        new_grade = "A"
-        stock_entity = StockEntity(
-            symbol=StockSymbol("AAPL"), name="Apple Inc.", grade="B", stock_id=123
-        )
-
-        self.mock_stock_repository.get_by_symbol.return_value = stock_entity
-        self.mock_stock_repository.update.return_value = True
-
-        # Act
-        result = self.service.update_stock_grade(symbol, new_grade)
-
-        # Assert
-        assert isinstance(result, StockDto)
-        assert result.grade == "A"
-
-        # Verify the entity was updated
-        assert stock_entity.grade == "A"
-
-        # Verify repository interactions
-        self.mock_stock_repository.get_by_symbol.assert_called_once_with(
-            StockSymbol("AAPL")
-        )
-        self.mock_stock_repository.update.assert_called_once()
-        self.mock_unit_of_work.commit.assert_called_once()
-
-    def test_update_stock_grade_not_found(self):
-        """Should raise error when trying to update non-existent stock."""
-        # Arrange
-        symbol = "NFND"  # Valid 4-character symbol
-        new_grade = "A"
-
-        self.mock_stock_repository.get_by_symbol.return_value = None
-
-        # Act & Assert
-        with pytest.raises(ValueError, match="Stock with symbol NFND not found"):
-            self.service.update_stock_grade(symbol, new_grade)
-
-        # Verify no update was attempted
-        self.mock_stock_repository.update.assert_not_called()
-        self.mock_unit_of_work.commit.assert_not_called()
 
     def test_stock_exists_true(self):
         """Should return True when stock exists."""

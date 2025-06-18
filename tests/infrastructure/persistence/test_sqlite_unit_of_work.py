@@ -218,7 +218,7 @@ class TestSqliteUnitOfWork:
             assert retrieved_stock is not None
 
             # Update through same repository instance
-            retrieved_stock.update_grade("A")
+            retrieved_stock.update_fields(grade="A")
             success = uow.stocks.update(stock_id, retrieved_stock)
             assert success is True
 

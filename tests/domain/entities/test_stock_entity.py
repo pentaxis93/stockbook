@@ -12,6 +12,7 @@ import pytest
 from domain.entities.stock_entity import StockEntity
 from shared_kernel.value_objects import Money, Quantity
 from domain.value_objects.stock_symbol import StockSymbol
+from domain.value_objects import CompanyName, IndustryGroup, Notes
 
 
 class TestStockEntity:
@@ -42,15 +43,48 @@ class TestStockEntity:
         assert stock.grade is None
         assert stock.notes == ""
 
-    def test_create_stock_with_empty_name_raises_error(self):
-        """Should raise error for empty company name."""
+    def test_stock_returns_value_objects(self):
+        """Should return value objects for name, industry_group, and notes."""
+        symbol = StockSymbol("AAPL")
+        stock = StockEntity(
+            symbol=symbol, 
+            name="Apple Inc.", 
+            industry_group="Technology", 
+            notes="Great company"
+        )
+
+        # Should return value objects, not raw strings
+        assert isinstance(stock.company_name, CompanyName)
+        assert isinstance(stock.industry_group_vo, IndustryGroup)
+        assert isinstance(stock.notes_vo, Notes)
+        
+        # Should also provide string properties for backward compatibility
+        assert stock.name == "Apple Inc."
+        assert stock.industry_group == "Technology"
+        assert stock.notes == "Great company"
+
+    def test_create_stock_with_empty_name_allowed(self):
+        """Should allow creating stock with empty company name (only symbol required)."""
         symbol = StockSymbol("AAPL")
 
-        with pytest.raises(ValueError, match="Company name cannot be empty"):
-            StockEntity(symbol=symbol, name="")
+        stock_empty_name = StockEntity(symbol=symbol, name="")
+        assert stock_empty_name.symbol == symbol
+        assert stock_empty_name.name == ""
 
-        with pytest.raises(ValueError, match="Company name cannot be empty"):
-            StockEntity(symbol=symbol, name="   ")
+        stock_whitespace_name = StockEntity(symbol=symbol, name="   ")
+        assert stock_whitespace_name.symbol == symbol
+        assert stock_whitespace_name.name == ""  # Whitespace is stripped during initialization
+
+    def test_create_stock_with_only_symbol(self):
+        """Should allow creating stock with only symbol (name defaults to empty)."""
+        symbol = StockSymbol("AAPL")
+        
+        stock = StockEntity(symbol=symbol)
+        assert stock.symbol == symbol
+        assert stock.name == ""
+        assert stock.industry_group is None
+        assert stock.grade is None
+        assert stock.notes == ""
 
     def test_create_stock_with_invalid_grade_raises_error(self):
         """Should raise error for invalid grade."""
@@ -60,7 +94,7 @@ class TestStockEntity:
             StockEntity(symbol=symbol, name="Apple Inc.", grade="Z")
 
     def test_create_stock_with_too_long_name_raises_error(self):
-        """Should raise error for company name that's too long."""
+        """Should raise error for company name that's too long (delegated to value object)."""
         symbol = StockSymbol("AAPL")
         long_name = "A" * 201  # Max is 200 characters
 
@@ -70,7 +104,7 @@ class TestStockEntity:
             StockEntity(symbol=symbol, name=long_name)
 
     def test_create_stock_with_too_long_industry_raises_error(self):
-        """Should raise error for industry group that's too long."""
+        """Should raise error for industry group that's too long (delegated to value object)."""
         symbol = StockSymbol("AAPL")
         long_industry = "A" * 101  # Max is 100 characters
 
@@ -80,7 +114,7 @@ class TestStockEntity:
             StockEntity(symbol=symbol, name="Apple Inc.", industry_group=long_industry)
 
     def test_create_stock_with_too_long_notes_raises_error(self):
-        """Should raise error for notes that are too long."""
+        """Should raise error for notes that are too long (delegated to value object)."""
         symbol = StockSymbol("AAPL")
         long_notes = "A" * 1001  # Max is 1000 characters
 
@@ -158,19 +192,6 @@ class TestStockEntity:
         with pytest.raises(ValueError):
             Quantity.for_shares(0)  # This should fail for share quantities
 
-    def test_is_high_grade(self):
-        """Should identify high grade stocks."""
-        symbol = StockSymbol("AAPL")
-
-        stock_a = StockEntity(symbol=symbol, name="Apple Inc.", grade="A")
-        stock_b = StockEntity(symbol=symbol, name="Apple Inc.", grade="B")
-        stock_c = StockEntity(symbol=symbol, name="Apple Inc.", grade="C")
-        stock_no_grade = StockEntity(symbol=symbol, name="Apple Inc.")
-
-        assert stock_a.is_high_grade() == True
-        assert stock_b.is_high_grade() == False
-        assert stock_c.is_high_grade() == False
-        assert stock_no_grade.is_high_grade() == False
 
     def test_has_notes(self):
         """Should check if stock has notes."""
@@ -186,45 +207,83 @@ class TestStockEntity:
         assert stock_without_notes.has_notes() == False
         assert stock_empty_notes.has_notes() == False
 
-    def test_update_grade(self):
-        """Should update stock grade with validation."""
+    def test_update_fields_single_field(self):
+        """Should update individual fields using update_fields method."""
         symbol = StockSymbol("AAPL")
         stock = StockEntity(symbol=symbol, name="Apple Inc.", grade="B")
 
-        stock.update_grade("A")
+        # Update grade
+        stock.update_fields(grade="A")
         assert stock.grade == "A"
 
-        stock.update_grade(None)
-        assert stock.grade is None
+        # Update name
+        stock.update_fields(name="Apple Inc. Updated")
+        assert stock.name == "Apple Inc. Updated"
 
-    def test_update_grade_with_invalid_grade_raises_error(self):
-        """Should raise error when updating to invalid grade."""
+        # Update industry_group
+        stock.update_fields(industry_group="Technology")
+        assert stock.industry_group == "Technology"
+
+        # Update notes
+        stock.update_fields(notes="Great company")
+        assert stock.notes == "Great company"
+
+    def test_update_fields_multiple_fields_atomic(self):
+        """Should update multiple fields atomically."""
         symbol = StockSymbol("AAPL")
         stock = StockEntity(symbol=symbol, name="Apple Inc.")
 
-        with pytest.raises(ValueError, match="Grade must be one of"):
-            stock.update_grade("Z")
+        # Update multiple fields at once
+        stock.update_fields(
+            name="Apple Inc. Updated",
+            grade="A",
+            industry_group="Technology",
+            notes="Excellent company"
+        )
 
-    def test_update_notes(self):
-        """Should update stock notes with validation."""
-        symbol = StockSymbol("AAPL")
-        stock = StockEntity(symbol=symbol, name="Apple Inc.")
-
-        stock.update_notes("Excellent company")
+        assert stock.name == "Apple Inc. Updated"
+        assert stock.grade == "A"
+        assert stock.industry_group == "Technology"
         assert stock.notes == "Excellent company"
 
-        stock.update_notes("")
+    def test_update_fields_validation_failure_rollback(self):
+        """Should rollback all changes if any validation fails."""
+        symbol = StockSymbol("AAPL")
+        stock = StockEntity(symbol=symbol, name="Apple Inc.", grade="B")
+
+        # Try to update with invalid grade - should fail and rollback all
+        with pytest.raises(ValueError, match="Grade must be one of"):
+            stock.update_fields(
+                name="Apple Inc. Updated",
+                grade="Z",  # Invalid grade
+                notes="New notes"
+            )
+
+        # Original values should be unchanged
+        assert stock.name == "Apple Inc."
+        assert stock.grade == "B"
         assert stock.notes == ""
 
-    def test_update_notes_with_too_long_notes_raises_error(self):
-        """Should raise error when updating with notes that are too long."""
+    def test_update_fields_with_too_long_values_raises_error(self):
+        """Should raise error for values that are too long."""
         symbol = StockSymbol("AAPL")
         stock = StockEntity(symbol=symbol, name="Apple Inc.")
 
-        long_notes = "A" * 1001  # Max is 1000 characters
+        # Test name too long
+        long_name = "A" * 201
+        with pytest.raises(ValueError, match="Company name cannot exceed 200 characters"):
+            stock.update_fields(name=long_name)
 
+        # Test industry too long
+        long_industry = "A" * 101
+        with pytest.raises(ValueError, match="Industry group cannot exceed 100 characters"):
+            stock.update_fields(industry_group=long_industry)
+
+        # Test notes too long
+        long_notes = "A" * 1001
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
-            stock.update_notes(long_notes)
+            stock.update_fields(notes=long_notes)
+
 
     def test_set_id(self):
         """Should allow setting ID (for persistence layer)."""

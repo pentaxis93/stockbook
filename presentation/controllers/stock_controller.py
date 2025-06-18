@@ -142,38 +142,6 @@ class StockController:
             logger.error(f"Error retrieving stock by symbol: {e}")
             return StockDetailResponse.error(str(e))
 
-    def get_stocks_by_grade(
-        self, grade: str
-    ) -> Union[StockListResponse, ValidationErrorResponse]:
-        """
-        Retrieve stocks filtered by grade.
-
-        Args:
-            grade: Grade to filter by (A, B, or C)
-
-        Returns:
-            Stock list response or validation error
-        """
-        try:
-            # Validate grade
-            if grade not in ["A", "B", "C"]:
-                return ValidationErrorResponse({"grade": "Grade must be A, B, or C"})
-
-            # Call application service
-            stock_dtos = self.stock_service.get_stocks_by_grade(grade)
-
-            stock_view_models = [StockViewModel.from_dto(dto) for dto in stock_dtos]
-
-            return StockListResponse.success(
-                stock_view_models,
-                f"Retrieved {len(stock_view_models)} stocks with grade {grade}",
-                filters_applied={"grade": grade},
-            )
-
-        except Exception as e:
-            logger.error(f"Error retrieving stocks by grade: {e}")
-            return StockListResponse.error(str(e))
-
     def update_stock(
         self, request: UpdateStockRequest
     ) -> Union[UpdateStockResponse, ValidationErrorResponse]:

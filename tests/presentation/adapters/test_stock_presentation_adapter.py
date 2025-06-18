@@ -267,14 +267,14 @@ class TestStockPresentationAdapter:
             [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")],
             "Retrieved 1 stock with grade A",
         )
-        self.mock_controller.get_stocks_by_grade.return_value = filtered_response
+        self.mock_controller.search_stocks.return_value = filtered_response
 
         # Act
         result = self.adapter.render_grade_filter_widget()
 
         # Assert
         assert result == filtered_response
-        self.mock_controller.get_stocks_by_grade.assert_called_once_with("A")
+        self.mock_controller.search_stocks.assert_called_once()
         self.mock_ui_operations.create_selectbox.assert_called_once()
         self.mock_ui_operations.create_button.assert_called_once()
 

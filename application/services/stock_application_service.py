@@ -106,59 +106,6 @@ class StockApplicationService:
         stock_entities = self._unit_of_work.stocks.get_all()
         return [StockDto.from_entity(entity) for entity in stock_entities]
 
-    def get_stocks_by_grade(self, grade: str) -> List[StockDto]:
-        """
-        Retrieve stocks filtered by grade.
-
-        Args:
-            grade: Grade to filter by (A, B, or C)
-
-        Returns:
-            List of DTOs representing stocks with the specified grade
-        """
-        stock_entities = self._unit_of_work.stocks.get_by_grade(grade)
-        return [StockDto.from_entity(entity) for entity in stock_entities]
-
-    def update_stock_grade(self, symbol: str, new_grade: Optional[str]) -> StockDto:
-        """
-        Update stock grade.
-
-        Args:
-            symbol: Stock symbol to update
-            new_grade: New grade value
-
-        Returns:
-            Updated stock DTO
-
-        Raises:
-            ValueError: If stock not found
-        """
-        try:
-            with self._unit_of_work:
-                symbol_vo = StockSymbol(symbol)
-                stock_entity = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
-
-                if stock_entity is None:
-                    raise ValueError(f"Stock with symbol {symbol} not found")
-
-                if stock_entity.id is None:
-                    raise ValueError("Stock entity missing ID - cannot update")
-
-                # Update domain entity
-                stock_entity.update_grade(new_grade)
-
-                # Persist changes
-                self._unit_of_work.stocks.update(stock_entity.id, stock_entity)
-
-                # Commit transaction
-                self._unit_of_work.commit()
-
-                return StockDto.from_entity(stock_entity)
-
-        except Exception as e:
-            self._unit_of_work.rollback()
-            raise
-
     def stock_exists(self, symbol: str) -> bool:
         """
         Check if stock exists by symbol.
