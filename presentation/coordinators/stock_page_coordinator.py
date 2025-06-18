@@ -142,7 +142,7 @@ class StockPageCoordinator:
 
                     if isinstance(search_response, ValidationErrorResponse):
                         self._handle_validation_errors(search_response)
-                    if search_response.success:
+                    elif search_response.success:
                         st.success(search_response.message)
                         if search_response.stocks:
                             # Display search results
@@ -164,7 +164,9 @@ class StockPageCoordinator:
             st.error("An unexpected error occurred while loading the page")
             return None
 
-    def render_stock_detail_page(self, symbol: str) -> Optional[StockDetailResponse]:
+    def render_stock_detail_page(
+        self, symbol: str
+    ) -> Union[StockDetailResponse, ValidationErrorResponse, None]:
         """
         Render detailed stock information page.
 
@@ -179,7 +181,12 @@ class StockPageCoordinator:
 
             response = self.adapter.render_stock_detail(symbol)
 
-            if response and response.success:
+            if (
+                response
+                and not isinstance(response, ValidationErrorResponse)
+                and response.success
+                and response.stock
+            ):
                 # Add additional detail sections
                 self._render_stock_detail_sections(response.stock)
 

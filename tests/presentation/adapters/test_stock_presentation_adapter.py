@@ -100,7 +100,7 @@ class TestStockPresentationAdapter:
         self.mock_ui_operations.create_text_area.return_value = ""
         self.mock_ui_operations.create_form_submit_button.return_value = True
 
-        success_response = CreateStockResponse.success(
+        success_response = CreateStockResponse.create_success(
             stock_id=1, symbol="AAPL", message="Stock created successfully"
         )
         self.mock_controller.create_stock.return_value = success_response
@@ -155,7 +155,7 @@ class TestStockPresentationAdapter:
             StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
         ]
 
-        response = StockListResponse.success(stocks, "Retrieved 3 stocks")
+        response = StockListResponse.create_success(stocks, "Retrieved 3 stocks")
         self.mock_controller.get_stock_list.return_value = response
 
         # Mock UI operations
@@ -172,7 +172,7 @@ class TestStockPresentationAdapter:
     def test_render_stock_list_empty(self):
         """Should handle empty stock list using UI operations."""
         # Arrange
-        response = StockListResponse.success([], "No stocks found")
+        response = StockListResponse.create_success([], "No stocks found")
         self.mock_controller.get_stock_list.return_value = response
 
         # Act
@@ -185,7 +185,7 @@ class TestStockPresentationAdapter:
     def test_render_stock_list_error(self):
         """Should handle error in stock list retrieval using UI operations."""
         # Arrange
-        response = StockListResponse.error("Database connection failed")
+        response = StockListResponse.create_error("Database connection failed")
         self.mock_controller.get_stock_list.return_value = response
 
         # Act
@@ -209,7 +209,7 @@ class TestStockPresentationAdapter:
             notes="High quality stock",
         )
 
-        response = StockDetailResponse.success(stock, "Stock retrieved successfully")
+        response = StockDetailResponse.create_success(stock, "Stock retrieved successfully")
         self.mock_controller.get_stock_by_symbol.return_value = response
 
         # Mock layout operations
@@ -246,7 +246,7 @@ class TestStockPresentationAdapter:
     def test_render_stock_detail_not_found(self):
         """Should handle stock not found scenario using UI operations."""
         # Arrange
-        response = StockDetailResponse.error("Stock not found")
+        response = StockDetailResponse.create_error("Stock not found")
         self.mock_controller.get_stock_by_symbol.return_value = response
 
         # Act
@@ -269,7 +269,7 @@ class TestStockPresentationAdapter:
         self.mock_ui_operations.create_selectbox.return_value = "A"
         self.mock_ui_operations.create_button.return_value = True
 
-        filtered_response = StockListResponse.success(
+        filtered_response = StockListResponse.create_success(
             [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")],
             "Retrieved 1 stock with grade A",
         )
@@ -406,7 +406,7 @@ class TestStockPresentationAdapter:
 
         # Arrange - All operations go through the mocked interfaces
         stocks = [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")]
-        response = StockListResponse.success(stocks, "Retrieved 1 stock")
+        response = StockListResponse.create_success(stocks, "Retrieved 1 stock")
         self.mock_controller.get_stock_list.return_value = response
         self.mock_ui_operations.create_columns.return_value = [Mock(), Mock(), Mock()]
 

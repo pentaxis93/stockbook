@@ -6,7 +6,7 @@ using dependency injection for UI operations.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from presentation.controllers.stock_controller import StockController
 from presentation.interfaces.ui_operations import (
@@ -58,7 +58,7 @@ class StockPresentationAdapter:
 
     def render_create_stock_form(
         self, refresh_on_success: bool = False
-    ) -> Optional[CreateStockResponse]:
+    ) -> Union[CreateStockResponse, ValidationErrorResponse, None]:
         """
         Render stock creation form.
 
@@ -169,7 +169,9 @@ class StockPresentationAdapter:
             self.ui.show_error("An unexpected error occurred while loading stocks")
             return None
 
-    def render_stock_detail(self, symbol: str) -> Optional[StockDetailResponse]:
+    def render_stock_detail(
+        self, symbol: str
+    ) -> Union[StockDetailResponse, ValidationErrorResponse, None]:
         """
         Render detailed view of a specific stock.
 
@@ -197,6 +199,10 @@ class StockPresentationAdapter:
 
             # Render stock details
             stock = response.stock
+            if stock is None:
+                self.ui.show_error("Stock data is missing")
+                return response
+
             self.ui.render_header(f"{stock.symbol} - {stock.name}")
 
             columns = self.ui.create_columns(2)
@@ -223,7 +229,9 @@ class StockPresentationAdapter:
             )
             return None
 
-    def render_grade_filter_widget(self) -> Optional[StockListResponse]:
+    def render_grade_filter_widget(
+        self,
+    ) -> Union[StockListResponse, ValidationErrorResponse, None]:
         """
         Render grade filtering widget.
 
@@ -249,7 +257,9 @@ class StockPresentationAdapter:
                 response = self.controller.search_stocks(search_request)
 
                 with self.layout.within_container(columns[1]):
-                    if response.success:
+                    if isinstance(response, ValidationErrorResponse):
+                        self.validation.display_validation_errors(response.errors)
+                    elif response.success:
                         # TODO: Add bold text formatting to UI operations
                         self.ui.show_info(f"**{response.message}**")
                         if response.stocks:

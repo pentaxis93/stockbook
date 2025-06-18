@@ -6,7 +6,7 @@ handling form rendering, data display, and user interactions.
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 import pandas as pd
 import streamlit as st
@@ -45,7 +45,7 @@ class StreamlitStockAdapter:
 
     def render_create_stock_form(
         self, refresh_on_success: bool = False
-    ) -> Optional[CreateStockResponse]:
+    ) -> Union[CreateStockResponse, ValidationErrorResponse, None]:
         """
         Render stock creation form.
 
@@ -154,7 +154,9 @@ class StreamlitStockAdapter:
             st.error("An unexpected error occurred while loading stocks")
             return None
 
-    def render_stock_detail(self, symbol: str) -> Optional[StockDetailResponse]:
+    def render_stock_detail(
+        self, symbol: str
+    ) -> Union[StockDetailResponse, ValidationErrorResponse, None]:
         """
         Render detailed view of a specific stock.
 
@@ -182,6 +184,10 @@ class StreamlitStockAdapter:
 
             # Render stock details
             stock = response.stock
+            if stock is None:
+                st.error("Stock data is missing")
+                return response
+
             st.header(f"{stock.symbol} - {stock.name}")
 
             col1, col2 = st.columns(2)
@@ -202,7 +208,9 @@ class StreamlitStockAdapter:
             st.error("An unexpected error occurred while loading stock details")
             return None
 
-    def render_grade_filter_widget(self) -> Optional[StockListResponse]:
+    def render_grade_filter_widget(
+        self,
+    ) -> Union[StockListResponse, ValidationErrorResponse, None]:
         """
         Render grade filtering widget.
 
@@ -228,7 +236,9 @@ class StreamlitStockAdapter:
                 response = self.controller.search_stocks(search_request)
 
                 with col2:
-                    if response.success:
+                    if isinstance(response, ValidationErrorResponse):
+                        self._display_validation_errors(response)
+                    elif response.success:
                         st.write(f"**{response.message}**")
                         if response.stocks:
                             self._render_stock_dataframe(response.stocks)

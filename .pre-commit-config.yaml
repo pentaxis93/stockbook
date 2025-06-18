@@ -18,9 +18,9 @@ repos:
     rev: v1.1.402
     hooks:
       - id: pyright
-        name: Type check core infrastructure with pyright
+        name: Type check all business logic layers with pyright
         args: ["--project", "pyproject.toml"]
-        files: ^(infrastructure/persistence|infrastructure/repositories)/.*\.py$
+        files: ^(infrastructure/persistence|infrastructure/repositories|application|domain|shared_kernel|presentation)/.*\.py$
         additional_dependencies: []
 
   # Custom quality checks (pylint, tests) that don't modify files

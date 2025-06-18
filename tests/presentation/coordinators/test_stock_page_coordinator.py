@@ -78,7 +78,7 @@ class TestStockPageCoordinator:
         mock_tab1, mock_tab2, mock_tab3 = MagicMock(), MagicMock(), MagicMock()
         mock_tabs.return_value = [mock_tab1, mock_tab2, mock_tab3]
 
-        stock_list_response = StockListResponse.success(
+        stock_list_response = StockListResponse.create_success(
             [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")],
             "Retrieved 1 stock",
         )
@@ -118,7 +118,7 @@ class TestStockPageCoordinator:
             StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
         ]
 
-        stock_list_response = StockListResponse.success(stocks, "Retrieved 3 stocks")
+        stock_list_response = StockListResponse.create_success(stocks, "Retrieved 3 stocks")
         self.mock_adapter.render_stock_list.return_value = stock_list_response
 
         # Act
@@ -141,7 +141,7 @@ class TestStockPageCoordinator:
         mock_sidebar.return_value.__exit__.return_value = None
 
         self.mock_adapter.render_sidebar_navigation.return_value = "list"
-        self.mock_adapter.render_stock_list.return_value = StockListResponse.success(
+        self.mock_adapter.render_stock_list.return_value = StockListResponse.create_success(
             [], "No stocks"
         )
 
@@ -157,7 +157,7 @@ class TestStockPageCoordinator:
         # Test "list" action - should use the active adapter (presentation adapter)
         self.mock_adapter.render_sidebar_navigation.return_value = "list"
         self.mock_presentation_adapter.render_stock_list.return_value = (
-            StockListResponse.success([], "No stocks")
+            StockListResponse.create_success([], "No stocks")
         )
 
         result = self.coordinator.render_stock_management_page()
@@ -191,7 +191,7 @@ class TestStockPageCoordinator:
             notes="High quality stock",
         )
 
-        detail_response = StockDetailResponse.success(stock, "Stock retrieved")
+        detail_response = StockDetailResponse.create_success(stock, "Stock retrieved")
         self.mock_adapter.render_stock_detail.return_value = detail_response
 
         mock_col1, mock_col2 = MagicMock(), MagicMock()
@@ -208,7 +208,7 @@ class TestStockPageCoordinator:
     def test_render_stock_detail_page_not_found(self):
         """Should handle stock not found in detail page."""
         # Arrange
-        error_response = StockDetailResponse.error("Stock not found")
+        error_response = StockDetailResponse.create_error("Stock not found")
         self.mock_adapter.render_stock_detail.return_value = error_response
 
         # Act
@@ -223,7 +223,7 @@ class TestStockPageCoordinator:
     def test_handle_successful_stock_creation(self, mock_balloons, mock_success):
         """Should handle successful stock creation with celebration."""
         # Arrange
-        success_response = CreateStockResponse.success(
+        success_response = CreateStockResponse.create_success(
             1, "AAPL", "Stock created successfully"
         )
 
@@ -239,7 +239,7 @@ class TestStockPageCoordinator:
     def test_handle_stock_creation_error(self, mock_error):
         """Should handle stock creation errors appropriately."""
         # Arrange
-        error_response = CreateStockResponse.error("Stock already exists")
+        error_response = CreateStockResponse.create_error("Stock already exists")
 
         # Act
         result = self.coordinator._handle_stock_creation_error(error_response)
@@ -365,7 +365,7 @@ class TestStockPageCoordinator:
     def test_render_stock_page_delegates_to_management_page(self):
         """Should delegate stock page rendering to management page."""
         # Arrange
-        expected_response = StockListResponse.success([], "No stocks")
+        expected_response = StockListResponse.create_success([], "No stocks")
         self.mock_adapter.render_sidebar_navigation.return_value = "list"
         self.mock_presentation_adapter.render_stock_list.return_value = (
             expected_response
@@ -409,7 +409,7 @@ class TestStockPageCoordinator:
     def test_coordinator_page_refresh_coordination(self, mock_rerun):
         """Should coordinate page refreshes after actions."""
         # Arrange
-        success_response = CreateStockResponse.success(
+        success_response = CreateStockResponse.create_success(
             1, "AAPL", "Created successfully"
         )
 
@@ -425,8 +425,8 @@ class TestStockPageCoordinator:
     def test_coordinator_multi_action_workflow(self):
         """Should coordinate multi-step workflows."""
         # Arrange - Simulate create stock followed by view detail workflow
-        create_response = CreateStockResponse.success(1, "AAPL", "Created successfully")
-        detail_response = StockDetailResponse.success(
+        create_response = CreateStockResponse.create_success(1, "AAPL", "Created successfully")
+        detail_response = StockDetailResponse.create_success(
             StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
             "Stock retrieved",
         )

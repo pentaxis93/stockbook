@@ -302,7 +302,7 @@ class TestStockListResponse:
         ]
 
         # Act
-        response = StockListResponse.success(stocks, "Retrieved successfully")
+        response = StockListResponse.create_success(stocks, "Retrieved successfully")
 
         # Assert
         assert response.success is True
@@ -314,7 +314,7 @@ class TestStockListResponse:
     def test_stock_list_response_empty(self):
         """Should handle empty stock list."""
         # Act
-        response = StockListResponse.success([], "No stocks found")
+        response = StockListResponse.create_success([], "No stocks found")
 
         # Assert
         assert response.success is True
@@ -325,7 +325,7 @@ class TestStockListResponse:
     def test_stock_list_response_error(self):
         """Should create error response."""
         # Act
-        response = StockListResponse.error("Database error")
+        response = StockListResponse.create_error("Database error")
 
         # Assert
         assert response.success is False
@@ -339,7 +339,7 @@ class TestStockListResponse:
         stocks = [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")]
 
         # Act
-        response = StockListResponse.success(
+        response = StockListResponse.create_success(
             stocks, "Filtered results", filters_applied={"grade": "A"}
         )
 
@@ -354,7 +354,7 @@ class TestCreateStockResponse:
     def test_create_stock_response_success(self):
         """Should create successful response."""
         # Act
-        response = CreateStockResponse.success(
+        response = CreateStockResponse.create_success(
             stock_id=1, symbol="AAPL", message="Stock created successfully"
         )
 
@@ -368,7 +368,7 @@ class TestCreateStockResponse:
     def test_create_stock_response_error(self):
         """Should create error response."""
         # Act
-        response = CreateStockResponse.error("Stock already exists")
+        response = CreateStockResponse.create_error("Stock already exists")
 
         # Assert
         assert response.success is False

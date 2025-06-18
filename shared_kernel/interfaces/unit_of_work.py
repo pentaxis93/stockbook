@@ -6,9 +6,7 @@ can implement for consistent data persistence and rollback behavior.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional, TypeVar
-
-Self = TypeVar("Self", bound="IUnitOfWork")
+from typing import Any, Optional
 
 
 class IUnitOfWork(ABC):
@@ -20,7 +18,7 @@ class IUnitOfWork(ABC):
     """
 
     @abstractmethod
-    def __enter__(self) -> Self:
+    def __enter__(self) -> "IUnitOfWork":
         """
         Enter the unit of work context.
 

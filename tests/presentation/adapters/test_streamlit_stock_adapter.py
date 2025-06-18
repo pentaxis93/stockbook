@@ -93,7 +93,7 @@ class TestStreamlitStockAdapter:
         mock_selectbox.return_value = "A"
         mock_submit.return_value = True  # Form submitted
 
-        success_response = CreateStockResponse.success(
+        success_response = CreateStockResponse.create_success(
             stock_id=1, symbol="AAPL", message="Stock created successfully"
         )
         self.mock_controller.create_stock.return_value = success_response
@@ -161,7 +161,7 @@ class TestStreamlitStockAdapter:
             StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
         ]
 
-        response = StockListResponse.success(stocks, "Retrieved 3 stocks")
+        response = StockListResponse.create_success(stocks, "Retrieved 3 stocks")
         self.mock_controller.get_stock_list.return_value = response
 
         mock_columns.return_value = [MagicMock(), MagicMock(), MagicMock()]
@@ -179,7 +179,7 @@ class TestStreamlitStockAdapter:
     def test_render_stock_list_empty(self, mock_info):
         """Should handle empty stock list."""
         # Arrange
-        response = StockListResponse.success([], "No stocks found")
+        response = StockListResponse.create_success([], "No stocks found")
         self.mock_controller.get_stock_list.return_value = response
 
         # Act
@@ -193,7 +193,7 @@ class TestStreamlitStockAdapter:
     def test_render_stock_list_error(self, mock_error):
         """Should handle error in stock list retrieval."""
         # Arrange
-        response = StockListResponse.error("Database connection failed")
+        response = StockListResponse.create_error("Database connection failed")
         self.mock_controller.get_stock_list.return_value = response
 
         # Act
@@ -241,7 +241,7 @@ class TestStreamlitStockAdapter:
             notes="High quality stock",
         )
 
-        response = StockDetailResponse.success(stock, "Stock retrieved successfully")
+        response = StockDetailResponse.create_success(stock, "Stock retrieved successfully")
         self.mock_controller.get_stock_by_symbol.return_value = response
 
         mock_columns.return_value = [MagicMock(), MagicMock()]
@@ -259,7 +259,7 @@ class TestStreamlitStockAdapter:
     def test_render_stock_detail_not_found(self, mock_warning):
         """Should handle stock not found scenario."""
         # Arrange
-        response = StockDetailResponse.error("Stock not found")
+        response = StockDetailResponse.create_error("Stock not found")
         self.mock_controller.get_stock_by_symbol.return_value = response
 
         # Act
@@ -281,7 +281,7 @@ class TestStreamlitStockAdapter:
         mock_selectbox.return_value = "A"
         mock_button.return_value = True
 
-        filtered_response = StockListResponse.success(
+        filtered_response = StockListResponse.create_success(
             [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")],
             "Retrieved 1 stock with grade A",
         )
@@ -404,7 +404,7 @@ class TestStreamlitStockAdapter:
     def test_adapter_page_refresh_after_successful_create(self, mock_rerun):
         """Should refresh page after successful stock creation."""
         # Arrange
-        success_response = CreateStockResponse.success(
+        success_response = CreateStockResponse.create_success(
             1, "AAPL", "Created successfully"
         )
 

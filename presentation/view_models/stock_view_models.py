@@ -9,7 +9,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
-from application.commands.stock_commands import CreateStockCommand
+from application.commands.stock_commands import CreateStockCommand, UpdateStockCommand
 from application.dto.stock_dto import StockDto
 
 
@@ -141,10 +141,8 @@ class UpdateStockRequest:
             notes=self.notes.strip() if self.notes else None,
         )
 
-    def to_command(self) -> "UpdateStockCommand":
+    def to_command(self) -> UpdateStockCommand:
         """Convert to application command."""
-        from application.commands.stock_commands import UpdateStockCommand
-
         return UpdateStockCommand(
             stock_id=self.stock_id,
             name=self.name,
@@ -190,6 +188,9 @@ class StockViewModel:
         Returns:
             StockViewModel for presentation
         """
+        if dto.id is None:
+            raise ValueError("Cannot create view model from DTO without ID")
+
         return cls(
             id=dto.id,
             symbol=dto.symbol,
@@ -261,7 +262,7 @@ class StockListResponse:
         self.filters_applied = filters_applied
 
     @classmethod
-    def success(
+    def create_success(
         cls,
         stocks: List[StockViewModel],
         message: str,
@@ -277,7 +278,7 @@ class StockListResponse:
         )
 
     @classmethod
-    def error(cls, message: str) -> "StockListResponse":
+    def create_error(cls, message: str) -> "StockListResponse":
         """Create error response."""
         return cls(success=False, stocks=[], total_count=0, message=message)
 
@@ -308,12 +309,14 @@ class StockDetailResponse:
         self.errors = errors
 
     @classmethod
-    def success(cls, stock: StockViewModel, message: str) -> "StockDetailResponse":
+    def create_success(
+        cls, stock: StockViewModel, message: str
+    ) -> "StockDetailResponse":
         """Create successful response."""
         return cls(success=True, stock=stock, message=message)
 
     @classmethod
-    def error(cls, message: str) -> "StockDetailResponse":
+    def create_error(cls, message: str) -> "StockDetailResponse":
         """Create error response."""
         return cls(success=False, stock=None, message=message)
 
@@ -341,12 +344,14 @@ class CreateStockResponse:
         self.errors = errors
 
     @classmethod
-    def success(cls, stock_id: int, symbol: str, message: str) -> "CreateStockResponse":
+    def create_success(
+        cls, stock_id: int, symbol: str, message: str
+    ) -> "CreateStockResponse":
         """Create successful response."""
         return cls(success=True, stock_id=stock_id, symbol=symbol, message=message)
 
     @classmethod
-    def error(cls, message: str) -> "CreateStockResponse":
+    def create_error(cls, message: str) -> "CreateStockResponse":
         """Create error response."""
         return cls(success=False, stock_id=None, symbol=None, message=message)
 
@@ -372,12 +377,12 @@ class UpdateStockResponse:
         self.errors = errors
 
     @classmethod
-    def success(cls, stock_id: int, message: str) -> "UpdateStockResponse":
+    def create_success(cls, stock_id: int, message: str) -> "UpdateStockResponse":
         """Create successful response."""
         return cls(success=True, stock_id=stock_id, message=message)
 
     @classmethod
-    def error(cls, message: str) -> "UpdateStockResponse":
+    def create_error(cls, message: str) -> "UpdateStockResponse":
         """Create error response."""
         return cls(success=False, stock_id=None, message=message)
 

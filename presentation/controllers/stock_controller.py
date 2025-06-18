@@ -66,7 +66,10 @@ class StockController:
             command = sanitized_request.to_command()
             stock_dto = self.stock_service.create_stock(command)
 
-            return CreateStockResponse.success(
+            if stock_dto.id is None:
+                raise ValueError("Created stock should have a valid ID")
+
+            return CreateStockResponse.create_success(
                 stock_id=stock_dto.id,
                 symbol=stock_dto.symbol,
                 message="Stock created successfully",
@@ -74,10 +77,10 @@ class StockController:
 
         except ValueError as e:
             logger.warning(f"Stock creation failed: {e}")
-            return CreateStockResponse.error(str(e))
+            return CreateStockResponse.create_error(str(e))
         except Exception as e:
             logger.error(f"Unexpected error creating stock: {e}")
-            return CreateStockResponse.error(f"Unexpected error: {str(e)}")
+            return CreateStockResponse.create_error(f"Unexpected error: {str(e)}")
 
     def get_stock_list(self) -> StockListResponse:
         """
@@ -90,17 +93,17 @@ class StockController:
             stock_dtos = self.stock_service.get_all_stocks()
 
             if not stock_dtos:
-                return StockListResponse.success([], "No stocks found")
+                return StockListResponse.create_success([], "No stocks found")
 
             stock_view_models = [StockViewModel.from_dto(dto) for dto in stock_dtos]
 
-            return StockListResponse.success(
+            return StockListResponse.create_success(
                 stock_view_models, f"Retrieved {len(stock_view_models)} stocks"
             )
 
         except Exception as e:
             logger.error(f"Error retrieving stock list: {e}")
-            return StockListResponse.error(str(e))
+            return StockListResponse.create_error(str(e))
 
     def get_stock_by_symbol(
         self, symbol: str
@@ -134,19 +137,19 @@ class StockController:
             stock_dto = self.stock_service.get_stock_by_symbol(normalized_symbol)
 
             if not stock_dto:
-                return StockDetailResponse.error(
+                return StockDetailResponse.create_error(
                     f"Stock with symbol {normalized_symbol} not found"
                 )
 
             stock_view_model = StockViewModel.from_dto(stock_dto)
 
-            return StockDetailResponse.success(
+            return StockDetailResponse.create_success(
                 stock_view_model, "Stock retrieved successfully"
             )
 
         except Exception as e:
             logger.error(f"Error retrieving stock by symbol: {e}")
-            return StockDetailResponse.error(str(e))
+            return StockDetailResponse.create_error(str(e))
 
     def update_stock(
         self, request: UpdateStockRequest
@@ -177,17 +180,20 @@ class StockController:
             command = sanitized_request.to_command()
             stock_dto = self.stock_service.update_stock(command)
 
-            return UpdateStockResponse.success(
+            if stock_dto.id is None:
+                raise ValueError("Updated stock should have a valid ID")
+
+            return UpdateStockResponse.create_success(
                 stock_id=stock_dto.id,
                 message="Stock updated successfully",
             )
 
         except ValueError as e:
             logger.warning(f"Stock update failed: {e}")
-            return UpdateStockResponse.error(str(e))
+            return UpdateStockResponse.create_error(str(e))
         except Exception as e:
             logger.error(f"Unexpected error updating stock: {e}")
-            return UpdateStockResponse.error(f"Unexpected error: {str(e)}")
+            return UpdateStockResponse.create_error(f"Unexpected error: {str(e)}")
 
     def search_stocks(
         self, search_request: StockSearchRequest
@@ -233,7 +239,7 @@ class StockController:
             else:
                 message = f"Retrieved {len(stock_view_models)} stocks matching {filter_count} filters"
 
-            return StockListResponse.success(
+            return StockListResponse.create_success(
                 stock_view_models,
                 message,
                 filters_applied=active_filters,
@@ -241,7 +247,7 @@ class StockController:
 
         except Exception as e:
             logger.error(f"Error searching stocks: {e}")
-            return StockListResponse.error(str(e))
+            return StockListResponse.create_error(str(e))
 
     def _is_valid_symbol_format(self, symbol: str) -> bool:
         """
