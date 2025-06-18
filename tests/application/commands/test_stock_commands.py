@@ -7,7 +7,8 @@ of command objects used for stock operations.
 
 import pytest
 
-from application.commands.stock_commands import CreateStockCommand, UpdateStockCommand
+from application.commands.stock_commands import (CreateStockCommand,
+                                                 UpdateStockCommand)
 
 
 class TestCreateStockCommand:
@@ -18,14 +19,16 @@ class TestCreateStockCommand:
         command = CreateStockCommand(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Excellent company",
         )
 
         assert command.symbol == "AAPL"
         assert command.name == "Apple Inc."
-        assert command.industry_group == "Technology"
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
         assert command.grade == "A"
         assert command.notes == "Excellent company"
 
@@ -50,13 +53,15 @@ class TestCreateStockCommand:
         command = CreateStockCommand(
             symbol="  AAPL  ",
             name="  Apple Inc.  ",
-            industry_group="  Technology  ",
+            sector="  Technology  ",
+            industry_group="  Software  ",
             notes="  Great company  ",
         )
 
         assert command.symbol == "AAPL"
         assert command.name == "Apple Inc."
-        assert command.industry_group == "Technology"
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
         assert command.notes == "Great company"
 
     def test_create_stock_command_with_empty_symbol_raises_error(self):

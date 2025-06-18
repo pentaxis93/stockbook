@@ -106,21 +106,21 @@ def sample_portfolio(test_db):
         dict: Portfolio information including ID
     """
     from domain.entities import PortfolioEntity
-    from infrastructure.persistence.database_connection import DatabaseConnection
-    from infrastructure.repositories.sqlite_portfolio_repository import SqlitePortfolioRepository
+    from infrastructure.persistence.database_connection import \
+        DatabaseConnection
     from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+    from infrastructure.repositories.sqlite_portfolio_repository import \
+        SqlitePortfolioRepository
 
     # Create portfolio using clean architecture
     db_connection = DatabaseConnection(str(test_db))
     portfolio_repo = SqlitePortfolioRepository(db_connection)
     uow = SqliteUnitOfWork(db_connection)
-    
+
     portfolio = PortfolioEntity(
-        name="Test Portfolio",
-        description="Test portfolio for testing",
-        is_active=True
+        name="Test Portfolio", description="Test portfolio for testing", is_active=True
     )
-    
+
     with uow:
         uow.portfolio_repository = portfolio_repo
         saved_portfolio = uow.portfolio_repository.add(portfolio)

@@ -45,7 +45,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="High quality stock",
         )
@@ -54,7 +55,8 @@ class TestStockController:
             id=1,
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="High quality stock",
         )
@@ -85,7 +87,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="",  # Invalid empty symbol
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="",
         )
@@ -109,7 +112,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="",
         )
@@ -134,7 +138,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="invalid123",  # Invalid format
             name="Test Company",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="",
         )
@@ -154,7 +159,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="Z",  # Invalid grade
             notes="",
         )
@@ -176,7 +182,8 @@ class TestStockController:
                 id=1,
                 symbol="AAPL",
                 name="Apple Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -184,7 +191,8 @@ class TestStockController:
                 id=2,
                 symbol="GOOGL",
                 name="Alphabet Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -192,7 +200,8 @@ class TestStockController:
                 id=3,
                 symbol="MSFT",
                 name="Microsoft Corp.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="B",
                 notes="",
             ),
@@ -249,7 +258,8 @@ class TestStockController:
             id=1,
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="High quality stock",
         )
@@ -301,14 +311,14 @@ class TestStockController:
         # Service should not be called
         self.mock_stock_service.get_stock_by_symbol.assert_not_called()
 
-
     def test_controller_error_handling_generic_exception(self):
         """Should handle unexpected exceptions gracefully."""
         # Arrange
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="",
         )
@@ -329,7 +339,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="  aapl  ",  # Needs trimming and uppercase
             name="  Apple Inc.  ",  # Needs trimming
-            industry_group="  Technology  ",
+            sector="  Technology  ",
+            industry_group="  Software  ",
             grade="a",  # Needs uppercase
             notes="  Some notes  ",
         )
@@ -338,7 +349,8 @@ class TestStockController:
             id=1,
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Some notes",
         )
@@ -355,7 +367,8 @@ class TestStockController:
         call_args = self.mock_stock_service.create_stock.call_args[0][0]
         assert call_args.symbol == "AAPL"
         assert call_args.name == "Apple Inc."
-        assert call_args.industry_group == "Technology"
+        assert call_args.sector == "Technology"
+        assert call_args.industry_group == "Software"
         assert call_args.grade == "A"
         assert call_args.notes == "Some notes"
 
@@ -365,7 +378,8 @@ class TestStockController:
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="",
         )
@@ -376,7 +390,8 @@ class TestStockController:
                 id=1,
                 symbol="AAPL",
                 name="Apple Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -409,7 +424,8 @@ class TestStockController:
                 id=1,
                 symbol="AAPL",
                 name="Apple Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -453,7 +469,8 @@ class TestStockController:
                 id=1,
                 symbol="AAPL",
                 name="Apple Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -461,7 +478,8 @@ class TestStockController:
                 id=2,
                 symbol="GOOGL",
                 name="Alphabet Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -569,7 +587,8 @@ class TestStockController:
     def test_update_stock_with_valid_request(self):
         """Should update stock successfully with valid request."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from presentation.view_models.stock_view_models import \
+            UpdateStockRequest
 
         request = UpdateStockRequest(
             stock_id=1,
@@ -602,7 +621,8 @@ class TestStockController:
     def test_update_stock_with_validation_errors(self):
         """Should return validation errors for invalid update request."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from presentation.view_models.stock_view_models import \
+            UpdateStockRequest
 
         request = UpdateStockRequest(
             stock_id=1,
@@ -621,11 +641,14 @@ class TestStockController:
     def test_update_stock_with_nonexistent_stock(self):
         """Should handle update of nonexistent stock."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from presentation.view_models.stock_view_models import \
+            UpdateStockRequest
 
         request = UpdateStockRequest(stock_id=999, grade="A")
 
-        self.mock_stock_service.update_stock.side_effect = ValueError("Stock with ID 999 not found")
+        self.mock_stock_service.update_stock.side_effect = ValueError(
+            "Stock with ID 999 not found"
+        )
 
         # Act
         response = self.controller.update_stock(request)
@@ -638,7 +661,8 @@ class TestStockController:
     def test_update_stock_with_no_fields_to_update(self):
         """Should handle update request with no fields to update."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from presentation.view_models.stock_view_models import \
+            UpdateStockRequest
 
         request = UpdateStockRequest(stock_id=1)  # No fields to update
 
@@ -652,7 +676,8 @@ class TestStockController:
     def test_update_stock_with_service_error(self):
         """Should handle application service errors during update."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from presentation.view_models.stock_view_models import \
+            UpdateStockRequest
 
         request = UpdateStockRequest(stock_id=1, grade="A")
 

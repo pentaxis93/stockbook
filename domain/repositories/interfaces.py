@@ -11,16 +11,10 @@ from decimal import Decimal
 from typing import Any, Dict, List, Optional
 
 # Import domain entities and value objects
-from domain.entities import (
-    StockEntity,
-    PortfolioEntity,
-    TransactionEntity,
-    TargetEntity,
-    PortfolioBalanceEntity,
-    JournalEntryEntity,
-)
+from domain.entities import (JournalEntryEntity, PortfolioBalanceEntity,
+                             PortfolioEntity, StockEntity, TargetEntity,
+                             TransactionEntity)
 from domain.value_objects.stock_symbol import StockSymbol
-
 # Import shared kernel interfaces
 from shared_kernel.interfaces.unit_of_work import IUnitOfWork
 
@@ -143,10 +137,37 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
+    def get_by_industry_group(self, industry_group: str) -> List[StockEntity]:
+        """
+        Retrieve all stocks in a specific industry group.
+
+        Args:
+            industry_group: Industry group to filter by
+
+        Returns:
+            List of StockEntity domain models in the industry group
+        """
+        pass
+
+    @abstractmethod
+    def get_by_sector(self, sector: str) -> List[StockEntity]:
+        """
+        Retrieve all stocks in a specific sector.
+
+        Args:
+            sector: Sector to filter by
+
+        Returns:
+            List of StockEntity domain models in the sector
+        """
+        pass
+
+    @abstractmethod
     def search_stocks(
         self,
         symbol_filter: Optional[str] = None,
         name_filter: Optional[str] = None,
+        sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
         grade_filter: Optional[str] = None,
     ) -> List[StockEntity]:
@@ -156,6 +177,7 @@ class IStockRepository(ABC):
         Args:
             symbol_filter: Filter by symbols containing this string (case-insensitive)
             name_filter: Filter by names containing this string (case-insensitive)
+            sector_filter: Filter by sector containing this string (case-insensitive)
             industry_filter: Filter by industry group containing this string (case-insensitive)
             grade_filter: Filter by exact grade match (A, B, or C)
 
@@ -642,7 +664,9 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_date_range(self, start_date: date, end_date: date) -> List[JournalEntryEntity]:
+    def get_by_date_range(
+        self, start_date: date, end_date: date
+    ) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries within a date range.
 

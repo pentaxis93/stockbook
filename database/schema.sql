@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS stock (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
+    sector TEXT,
     industry_group TEXT,
     grade TEXT CHECK(grade IN ('A', 'B', 'C', NULL)),
     notes TEXT,

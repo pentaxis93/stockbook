@@ -27,7 +27,8 @@ class TestCreateStockRequest:
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="High quality stock",
         )
@@ -35,7 +36,8 @@ class TestCreateStockRequest:
         # Assert
         assert request.symbol == "AAPL"
         assert request.name == "Apple Inc."
-        assert request.industry_group == "Technology"
+        assert request.sector == "Technology"
+        assert request.industry_group == "Software"
         assert request.grade == "A"
         assert request.notes == "High quality stock"
 
@@ -66,7 +68,8 @@ class TestCreateStockRequest:
         request = CreateStockRequest(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Test notes",
         )
@@ -77,7 +80,8 @@ class TestCreateStockRequest:
         # Assert
         assert command.symbol == "AAPL"
         assert command.name == "Apple Inc."
-        assert command.industry_group == "Technology"
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
         assert command.grade == "A"
         assert command.notes == "Test notes"
 

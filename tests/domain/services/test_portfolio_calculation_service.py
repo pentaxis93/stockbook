@@ -17,8 +17,8 @@ from domain.services.portfolio_calculation_service import \
     PortfolioCalculationService
 from domain.services.value_objects.portfolio_metrics import (
     PortfolioAllocation, PortfolioMetrics)
-from shared_kernel.value_objects import Money, Quantity
 from domain.value_objects.stock_symbol import StockSymbol
+from shared_kernel.value_objects import Money, Quantity
 
 
 # Test data helpers
@@ -27,7 +27,8 @@ def create_test_stock(symbol="AAPL", price=100.00, quantity=10, grade="B"):
     stock = StockEntity(
         symbol=StockSymbol(symbol),
         name=f"{symbol} Corp",
-        industry_group="Technology",
+        sector="Technology",
+        industry_group="Software",
         grade=grade,
     )
     return stock, Quantity(quantity), Money(Decimal(str(price)), "USD")
@@ -132,8 +133,8 @@ class TestPortfolioAllocationAnalysis:
 
         industry_allocations = service.calculate_industry_allocations(portfolio, prices)
 
-        tech_allocation = industry_allocations.get_allocation_percentage("Technology")
-        assert tech_allocation == Decimal("100.0")  # All are Technology
+        tech_allocation = industry_allocations.get_allocation_percentage("Software")
+        assert tech_allocation == Decimal("100.0")  # All are Software
 
     def test_calculate_allocation_by_grade(self):
         """Should calculate allocation by stock grades."""

@@ -21,6 +21,7 @@ class StockDto:
     id: Optional[int]
     symbol: str
     name: str
+    sector: Optional[str] = None
     industry_group: Optional[str] = None
     grade: Optional[str] = None
     notes: str = ""
@@ -57,6 +58,7 @@ class StockDto:
             id=entity.id,
             symbol=str(entity.symbol),
             name=entity.name,
+            sector=entity.sector,
             industry_group=entity.industry_group,
             grade=entity.grade,
             notes=entity.notes,

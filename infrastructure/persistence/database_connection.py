@@ -45,8 +45,9 @@ class DatabaseConnection:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             symbol TEXT NOT NULL UNIQUE,
             name TEXT NOT NULL,
+            sector TEXT,
             industry_group TEXT,
-            grade TEXT,
+            grade TEXT CHECK(grade IN ('A', 'B', 'C', NULL)),
             notes TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

@@ -215,7 +215,9 @@ class StreamlitStockAdapter:
                 apply_filter = st.button("Apply Filter", type="secondary")
 
             if apply_filter and selected_grade:
-                from presentation.view_models.stock_view_models import StockSearchRequest
+                from presentation.view_models.stock_view_models import \
+                    StockSearchRequest
+
                 search_request = StockSearchRequest(grade_filter=selected_grade)
                 response = self.controller.search_stocks(search_request)
 

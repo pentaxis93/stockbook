@@ -60,6 +60,7 @@ class StockApplicationService:
                 stock_entity = StockEntity(
                     symbol=symbol_vo,
                     name=command.name,
+                    sector=command.sector,
                     industry_group=command.industry_group,
                     grade=command.grade,
                     notes=command.notes,

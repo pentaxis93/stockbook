@@ -48,12 +48,13 @@ class SqliteStockRepository(IStockRepository):
             with self.db_connection.transaction() as conn:
                 cursor = conn.execute(
                     """
-                    INSERT INTO stock (symbol, name, industry_group, grade, notes)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO stock (symbol, name, sector, industry_group, grade, notes)
+                    VALUES (?, ?, ?, ?, ?, ?)
                     """,
                     (
                         stock.symbol.value,
                         stock.name,
+                        stock.sector,
                         stock.industry_group,
                         stock.grade,
                         stock.notes,
@@ -80,7 +81,7 @@ class SqliteStockRepository(IStockRepository):
         conn = self.db_connection.get_connection()
         try:
             cursor = conn.execute(
-                "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE id = ?",
+                "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE id = ?",
                 (stock_id,),
             )
             row = cursor.fetchone()
@@ -107,7 +108,7 @@ class SqliteStockRepository(IStockRepository):
         conn = self.db_connection.get_connection()
         try:
             cursor = conn.execute(
-                "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE symbol = ?",
+                "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE symbol = ?",
                 (symbol.value,),
             )
             row = cursor.fetchone()
@@ -131,7 +132,7 @@ class SqliteStockRepository(IStockRepository):
         conn = self.db_connection.get_connection()
         try:
             cursor = conn.execute(
-                "SELECT id, symbol, name, industry_group, grade, notes FROM stock ORDER BY symbol"
+                "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock ORDER BY symbol"
             )
             rows = cursor.fetchall()
 
@@ -156,10 +157,17 @@ class SqliteStockRepository(IStockRepository):
             cursor = conn.execute(
                 """
                 UPDATE stock 
-                SET name = ?, industry_group = ?, grade = ?, notes = ?
+                SET name = ?, sector = ?, industry_group = ?, grade = ?, notes = ?
                 WHERE id = ?
                 """,
-                (stock.name, stock.industry_group, stock.grade, stock.notes, stock_id),
+                (
+                    stock.name,
+                    stock.sector,
+                    stock.industry_group,
+                    stock.grade,
+                    stock.notes,
+                    stock_id,
+                ),
             )
             return cursor.rowcount > 0
 
@@ -211,7 +219,7 @@ class SqliteStockRepository(IStockRepository):
         conn = self.db_connection.get_connection()
         try:
             cursor = conn.execute(
-                "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE grade = ? ORDER BY symbol",
+                "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE grade = ? ORDER BY symbol",
                 (grade,),
             )
             rows = cursor.fetchall()
@@ -235,8 +243,32 @@ class SqliteStockRepository(IStockRepository):
         conn = self.db_connection.get_connection()
         try:
             cursor = conn.execute(
-                "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE industry_group = ? ORDER BY symbol",
+                "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE industry_group = ? ORDER BY symbol",
                 (industry_group,),
+            )
+            rows = cursor.fetchall()
+
+            return [self._row_to_entity(row) for row in rows]
+        finally:
+            # Only close if not in a transactional context
+            if not getattr(self.db_connection, "is_transactional", False):
+                conn.close()
+
+    def get_by_sector(self, sector: str) -> List[StockEntity]:
+        """
+        Get all stocks in a specific sector.
+
+        Args:
+            sector: Sector to filter by
+
+        Returns:
+            List of stock entities in the sector
+        """
+        conn = self.db_connection.get_connection()
+        try:
+            cursor = conn.execute(
+                "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE sector = ? ORDER BY symbol",
+                (sector,),
             )
             rows = cursor.fetchall()
 
@@ -250,6 +282,7 @@ class SqliteStockRepository(IStockRepository):
         self,
         symbol_filter: Optional[str] = None,
         name_filter: Optional[str] = None,
+        sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
         grade_filter: Optional[str] = None,
     ) -> List[StockEntity]:
@@ -259,6 +292,7 @@ class SqliteStockRepository(IStockRepository):
         Args:
             symbol_filter: Filter by symbols containing this string (case-insensitive)
             name_filter: Filter by names containing this string (case-insensitive)
+            sector_filter: Filter by sector containing this string (case-insensitive)
             industry_filter: Filter by industry group containing this string (case-insensitive)
             grade_filter: Filter by exact grade match (A, B, or C)
 
@@ -279,6 +313,10 @@ class SqliteStockRepository(IStockRepository):
                 where_clauses.append("UPPER(name) LIKE UPPER(?)")
                 parameters.append(f"%{name_filter}%")
 
+            if sector_filter:
+                where_clauses.append("UPPER(sector) LIKE UPPER(?)")
+                parameters.append(f"%{sector_filter}%")
+
             if industry_filter:
                 where_clauses.append("UPPER(industry_group) LIKE UPPER(?)")
                 parameters.append(f"%{industry_filter}%")
@@ -288,9 +326,7 @@ class SqliteStockRepository(IStockRepository):
                 parameters.append(grade_filter)
 
             # Build the complete query
-            base_query = (
-                "SELECT id, symbol, name, industry_group, grade, notes FROM stock"
-            )
+            base_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock"
 
             if where_clauses:
                 query = (
@@ -322,6 +358,7 @@ class SqliteStockRepository(IStockRepository):
             stock_id=row["id"],
             symbol=StockSymbol(row["symbol"]),
             name=row["name"],
+            sector=row["sector"],
             industry_group=row["industry_group"],
             grade=row["grade"],
             notes=row["notes"] or "",

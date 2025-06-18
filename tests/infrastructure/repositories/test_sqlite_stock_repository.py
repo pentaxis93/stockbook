@@ -44,7 +44,8 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("AAPL"),
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Great company",
         )
@@ -61,7 +62,8 @@ class TestSqliteStockRepository:
         assert retrieved_stock is not None
         assert str(retrieved_stock.symbol) == "AAPL"
         assert retrieved_stock.name == "Apple Inc."
-        assert retrieved_stock.industry_group == "Technology"
+        assert retrieved_stock.sector == "Technology"
+        assert retrieved_stock.industry_group == "Software"
         assert retrieved_stock.grade == "A"
         assert retrieved_stock.notes == "Great company"
         assert retrieved_stock.id == stock_id
@@ -302,7 +304,8 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=original_symbol,
             name="Johnson & Johnson",
-            industry_group="Healthcare",
+            sector="Healthcare",
+            industry_group="Pharmaceuticals",
             grade="A",
         )
 

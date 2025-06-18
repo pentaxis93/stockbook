@@ -21,6 +21,7 @@ class CreateStockCommand:
     # Private attributes for type checking
     _symbol: str
     _name: str
+    _sector: Optional[str]
     _industry_group: Optional[str]
     _grade: Optional[str]
     _notes: str
@@ -29,6 +30,7 @@ class CreateStockCommand:
         self,
         symbol: str,
         name: str,
+        sector: Optional[str] = None,
         industry_group: Optional[str] = None,
         grade: Optional[str] = None,
         notes: str = "",
@@ -39,7 +41,8 @@ class CreateStockCommand:
         Args:
             symbol: Stock symbol (will be normalized)
             name: Company name
-            industry_group: Industry classification
+            sector: Sector classification
+            industry_group: Industry classification (must belong to sector if provided)
             grade: Stock grade (A/B/C or None)
             notes: Additional notes
 
@@ -49,6 +52,7 @@ class CreateStockCommand:
         # Normalize and validate inputs
         symbol = self._normalize_symbol(symbol)
         name = self._normalize_name(name)
+        sector = self._normalize_sector(sector)
         industry_group = self._normalize_industry_group(industry_group)
         notes = self._normalize_notes(notes)
 
@@ -56,10 +60,12 @@ class CreateStockCommand:
         self._validate_symbol(symbol)
         self._validate_name(name)
         self._validate_grade(grade)
+        self._validate_sector_industry_combination(sector, industry_group)
 
         # Use object.__setattr__ to bypass immutability during initialization
         object.__setattr__(self, "_symbol", symbol)
         object.__setattr__(self, "_name", name)
+        object.__setattr__(self, "_sector", sector)
         object.__setattr__(self, "_industry_group", industry_group)
         object.__setattr__(self, "_grade", grade)
         object.__setattr__(self, "_notes", notes)
@@ -73,6 +79,11 @@ class CreateStockCommand:
     def name(self) -> str:
         """Get the company name."""
         return self._name
+
+    @property
+    def sector(self) -> Optional[str]:
+        """Get the sector."""
+        return self._sector
 
     @property
     def industry_group(self) -> Optional[str]:
@@ -103,6 +114,7 @@ class CreateStockCommand:
         return (
             self.symbol == other.symbol
             and self.name == other.name
+            and self.sector == other.sector
             and self.industry_group == other.industry_group
             and self.grade == other.grade
             and self.notes == other.notes
@@ -111,7 +123,14 @@ class CreateStockCommand:
     def __hash__(self) -> int:
         """Hash based on all properties."""
         return hash(
-            (self.symbol, self.name, self.industry_group, self.grade, self.notes)
+            (
+                self.symbol,
+                self.name,
+                self.sector,
+                self.industry_group,
+                self.grade,
+                self.notes,
+            )
         )
 
     def __str__(self) -> str:
@@ -122,7 +141,7 @@ class CreateStockCommand:
         """Developer representation."""
         return (
             f"CreateStockCommand(symbol='{self.symbol}', name='{self.name}', "
-            f"industry_group={self.industry_group!r}, grade={self.grade!r}, "
+            f"sector={self.sector!r}, industry_group={self.industry_group!r}, grade={self.grade!r}, "
             f"notes='{self.notes}')"
         )
 
@@ -139,6 +158,16 @@ class CreateStockCommand:
         if not isinstance(name, str):
             raise ValueError("Name must be a string")
         return name.strip()
+
+    @staticmethod
+    def _normalize_sector(sector: Optional[str]) -> Optional[str]:
+        """Normalize sector."""
+        if sector is None:
+            return None
+        if not isinstance(sector, str):
+            raise ValueError("Sector must be a string or None")
+        normalized = sector.strip()
+        return normalized if normalized else None
 
     @staticmethod
     def _normalize_industry_group(industry_group: Optional[str]) -> Optional[str]:
@@ -183,6 +212,27 @@ class CreateStockCommand:
                     f"Invalid grade. Must be one of {valid_grades} or None"
                 )
 
+    @staticmethod
+    def _validate_sector_industry_combination(
+        sector: Optional[str], industry_group: Optional[str]
+    ) -> None:
+        """Validate sector-industry combination."""
+        # Import here to avoid circular imports
+        from domain.services.sector_industry_service import \
+            SectorIndustryService
+
+        # If no industry group, sector can be anything (or None)
+        if industry_group is None:
+            return
+
+        # If industry group is provided, sector must also be provided
+        if sector is None:
+            raise ValueError("Sector must be provided when industry_group is specified")
+
+        # Validate the combination using domain service
+        service = SectorIndustryService()
+        service.validate_sector_industry_combination_strict(sector, industry_group)
+
 
 class UpdateStockCommand:
     """
@@ -195,6 +245,7 @@ class UpdateStockCommand:
     # Private attributes for type checking
     _stock_id: int
     _name: Optional[str]
+    _sector: Optional[str]
     _industry_group: Optional[str]
     _grade: Optional[str]
     _notes: Optional[str]
@@ -203,6 +254,7 @@ class UpdateStockCommand:
         self,
         stock_id: int,
         name: Optional[str] = None,
+        sector: Optional[str] = None,
         industry_group: Optional[str] = None,
         grade: Optional[str] = None,
         notes: Optional[str] = None,
@@ -213,6 +265,7 @@ class UpdateStockCommand:
         Args:
             stock_id: ID of the stock to update
             name: New company name (None to keep unchanged)
+            sector: New sector classification (None to keep unchanged)
             industry_group: New industry classification (None to keep unchanged)
             grade: New stock grade (A/B/C or None)
             notes: New notes (None to keep unchanged)
@@ -228,6 +281,9 @@ class UpdateStockCommand:
             name = self._normalize_name(name)
             self._validate_name(name)
 
+        if sector is not None:
+            sector = self._normalize_sector(sector)
+
         if industry_group is not None:
             industry_group = self._normalize_industry_group(industry_group)
 
@@ -240,6 +296,7 @@ class UpdateStockCommand:
         # Use object.__setattr__ to bypass immutability during initialization
         object.__setattr__(self, "_stock_id", stock_id)
         object.__setattr__(self, "_name", name)
+        object.__setattr__(self, "_sector", sector)
         object.__setattr__(self, "_industry_group", industry_group)
         object.__setattr__(self, "_grade", grade)
         object.__setattr__(self, "_notes", notes)
@@ -253,6 +310,11 @@ class UpdateStockCommand:
     def name(self) -> Optional[str]:
         """Get the company name."""
         return self._name
+
+    @property
+    def sector(self) -> Optional[str]:
+        """Get the sector."""
+        return self._sector
 
     @property
     def industry_group(self) -> Optional[str]:
@@ -279,6 +341,7 @@ class UpdateStockCommand:
         return any(
             [
                 self._name is not None,
+                self._sector is not None,
                 self._industry_group is not None,
                 self._grade is not None,
                 self._notes is not None,
@@ -295,6 +358,8 @@ class UpdateStockCommand:
         fields = {}
         if self._name is not None:
             fields["name"] = self._name
+        if self._sector is not None:
+            fields["sector"] = self._sector
         if self._industry_group is not None:
             fields["industry_group"] = self._industry_group
         if self._grade is not None:
@@ -353,6 +418,16 @@ class UpdateStockCommand:
         if not isinstance(name, str):
             raise ValueError("Name must be a string")
         return name.strip()
+
+    @staticmethod
+    def _normalize_sector(sector: Optional[str]) -> Optional[str]:
+        """Normalize sector."""
+        if sector is None:
+            return None
+        if not isinstance(sector, str):
+            raise ValueError("Sector must be a string or None")
+        normalized = sector.strip()
+        return normalized if normalized else None
 
     @staticmethod
     def _normalize_industry_group(industry_group: str) -> Optional[str]:

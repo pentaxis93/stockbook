@@ -8,6 +8,7 @@ and validation rules encapsulated within the entity.
 from typing import Optional
 
 from domain.value_objects import CompanyName, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 
@@ -27,6 +28,7 @@ class StockEntity:
         self,
         symbol: StockSymbol,
         name: str = "",
+        sector: Optional[str] = None,
         industry_group: Optional[str] = None,
         grade: Optional[str] = None,
         notes: str = "",
@@ -38,7 +40,8 @@ class StockEntity:
         Args:
             symbol: Stock symbol (value object)
             name: Company name
-            industry_group: Industry classification
+            sector: Sector classification
+            industry_group: Industry classification (must belong to sector if provided)
             grade: Stock grade (A/B/C or None)
             notes: Additional notes
             stock_id: Database ID (for persistence)
@@ -46,13 +49,23 @@ class StockEntity:
         Raises:
             ValueError: If any validation fails
         """
-        # Create value objects (validation delegated to them)
+        # Initialize sector industry service for validation (import here to avoid circular imports)
+        from domain.services.sector_industry_service import \
+            SectorIndustryService
+
+        self._sector_industry_service = SectorIndustryService()
+
+        # Create value objects first (this validates format/length)
         self._symbol = symbol
         self._company_name = CompanyName(name)
+        self._sector_vo = Sector(sector) if sector is not None else None
         self._industry_group_vo = (
             IndustryGroup(industry_group) if industry_group else None
         )
         self._notes_vo = Notes(notes)
+
+        # Then validate domain business rules (sector-industry relationship)
+        self._validate_sector_industry_combination(sector, industry_group)
 
         # Validate grade (still entity's responsibility as it's domain-specific)
         self._validate_grade(grade)
@@ -73,6 +86,16 @@ class StockEntity:
     def name(self) -> str:
         """Get the company name as string (backward compatibility)."""
         return self._company_name.value
+
+    @property
+    def sector_vo(self) -> Optional[Sector]:
+        """Get the sector value object."""
+        return self._sector_vo
+
+    @property
+    def sector(self) -> Optional[str]:
+        """Get the sector as string (backward compatibility)."""
+        return self._sector_vo.value if self._sector_vo else None
 
     @property
     def industry_group_vo(self) -> Optional[IndustryGroup]:
@@ -158,16 +181,19 @@ class StockEntity:
 
         Args:
             **kwargs: Field names and values to update.
-                     Supported fields: name, industry_group, grade, notes
+                     Supported fields: name, sector, industry_group, grade, notes
 
         Raises:
             ValueError: If any field is invalid
         """
-        # Create temporary value objects for validation (atomic operation)
+        # Create temporary value objects for validation first (atomic operation)
         temp_values = {}
 
         if "name" in kwargs:
             temp_values["company_name"] = CompanyName(kwargs["name"])
+        if "sector" in kwargs:
+            sector = kwargs["sector"]
+            temp_values["sector_vo"] = Sector(sector) if sector is not None else None
         if "industry_group" in kwargs:
             industry_group = kwargs["industry_group"]
             temp_values["industry_group_vo"] = (
@@ -179,9 +205,32 @@ class StockEntity:
         if "notes" in kwargs:
             temp_values["notes_vo"] = Notes(kwargs["notes"])
 
+        # Now handle sector-industry domain logic
+        new_sector = kwargs.get("sector", self.sector)
+        new_industry_group = kwargs.get("industry_group", self.industry_group)
+
+        # Special logic: if changing sector, check if current industry_group is compatible
+        if "sector" in kwargs and "industry_group" not in kwargs:
+            # User is only changing sector, check if current industry_group is still valid
+            if (
+                self.industry_group is not None
+                and new_sector is not None
+                and not self._sector_industry_service.validate_sector_industry_combination(
+                    new_sector, self.industry_group
+                )
+            ):
+                # Current industry_group is not valid for new sector, clear it
+                new_industry_group = None
+                temp_values["industry_group_vo"] = None
+
+        # Validate the final sector-industry combination
+        self._validate_sector_industry_combination(new_sector, new_industry_group)
+
         # All validation passed, now update the actual fields
         if "company_name" in temp_values:
             self._company_name = temp_values["company_name"]
+        if "sector_vo" in temp_values:
+            self._sector_vo = temp_values["sector_vo"]
         if "industry_group_vo" in temp_values:
             self._industry_group_vo = temp_values["industry_group_vo"]
         if "grade" in temp_values:
@@ -212,3 +261,29 @@ class StockEntity:
         """Validate stock grade."""
         if grade is not None and grade not in cls.VALID_GRADES:
             raise ValueError(f"Grade must be one of {cls.VALID_GRADES} or None")
+
+    def _validate_sector_industry_combination(
+        self, sector: Optional[str], industry_group: Optional[str]
+    ) -> None:
+        """
+        Validate that sector and industry_group combination is valid.
+
+        Args:
+            sector: Sector name
+            industry_group: Industry group name
+
+        Raises:
+            ValueError: If combination is invalid
+        """
+        # If no industry group, sector can be anything (or None)
+        if industry_group is None:
+            return
+
+        # If industry group is provided, sector must also be provided
+        if sector is None:
+            raise ValueError("Sector must be provided when industry_group is specified")
+
+        # Validate the combination using domain service
+        self._sector_industry_service.validate_sector_industry_combination_strict(
+            sector, industry_group
+        )

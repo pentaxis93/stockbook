@@ -10,6 +10,7 @@ rich domain entities with proper business logic and validation.
 
 import pytest
 
+
 def test_legacy_models_deprecated():
     """Test that confirms legacy models have been deprecated"""
     # This test serves as a marker that the legacy model tests have been migrated

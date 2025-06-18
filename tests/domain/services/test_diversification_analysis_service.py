@@ -11,8 +11,8 @@ from typing import Dict, List
 import pytest
 
 from domain.entities.stock_entity import StockEntity
-from shared_kernel.value_objects import Money, Quantity
 from domain.value_objects.stock_symbol import StockSymbol
+from shared_kernel.value_objects import Money, Quantity
 
 # These imports will exist after implementation
 # from domain.services.diversification_analysis_service import DiversificationAnalysisService

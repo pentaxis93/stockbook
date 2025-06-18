@@ -9,8 +9,8 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict, List, Optional
 
-from shared_kernel.value_objects import Money
 from domain.value_objects.stock_symbol import StockSymbol
+from shared_kernel.value_objects import Money
 
 
 @dataclass(frozen=True)

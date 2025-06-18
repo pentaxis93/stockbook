@@ -9,13 +9,15 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from application.commands.stock_commands import CreateStockCommand, UpdateStockCommand
+from application.commands.stock_commands import (CreateStockCommand,
+                                                 UpdateStockCommand)
 from application.dto.stock_dto import StockDto
 from application.services.stock_application_service import \
     StockApplicationService
 from domain.entities.stock_entity import StockEntity
 from domain.events.stock_events import StockAddedEvent
-from domain.repositories.interfaces import IStockRepository, IStockBookUnitOfWork
+from domain.repositories.interfaces import (IStockBookUnitOfWork,
+                                            IStockRepository)
 from domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -40,7 +42,8 @@ class TestStockApplicationService:
         command = CreateStockCommand(
             symbol="AAPL",
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Great company",
         )
@@ -57,7 +60,8 @@ class TestStockApplicationService:
         assert result.id == 123
         assert result.symbol == "AAPL"
         assert result.name == "Apple Inc."
-        assert result.industry_group == "Technology"
+        assert result.sector == "Technology"
+        assert result.industry_group == "Software"
         assert result.grade == "A"
         assert result.notes == "Great company"
 
@@ -113,7 +117,8 @@ class TestStockApplicationService:
         stock_entity = StockEntity(
             symbol=StockSymbol("AAPL"),
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Great company",
             stock_id=123,
@@ -128,7 +133,8 @@ class TestStockApplicationService:
         assert result.id == 123
         assert result.symbol == "AAPL"
         assert result.name == "Apple Inc."
-        assert result.industry_group == "Technology"
+        assert result.sector == "Technology"
+        assert result.industry_group == "Software"
         assert result.grade == "A"
         assert result.notes == "Great company"
 
@@ -190,7 +196,6 @@ class TestStockApplicationService:
         # Verify repository interaction
         self.mock_stock_repository.get_all.assert_called_once()
 
-
     def test_stock_exists_true(self):
         """Should return True when stock exists."""
         # Arrange
@@ -238,7 +243,8 @@ class TestStockApplicationService:
                 stock_id=1,
                 symbol=StockSymbol("AAPL"),
                 name="Apple Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -274,7 +280,8 @@ class TestStockApplicationService:
                 stock_id=1,
                 symbol=StockSymbol("AAPL"),
                 name="Apple Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -282,7 +289,8 @@ class TestStockApplicationService:
                 stock_id=2,
                 symbol=StockSymbol("GOOGL"),
                 name="Alphabet Inc.",
-                industry_group="Technology",
+                sector="Technology",
+                industry_group="Software",
                 grade="A",
                 notes="",
             ),
@@ -329,7 +337,8 @@ class TestStockApplicationService:
         command = UpdateStockCommand(
             stock_id=1,
             name="Apple Inc. (Updated)",
-            industry_group="Consumer Electronics",
+            sector="Technology",
+            industry_group="Hardware",
             grade="A",
             notes="Updated notes",
         )
@@ -338,7 +347,8 @@ class TestStockApplicationService:
             stock_id=1,
             symbol=StockSymbol("AAPL"),
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="B",
             notes="Old notes",
         )
@@ -354,7 +364,8 @@ class TestStockApplicationService:
         assert isinstance(result, StockDto)
         assert result.id == 1
         assert result.name == "Apple Inc. (Updated)"
-        assert result.industry_group == "Consumer Electronics"
+        assert result.sector == "Technology"
+        assert result.industry_group == "Hardware"
         assert result.grade == "A"
         assert result.notes == "Updated notes"
 
@@ -375,7 +386,8 @@ class TestStockApplicationService:
             stock_id=1,
             symbol=StockSymbol("AAPL"),
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="B",
             notes="Existing notes",
         )
@@ -392,7 +404,8 @@ class TestStockApplicationService:
         assert result.grade == "A"
         # Verify other fields remain unchanged
         assert result.name == "Apple Inc."
-        assert result.industry_group == "Technology"
+        assert result.sector == "Technology"
+        assert result.industry_group == "Software"
         assert result.notes == "Existing notes"
 
     def test_update_stock_with_nonexistent_stock_raises_error(self):
@@ -421,7 +434,7 @@ class TestStockApplicationService:
         """Should handle repository update failure."""
         # Arrange
         command = UpdateStockCommand(stock_id=1, grade="A")
-        
+
         existing_stock = StockEntity(
             stock_id=1,
             symbol=StockSymbol("AAPL"),
@@ -443,7 +456,7 @@ class TestStockApplicationService:
         """Should rollback transaction on any exception."""
         # Arrange
         command = UpdateStockCommand(stock_id=1, grade="A")
-        
+
         existing_stock = StockEntity(
             stock_id=1,
             symbol=StockSymbol("AAPL"),

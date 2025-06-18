@@ -8,14 +8,9 @@ from decimal import Decimal
 
 import pytest
 
-from domain.entities import (
-    JournalEntryEntity,
-    PortfolioEntity, 
-    PortfolioBalanceEntity,
-    StockEntity,
-    TargetEntity,
-    TransactionEntity,
-)
+from domain.entities import (JournalEntryEntity, PortfolioBalanceEntity,
+                             PortfolioEntity, StockEntity, TargetEntity,
+                             TransactionEntity)
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 
@@ -28,13 +23,15 @@ class TestStockEntity:
         stock = StockEntity(
             symbol=StockSymbol("AAPL"),
             name="Apple Inc.",
-            industry_group="Technology",
+            sector="Technology",
+            industry_group="Software",
             grade="A",
             notes="Great company",
         )
         assert stock.symbol.value == "AAPL"
         assert stock.name == "Apple Inc."
-        assert stock.industry_group == "Technology"
+        assert stock.sector == "Technology"
+        assert stock.industry_group == "Software"
         assert stock.grade == "A"
         assert stock.notes == "Great company"
 
@@ -55,7 +52,9 @@ class TestStockEntity:
     def test_valid_grades_accepted(self):
         """Test that valid grades A, B, C are accepted"""
         for grade in ["A", "B", "C"]:
-            stock = StockEntity(symbol=StockSymbol("TEST"), name="Test Stock", grade=grade)
+            stock = StockEntity(
+                symbol=StockSymbol("TEST"), name="Test Stock", grade=grade
+            )
             assert stock.grade == grade
 
     def test_empty_name_allowed(self):
@@ -101,7 +100,9 @@ class TestPortfolioEntity:
     def test_long_name_rejected(self):
         """Test that excessively long names are rejected"""
         long_name = "A" * 101
-        with pytest.raises(ValueError, match="Portfolio name cannot exceed 100 characters"):
+        with pytest.raises(
+            ValueError, match="Portfolio name cannot exceed 100 characters"
+        ):
             PortfolioEntity(name=long_name)
 
 
@@ -140,7 +141,9 @@ class TestTransactionEntity:
 
     def test_invalid_transaction_type_rejected(self):
         """Test that invalid transaction types are rejected"""
-        with pytest.raises(ValueError, match="Transaction type must be 'buy' or 'sell'"):
+        with pytest.raises(
+            ValueError, match="Transaction type must be 'buy' or 'sell'"
+        ):
             TransactionEntity(
                 portfolio_id=1,
                 stock_id=1,

@@ -11,7 +11,8 @@ from typing import Any, Callable, Dict, Optional
 from application.services.stock_application_service import \
     StockApplicationService
 # Domain layer imports
-from domain.repositories.interfaces import IStockRepository, IStockBookUnitOfWork
+from domain.repositories.interfaces import (IStockBookUnitOfWork,
+                                            IStockRepository)
 # Infrastructure layer imports
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.persistence.unit_of_work import SqliteUnitOfWork

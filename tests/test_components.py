@@ -10,6 +10,7 @@ framework-agnostic UI operation interfaces with proper dependency injection.
 
 import pytest
 
+
 def test_legacy_components_deprecated():
     """Test that confirms legacy components have been deprecated"""
     # This test serves as a marker that the legacy component tests have been migrated
@@ -19,7 +20,7 @@ def test_legacy_components_deprecated():
 
 # The UI functionality is now tested through:
 # - tests/presentation/interfaces/test_ui_operations.py
-# - tests/presentation/adapters/test_streamlit_adapter.py  
+# - tests/presentation/adapters/test_streamlit_adapter.py
 # - tests/presentation/controllers/test_stock_controller.py
 # - tests/presentation/coordinators/test_stock_page_coordinator.py
 

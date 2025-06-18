@@ -20,6 +20,7 @@ class CreateStockRequest:
 
     symbol: str
     name: str
+    sector: Optional[str] = field(default=None)
     industry_group: Optional[str] = field(default=None)
     grade: Optional[str] = field(default=None)
     notes: str = field(default="")
@@ -61,6 +62,7 @@ class CreateStockRequest:
         return CreateStockRequest(
             symbol=self.symbol.strip().upper() if self.symbol else "",
             name=self.name.strip() if self.name else "",
+            sector=self.sector.strip() if self.sector else None,
             industry_group=self.industry_group.strip() if self.industry_group else None,
             grade=self.grade.strip().upper() if self.grade else None,
             notes=self.notes.strip() if self.notes else "",
@@ -77,6 +79,7 @@ class CreateStockRequest:
         return CreateStockCommand(
             symbol=sanitized.symbol,
             name=sanitized.name,
+            sector=sanitized.sector,
             industry_group=sanitized.industry_group,
             grade=sanitized.grade,
             notes=sanitized.notes,
@@ -94,6 +97,7 @@ class UpdateStockRequest:
 
     stock_id: int
     name: Optional[str] = field(default=None)
+    sector: Optional[str] = field(default=None)
     industry_group: Optional[str] = field(default=None)
     grade: Optional[str] = field(default=None)
     notes: Optional[str] = field(default=None)
@@ -132,6 +136,7 @@ class UpdateStockRequest:
         return UpdateStockRequest(
             stock_id=self.stock_id,
             name=self.name.strip().title() if self.name else None,
+            sector=self.sector.strip() if self.sector else None,
             industry_group=self.industry_group.strip() if self.industry_group else None,
             grade=self.grade.upper() if self.grade else None,
             notes=self.notes.strip() if self.notes else None,
@@ -144,6 +149,7 @@ class UpdateStockRequest:
         return UpdateStockCommand(
             stock_id=self.stock_id,
             name=self.name,
+            sector=self.sector,
             industry_group=self.industry_group,
             grade=self.grade,
             notes=self.notes,
@@ -154,6 +160,7 @@ class UpdateStockRequest:
         return any(
             [
                 self.name is not None,
+                self.sector is not None,
                 self.industry_group is not None,
                 self.grade is not None,
                 self.notes is not None,
@@ -168,6 +175,7 @@ class StockViewModel:
     id: int
     symbol: str
     name: str
+    sector: Optional[str] = field(default=None)
     industry_group: Optional[str] = field(default=None)
     grade: Optional[str] = field(default=None)
     notes: str = field(default="")
@@ -187,6 +195,7 @@ class StockViewModel:
             id=dto.id,
             symbol=dto.symbol,
             name=dto.name,
+            sector=dto.sector,
             industry_group=dto.industry_group,
             grade=dto.grade,
             notes=dto.notes or "",

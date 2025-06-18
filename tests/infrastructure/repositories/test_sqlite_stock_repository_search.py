@@ -35,7 +35,7 @@ class TestSqliteStockRepositorySearch:
         """Should search stocks by symbol filter."""
         # Arrange
         symbol_filter = "APP"
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) ORDER BY symbol"
         expected_params = ["%APP%"]
 
         # Mock database results
@@ -44,7 +44,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -66,7 +67,7 @@ class TestSqliteStockRepositorySearch:
         """Should search stocks by name filter."""
         # Arrange
         name_filter = "Apple"
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE UPPER(name) LIKE UPPER(?) ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE UPPER(name) LIKE UPPER(?) ORDER BY symbol"
         expected_params = ["%Apple%"]
 
         # Mock database results
@@ -75,7 +76,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -96,7 +98,7 @@ class TestSqliteStockRepositorySearch:
         """Should search stocks by industry filter."""
         # Arrange
         industry_filter = "Tech"
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE UPPER(industry_group) LIKE UPPER(?) ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE UPPER(industry_group) LIKE UPPER(?) ORDER BY symbol"
         expected_params = ["%Tech%"]
 
         # Mock database results
@@ -105,7 +107,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -113,7 +116,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 2,
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -133,7 +137,7 @@ class TestSqliteStockRepositorySearch:
         """Should search stocks by grade filter."""
         # Arrange
         grade_filter = "A"
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE grade = ? ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE grade = ? ORDER BY symbol"
         expected_params = ["A"]
 
         # Mock database results
@@ -142,7 +146,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -150,7 +155,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 2,
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -172,7 +178,7 @@ class TestSqliteStockRepositorySearch:
         # Arrange
         symbol_filter = "G"
         grade_filter = "A"
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) AND grade = ? ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) AND grade = ? ORDER BY symbol"
         expected_params = ["%G%", "A"]
 
         # Mock database results
@@ -181,7 +187,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 2,
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -209,7 +216,7 @@ class TestSqliteStockRepositorySearch:
         industry_filter = "Tech"
         grade_filter = "A"
         expected_query = (
-            "SELECT id, symbol, name, industry_group, grade, notes FROM stock "
+            "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock "
             "WHERE UPPER(symbol) LIKE UPPER(?) AND UPPER(name) LIKE UPPER(?) "
             "AND UPPER(industry_group) LIKE UPPER(?) AND grade = ? ORDER BY symbol"
         )
@@ -221,7 +228,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -246,7 +254,7 @@ class TestSqliteStockRepositorySearch:
     def test_search_stocks_with_no_filters(self):
         """Should return all stocks when no filters are provided."""
         # Arrange
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock ORDER BY symbol"
         expected_params = []
 
         # Mock database results
@@ -255,7 +263,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -263,7 +272,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 2,
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -271,7 +281,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 3,
                 "symbol": "MSFT",
                 "name": "Microsoft Corp.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "B",
                 "notes": "",
             },
@@ -291,7 +302,7 @@ class TestSqliteStockRepositorySearch:
         """Should handle empty search results gracefully."""
         # Arrange
         symbol_filter = "NOTFOUND"
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) ORDER BY symbol"
         expected_params = ["%NOTFOUND%"]
 
         # Mock database results
@@ -310,7 +321,7 @@ class TestSqliteStockRepositorySearch:
         """Should perform case-insensitive searches."""
         # Arrange
         symbol_filter = "app"  # lowercase
-        expected_query = "SELECT id, symbol, name, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) ORDER BY symbol"
+        expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock WHERE UPPER(symbol) LIKE UPPER(?) ORDER BY symbol"
         expected_params = ["%app%"]
 
         # Mock database results
@@ -319,7 +330,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -345,7 +357,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "",
             },
@@ -371,7 +384,8 @@ class TestSqliteStockRepositorySearch:
                 "id": 1,
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
-                "industry_group": "Technology",
+                "sector": "Technology",
+                "industry_group": "Software",
                 "grade": "A",
                 "notes": "High quality stock",
             },
@@ -389,6 +403,7 @@ class TestSqliteStockRepositorySearch:
         assert stock.id == 1
         assert stock.symbol.value == "AAPL"
         assert stock.name == "Apple Inc."
-        assert stock.industry_group == "Technology"
+        assert stock.sector == "Technology"
+        assert stock.industry_group == "Software"
         assert stock.grade == "A"
         assert stock.notes == "High quality stock"
