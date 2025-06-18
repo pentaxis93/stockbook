@@ -7,12 +7,31 @@ set -e
 
 echo "Running quality checks (formatting already handled by previous hooks)..."
 
-# Run pylint with different configurations for production vs test files
-echo "Running pylint with strict rules on production code..."
-PRODUCTION_FILES=$(find . -name "*.py" -not -path "./tests/*" -not -path "./.*" -not -path "./venv/*" -not -path "./.venv/*")
-if [ -n "$PRODUCTION_FILES" ]; then
-    if ! pylint $PRODUCTION_FILES; then
-        echo "❌ Pylint strict check failed on production code. Fix the issues before committing."
+# Run pylint with layer-specific configurations
+echo "Running pylint with strictest rules on core business logic..."
+CORE_FILES=$(find domain/ application/ infrastructure/ shared_kernel/ -name "*.py" 2>/dev/null || true)
+if [ -n "$CORE_FILES" ]; then
+    if ! pylint --rcfile=.pylintrc-core $CORE_FILES; then
+        echo "❌ Pylint strict check failed on core business logic. Fix the issues before committing."
+        exit 1
+    fi
+fi
+
+echo "Running pylint with moderate rules on presentation layer..."
+PRESENTATION_FILES=$(find presentation/ -name "*.py" 2>/dev/null || true)
+if [ -n "$PRESENTATION_FILES" ]; then
+    if ! pylint --rcfile=.pylintrc-presentation $PRESENTATION_FILES; then
+        echo "❌ Pylint moderate check failed on presentation layer. Fix the issues before committing."
+        exit 1
+    fi
+fi
+
+echo "Running pylint with lenient rules on configuration files..."
+CONFIG_FILES=$(find . -maxdepth 1 -name "*.py" -not -path "./tests/*" 2>/dev/null || true)
+CONFIG_FILES="$CONFIG_FILES $(find dependency_injection/ -name "*.py" 2>/dev/null || true)"
+if [ -n "$CONFIG_FILES" ]; then
+    if ! pylint --rcfile=.pylintrc-config $CONFIG_FILES; then
+        echo "❌ Pylint lenient check failed on configuration files. Fix the issues before committing."
         exit 1
     fi
 fi
