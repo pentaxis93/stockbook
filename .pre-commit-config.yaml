@@ -13,6 +13,16 @@ repos:
       - id: isort
         args: ["--profile", "black"]
 
+  # Pyright type checking for core infrastructure
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.402
+    hooks:
+      - id: pyright
+        name: Type check core infrastructure with pyright
+        args: ["--project", "pyproject.toml"]
+        files: ^(infrastructure/persistence|infrastructure/repositories)/.*\.py$
+        additional_dependencies: []
+
   # Custom quality checks (pylint, tests) that don't modify files
   - repo: local
     hooks:

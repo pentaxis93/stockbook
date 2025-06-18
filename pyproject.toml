@@ -88,3 +88,13 @@ exclude_lines = [
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
 ]
+
+[tool.pyright]
+# Focus on core business logic layers only
+include = [
+    "infrastructure/persistence",
+    "infrastructure/repositories"
+]
+
+# Use basic type checking - just catch the most important errors
+typeCheckingMode = "basic"
