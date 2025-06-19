@@ -12,6 +12,7 @@ from typing import List, Optional
 
 from domain.entities.transaction_entity import TransactionEntity
 from domain.repositories.interfaces import ITransactionRepository
+from domain.value_objects import Notes, TransactionType
 from infrastructure.persistence.interfaces import IDatabaseConnection
 from shared_kernel.value_objects import Money, Quantity
 
@@ -56,15 +57,11 @@ class SqliteTransactionRepository(ITransactionRepository):
                 (
                     transaction.portfolio_id,
                     transaction.stock_id,
-                    transaction.transaction_type,
-                    int(transaction.quantity.value) if transaction.quantity else 0,
-                    float(transaction.price.amount) if transaction.price else 0.0,
-                    (
-                        transaction.transaction_date.isoformat()
-                        if transaction.transaction_date
-                        else ""
-                    ),
-                    transaction.notes or "",
+                    transaction.transaction_type.value,  # Extract value from TransactionType
+                    int(transaction.quantity.value),
+                    float(transaction.price.amount),
+                    transaction.transaction_date.isoformat(),
+                    transaction.notes.value,  # Extract value from Notes
                 ),
             )
             return cursor.lastrowid or 0
@@ -241,15 +238,11 @@ class SqliteTransactionRepository(ITransactionRepository):
                 (
                     transaction.portfolio_id,
                     transaction.stock_id,
-                    transaction.transaction_type,
-                    int(transaction.quantity.value) if transaction.quantity else 0,
-                    float(transaction.price.amount) if transaction.price else 0.0,
-                    (
-                        transaction.transaction_date.isoformat()
-                        if transaction.transaction_date
-                        else ""
-                    ),
-                    transaction.notes or "",
+                    transaction.transaction_type.value,  # Extract value from TransactionType
+                    int(transaction.quantity.value),
+                    float(transaction.price.amount),
+                    transaction.transaction_date.isoformat(),
+                    transaction.notes.value,  # Extract value from Notes
                     transaction_id,
                 ),
             )
@@ -281,23 +274,24 @@ class SqliteTransactionRepository(ITransactionRepository):
         Returns:
             Transaction entity populated from row data
         """
-        # Parse transaction date
-        transaction_date = None
+        # Parse transaction date - must be valid for TransactionEntity
+        transaction_date = date.today()  # Default fallback
         if row["transaction_date"]:
             try:
                 transaction_date = date.fromisoformat(row["transaction_date"])
             except ValueError:
-                transaction_date = None
+                # Keep default fallback if parsing fails
+                pass
 
         return TransactionEntity(
-            id=row["id"],
+            transaction_id=row["id"],  # Use transaction_id parameter
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
-            transaction_type=row["type"],
+            transaction_type=TransactionType(row["type"]),  # Wrap in TransactionType
             quantity=Quantity(row["quantity"]),
             price=Money(
                 Decimal(str(row["price"])), "USD"
             ),  # TODO: Store currency in DB
             transaction_date=transaction_date,
-            notes=row["notes"] or None,
+            notes=Notes(row["notes"] or ""),  # Wrap in Notes value object
         )

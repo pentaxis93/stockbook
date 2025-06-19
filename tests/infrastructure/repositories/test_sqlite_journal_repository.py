@@ -13,6 +13,7 @@ import pytest
 
 from domain.entities.journal_entry_entity import JournalEntryEntity
 from domain.repositories.interfaces import IJournalRepository
+from domain.value_objects import JournalContent
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.repositories.sqlite_journal_repository import (
     SqliteJournalRepository,
@@ -64,7 +65,9 @@ def sample_entry():
         portfolio_id=1,
         stock_id=1,
         entry_date=date(2024, 1, 15),
-        content="This is a test journal entry about Apple stock analysis.",
+        content=JournalContent(
+            "This is a test journal entry about Apple stock analysis."
+        ),
     )
 
 
@@ -91,7 +94,7 @@ class TestJournalRepositoryBasic:
         # Assert
         assert retrieved is not None
         assert retrieved.id == entry_id
-        assert retrieved.content == sample_entry.content
+        assert retrieved.content.value == sample_entry.content.value
         assert retrieved.portfolio_id == sample_entry.portfolio_id
 
     def test_get_recent(self, journal_repository):
@@ -99,10 +102,14 @@ class TestJournalRepositoryBasic:
         # Arrange
         entries = [
             JournalEntryEntity(
-                portfolio_id=1, entry_date=date(2024, 1, 1), content="First entry"
+                portfolio_id=1,
+                entry_date=date(2024, 1, 1),
+                content=JournalContent("First entry"),
             ),
             JournalEntryEntity(
-                portfolio_id=1, entry_date=date(2024, 1, 15), content="Latest entry"
+                portfolio_id=1,
+                entry_date=date(2024, 1, 15),
+                content=JournalContent("Latest entry"),
             ),
         ]
 
@@ -116,7 +123,7 @@ class TestJournalRepositoryBasic:
         assert len(recent) == 2
         # Should be ordered by date (newest first)
         assert recent[0].entry_date > recent[1].entry_date
-        assert recent[0].content == "Latest entry"
+        assert recent[0].content.value == "Latest entry"
 
     def test_get_by_portfolio(self, journal_repository, sample_entry):
         """Should retrieve entries for specific portfolio."""
@@ -138,7 +145,7 @@ class TestJournalRepositoryBasic:
             portfolio_id=1,
             stock_id=1,
             entry_date=date(2024, 1, 15),
-            content="Updated journal entry content.",
+            content=JournalContent("Updated journal entry content."),
         )
 
         # Act
@@ -149,7 +156,7 @@ class TestJournalRepositoryBasic:
 
         # Verify update
         retrieved = journal_repository.get_by_id(entry_id)
-        assert retrieved.content == "Updated journal entry content."
+        assert retrieved.content.value == "Updated journal entry content."
 
     def test_delete_entry(self, journal_repository, sample_entry):
         """Should delete journal entry."""

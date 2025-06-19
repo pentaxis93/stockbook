@@ -49,7 +49,7 @@ class SqliteJournalRepository(IJournalRepository):
                 """,
                 (
                     entry.entry_date.isoformat() if entry.entry_date else "",
-                    entry.content,
+                    entry.content.value,
                     entry.stock_id,
                     entry.portfolio_id,
                     entry.transaction_id,
@@ -267,7 +267,7 @@ class SqliteJournalRepository(IJournalRepository):
                 """,
                 (
                     entry.entry_date.isoformat() if entry.entry_date else "",
-                    entry.content,
+                    entry.content.value,
                     entry.stock_id,
                     entry.portfolio_id,
                     entry.transaction_id,
@@ -308,11 +308,18 @@ class SqliteJournalRepository(IJournalRepository):
             except ValueError:
                 entry_date = None
 
-        return JournalEntryEntity(
-            id=row["id"],
+        # Provide default date if none available
+        if entry_date is None:
+            entry_date = date.today()
+
+        from domain.value_objects import JournalContent
+
+        entity = JournalEntryEntity(
+            entry_date=entry_date,
+            content=JournalContent(row["content"]),
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
             transaction_id=row["transaction_id"],
-            entry_date=entry_date,
-            content=row["content"],
+            entry_id=row["id"],
         )
+        return entity

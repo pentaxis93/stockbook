@@ -12,7 +12,7 @@ import pytest
 
 from domain.entities.portfolio_entity import PortfolioEntity
 from domain.entities.stock_entity import StockEntity
-from domain.value_objects import CompanyName, Grade, IndustryGroup
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes, PortfolioName
 from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from infrastructure.persistence.database_connection import DatabaseConnection
@@ -69,7 +69,8 @@ def test_unit_of_work_transactional_context(unit_of_work):
 
         # Create a portfolio
         portfolio = PortfolioEntity(
-            name="Test Portfolio", description="Test portfolio for unit of work"
+            name=PortfolioName("Test Portfolio"),
+            description=Notes("Test portfolio for unit of work"),
         )
         portfolio_id = unit_of_work.portfolios.create(portfolio)
 
@@ -80,7 +81,7 @@ def test_unit_of_work_transactional_context(unit_of_work):
         assert retrieved_stock is not None
         assert retrieved_portfolio is not None
         assert retrieved_stock.company_name.value == "Apple Inc."
-        assert retrieved_portfolio.name == "Test Portfolio"
+        assert retrieved_portfolio.name.value == "Test Portfolio"
 
 
 def test_unit_of_work_rollback_on_exception(unit_of_work):

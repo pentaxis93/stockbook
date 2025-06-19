@@ -11,6 +11,7 @@ from typing import List, Optional
 
 from domain.entities.portfolio_entity import PortfolioEntity
 from domain.repositories.interfaces import IPortfolioRepository
+from domain.value_objects import Notes, PortfolioName
 from infrastructure.persistence.interfaces import IDatabaseConnection
 
 
@@ -51,8 +52,8 @@ class SqlitePortfolioRepository(IPortfolioRepository):
                 VALUES (?, ?, ?, ?, ?)
                 """,
                 (
-                    portfolio.name,
-                    portfolio.description,
+                    portfolio.name.value,
+                    portfolio.description.value if portfolio.description else None,
                     50,  # Default max positions - TODO: make configurable
                     0.02,  # Default 2% max risk - TODO: make configurable
                     portfolio.is_active,
@@ -162,8 +163,8 @@ class SqlitePortfolioRepository(IPortfolioRepository):
                 WHERE id = ?
                 """,
                 (
-                    portfolio.name,
-                    portfolio.description,
+                    portfolio.name.value,
+                    portfolio.description.value if portfolio.description else None,
                     portfolio.is_active,
                     portfolio_id,
                 ),
@@ -213,9 +214,9 @@ class SqlitePortfolioRepository(IPortfolioRepository):
                 created_date = None
 
         return PortfolioEntity(
-            id=row["id"],
-            name=row["name"],
-            description=row["description"],
+            portfolio_id=row["id"],
+            name=PortfolioName(row["name"]),
+            description=Notes(row["description"] or ""),
             created_date=created_date,
             is_active=bool(row["is_active"]),
         )

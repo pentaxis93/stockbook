@@ -1,60 +1,165 @@
 """
 Target aggregate root entity.
 
-Placeholder implementation for target domain entity to replace
-legacy Pydantic model dependency in repository interfaces.
+Rich domain entity implementing clean architecture with value objects.
+Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
-from dataclasses import dataclass
 from datetime import date
-from typing import Optional
+from typing import Optional, Union
 
+from domain.value_objects import Notes, TargetStatus
 from shared_kernel.value_objects import Money
 
 
-@dataclass
 class TargetEntity:
     """
     Target aggregate root representing investment price targets.
 
-    TODO: Implement full domain entity with business logic, validation,
-    and rich behavior. This is currently a placeholder to remove
-    legacy model dependencies from repository interfaces.
+    Rich domain entity with value objects and business logic.
+    Follows clean architecture and Domain-Driven Design principles.
     """
 
-    # Identity
-    id: Optional[int] = None
-
-    # Core attributes
-    portfolio_id: int = 0
-    stock_id: int = 0
-    pivot_price: Optional[Money] = None  # Target price for entry/exit
-    failure_price: Optional[Money] = None  # Stop-loss price
-    status: str = "active"  # 'active', 'hit', 'failed', 'cancelled'
-    created_date: Optional[date] = None
-    notes: Optional[str] = None
-
-    def __post_init__(self):
-        """Validate target data after initialization."""
-        if self.status not in ["active", "hit", "failed", "cancelled"]:
-            raise ValueError("Invalid target status")
-
-        if self.portfolio_id <= 0:
+    def __init__(
+        self,
+        portfolio_id: int,
+        stock_id: int,
+        pivot_price: Money,
+        failure_price: Money,
+        status: TargetStatus,
+        created_date: date,
+        notes: Optional[Notes] = None,
+        target_id: Optional[int] = None,
+    ):
+        """Initialize target with required value objects and validation."""
+        # Validate primitive IDs
+        if not isinstance(portfolio_id, int) or portfolio_id <= 0:
             raise ValueError("Portfolio ID must be positive")
-
-        if self.stock_id <= 0:
+        if not isinstance(stock_id, int) or stock_id <= 0:
             raise ValueError("Stock ID must be positive")
 
-        if self.pivot_price is None:
-            raise ValueError("Pivot price cannot be None")
+        # Store validated attributes
+        self._id = target_id
+        self._portfolio_id = portfolio_id
+        self._stock_id = stock_id
+        self._pivot_price = pivot_price
+        self._failure_price = failure_price
+        self._status = status
+        self._created_date = created_date
+        self._notes = notes or Notes("")
 
-        if self.failure_price is None:
-            raise ValueError("Failure price cannot be None")
+    # Identity
+    @property
+    def id(self) -> Optional[int]:
+        """Get target ID."""
+        return self._id
+
+    @property
+    def portfolio_id(self) -> int:
+        """Get portfolio ID."""
+        return self._portfolio_id
+
+    @property
+    def stock_id(self) -> int:
+        """Get stock ID."""
+        return self._stock_id
+
+    # Core attributes
+    @property
+    def pivot_price(self) -> Money:
+        """Get pivot price."""
+        return self._pivot_price
+
+    @property
+    def failure_price(self) -> Money:
+        """Get failure price."""
+        return self._failure_price
+
+    @property
+    def status(self) -> TargetStatus:
+        """Get target status."""
+        return self._status
+
+    @property
+    def created_date(self) -> date:
+        """Get created date."""
+        return self._created_date
+
+    @property
+    def notes(self) -> Notes:
+        """Get notes."""
+        return self._notes
+
+    # Business methods
+    def activate(self) -> None:
+        """Activate the target."""
+        self._status = TargetStatus("active")
+
+    def mark_as_hit(self) -> None:
+        """Mark the target as hit."""
+        self._status = TargetStatus("hit")
+
+    def mark_as_failed(self) -> None:
+        """Mark the target as failed."""
+        self._status = TargetStatus("failed")
+
+    def cancel(self) -> None:
+        """Cancel the target."""
+        self._status = TargetStatus("cancelled")
+
+    def is_active(self) -> bool:
+        """Check if target is active."""
+        return self._status.value == "active"
+
+    def is_hit(self) -> bool:
+        """Check if target is hit."""
+        return self._status.value == "hit"
+
+    def is_failed(self) -> bool:
+        """Check if target is failed."""
+        return self._status.value == "failed"
+
+    def is_cancelled(self) -> bool:
+        """Check if target is cancelled."""
+        return self._status.value == "cancelled"
+
+    def has_notes(self) -> bool:
+        """Check if target has non-empty notes."""
+        return self._notes.has_content()
+
+    def update_notes(self, notes: Union[Notes, str]) -> None:
+        """Update target notes."""
+        if isinstance(notes, str):
+            self._notes = Notes(notes)
+        else:
+            self._notes = notes
+
+    def set_id(self, target_id: int) -> None:
+        """Set target ID (for persistence layer)."""
+        if not isinstance(target_id, int) or target_id <= 0:
+            raise ValueError("ID must be a positive integer")
+        if self._id is not None:
+            raise ValueError("ID is already set and cannot be changed")
+        self._id = target_id
+
+    # Equality and representation
+    def __eq__(self, other) -> bool:
+        """Check equality based on business identity (portfolio_id, stock_id)."""
+        if not isinstance(other, TargetEntity):
+            return False
+        return (
+            self._portfolio_id == other._portfolio_id
+            and self._stock_id == other._stock_id
+        )
+
+    def __hash__(self) -> int:
+        """Hash for use in collections based on business identity."""
+        return hash((self._portfolio_id, self._stock_id))
 
     def __str__(self) -> str:
         """String representation."""
-        return f"Target(pivot: {self.pivot_price}, failure: {self.failure_price}, status={self.status})"
+        return f"Target(pivot: {self._pivot_price}, failure: {self._failure_price}, status={self._status.value})"
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"TargetEntity(id={self.id}, pivot={self.pivot_price}, status='{self.status}')"
+        return f"TargetEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, status='{self._status.value}')"

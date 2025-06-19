@@ -6,7 +6,7 @@ while fulfilling the domain repository contract.
 """
 
 import sqlite3
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 from typing import List, Optional
 
@@ -58,8 +58,8 @@ class SqliteTargetRepository(ITargetRepository):
                     target.portfolio_id,
                     float(target.pivot_price.amount) if target.pivot_price else 0.0,
                     float(target.failure_price.amount) if target.failure_price else 0.0,
-                    target.notes or "",
-                    target.status,
+                    target.notes.value or "",
+                    target.status.value,
                 ),
             )
             return cursor.lastrowid or 0
@@ -202,8 +202,8 @@ class SqliteTargetRepository(ITargetRepository):
                     target.portfolio_id,
                     float(target.pivot_price.amount) if target.pivot_price else 0.0,
                     float(target.failure_price.amount) if target.failure_price else 0.0,
-                    target.notes or "",
-                    target.status,
+                    target.notes.value or "",
+                    target.status.value,
                     target_id,
                 ),
             )
@@ -253,17 +253,24 @@ class SqliteTargetRepository(ITargetRepository):
             except (ValueError, AttributeError):
                 created_date = None
 
-        return TargetEntity(
-            id=row["id"],
-            stock_id=row["stock_id"],
+        # Provide default date if none available
+        if created_date is None:
+            created_date = date.today()
+
+        from domain.value_objects import Notes, TargetStatus
+
+        entity = TargetEntity(
             portfolio_id=row["portfolio_id"],
+            stock_id=row["stock_id"],
             pivot_price=Money(
                 Decimal(str(row["pivot_price"])), "USD"
             ),  # TODO: Store currency in DB
             failure_price=Money(
                 Decimal(str(row["failure_price"])), "USD"
             ),  # TODO: Store currency in DB
-            status=row["status"],
+            status=TargetStatus(row["status"]),
             created_date=created_date,
-            notes=row["notes"] or None,
+            notes=Notes(row["notes"] or ""),
+            target_id=row["id"],
         )
+        return entity

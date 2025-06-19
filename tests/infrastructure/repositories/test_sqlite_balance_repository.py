@@ -14,6 +14,7 @@ import pytest
 
 from domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 from domain.repositories.interfaces import IPortfolioBalanceRepository
+from domain.value_objects import IndexChange
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.repositories.sqlite_balance_repository import (
     SqlitePortfolioBalanceRepository,
@@ -62,7 +63,7 @@ def sample_balance():
         withdrawals=Money(Decimal("0.00"), "USD"),
         deposits=Money(Decimal("1000.00"), "USD"),
         final_balance=Money(Decimal("10500.00"), "USD"),
-        index_change=2.5,
+        index_change=IndexChange(2.5),
     )
 
 
@@ -180,14 +181,14 @@ class TestPortfolioBalanceRepositoryIntegration:
             withdrawals=Money(Decimal("100.00"), "USD"),
             deposits=Money(Decimal("1000.00"), "USD"),
             final_balance=Money(Decimal("10000.00"), "USD"),
-            index_change=1.5,
+            index_change=IndexChange(1.5),
         )
         balance_id = balance_repository.create(balance)
         assert balance_id is not None
 
         # Read
         retrieved = balance_repository.get_by_id(balance_id)
-        assert retrieved.index_change == 1.5
+        assert retrieved.index_change.value == 1.5
 
         # Test portfolio queries
         by_date = balance_repository.get_by_portfolio_and_date(1, date(2024, 1, 1))

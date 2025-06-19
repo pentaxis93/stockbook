@@ -93,33 +93,41 @@ class TestPortfolioEntity:
 
     def test_valid_portfolio_creation(self):
         """Test creating a valid portfolio"""
+        from domain.value_objects import Notes, PortfolioName
+
         portfolio = PortfolioEntity(
-            name="My Portfolio",
-            description="Test portfolio",
+            name=PortfolioName("My Portfolio"),
+            description=Notes("Test portfolio"),
             is_active=True,
         )
-        assert portfolio.name == "My Portfolio"
-        assert portfolio.description == "Test portfolio"
+        assert portfolio.name.value == "My Portfolio"
+        assert portfolio.description.value == "Test portfolio"
         assert portfolio.is_active is True
 
     def test_minimal_portfolio_creation(self):
         """Test creating portfolio with only required fields"""
-        portfolio = PortfolioEntity(name="Test Portfolio")
-        assert portfolio.name == "Test Portfolio"
+        from domain.value_objects import PortfolioName
+
+        portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
+        assert portfolio.name.value == "Test Portfolio"
         assert portfolio.is_active is True
 
     def test_empty_name_rejected(self):
         """Test that empty name is rejected"""
+        from domain.value_objects import PortfolioName
+
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
-            PortfolioEntity(name="")
+            PortfolioName("")  # Error happens at value object level
 
     def test_long_name_rejected(self):
         """Test that excessively long names are rejected"""
+        from domain.value_objects import PortfolioName
+
         long_name = "A" * 101
         with pytest.raises(
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
-            PortfolioEntity(name=long_name)
+            PortfolioName(long_name)  # Error happens at value object level
 
 
 class TestTransactionEntity:
@@ -127,55 +135,56 @@ class TestTransactionEntity:
 
     def test_valid_buy_transaction(self):
         """Test creating a valid buy transaction"""
+        from domain.value_objects import Notes, TransactionType
+
         transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("150.25"), "USD"),
             transaction_date=date(2024, 1, 15),
-            notes="Initial purchase",
+            notes=Notes("Initial purchase"),
         )
-        assert transaction.transaction_type == "buy"
+        assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 100
         assert transaction.price.amount == Decimal("150.25")
         assert transaction.transaction_date == date(2024, 1, 15)
 
     def test_valid_sell_transaction(self):
         """Test creating a valid sell transaction"""
+        from domain.value_objects import TransactionType
+
         transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="sell",
+            transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("175.00"), "USD"),
             transaction_date=date(2024, 2, 15),
         )
-        assert transaction.transaction_type == "sell"
+        assert transaction.transaction_type.value == "sell"
         assert transaction.quantity.value == 50
         assert transaction.price.amount == Decimal("175.00")
 
     def test_invalid_transaction_type_rejected(self):
         """Test that invalid transaction types are rejected"""
+        from domain.value_objects import TransactionType
+
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
         ):
-            TransactionEntity(
-                portfolio_id=1,
-                stock_id=1,
-                transaction_type="transfer",
-                quantity=Quantity(100),
-                price=Money(Decimal("150.00"), "USD"),
-                transaction_date=date.today(),
-            )
+            TransactionType("transfer")  # Error happens at value object level
 
     def test_invalid_portfolio_id_rejected(self):
         """Test that invalid portfolio ID is rejected"""
+        from domain.value_objects import TransactionType
+
         with pytest.raises(ValueError, match="Portfolio ID must be positive"):
             TransactionEntity(
                 portfolio_id=0,
                 stock_id=1,
-                transaction_type="buy",
+                transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
                 price=Money(Decimal("150.00"), "USD"),
                 transaction_date=date.today(),
@@ -183,11 +192,13 @@ class TestTransactionEntity:
 
     def test_invalid_stock_id_rejected(self):
         """Test that invalid stock ID is rejected"""
+        from domain.value_objects import TransactionType
+
         with pytest.raises(ValueError, match="Stock ID must be positive"):
             TransactionEntity(
                 portfolio_id=1,
                 stock_id=0,
-                transaction_type="buy",
+                transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
                 price=Money(Decimal("150.00"), "USD"),
                 transaction_date=date.today(),
@@ -195,45 +206,72 @@ class TestTransactionEntity:
 
 
 class TestTargetEntity:
-    """Test TargetEntity domain entity - placeholder implementation"""
+    """Test TargetEntity domain entity with value objects"""
 
-    def test_target_entity_exists(self):
-        """Test that TargetEntity can be instantiated with valid data"""
-        # This is a placeholder test since TargetEntity is not fully implemented
+    def test_target_entity_creation_with_value_objects(self):
+        """Test that TargetEntity can be instantiated with value objects"""
+        from domain.value_objects import TargetStatus
+
         target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("80.00"), "USD"),
+            status=TargetStatus("active"),
+            created_date=date.today(),
         )
-        assert target is not None
+        assert target.portfolio_id == 1
+        assert target.stock_id == 1
+        assert target.pivot_price.amount == Decimal("100.00")
+        assert target.failure_price.amount == Decimal("80.00")
+        assert target.status.value == "active"
 
 
 class TestPortfolioBalanceEntity:
-    """Test PortfolioBalanceEntity domain entity - placeholder implementation"""
+    """Test PortfolioBalanceEntity domain entity with value objects"""
 
-    def test_portfolio_balance_entity_exists(self):
-        """Test that PortfolioBalanceEntity can be instantiated with valid data"""
-        # This is a placeholder test since PortfolioBalanceEntity is not fully implemented
+    def test_portfolio_balance_entity_creation_with_value_objects(self):
+        """Test that PortfolioBalanceEntity can be instantiated with value objects"""
+        from domain.value_objects import IndexChange
+
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date.today(),
             final_balance=Money(Decimal("10000.00"), "USD"),
+            deposits=Money(Decimal("1000.00"), "USD"),
+            withdrawals=Money(Decimal("500.00"), "USD"),
+            index_change=IndexChange(5.25),
         )
-        assert balance is not None
+        assert balance.portfolio_id == 1
+        assert balance.final_balance.amount == Decimal("10000.00")
+        assert balance.deposits.amount == Decimal("1000.00")
+        assert balance.withdrawals.amount == Decimal("500.00")
+        assert balance.index_change.value == 5.25
 
 
 class TestJournalEntryEntity:
-    """Test JournalEntryEntity domain entity - placeholder implementation"""
+    """Test JournalEntryEntity domain entity with value objects"""
 
-    def test_journal_entry_entity_exists(self):
-        """Test that JournalEntryEntity can be instantiated with valid data"""
-        # This is a placeholder test since JournalEntryEntity is not fully implemented
+    def test_journal_entry_entity_creation_with_value_objects(self):
+        """Test that JournalEntryEntity can be instantiated with value objects"""
+        from domain.value_objects import JournalContent
+
         entry = JournalEntryEntity(
             entry_date=date.today(),
-            content="Test journal entry content",
+            content=JournalContent(
+                "This is a detailed market analysis and observations."
+            ),
+            portfolio_id=1,
+            stock_id=2,
         )
-        assert entry is not None
+        assert entry.entry_date == date.today()
+        assert (
+            entry.content.value
+            == "This is a detailed market analysis and observations."
+        )
+        assert entry.portfolio_id == 1
+        assert entry.stock_id == 2
+        assert entry.transaction_id is None
 
 
 # Additional tests for value objects used by entities

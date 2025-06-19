@@ -14,6 +14,7 @@ import pytest
 
 from domain.entities.transaction_entity import TransactionEntity
 from domain.repositories.interfaces import ITransactionRepository
+from domain.value_objects import Notes, TransactionType
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.repositories.sqlite_transaction_repository import (
     SqliteTransactionRepository,
@@ -68,11 +69,11 @@ def sample_transaction():
     return TransactionEntity(
         portfolio_id=1,
         stock_id=1,
-        transaction_type="buy",
+        transaction_type=TransactionType("buy"),
         quantity=Quantity(100),
         price=Money(Decimal("150.50"), "USD"),
         transaction_date=date(2024, 1, 15),
-        notes="Test transaction",
+        notes=Notes("Test transaction"),
     )
 
 
@@ -96,11 +97,11 @@ class TestTransactionRepositoryCreate:
         buy_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(50),
             price=Money(Decimal("100.25"), "USD"),
             transaction_date=date(2024, 2, 1),
-            notes="Buy order",
+            notes=Notes("Buy order"),
         )
 
         # Act
@@ -108,10 +109,10 @@ class TestTransactionRepositoryCreate:
 
         # Assert
         created_transaction = transaction_repository.get_by_id(transaction_id)
-        assert created_transaction.transaction_type == "buy"
+        assert created_transaction.transaction_type.value == "buy"
         assert created_transaction.quantity.value == 50
         assert created_transaction.price.amount == Decimal("100.25")
-        assert created_transaction.notes == "Buy order"
+        assert created_transaction.notes.value == "Buy order"
 
     def test_create_sell_transaction(self, transaction_repository):
         """Should create sell transaction."""
@@ -119,11 +120,11 @@ class TestTransactionRepositoryCreate:
         sell_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="sell",
+            transaction_type=TransactionType("sell"),
             quantity=Quantity(25),
             price=Money(Decimal("105.75"), "USD"),
             transaction_date=date(2024, 2, 15),
-            notes="Sell order",
+            notes=Notes("Sell order"),
         )
 
         # Act
@@ -131,7 +132,7 @@ class TestTransactionRepositoryCreate:
 
         # Assert
         created_transaction = transaction_repository.get_by_id(transaction_id)
-        assert created_transaction.transaction_type == "sell"
+        assert created_transaction.transaction_type.value == "sell"
         assert created_transaction.quantity.value == 25
         assert created_transaction.price.amount == Decimal("105.75")
 
@@ -141,7 +142,7 @@ class TestTransactionRepositoryCreate:
         minimal_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(10),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date.today(),
@@ -153,7 +154,7 @@ class TestTransactionRepositoryCreate:
         # Assert
         assert transaction_id is not None
         created = transaction_repository.get_by_id(transaction_id)
-        assert created.notes is None or created.notes == ""
+        assert created.notes.value == ""
 
 
 class TestTransactionRepositoryRead:
@@ -201,7 +202,7 @@ class TestTransactionRepositoryRead:
         transaction1 = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date(2024, 1, 1),
@@ -209,7 +210,7 @@ class TestTransactionRepositoryRead:
         transaction2 = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="sell",
+            transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("55.00"), "USD"),
             transaction_date=date(2024, 1, 15),
@@ -234,7 +235,7 @@ class TestTransactionRepositoryRead:
             transaction = TransactionEntity(
                 portfolio_id=1,
                 stock_id=1,
-                transaction_type="buy",
+                transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
                 price=Money(Decimal("50.00"), "USD"),
                 transaction_date=date(2024, 1, i + 1),
@@ -253,7 +254,7 @@ class TestTransactionRepositoryRead:
         transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date(2024, 1, 1),
@@ -273,7 +274,7 @@ class TestTransactionRepositoryRead:
         transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date(2024, 1, 1),
@@ -297,7 +298,7 @@ class TestTransactionRepositoryRead:
         early_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date(2024, 1, 1),
@@ -305,7 +306,7 @@ class TestTransactionRepositoryRead:
         middle_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="sell",
+            transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("55.00"), "USD"),
             transaction_date=date(2024, 1, 15),
@@ -313,7 +314,7 @@ class TestTransactionRepositoryRead:
         late_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(25),
             price=Money(Decimal("60.00"), "USD"),
             transaction_date=date(2024, 2, 1),
@@ -348,11 +349,11 @@ class TestTransactionRepositoryUpdate:
         updated_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="sell",
+            transaction_type=TransactionType("sell"),
             quantity=Quantity(75),
             price=Money(Decimal("155.25"), "USD"),
             transaction_date=date(2024, 1, 20),
-            notes="Updated transaction",
+            notes=Notes("Updated transaction"),
         )
 
         # Act
@@ -363,10 +364,10 @@ class TestTransactionRepositoryUpdate:
 
         # Verify changes
         retrieved = transaction_repository.get_by_id(transaction_id)
-        assert retrieved.transaction_type == "sell"
+        assert retrieved.transaction_type.value == "sell"
         assert retrieved.quantity.value == 75
         assert retrieved.price.amount == Decimal("155.25")
-        assert retrieved.notes == "Updated transaction"
+        assert retrieved.notes.value == "Updated transaction"
 
     def test_update_nonexistent_transaction(self, transaction_repository):
         """Should return False when updating non-existent transaction."""
@@ -374,7 +375,7 @@ class TestTransactionRepositoryUpdate:
         transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(10),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date.today(),
@@ -425,28 +426,28 @@ class TestTransactionRepositoryIntegration:
         transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="buy",
+            transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00"), "USD"),
             transaction_date=date(2024, 1, 1),
-            notes="Lifecycle test",
+            notes=Notes("Lifecycle test"),
         )
         transaction_id = transaction_repository.create(transaction)
         assert transaction_id is not None
 
         # Read
         retrieved = transaction_repository.get_by_id(transaction_id)
-        assert retrieved.notes == "Lifecycle test"
+        assert retrieved.notes.value == "Lifecycle test"
 
         # Update
         updated_transaction = TransactionEntity(
             portfolio_id=1,
             stock_id=1,
-            transaction_type="sell",
+            transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("55.00"), "USD"),
             transaction_date=date(2024, 1, 15),
-            notes="Updated lifecycle test",
+            notes=Notes("Updated lifecycle test"),
         )
         update_result = transaction_repository.update(
             transaction_id, updated_transaction
@@ -455,8 +456,8 @@ class TestTransactionRepositoryIntegration:
 
         # Verify update
         updated_retrieved = transaction_repository.get_by_id(transaction_id)
-        assert updated_retrieved.transaction_type == "sell"
-        assert updated_retrieved.notes == "Updated lifecycle test"
+        assert updated_retrieved.transaction_type.value == "sell"
+        assert updated_retrieved.notes.value == "Updated lifecycle test"
 
         # Delete
         delete_result = transaction_repository.delete(transaction_id)
@@ -476,7 +477,7 @@ class TestTransactionRepositoryErrorHandling:
             invalid_transaction = TransactionEntity(
                 portfolio_id=0,  # Invalid portfolio ID
                 stock_id=1,
-                transaction_type="buy",
+                transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
                 price=Money(Decimal("50.00"), "USD"),
                 transaction_date=date.today(),
@@ -485,13 +486,8 @@ class TestTransactionRepositoryErrorHandling:
 
     def test_create_transaction_with_invalid_type(self, transaction_repository):
         """Should raise validation error for invalid transaction type."""
-        with pytest.raises(ValueError):
-            invalid_transaction = TransactionEntity(
-                portfolio_id=1,
-                stock_id=1,
-                transaction_type="invalid",  # Invalid type
-                quantity=Quantity(10),
-                price=Money(Decimal("50.00"), "USD"),
-                transaction_date=date.today(),
-            )
-            transaction_repository.create(invalid_transaction)
+        # Error now happens at TransactionType value object construction
+        with pytest.raises(
+            ValueError, match="Transaction type must be 'buy' or 'sell'"
+        ):
+            TransactionType("invalid")  # Error happens at value object level

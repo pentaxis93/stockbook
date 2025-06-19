@@ -13,6 +13,7 @@ import pytest
 
 from domain.entities.portfolio_entity import PortfolioEntity
 from domain.repositories.interfaces import IPortfolioRepository
+from domain.value_objects import Notes, PortfolioName
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.repositories.sqlite_portfolio_repository import (
     SqlitePortfolioRepository,
@@ -46,8 +47,8 @@ def portfolio_repository(db_connection):
 def sample_portfolio():
     """Create sample portfolio entity for testing."""
     return PortfolioEntity(
-        name="Test Portfolio",
-        description="A test portfolio for unit testing",
+        name=PortfolioName("Test Portfolio"),
+        description=Notes("A test portfolio for unit testing"),
         created_date=date(2024, 1, 15),
         is_active=True,
     )
@@ -68,7 +69,7 @@ class TestPortfolioRepositoryCreate:
     def test_create_portfolio_with_minimal_data(self, portfolio_repository):
         """Should create portfolio with only required fields."""
         # Arrange
-        minimal_portfolio = PortfolioEntity(name="Minimal Portfolio")
+        minimal_portfolio = PortfolioEntity(name=PortfolioName("Minimal Portfolio"))
 
         # Act
         portfolio_id = portfolio_repository.create(minimal_portfolio)
@@ -78,7 +79,7 @@ class TestPortfolioRepositoryCreate:
 
         # Verify in database
         created_portfolio = portfolio_repository.get_by_id(portfolio_id)
-        assert created_portfolio.name == "Minimal Portfolio"
+        assert created_portfolio.name.value == "Minimal Portfolio"
         assert created_portfolio.is_active is True
 
     def test_create_portfolio_with_all_fields(
@@ -100,8 +101,8 @@ class TestPortfolioRepositoryCreate:
     def test_create_duplicate_portfolio_name_allowed(self, portfolio_repository):
         """Should allow duplicate portfolio names (no unique constraint)."""
         # Arrange
-        portfolio1 = PortfolioEntity(name="Duplicate Name")
-        portfolio2 = PortfolioEntity(name="Duplicate Name")
+        portfolio1 = PortfolioEntity(name=PortfolioName("Duplicate Name"))
+        portfolio2 = PortfolioEntity(name=PortfolioName("Duplicate Name"))
 
         # Act
         id1 = portfolio_repository.create(portfolio1)
@@ -109,8 +110,8 @@ class TestPortfolioRepositoryCreate:
 
         # Assert
         assert id1 != id2
-        assert portfolio_repository.get_by_id(id1).name == "Duplicate Name"
-        assert portfolio_repository.get_by_id(id2).name == "Duplicate Name"
+        assert portfolio_repository.get_by_id(id1).name.value == "Duplicate Name"
+        assert portfolio_repository.get_by_id(id2).name.value == "Duplicate Name"
 
 
 class TestPortfolioRepositoryRead:
@@ -148,8 +149,12 @@ class TestPortfolioRepositoryRead:
     def test_get_all_active_with_active_portfolios(self, portfolio_repository):
         """Should return only active portfolios."""
         # Arrange
-        active_portfolio = PortfolioEntity(name="Active Portfolio", is_active=True)
-        inactive_portfolio = PortfolioEntity(name="Inactive Portfolio", is_active=False)
+        active_portfolio = PortfolioEntity(
+            name=PortfolioName("Active Portfolio"), is_active=True
+        )
+        inactive_portfolio = PortfolioEntity(
+            name=PortfolioName("Inactive Portfolio"), is_active=False
+        )
 
         active_id = portfolio_repository.create(active_portfolio)
         portfolio_repository.create(inactive_portfolio)
@@ -160,13 +165,17 @@ class TestPortfolioRepositoryRead:
         # Assert
         assert len(active_portfolios) == 1
         assert active_portfolios[0].id == active_id
-        assert active_portfolios[0].name == "Active Portfolio"
+        assert active_portfolios[0].name.value == "Active Portfolio"
 
     def test_get_all_portfolios(self, portfolio_repository):
         """Should return all portfolios regardless of active status."""
         # Arrange
-        active_portfolio = PortfolioEntity(name="Active Portfolio", is_active=True)
-        inactive_portfolio = PortfolioEntity(name="Inactive Portfolio", is_active=False)
+        active_portfolio = PortfolioEntity(
+            name=PortfolioName("Active Portfolio"), is_active=True
+        )
+        inactive_portfolio = PortfolioEntity(
+            name=PortfolioName("Inactive Portfolio"), is_active=False
+        )
 
         portfolio_repository.create(active_portfolio)
         portfolio_repository.create(inactive_portfolio)
@@ -176,7 +185,7 @@ class TestPortfolioRepositoryRead:
 
         # Assert
         assert len(all_portfolios) == 2
-        portfolio_names = [p.name for p in all_portfolios]
+        portfolio_names = [p.name.value for p in all_portfolios]
         assert "Active Portfolio" in portfolio_names
         assert "Inactive Portfolio" in portfolio_names
 
@@ -189,8 +198,8 @@ class TestPortfolioRepositoryUpdate:
         # Arrange
         portfolio_id = portfolio_repository.create(sample_portfolio)
         updated_portfolio = PortfolioEntity(
-            name="Updated Portfolio Name",
-            description="Updated description",
+            name=PortfolioName("Updated Portfolio Name"),
+            description=Notes("Updated description"),
             is_active=False,
         )
 
@@ -202,14 +211,14 @@ class TestPortfolioRepositoryUpdate:
 
         # Verify changes
         retrieved = portfolio_repository.get_by_id(portfolio_id)
-        assert retrieved.name == "Updated Portfolio Name"
-        assert retrieved.description == "Updated description"
+        assert retrieved.name.value == "Updated Portfolio Name"
+        assert retrieved.description.value == "Updated description"
         assert retrieved.is_active is False
 
     def test_update_nonexistent_portfolio(self, portfolio_repository):
         """Should return False when updating non-existent portfolio."""
         # Arrange
-        portfolio = PortfolioEntity(name="Non-existent")
+        portfolio = PortfolioEntity(name=PortfolioName("Non-existent"))
 
         # Act
         result = portfolio_repository.update(999, portfolio)
@@ -222,7 +231,7 @@ class TestPortfolioRepositoryUpdate:
         # Arrange
         portfolio_id = portfolio_repository.create(sample_portfolio)
         partial_update = PortfolioEntity(
-            name="Partially Updated",
+            name=PortfolioName("Partially Updated"),
             description=sample_portfolio.description,  # Keep original
             is_active=sample_portfolio.is_active,  # Keep original
         )
@@ -232,7 +241,7 @@ class TestPortfolioRepositoryUpdate:
 
         # Assert
         retrieved = portfolio_repository.get_by_id(portfolio_id)
-        assert retrieved.name == "Partially Updated"
+        assert retrieved.name.value == "Partially Updated"
         assert retrieved.description == sample_portfolio.description
         assert retrieved.is_active == sample_portfolio.is_active
 
@@ -268,7 +277,9 @@ class TestPortfolioRepositoryDeactivate:
     def test_deactivate_already_inactive_portfolio(self, portfolio_repository):
         """Should handle deactivating already inactive portfolio."""
         # Arrange
-        inactive_portfolio = PortfolioEntity(name="Already Inactive", is_active=False)
+        inactive_portfolio = PortfolioEntity(
+            name=PortfolioName("Already Inactive"), is_active=False
+        )
         portfolio_id = portfolio_repository.create(inactive_portfolio)
 
         # Act
@@ -289,8 +300,8 @@ class TestPortfolioRepositoryIntegration:
         """Test complete CRUD operations in sequence."""
         # Create
         portfolio = PortfolioEntity(
-            name="Lifecycle Test Portfolio",
-            description="Testing full lifecycle",
+            name=PortfolioName("Lifecycle Test Portfolio"),
+            description=Notes("Testing full lifecycle"),
             is_active=True,
         )
         portfolio_id = portfolio_repository.create(portfolio)
@@ -298,12 +309,12 @@ class TestPortfolioRepositoryIntegration:
 
         # Read
         retrieved = portfolio_repository.get_by_id(portfolio_id)
-        assert retrieved.name == "Lifecycle Test Portfolio"
+        assert retrieved.name.value == "Lifecycle Test Portfolio"
 
         # Update
         updated_portfolio = PortfolioEntity(
-            name="Updated Lifecycle Portfolio",
-            description="Updated description",
+            name=PortfolioName("Updated Lifecycle Portfolio"),
+            description=Notes("Updated description"),
             is_active=True,
         )
         update_result = portfolio_repository.update(portfolio_id, updated_portfolio)
@@ -311,7 +322,7 @@ class TestPortfolioRepositoryIntegration:
 
         # Verify update
         updated_retrieved = portfolio_repository.get_by_id(portfolio_id)
-        assert updated_retrieved.name == "Updated Lifecycle Portfolio"
+        assert updated_retrieved.name.value == "Updated Lifecycle Portfolio"
 
         # Deactivate
         deactivate_result = portfolio_repository.deactivate(portfolio_id)
@@ -325,10 +336,10 @@ class TestPortfolioRepositoryIntegration:
         """Test filtering behavior with multiple portfolios."""
         # Create multiple portfolios
         portfolios = [
-            PortfolioEntity(name="Active 1", is_active=True),
-            PortfolioEntity(name="Active 2", is_active=True),
-            PortfolioEntity(name="Inactive 1", is_active=False),
-            PortfolioEntity(name="Inactive 2", is_active=False),
+            PortfolioEntity(name=PortfolioName("Active 1"), is_active=True),
+            PortfolioEntity(name=PortfolioName("Active 2"), is_active=True),
+            PortfolioEntity(name=PortfolioName("Inactive 1"), is_active=False),
+            PortfolioEntity(name=PortfolioName("Inactive 2"), is_active=False),
         ]
 
         for portfolio in portfolios:
@@ -337,7 +348,7 @@ class TestPortfolioRepositoryIntegration:
         # Test get_all_active
         active_portfolios = portfolio_repository.get_all_active()
         assert len(active_portfolios) == 2
-        active_names = [p.name for p in active_portfolios]
+        active_names = [p.name.value for p in active_portfolios]
         assert "Active 1" in active_names
         assert "Active 2" in active_names
 
@@ -353,16 +364,18 @@ class TestPortfolioRepositoryErrorHandling:
         """Should raise validation error for invalid portfolio entity."""
         # This test will pass once PortfolioEntity validation is implemented
         with pytest.raises(ValueError):
-            invalid_portfolio = PortfolioEntity(name="")  # Empty name should fail
+            invalid_portfolio = PortfolioEntity(
+                name=PortfolioName("")
+            )  # Empty name should fail
             portfolio_repository.create(invalid_portfolio)
 
     def test_database_connection_handling(self, portfolio_repository):
         """Should handle database connection properly."""
         # Create a portfolio to ensure connection works
-        portfolio = PortfolioEntity(name="Connection Test")
+        portfolio = PortfolioEntity(name=PortfolioName("Connection Test"))
         portfolio_id = portfolio_repository.create(portfolio)
 
         # Verify we can retrieve it
         retrieved = portfolio_repository.get_by_id(portfolio_id)
         assert retrieved is not None
-        assert retrieved.name == "Connection Test"
+        assert retrieved.name.value == "Connection Test"

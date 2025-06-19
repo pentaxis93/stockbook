@@ -61,7 +61,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                         if balance.final_balance
                         else 0.0
                     ),
-                    balance.index_change,
+                    balance.index_change.value if balance.index_change else None,
                 ),
             )
             return cursor.lastrowid or 0
@@ -214,10 +214,16 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
             except ValueError:
                 balance_date = None
 
-        return PortfolioBalanceEntity(
-            id=row["id"],
+        # Provide default date if none available
+        if balance_date is None:
+            balance_date = date.today()
+
+        from domain.value_objects import IndexChange
+
+        entity = PortfolioBalanceEntity(
             portfolio_id=row["portfolio_id"],
             balance_date=balance_date,
+            final_balance=Money(Decimal(str(row["final_balance"])), "USD"),
             withdrawals=(
                 Money(Decimal(str(row["withdrawals"])), "USD")
                 if row["withdrawals"]
@@ -228,6 +234,11 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 if row["deposits"]
                 else Money.zero("USD")
             ),
-            final_balance=Money(Decimal(str(row["final_balance"])), "USD"),
-            index_change=row["index_change"],
+            index_change=(
+                IndexChange(row["index_change"])
+                if row["index_change"] is not None
+                else None
+            ),
+            balance_id=row["id"],
         )
+        return entity

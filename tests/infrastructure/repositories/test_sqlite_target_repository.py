@@ -14,6 +14,7 @@ import pytest
 
 from domain.entities.target_entity import TargetEntity
 from domain.repositories.interfaces import ITargetRepository
+from domain.value_objects import Notes, TargetStatus
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.repositories.sqlite_target_repository import SqliteTargetRepository
 from shared_kernel.value_objects import Money
@@ -68,8 +69,9 @@ def sample_target():
         stock_id=1,
         pivot_price=Money(Decimal("150.00"), "USD"),
         failure_price=Money(Decimal("140.00"), "USD"),
-        status="active",
-        notes="Test target",
+        status=TargetStatus("active"),
+        created_date=date(2024, 1, 1),
+        notes=Notes("Test target"),
     )
 
 
@@ -93,8 +95,9 @@ class TestTargetRepositoryCreate:
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("95.00"), "USD"),
-            status="active",
-            notes="Active target test",
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 1),
+            notes=Notes("Active target test"),
         )
 
         # Act
@@ -102,10 +105,10 @@ class TestTargetRepositoryCreate:
 
         # Assert
         created_target = target_repository.get_by_id(target_id)
-        assert created_target.status == "active"
+        assert created_target.status.value == "active"
         assert created_target.pivot_price.amount == Decimal("100.00")
         assert created_target.failure_price.amount == Decimal("95.00")
-        assert created_target.notes == "Active target test"
+        assert created_target.notes.value == "Active target test"
 
     def test_create_target_minimal_data(self, target_repository):
         """Should create target with minimal required data."""
@@ -115,7 +118,8 @@ class TestTargetRepositoryCreate:
             stock_id=1,
             pivot_price=Money(Decimal("50.00"), "USD"),
             failure_price=Money(Decimal("45.00"), "USD"),
-            status="active",
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 1),
         )
 
         # Act
@@ -124,7 +128,7 @@ class TestTargetRepositoryCreate:
         # Assert
         assert target_id is not None
         created = target_repository.get_by_id(target_id)
-        assert created.notes is None or created.notes == ""
+        assert created.notes.value == ""
 
 
 class TestTargetRepositoryRead:
@@ -143,7 +147,7 @@ class TestTargetRepositoryRead:
         assert retrieved_target.id == target_id
         assert retrieved_target.portfolio_id == sample_target.portfolio_id
         assert retrieved_target.stock_id == sample_target.stock_id
-        assert retrieved_target.status == sample_target.status
+        assert retrieved_target.status.value == sample_target.status.value
 
     def test_get_by_id_nonexistent_target(self, target_repository):
         """Should return None for non-existent target."""
@@ -169,14 +173,16 @@ class TestTargetRepositoryRead:
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("95.00"), "USD"),
-            status="active",
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 1),
         )
         inactive_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
             pivot_price=Money(Decimal("105.00"), "USD"),
             failure_price=Money(Decimal("98.00"), "USD"),
-            status="hit",
+            status=TargetStatus("hit"),
+            created_date=date(2024, 1, 1),
         )
 
         active_id = target_repository.create(active_target)
@@ -188,7 +194,7 @@ class TestTargetRepositoryRead:
         # Assert
         assert len(active_targets) == 1
         assert active_targets[0].id == active_id
-        assert active_targets[0].status == "active"
+        assert active_targets[0].status.value == "active"
 
     def test_get_active_by_stock(self, target_repository):
         """Should return active targets for specific stock."""
@@ -198,7 +204,8 @@ class TestTargetRepositoryRead:
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("95.00"), "USD"),
-            status="active",
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 1),
         )
         target_id = target_repository.create(target)
 
@@ -217,14 +224,16 @@ class TestTargetRepositoryRead:
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("95.00"), "USD"),
-            status="active",
+            status=TargetStatus("active"),
+            created_date=date.today(),
         )
         target2 = TargetEntity(
             portfolio_id=1,
             stock_id=1,
             pivot_price=Money(Decimal("110.00"), "USD"),
             failure_price=Money(Decimal("105.00"), "USD"),
-            status="failed",
+            status=TargetStatus("failed"),
+            created_date=date.today(),
         )
 
         active_id = target_repository.create(target1)
@@ -250,8 +259,9 @@ class TestTargetRepositoryUpdate:
             stock_id=1,
             pivot_price=Money(Decimal("160.00"), "USD"),
             failure_price=Money(Decimal("145.00"), "USD"),
-            status="hit",
-            notes="Updated target",
+            status=TargetStatus("hit"),
+            created_date=date.today(),
+            notes=Notes("Updated target"),
         )
 
         # Act
@@ -264,8 +274,8 @@ class TestTargetRepositoryUpdate:
         retrieved = target_repository.get_by_id(target_id)
         assert retrieved.pivot_price.amount == Decimal("160.00")
         assert retrieved.failure_price.amount == Decimal("145.00")
-        assert retrieved.status == "hit"
-        assert retrieved.notes == "Updated target"
+        assert retrieved.status.value == "hit"
+        assert retrieved.notes.value == "Updated target"
 
     def test_update_nonexistent_target(self, target_repository):
         """Should return False when updating non-existent target."""
@@ -275,7 +285,8 @@ class TestTargetRepositoryUpdate:
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("95.00"), "USD"),
-            status="active",
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 1),
         )
 
         # Act
@@ -297,7 +308,7 @@ class TestTargetRepositoryUpdate:
 
         # Verify status change
         retrieved = target_repository.get_by_id(target_id)
-        assert retrieved.status == "hit"
+        assert retrieved.status.value == "hit"
 
     def test_update_status_nonexistent_target(self, target_repository):
         """Should return False when updating status of non-existent target."""
@@ -319,15 +330,16 @@ class TestTargetRepositoryIntegration:
             stock_id=1,
             pivot_price=Money(Decimal("100.00"), "USD"),
             failure_price=Money(Decimal("95.00"), "USD"),
-            status="active",
-            notes="Lifecycle test",
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 1),
+            notes=Notes("Lifecycle test"),
         )
         target_id = target_repository.create(target)
         assert target_id is not None
 
         # Read
         retrieved = target_repository.get_by_id(target_id)
-        assert retrieved.notes == "Lifecycle test"
+        assert retrieved.notes.value == "Lifecycle test"
 
         # Update
         updated_target = TargetEntity(
@@ -335,16 +347,17 @@ class TestTargetRepositoryIntegration:
             stock_id=1,
             pivot_price=Money(Decimal("105.00"), "USD"),
             failure_price=Money(Decimal("98.00"), "USD"),
-            status="hit",
-            notes="Updated lifecycle test",
+            status=TargetStatus("hit"),
+            created_date=date(2024, 1, 1),
+            notes=Notes("Updated lifecycle test"),
         )
         update_result = target_repository.update(target_id, updated_target)
         assert update_result is True
 
         # Verify update
         updated_retrieved = target_repository.get_by_id(target_id)
-        assert updated_retrieved.status == "hit"
-        assert updated_retrieved.notes == "Updated lifecycle test"
+        assert updated_retrieved.status.value == "hit"
+        assert updated_retrieved.notes.value == "Updated lifecycle test"
 
         # Update status
         status_result = target_repository.update_status(target_id, "cancelled")
@@ -352,7 +365,7 @@ class TestTargetRepositoryIntegration:
 
         # Verify status update
         final_retrieved = target_repository.get_by_id(target_id)
-        assert final_retrieved.status == "cancelled"
+        assert final_retrieved.status.value == "cancelled"
 
     def test_multiple_targets_filtering(self, target_repository):
         """Test filtering behavior with multiple targets."""
@@ -363,21 +376,24 @@ class TestTargetRepositoryIntegration:
                 stock_id=1,
                 pivot_price=Money(Decimal("100.00"), "USD"),
                 failure_price=Money(Decimal("95.00"), "USD"),
-                status="active",
+                status=TargetStatus("active"),
+                created_date=date(2024, 1, 1),
             ),
             TargetEntity(
                 portfolio_id=1,
                 stock_id=1,
                 pivot_price=Money(Decimal("110.00"), "USD"),
                 failure_price=Money(Decimal("105.00"), "USD"),
-                status="hit",
+                status=TargetStatus("hit"),
+                created_date=date(2024, 1, 1),
             ),
             TargetEntity(
                 portfolio_id=1,
                 stock_id=1,
                 pivot_price=Money(Decimal("120.00"), "USD"),
                 failure_price=Money(Decimal("115.00"), "USD"),
-                status="active",
+                status=TargetStatus("active"),
+                created_date=date(2024, 1, 1),
             ),
         ]
 
@@ -404,7 +420,8 @@ class TestTargetRepositoryErrorHandling:
                 stock_id=1,
                 pivot_price=Money(Decimal("100.00"), "USD"),
                 failure_price=Money(Decimal("95.00"), "USD"),
-                status="active",
+                status=TargetStatus("active"),
+                created_date=date(2024, 1, 1),
             )
             target_repository.create(invalid_target)
 
@@ -416,6 +433,7 @@ class TestTargetRepositoryErrorHandling:
                 stock_id=1,
                 pivot_price=Money(Decimal("100.00"), "USD"),
                 failure_price=Money(Decimal("95.00"), "USD"),
-                status="invalid_status",  # Invalid status
+                status=TargetStatus("invalid_status"),  # Invalid status
+                created_date=date(2024, 1, 1),
             )
             target_repository.create(invalid_target)
