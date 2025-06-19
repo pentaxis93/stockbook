@@ -7,7 +7,7 @@ and validation rules encapsulated within the entity.
 
 from typing import Optional
 
-from domain.value_objects import CompanyName, IndustryGroup, Notes
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
 from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
@@ -21,29 +21,26 @@ class StockEntity:
     validation, calculations, and state management.
     """
 
-    # Valid grade options
-    VALID_GRADES = {"A", "B", "C"}
-
     def __init__(
         self,
         symbol: StockSymbol,
-        name: str = "",
-        sector: Optional[str] = None,
-        industry_group: Optional[str] = None,
-        grade: Optional[str] = None,
-        notes: str = "",
+        company_name: CompanyName,
+        sector: Optional[Sector] = None,
+        industry_group: Optional[IndustryGroup] = None,
+        grade: Optional[Grade] = None,
+        notes: Optional[Notes] = None,
         stock_id: Optional[int] = None,
     ):
         """
-        Initialize Stock entity with validation.
+        Initialize Stock entity with value objects.
 
         Args:
             symbol: Stock symbol (value object)
-            name: Company name
-            sector: Sector classification
-            industry_group: Industry classification (must belong to sector if provided)
-            grade: Stock grade (A/B/C or None)
-            notes: Additional notes
+            company_name: Company name value object
+            sector: Sector classification value object
+            industry_group: Industry classification value object (must belong to sector if provided)
+            grade: Stock grade value object (A/B/C/D/F or None)
+            notes: Additional notes value object
             stock_id: Database ID (for persistence)
 
         Raises:
@@ -54,22 +51,19 @@ class StockEntity:
 
         self._sector_industry_service = SectorIndustryService()
 
-        # Create value objects first (this validates format/length)
+        # Store value objects directly (they're already validated)
         self._symbol = symbol
-        self._company_name = CompanyName(name)
-        self._sector_vo = Sector(sector) if sector is not None else None
-        self._industry_group_vo = (
-            IndustryGroup(industry_group) if industry_group else None
-        )
-        self._notes_vo = Notes(notes)
-
-        # Then validate domain business rules (sector-industry relationship)
-        self._validate_sector_industry_combination(sector, industry_group)
-
-        # Validate grade (still entity's responsibility as it's domain-specific)
-        self._validate_grade(grade)
-        self._grade = grade
+        self._company_name = company_name
+        self._sector_vo = sector
+        self._industry_group_vo = industry_group
+        self._grade_vo = grade
+        self._notes_vo = notes if notes is not None else Notes("")
         self._id = stock_id
+
+        # Validate domain business rules (sector-industry relationship)
+        sector_str = sector.value if sector else None
+        industry_group_str = industry_group.value if industry_group else None
+        self._validate_sector_industry_combination(sector_str, industry_group_str)
 
     @property
     def symbol(self) -> StockSymbol:
@@ -82,44 +76,24 @@ class StockEntity:
         return self._company_name
 
     @property
-    def name(self) -> str:
-        """Get the company name as string (backward compatibility)."""
-        return self._company_name.value
-
-    @property
-    def sector_vo(self) -> Optional[Sector]:
+    def sector(self) -> Optional[Sector]:
         """Get the sector value object."""
         return self._sector_vo
 
     @property
-    def sector(self) -> Optional[str]:
-        """Get the sector as string (backward compatibility)."""
-        return self._sector_vo.value if self._sector_vo else None
-
-    @property
-    def industry_group_vo(self) -> Optional[IndustryGroup]:
+    def industry_group(self) -> Optional[IndustryGroup]:
         """Get the industry group value object."""
         return self._industry_group_vo
 
     @property
-    def industry_group(self) -> Optional[str]:
-        """Get the industry group as string (backward compatibility)."""
-        return self._industry_group_vo.value if self._industry_group_vo else None
+    def grade(self) -> Optional[Grade]:
+        """Get the grade value object."""
+        return self._grade_vo
 
     @property
-    def grade(self) -> Optional[str]:
-        """Get the stock grade."""
-        return self._grade
-
-    @property
-    def notes_vo(self) -> Notes:
+    def notes(self) -> Notes:
         """Get the notes value object."""
         return self._notes_vo
-
-    @property
-    def notes(self) -> str:
-        """Get the notes as string (backward compatibility)."""
-        return self._notes_vo.value
 
     @property
     def id(self) -> Optional[int]:
@@ -143,12 +117,12 @@ class StockEntity:
 
     def __str__(self) -> str:
         """String representation for display."""
-        return f"{self.symbol} - {self.name}"
+        return f"{self.symbol} - {self.company_name.value}"
 
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"StockEntity(symbol={self.symbol!r}, name={self.name!r}, "
+            f"StockEntity(symbol={self.symbol!r}, company_name={self.company_name!r}, "
             f"grade={self.grade!r})"
         )
 
@@ -199,14 +173,18 @@ class StockEntity:
                 IndustryGroup(industry_group) if industry_group else None
             )
         if "grade" in kwargs:
-            self._validate_grade(kwargs["grade"])
-            temp_values["grade"] = kwargs["grade"]
+            grade_value = kwargs["grade"]
+            temp_values["grade_vo"] = (
+                Grade(grade_value) if grade_value is not None else None
+            )
         if "notes" in kwargs:
             temp_values["notes_vo"] = Notes(kwargs["notes"])
 
         # Now handle sector-industry domain logic
-        new_sector = kwargs.get("sector", self.sector)
-        new_industry_group = kwargs.get("industry_group", self.industry_group)
+        new_sector = kwargs.get("sector", self.sector.value if self.sector else None)
+        new_industry_group = kwargs.get(
+            "industry_group", self.industry_group.value if self.industry_group else None
+        )
 
         # Special logic: if changing sector, check if current industry_group is compatible
         if "sector" in kwargs and "industry_group" not in kwargs:
@@ -215,7 +193,7 @@ class StockEntity:
                 self.industry_group is not None
                 and new_sector is not None
                 and not self._sector_industry_service.validate_sector_industry_combination(
-                    new_sector, self.industry_group
+                    new_sector, self.industry_group.value
                 )
             ):
                 # Current industry_group is not valid for new sector, clear it
@@ -232,8 +210,8 @@ class StockEntity:
             self._sector_vo = temp_values["sector_vo"]
         if "industry_group_vo" in temp_values:
             self._industry_group_vo = temp_values["industry_group_vo"]
-        if "grade" in temp_values:
-            self._grade = temp_values["grade"]
+        if "grade_vo" in temp_values:
+            self._grade_vo = temp_values["grade_vo"]
         if "notes_vo" in temp_values:
             self._notes_vo = temp_values["notes_vo"]
 
@@ -254,12 +232,6 @@ class StockEntity:
             raise ValueError("ID is already set and cannot be changed")
 
         self._id = stock_id
-
-    @classmethod
-    def _validate_grade(cls, grade: Optional[str]) -> None:
-        """Validate stock grade."""
-        if grade is not None and grade not in cls.VALID_GRADES:
-            raise ValueError(f"Grade must be one of {cls.VALID_GRADES} or None")
 
     def _validate_sector_industry_combination(
         self, sector: Optional[str], industry_group: Optional[str]

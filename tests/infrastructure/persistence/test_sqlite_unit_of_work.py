@@ -12,6 +12,7 @@ import pytest
 
 from domain.entities.stock_entity import StockEntity
 from domain.repositories.interfaces import IStockRepository
+from domain.value_objects import CompanyName
 from domain.value_objects.stock_symbol import StockSymbol
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
@@ -54,7 +55,9 @@ class TestSqliteUnitOfWork:
         """Should support context manager protocol for transactions."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("AAPL"), name="Apple Inc.")
+        stock = StockEntity(
+            symbol=StockSymbol("AAPL"), company_name=CompanyName("Apple Inc.")
+        )
 
         # Act
         with uow:
@@ -71,7 +74,9 @@ class TestSqliteUnitOfWork:
         """Should rollback transaction when exception occurs."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("MSFT"), name="Microsoft Corp.")
+        stock = StockEntity(
+            symbol=StockSymbol("MSFT"), company_name=CompanyName("Microsoft Corp.")
+        )
 
         # Act & Assert
         with pytest.raises(RuntimeError):
@@ -90,7 +95,9 @@ class TestSqliteUnitOfWork:
         """Should commit changes when explicitly called."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("GOOGL"), name="Alphabet Inc.")
+        stock = StockEntity(
+            symbol=StockSymbol("GOOGL"), company_name=CompanyName("Alphabet Inc.")
+        )
 
         # Act
         with uow:
@@ -115,7 +122,9 @@ class TestSqliteUnitOfWork:
         """Should rollback changes when explicitly called."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("TSLA"), name="Tesla Inc.")
+        stock = StockEntity(
+            symbol=StockSymbol("TSLA"), company_name=CompanyName("Tesla Inc.")
+        )
 
         # Act
         with uow:
@@ -133,9 +142,15 @@ class TestSqliteUnitOfWork:
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
         stocks = [
-            StockEntity(symbol=StockSymbol("AAPL"), name="Apple Inc."),
-            StockEntity(symbol=StockSymbol("MSFT"), name="Microsoft Corp."),
-            StockEntity(symbol=StockSymbol("GOOGL"), name="Alphabet Inc."),
+            StockEntity(
+                symbol=StockSymbol("AAPL"), company_name=CompanyName("Apple Inc.")
+            ),
+            StockEntity(
+                symbol=StockSymbol("MSFT"), company_name=CompanyName("Microsoft Corp.")
+            ),
+            StockEntity(
+                symbol=StockSymbol("GOOGL"), company_name=CompanyName("Alphabet Inc.")
+            ),
         ]
 
         # Act
@@ -163,12 +178,16 @@ class TestSqliteUnitOfWork:
 
         # Act & Assert
         with uow:
-            stock1 = StockEntity(symbol=StockSymbol("AMZN"), name="Amazon")
+            stock1 = StockEntity(
+                symbol=StockSymbol("AMZN"), company_name=CompanyName("Amazon")
+            )
             uow.stocks.create(stock1)
 
             # Nested context should work but share same transaction
             with uow:
-                stock2 = StockEntity(symbol=StockSymbol("META"), name="Meta")
+                stock2 = StockEntity(
+                    symbol=StockSymbol("META"), company_name=CompanyName("Meta")
+                )
                 uow.stocks.create(stock2)
                 uow.commit()
 
@@ -179,7 +198,9 @@ class TestSqliteUnitOfWork:
     def test_unit_of_work_isolation_between_instances(self):
         """Should provide isolation between different UoW instances."""
         # Arrange
-        stock = StockEntity(symbol=StockSymbol("NVDA"), name="NVIDIA Corp.")
+        stock = StockEntity(
+            symbol=StockSymbol("NVDA"), company_name=CompanyName("NVIDIA Corp.")
+        )
 
         # Act
         uow1 = SqliteUnitOfWork(self.db_connection)
@@ -206,7 +227,9 @@ class TestSqliteUnitOfWork:
         """Should maintain repository consistency within transaction."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("IBM"), name="IBM Corp.")
+        stock = StockEntity(
+            symbol=StockSymbol("IBM"), company_name=CompanyName("IBM Corp.")
+        )
 
         # Act
         with uow:
@@ -224,7 +247,7 @@ class TestSqliteUnitOfWork:
 
             # Verify update within same transaction
             updated_stock = uow.stocks.get_by_id(stock_id)
-            assert updated_stock.grade == "A"
+            assert updated_stock.grade.value == "A"
 
             uow.commit()
 
@@ -237,7 +260,9 @@ class TestSqliteUnitOfWork:
         # Act & Assert
         with pytest.raises(Exception):  # Should raise database error
             with uow:
-                stock = StockEntity(symbol=StockSymbol("ERR"), name="Error Inc.")
+                stock = StockEntity(
+                    symbol=StockSymbol("ERR"), company_name=CompanyName("Error Inc.")
+                )
                 uow.stocks.create(stock)
                 uow.commit()
 
@@ -245,7 +270,9 @@ class TestSqliteUnitOfWork:
         """Should handle commit/rollback outside context manager."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("SOLO"), name="Solo Inc.")
+        stock = StockEntity(
+            symbol=StockSymbol("SOLO"), company_name=CompanyName("Solo Inc.")
+        )
 
         # Act
         stock_id = uow.stocks.create(stock)
@@ -260,7 +287,9 @@ class TestSqliteUnitOfWork:
         """Should handle multiple commit calls safely."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("SAFE"), name="Safe Inc.")
+        stock = StockEntity(
+            symbol=StockSymbol("SAFE"), company_name=CompanyName("Safe Inc.")
+        )
 
         # Act
         with uow:
@@ -276,7 +305,9 @@ class TestSqliteUnitOfWork:
         """Should handle multiple rollback calls safely."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
-        stock = StockEntity(symbol=StockSymbol("ROLL"), name="Rollback Inc.")
+        stock = StockEntity(
+            symbol=StockSymbol("ROLL"), company_name=CompanyName("Rollback Inc.")
+        )
 
         # Act
         with uow:

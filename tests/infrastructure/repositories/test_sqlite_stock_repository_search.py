@@ -60,7 +60,7 @@ class TestSqliteStockRepositorySearch:
         )
         assert len(results) == 1
         assert results[0].symbol.value == "AAPL"
-        assert results[0].name == "Apple Inc."
+        assert results[0].company_name.value == "Apple Inc."
 
     def test_search_stocks_with_name_filter(self):
         """Should search stocks by name filter."""
@@ -91,7 +91,7 @@ class TestSqliteStockRepositorySearch:
             expected_query, expected_params
         )
         assert len(results) == 1
-        assert results[0].name == "Apple Inc."
+        assert results[0].company_name.value == "Apple Inc."
 
     def test_search_stocks_with_industry_filter(self):
         """Should search stocks by industry filter."""
@@ -170,7 +170,7 @@ class TestSqliteStockRepositorySearch:
             expected_query, expected_params
         )
         assert len(results) == 2
-        assert all(stock.grade == "A" for stock in results)
+        assert all(stock.grade.value == "A" for stock in results)
 
     def test_search_stocks_with_multiple_filters(self):
         """Should search stocks with multiple filter criteria."""
@@ -205,7 +205,7 @@ class TestSqliteStockRepositorySearch:
         )
         assert len(results) == 1
         assert results[0].symbol.value == "GOOGL"
-        assert results[0].grade == "A"
+        assert results[0].grade.value == "A"
 
     def test_search_stocks_with_all_filters(self):
         """Should search stocks with all filter criteria."""
@@ -401,8 +401,8 @@ class TestSqliteStockRepositorySearch:
         assert isinstance(stock.symbol, StockSymbol)
         assert stock.id == 1
         assert stock.symbol.value == "AAPL"
-        assert stock.name == "Apple Inc."
-        assert stock.sector == "Technology"
-        assert stock.industry_group == "Software"
-        assert stock.grade == "A"
-        assert stock.notes == "High quality stock"
+        assert stock.company_name.value == "Apple Inc."
+        assert stock.sector.value == "Technology"
+        assert stock.industry_group.value == "Software"
+        assert stock.grade.value == "A"
+        assert stock.notes.value == "High quality stock"

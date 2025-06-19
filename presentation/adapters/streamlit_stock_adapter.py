@@ -197,7 +197,10 @@ class StreamlitStockAdapter:
                 st.metric("Grade", stock.grade_display)
 
             with col2:
-                st.metric("Industry", stock.industry_group or "Not specified")
+                st.metric(
+                    "Industry",
+                    stock.industry_group if stock.industry_group else "Not specified",
+                )
                 if stock.has_notes:
                     st.text_area("Notes", value=stock.notes, disabled=True)
 
@@ -375,7 +378,9 @@ class StreamlitStockAdapter:
             {
                 "Symbol": stock.symbol,
                 "Name": stock.name,
-                "Industry": stock.industry_group or "Not specified",
+                "Industry": (
+                    stock.industry_group if stock.industry_group else "Not specified"
+                ),
                 "Grade": stock.grade_display,
                 "Notes": "Yes" if stock.has_notes else "No",
             }

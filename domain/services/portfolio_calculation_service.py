@@ -127,7 +127,7 @@ class PortfolioCalculationService:
         industry_values: Dict[str, Decimal] = {}
 
         for stock, quantity in portfolio:
-            industry = stock.industry_group or "Unknown"
+            industry = stock.industry_group.value if stock.industry_group else "Unknown"
             symbol_str = str(stock.symbol)
             current_price = prices[symbol_str]
             position_value = self.calculate_position_value(
@@ -161,7 +161,7 @@ class PortfolioCalculationService:
         grade_values: Dict[str, Decimal] = {}
 
         for stock, quantity in portfolio:
-            grade = stock.grade or "Ungraded"
+            grade = stock.grade.value if stock.grade else "Ungraded"
             symbol_str = str(stock.symbol)
             current_price = prices[symbol_str]
             position_value = self.calculate_position_value(
@@ -230,14 +230,14 @@ class PortfolioCalculationService:
         total_weight = Decimal("0")
 
         for stock, quantity in portfolio:
-            if stock.grade and stock.grade in grade_values:
+            if stock.grade and stock.grade.value in grade_values:
                 symbol_str = str(stock.symbol)
                 current_price = prices[symbol_str]
                 position_value = self.calculate_position_value(
                     stock, quantity, current_price
                 )
                 weight = position_value.amount / total_value.amount
-                weighted_sum += Decimal(str(grade_values[stock.grade])) * weight
+                weighted_sum += Decimal(str(grade_values[stock.grade.value])) * weight
                 total_weight += weight
 
         if total_weight == 0:

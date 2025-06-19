@@ -11,6 +11,8 @@ from decimal import Decimal
 import pytest
 
 from domain.entities.stock_entity import StockEntity
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money
 
@@ -25,10 +27,11 @@ def create_test_stock(symbol="AAPL", price=100.00, grade="B"):
     """Helper to create test stock."""
     return StockEntity(
         symbol=StockSymbol(symbol),
-        name=f"{symbol} Corp",
-        current_price=Money(Decimal(str(price)), "USD"),
-        grade=grade,
-        industry="Technology",
+        company_name=CompanyName(f"{symbol} Corp"),
+        sector=Sector("Technology"),
+        industry_group=IndustryGroup("Software"),
+        grade=Grade(grade),
+        notes=Notes(""),
     )
 
 

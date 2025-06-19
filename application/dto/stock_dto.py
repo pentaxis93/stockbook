@@ -57,9 +57,11 @@ class StockDto:
         return cls(
             id=entity.id,
             symbol=str(entity.symbol),
-            name=entity.name,
-            sector=entity.sector,
-            industry_group=entity.industry_group,
-            grade=entity.grade,
-            notes=entity.notes,
+            name=entity.company_name.value,
+            sector=entity.sector.value if entity.sector else None,
+            industry_group=(
+                entity.industry_group.value if entity.industry_group else None
+            ),
+            grade=entity.grade.value if entity.grade else None,
+            notes=entity.notes.value,
         )

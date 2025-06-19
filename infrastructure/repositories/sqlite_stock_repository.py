@@ -10,6 +10,8 @@ from typing import List, Optional
 
 from domain.entities.stock_entity import StockEntity
 from domain.repositories.interfaces import IStockRepository
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from infrastructure.persistence.interfaces import IDatabaseConnection
 
@@ -53,11 +55,11 @@ class SqliteStockRepository(IStockRepository):
                     """,
                     (
                         stock.symbol.value,
-                        stock.name,
-                        stock.sector,
-                        stock.industry_group,
-                        stock.grade,
-                        stock.notes,
+                        stock.company_name.value,
+                        stock.sector.value if stock.sector else None,
+                        stock.industry_group.value if stock.industry_group else None,
+                        stock.grade.value if stock.grade else None,
+                        stock.notes.value,
                     ),
                 )
                 return cursor.lastrowid or 0
@@ -161,11 +163,11 @@ class SqliteStockRepository(IStockRepository):
                 WHERE id = ?
                 """,
                 (
-                    stock.name,
-                    stock.sector,
-                    stock.industry_group,
-                    stock.grade,
-                    stock.notes,
+                    stock.company_name.value,
+                    stock.sector.value if stock.sector else None,
+                    stock.industry_group.value if stock.industry_group else None,
+                    stock.grade.value if stock.grade else None,
+                    stock.notes.value,
                     stock_id,
                 ),
             )
@@ -357,9 +359,11 @@ class SqliteStockRepository(IStockRepository):
         return StockEntity(
             stock_id=row["id"],
             symbol=StockSymbol(row["symbol"]),
-            name=row["name"],
-            sector=row["sector"],
-            industry_group=row["industry_group"],
-            grade=row["grade"],
-            notes=row["notes"] or "",
+            company_name=CompanyName(row["name"] or ""),
+            sector=Sector(row["sector"]) if row["sector"] else None,
+            industry_group=(
+                IndustryGroup(row["industry_group"]) if row["industry_group"] else None
+            ),
+            grade=Grade(row["grade"]) if row["grade"] else None,
+            notes=Notes(row["notes"] or ""),
         )

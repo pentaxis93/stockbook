@@ -11,6 +11,8 @@ from typing import Dict, List
 import pytest
 
 from domain.entities.stock_entity import StockEntity
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 
@@ -27,10 +29,11 @@ def create_test_stock(symbol, price, quantity, industry, market_cap_category="La
     """Helper to create test stock with diversification attributes."""
     stock = StockEntity(
         symbol=StockSymbol(symbol),
-        name=f"{symbol} Corporation",
-        current_price=Money(Decimal(str(price)), "USD"),
-        grade="B",
-        industry=industry,
+        company_name=CompanyName(f"{symbol} Corporation"),
+        sector=Sector(industry),
+        industry_group=IndustryGroup("Software"),
+        grade=Grade("B"),
+        notes=Notes(""),
     )
     stock.market_cap_category = market_cap_category
     stock.set_id(f"stock_{symbol.lower()}")

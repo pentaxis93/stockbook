@@ -213,7 +213,8 @@ class StockPresentationAdapter:
 
             with self.layout.within_container(columns[1]):
                 self.ui.render_metric(
-                    "Industry", stock.industry_group or "Not specified"
+                    "Industry",
+                    stock.industry_group if stock.industry_group else "Not specified",
                 )
                 if stock.has_notes:
                     # For notes, we'll use a simple display since text_area is input-specific
@@ -403,7 +404,9 @@ class StockPresentationAdapter:
             {
                 "Symbol": stock.symbol,
                 "Name": stock.name,
-                "Industry": stock.industry_group or "Not specified",
+                "Industry": (
+                    stock.industry_group if stock.industry_group else "Not specified"
+                ),
                 "Grade": stock.grade_display,
                 "Notes": "Yes" if stock.has_notes else "No",
             }

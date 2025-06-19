@@ -16,6 +16,7 @@ from domain.entities import (
     TargetEntity,
     TransactionEntity,
 )
+from domain.value_objects import CompanyName, Grade
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 
@@ -25,47 +26,57 @@ class TestStockEntity:
 
     def test_valid_stock_creation(self):
         """Test creating a valid stock with all fields"""
+        from domain.value_objects import IndustryGroup, Notes
+        from domain.value_objects.sector import Sector
+
         stock = StockEntity(
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            sector="Technology",
-            industry_group="Software",
-            grade="A",
-            notes="Great company",
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),
+            grade=Grade("A"),
+            notes=Notes("Great company"),
         )
         assert stock.symbol.value == "AAPL"
-        assert stock.name == "Apple Inc."
-        assert stock.sector == "Technology"
-        assert stock.industry_group == "Software"
-        assert stock.grade == "A"
-        assert stock.notes == "Great company"
+        assert stock.company_name.value == "Apple Inc."
+        assert stock.sector.value == "Technology"
+        assert stock.industry_group.value == "Software"
+        assert stock.grade.value == "A"
+        assert stock.notes.value == "Great company"
 
     def test_minimal_stock_creation(self):
         """Test creating stock with only required fields"""
-        stock = StockEntity(symbol=StockSymbol("MSFT"), name="Microsoft Corporation")
+        stock = StockEntity(
+            symbol=StockSymbol("MSFT"),
+            company_name=CompanyName("Microsoft Corporation"),
+        )
         assert stock.symbol.value == "MSFT"
-        assert stock.name == "Microsoft Corporation"
+        assert stock.company_name.value == "Microsoft Corporation"
         assert stock.industry_group is None
         assert stock.grade is None
-        assert stock.notes == ""
+        assert stock.notes.value == ""
 
     def test_invalid_grade_rejected(self):
         """Test that invalid grades are rejected"""
         with pytest.raises(ValueError, match="Grade must be one of"):
-            StockEntity(symbol=StockSymbol("AAPL"), name="Apple Inc.", grade="D")
+            Grade("X")  # Invalid grade, now tested at value object level
 
     def test_valid_grades_accepted(self):
-        """Test that valid grades A, B, C are accepted"""
-        for grade in ["A", "B", "C"]:
+        """Test that valid grades A, B, C, D, F are accepted"""
+        for grade_str in ["A", "B", "C", "D", "F"]:
+            grade = Grade(grade_str)
             stock = StockEntity(
-                symbol=StockSymbol("TEST"), name="Test Stock", grade=grade
+                symbol=StockSymbol("TEST"),
+                company_name=CompanyName("Test Stock"),
+                grade=grade,
             )
             assert stock.grade == grade
+            assert stock.grade.value == grade_str
 
     def test_empty_name_allowed(self):
         """Test that empty name is now allowed (users can create stock with only symbol)"""
-        stock = StockEntity(symbol=StockSymbol("TEST"), name="")
-        assert stock.name == ""
+        stock = StockEntity(symbol=StockSymbol("TEST"), company_name=CompanyName(""))
+        assert stock.company_name.value == ""
         assert stock.symbol.value == "TEST"
 
     def test_invalid_symbol_rejected(self):

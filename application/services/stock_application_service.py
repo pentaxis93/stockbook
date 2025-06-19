@@ -11,6 +11,8 @@ from application.commands.stock_commands import CreateStockCommand, UpdateStockC
 from application.dto.stock_dto import StockDto
 from domain.entities.stock_entity import StockEntity
 from domain.repositories.interfaces import IStockBookUnitOfWork
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -58,11 +60,15 @@ class StockApplicationService:
                 # Create domain entity
                 stock_entity = StockEntity(
                     symbol=symbol_vo,
-                    name=command.name,
-                    sector=command.sector,
-                    industry_group=command.industry_group,
-                    grade=command.grade,
-                    notes=command.notes,
+                    company_name=CompanyName(command.name),
+                    sector=Sector(command.sector) if command.sector else None,
+                    industry_group=(
+                        IndustryGroup(command.industry_group)
+                        if command.industry_group
+                        else None
+                    ),
+                    grade=Grade(command.grade) if command.grade else None,
+                    notes=Notes(command.notes) if command.notes else None,
                 )
 
                 # Persist entity

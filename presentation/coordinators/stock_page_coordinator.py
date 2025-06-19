@@ -239,8 +239,9 @@ class StockPageCoordinator:
 
         grade_counts = {"A": 0, "B": 0, "C": 0}
         for stock in stocks:
-            if stock.grade in grade_counts:
-                grade_counts[stock.grade] += 1
+            grade_value = stock.grade if stock.grade else "Ungraded"
+            if grade_value in grade_counts:
+                grade_counts[grade_value] += 1
 
         high_grade_percentage = (
             (grade_counts["A"] / total_stocks * 100) if total_stocks > 0 else 0
@@ -290,7 +291,7 @@ class StockPageCoordinator:
             # Notes section if available
             if stock.has_notes:
                 with st.expander("📝 Notes", expanded=False):
-                    st.write(stock.notes)
+                    st.write(stock.notes.value)
 
         except Exception as e:
             logger.error(f"Error rendering stock detail sections: {e}")

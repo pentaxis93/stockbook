@@ -156,11 +156,11 @@ class RiskAssessmentService:
     def _assess_fundamental_risk(self, stock: StockEntity) -> RiskLevel:
         """Assess fundamental business risk factors."""
         # Simplified assessment based on grade
-        if stock.grade == "A":
+        if stock.grade and stock.grade.value == "A":
             return RiskLevel.LOW
-        if stock.grade == "B":
+        if stock.grade and stock.grade.value == "B":
             return RiskLevel.MEDIUM
-        if stock.grade == "C":
+        if stock.grade and stock.grade.value == "C":
             return RiskLevel.HIGH
         return RiskLevel.MEDIUM  # Default for ungraded
 

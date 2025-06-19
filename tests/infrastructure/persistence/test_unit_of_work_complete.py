@@ -12,6 +12,8 @@ import pytest
 
 from domain.entities.portfolio_entity import PortfolioEntity
 from domain.entities.stock_entity import StockEntity
+from domain.value_objects import CompanyName, Grade, IndustryGroup
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from infrastructure.persistence.database_connection import DatabaseConnection
 from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
@@ -58,10 +60,10 @@ def test_unit_of_work_transactional_context(unit_of_work):
         # Create a stock
         stock = StockEntity(
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            sector="Technology",
-            industry_group="Software",
-            grade="A",
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),
+            grade=Grade("A"),
         )
         stock_id = unit_of_work.stocks.create(stock)
 
@@ -77,7 +79,7 @@ def test_unit_of_work_transactional_context(unit_of_work):
 
         assert retrieved_stock is not None
         assert retrieved_portfolio is not None
-        assert retrieved_stock.name == "Apple Inc."
+        assert retrieved_stock.company_name.value == "Apple Inc."
         assert retrieved_portfolio.name == "Test Portfolio"
 
 
@@ -89,10 +91,10 @@ def test_unit_of_work_rollback_on_exception(unit_of_work):
             # Create a stock
             stock = StockEntity(
                 symbol=StockSymbol("MSFT"),
-                name="Microsoft Corp.",
-                sector="Technology",
-                industry_group="Software",
-                grade="A",
+                company_name=CompanyName("Microsoft Corp."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Software"),
+                grade=Grade("A"),
             )
             stock_id = unit_of_work.stocks.create(stock)
 

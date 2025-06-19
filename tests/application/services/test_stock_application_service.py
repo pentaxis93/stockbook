@@ -14,6 +14,8 @@ from application.dto.stock_dto import StockDto
 from application.services.stock_application_service import StockApplicationService
 from domain.entities.stock_entity import StockEntity
 from domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -70,7 +72,7 @@ class TestStockApplicationService:
         create_call = self.mock_stock_repository.create.call_args[0][0]
         assert isinstance(create_call, StockEntity)
         assert str(create_call.symbol) == "AAPL"
-        assert create_call.name == "Apple Inc."
+        assert create_call.company_name.value == "Apple Inc."
 
     def test_create_stock_with_duplicate_symbol_raises_error(self):
         """Should raise error when trying to create stock with existing symbol."""
@@ -79,7 +81,9 @@ class TestStockApplicationService:
 
         # Mock repository to return existing stock
         existing_stock = StockEntity(
-            symbol=StockSymbol("AAPL"), name="Existing Apple Inc.", stock_id=456
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Existing Apple Inc."),
+            stock_id=456,
         )
         self.mock_stock_repository.get_by_symbol.return_value = existing_stock
 
@@ -112,11 +116,11 @@ class TestStockApplicationService:
         symbol = "AAPL"
         stock_entity = StockEntity(
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            sector="Technology",
-            industry_group="Software",
-            grade="A",
-            notes="Great company",
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),
+            grade=Grade("A"),
+            notes=Notes("Great company"),
             stock_id=123,
         )
         self.mock_stock_repository.get_by_symbol.return_value = stock_entity
@@ -159,9 +163,15 @@ class TestStockApplicationService:
     def test_get_all_stocks_success(self):
         """Should retrieve all stocks successfully."""
         # Arrange
-        stock1 = StockEntity(symbol=StockSymbol("AAPL"), name="Apple Inc.", stock_id=1)
+        stock1 = StockEntity(
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+            stock_id=1,
+        )
         stock2 = StockEntity(
-            symbol=StockSymbol("MSFT"), name="Microsoft Corp.", stock_id=2
+            symbol=StockSymbol("MSFT"),
+            company_name=CompanyName("Microsoft Corp."),
+            stock_id=2,
         )
 
         self.mock_stock_repository.get_all.return_value = [stock1, stock2]
@@ -238,11 +248,11 @@ class TestStockApplicationService:
             StockEntity(
                 stock_id=1,
                 symbol=StockSymbol("AAPL"),
-                name="Apple Inc.",
-                sector="Technology",
-                industry_group="Software",
-                grade="A",
-                notes="",
+                company_name=CompanyName("Apple Inc."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Software"),
+                grade=Grade("A"),
+                notes=Notes(""),
             ),
         ]
         self.mock_stock_repository.search_stocks.return_value = mock_entities
@@ -275,20 +285,20 @@ class TestStockApplicationService:
             StockEntity(
                 stock_id=1,
                 symbol=StockSymbol("AAPL"),
-                name="Apple Inc.",
-                sector="Technology",
-                industry_group="Software",
-                grade="A",
-                notes="",
+                company_name=CompanyName("Apple Inc."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Software"),
+                grade=Grade("A"),
+                notes=Notes(""),
             ),
             StockEntity(
                 stock_id=2,
                 symbol=StockSymbol("GOOGL"),
-                name="Alphabet Inc.",
-                sector="Technology",
-                industry_group="Software",
-                grade="A",
-                notes="",
+                company_name=CompanyName("Alphabet Inc."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Software"),
+                grade=Grade("A"),
+                notes=Notes(""),
             ),
         ]
         self.mock_stock_repository.search_stocks.return_value = mock_entities
@@ -342,11 +352,11 @@ class TestStockApplicationService:
         existing_stock = StockEntity(
             stock_id=1,
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            sector="Technology",
-            industry_group="Software",
-            grade="B",
-            notes="Old notes",
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),
+            grade=Grade("B"),
+            notes=Notes("Old notes"),
         )
 
         # Mock repository responses
@@ -381,11 +391,11 @@ class TestStockApplicationService:
         existing_stock = StockEntity(
             stock_id=1,
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            sector="Technology",
-            industry_group="Software",
-            grade="B",
-            notes="Existing notes",
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),
+            grade=Grade("B"),
+            notes=Notes("Existing notes"),
         )
 
         # Mock repository responses
@@ -434,8 +444,8 @@ class TestStockApplicationService:
         existing_stock = StockEntity(
             stock_id=1,
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            grade="B",
+            company_name=CompanyName("Apple Inc."),
+            grade=Grade("B"),
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock
@@ -456,8 +466,8 @@ class TestStockApplicationService:
         existing_stock = StockEntity(
             stock_id=1,
             symbol=StockSymbol("AAPL"),
-            name="Apple Inc.",
-            grade="B",
+            company_name=CompanyName("Apple Inc."),
+            grade=Grade("B"),
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock

@@ -19,6 +19,8 @@ from domain.services.value_objects.portfolio_metrics import (
     PortfolioAllocation,
     PortfolioMetrics,
 )
+from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from domain.value_objects.sector import Sector
 from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
 
@@ -28,10 +30,10 @@ def create_test_stock(symbol="AAPL", price=100.00, quantity=10, grade="B"):
     """Helper to create test stock with position."""
     stock = StockEntity(
         symbol=StockSymbol(symbol),
-        name=f"{symbol} Corp",
-        sector="Technology",
-        industry_group="Software",
-        grade=grade,
+        company_name=CompanyName(f"{symbol} Corp"),
+        sector=Sector("Technology"),
+        industry_group=IndustryGroup("Software"),
+        grade=Grade(grade),
     )
     return stock, Quantity(quantity), Money(Decimal(str(price)), "USD")
 
