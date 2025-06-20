@@ -1,28 +1,25 @@
 """
 Value objects used by domain services.
 
-These value objects encapsulate the results and parameters of domain service
-operations, providing type-safe and immutable data structures.
+Consolidated into simple, focused data structures for portfolio analysis.
 """
 
-from .portfolio_metrics import PortfolioAllocation, PortfolioMetrics, PortfolioSummary
-from .risk_metrics import PortfolioRisk, RiskLevel, RiskMetrics, RiskProfile
-
-# from .diversification_metrics import DiversificationScore, SectorAllocation, CorrelationMatrix
-# from .price_analysis import PriceAnalysis, PriceAlert, PriceTrend
+from .metrics import (
+    PortfolioAllocation,
+    PortfolioMetrics,
+    PositionAllocation,
+    PriceAnalysis,
+    RiskAssessment,
+    RiskLevel,
+    TrendDirection,
+)
 
 __all__ = [
-    "PortfolioMetrics",
+    "PositionAllocation",
     "PortfolioAllocation",
-    "PortfolioSummary",
-    "RiskProfile",
+    "PortfolioMetrics",
+    "PriceAnalysis",
+    "RiskAssessment",
     "RiskLevel",
-    "RiskMetrics",
-    "PortfolioRisk",
-    # 'DiversificationScore',
-    # 'SectorAllocation',
-    # 'CorrelationMatrix',
-    # 'PriceAnalysis',
-    # 'PriceAlert',
-    # 'PriceTrend'
+    "TrendDirection",
 ]

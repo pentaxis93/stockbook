@@ -17,9 +17,10 @@ from src.domain.services.exceptions import CalculationError, InsufficientDataErr
 from src.domain.services.portfolio_calculation_service import (
     PortfolioCalculationService,
 )
-from src.domain.services.value_objects.portfolio_metrics import (
+from src.domain.services.value_objects import (
     PortfolioAllocation,
     PortfolioMetrics,
+    PositionAllocation,
 )
 from src.domain.value_objects import (
     CompanyName,

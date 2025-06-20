@@ -12,7 +12,7 @@ from src.domain.entities.stock_entity import StockEntity
 from src.domain.value_objects import Money, Quantity
 
 from .exceptions import CalculationError
-from .value_objects.portfolio_metrics import (
+from .value_objects import (
     PortfolioAllocation,
     PositionAllocation,
 )

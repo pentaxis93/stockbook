@@ -5,9 +5,6 @@ Domain services contain business logic that doesn't naturally belong to a single
 entity or value object but represents important business concepts and processes.
 """
 
-# from .stock_pricing_service import StockPricingService
-# from .diversification_analysis_service import DiversificationAnalysisService
-# from .risk_assessment_service import RiskAssessmentService
 from .exceptions import (
     BusinessRuleViolationError,
     CalculationError,
@@ -18,12 +15,11 @@ from .exceptions import (
     ValidationError,
 )
 from .portfolio_calculation_service import PortfolioCalculationService
+from .risk_assessment_service import RiskAssessmentService
 
 __all__ = [
     "PortfolioCalculationService",
-    # 'StockPricingService',
-    # 'DiversificationAnalysisService',
-    # 'RiskAssessmentService',
+    "RiskAssessmentService",
     "DomainServiceError",
     "ValidationError",
     "BusinessRuleViolationError",

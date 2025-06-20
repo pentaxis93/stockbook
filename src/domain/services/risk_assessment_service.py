@@ -12,11 +12,9 @@ from src.domain.entities.stock_entity import StockEntity
 from src.domain.value_objects import Money, Quantity
 
 from .exceptions import InsufficientDataError
-from .value_objects.risk_metrics import (
-    PortfolioRisk,
+from .value_objects import (
+    RiskAssessment,
     RiskLevel,
-    RiskMetrics,
-    RiskProfile,
 )
 
 
@@ -47,25 +45,24 @@ class RiskAssessmentService:
     def __init__(self, config: Optional[RiskAssessmentConfig] = None):
         self.config = config or RiskAssessmentConfig()
 
-    def assess_stock_risk(self, stock: StockEntity) -> RiskProfile:
+    def assess_stock_risk(self, stock: StockEntity) -> RiskAssessment:
         """Calculate overall risk level for individual stocks."""
         # TODO: Implement comprehensive risk assessment logic
-        return RiskProfile(
-            symbol=stock.symbol,
+        risk_factors = []
+        if stock.grade and stock.grade.value in ["D", "F"]:
+            risk_factors.append("Low quality grade")
+
+        return RiskAssessment(
             overall_risk_level=RiskLevel.MEDIUM,
-            volatility_risk=RiskLevel.MEDIUM,
-            beta_risk=RiskLevel.MEDIUM,
-            fundamental_risk=RiskLevel.MEDIUM,
-            sector_risk=RiskLevel.MEDIUM,
-            risk_factors=[],
             risk_score=Decimal("50.0"),
+            risk_factors=risk_factors,
         )
 
     def assess_portfolio_risk(
         self,
         portfolio: List[Tuple[StockEntity, Quantity]],
         prices: Dict[str, Money],  # pylint: disable=unused-argument
-    ) -> PortfolioRisk:
+    ) -> RiskAssessment:
         """Calculate overall portfolio risk level."""
         if not portfolio:
             raise InsufficientDataError(
@@ -75,32 +72,25 @@ class RiskAssessmentService:
             )
 
         # TODO: Implement comprehensive portfolio risk assessment logic
-        # Create stub individual stock risks
-        individual_risks = []
-        for stock, _quantity in portfolio:
-            risk_profile = self.assess_stock_risk(stock)
-            individual_risks.append(risk_profile)
+        risk_factors = []
 
-        # Create stub portfolio metrics
-        portfolio_metrics = RiskMetrics(
-            overall_risk_level=RiskLevel.MEDIUM,
-            weighted_beta=Decimal("1.0"),
-            portfolio_volatility=Decimal("0.20"),
-            var_95_percent=Money(Decimal("1000.00")),
-            cvar_95_percent=Money(Decimal("1500.00")),
-            sharpe_ratio=Decimal("1.0"),
-            maximum_drawdown=Decimal("0.10"),
-            concentration_risks=[],
-            risk_score=Decimal("50.0"),
-        )
+        # Check concentration risk
+        if len(portfolio) < 5:
+            risk_factors.append("Insufficient diversification (< 5 positions)")
 
-        return PortfolioRisk(
-            portfolio_metrics=portfolio_metrics,
-            individual_stock_risks=individual_risks,
-            sector_risks={},
-            geographic_risks={},
-            correlation_risks=[],
-            stress_test_results={},
-            risk_warnings=[],
-            mitigation_strategies=[],
+        # Simple risk score based on portfolio size for now
+        if len(portfolio) < 3:
+            overall_risk = RiskLevel.HIGH
+            risk_score = Decimal("80.0")
+        elif len(portfolio) < 10:
+            overall_risk = RiskLevel.MEDIUM
+            risk_score = Decimal("50.0")
+        else:
+            overall_risk = RiskLevel.LOW
+            risk_score = Decimal("30.0")
+
+        return RiskAssessment(
+            overall_risk_level=overall_risk,
+            risk_score=risk_score,
+            risk_factors=risk_factors,
         )

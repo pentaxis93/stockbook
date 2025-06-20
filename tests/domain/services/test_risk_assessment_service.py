@@ -13,10 +13,9 @@ from src.domain.services.risk_assessment_service import (
     RiskAssessmentConfig,
     RiskAssessmentService,
 )
-from src.domain.services.value_objects.risk_metrics import (
-    PortfolioRisk,
+from src.domain.services.value_objects import (
+    RiskAssessment,
     RiskLevel,
-    RiskProfile,
 )
 from src.domain.value_objects.company_name import CompanyName
 from src.domain.value_objects.grade import Grade
@@ -123,41 +122,47 @@ def create_test_prices(portfolio: List) -> Dict[str, Money]:
 class TestRiskAssessmentStubs:
     """Test stubbed risk assessment methods."""
 
-    def test_assess_stock_risk_returns_stub_profile(self):
-        """Should return minimal RiskProfile with placeholder values."""
+    def test_assess_stock_risk_returns_assessment(self):
+        """Should return RiskAssessment with basic risk information."""
         service = RiskAssessmentService()
         stock = create_test_stock("TEST", 100.00, "A", "Technology")
 
-        risk_profile = service.assess_stock_risk(stock)
+        risk_assessment = service.assess_stock_risk(stock)
 
-        # Should return a RiskProfile with placeholder values
-        assert isinstance(risk_profile, RiskProfile)
-        assert risk_profile.symbol == stock.symbol
-        assert risk_profile.overall_risk_level == RiskLevel.MEDIUM
-        assert risk_profile.volatility_risk == RiskLevel.MEDIUM
-        assert risk_profile.beta_risk == RiskLevel.MEDIUM
-        assert risk_profile.fundamental_risk == RiskLevel.MEDIUM
-        assert risk_profile.sector_risk == RiskLevel.MEDIUM
-        assert not risk_profile.risk_factors
-        assert risk_profile.risk_score == Decimal("50.0")
+        # Should return a RiskAssessment with basic values
+        assert isinstance(risk_assessment, RiskAssessment)
+        assert risk_assessment.overall_risk_level == RiskLevel.MEDIUM
+        assert risk_assessment.risk_score == Decimal("50.0")
+        assert isinstance(risk_assessment.risk_factors, list)
 
-    def test_assess_portfolio_risk_returns_stub_risk(self):
-        """Should return minimal PortfolioRisk with placeholder values."""
+    def test_assess_portfolio_risk_returns_assessment(self):
+        """Should return portfolio RiskAssessment based on simple diversification rules."""
         service = RiskAssessmentService()
         portfolio = create_conservative_portfolio()
         prices = create_test_prices(portfolio)
 
         portfolio_risk = service.assess_portfolio_risk(portfolio, prices)
 
-        # Should return a PortfolioRisk with placeholder values
-        assert isinstance(portfolio_risk, PortfolioRisk)
-        assert len(portfolio_risk.individual_stock_risks) == len(portfolio)
-        assert not portfolio_risk.sector_risks
-        assert not portfolio_risk.geographic_risks
-        assert not portfolio_risk.correlation_risks
-        assert not portfolio_risk.stress_test_results
-        assert not portfolio_risk.risk_warnings
-        assert not portfolio_risk.mitigation_strategies
+        # Should return a RiskAssessment
+        assert isinstance(portfolio_risk, RiskAssessment)
+        assert (
+            portfolio_risk.overall_risk_level == RiskLevel.MEDIUM
+        )  # 4 positions = medium risk
+        assert portfolio_risk.risk_score == Decimal("50.0")
+        assert isinstance(portfolio_risk.risk_factors, list)
+
+    def test_assess_portfolio_risk_high_risk_small_portfolio(self):
+        """Should assess small portfolios as high risk."""
+        service = RiskAssessmentService()
+        # Create a small portfolio with only 2 positions
+        portfolio = create_conservative_portfolio()[:2]
+        prices = create_test_prices(portfolio)
+
+        portfolio_risk = service.assess_portfolio_risk(portfolio, prices)
+
+        assert portfolio_risk.overall_risk_level == RiskLevel.HIGH
+        assert portfolio_risk.risk_score == Decimal("80.0")
+        assert "Insufficient diversification" in " ".join(portfolio_risk.risk_factors)
 
     def test_private_methods_removed(self):
         """All private risk assessment methods should be removed."""

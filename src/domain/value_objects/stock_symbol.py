@@ -73,30 +73,6 @@ class StockSymbol:
         """Make StockSymbol hashable for use in sets/dicts."""
         return hash(self.value)
 
-    def __lt__(self, other) -> bool:
-        """Less than comparison for ordering."""
-        if not isinstance(other, StockSymbol):
-            raise TypeError("Cannot compare StockSymbol with non-StockSymbol")
-        return self.value < other.value
-
-    def __le__(self, other) -> bool:
-        """Less than or equal comparison."""
-        if not isinstance(other, StockSymbol):
-            raise TypeError("Cannot compare StockSymbol with non-StockSymbol")
-        return self.value <= other.value
-
-    def __gt__(self, other) -> bool:
-        """Greater than comparison."""
-        if not isinstance(other, StockSymbol):
-            raise TypeError("Cannot compare StockSymbol with non-StockSymbol")
-        return self.value > other.value
-
-    def __ge__(self, other) -> bool:
-        """Greater than or equal comparison."""
-        if not isinstance(other, StockSymbol):
-            raise TypeError("Cannot compare StockSymbol with non-StockSymbol")
-        return self.value >= other.value
-
     def __str__(self) -> str:
         """String representation for display."""
         return self.value
@@ -153,16 +129,3 @@ class StockSymbol:
             return False
 
         return cls.SYMBOL_PATTERN.match(normalized_symbol) is not None
-
-    @classmethod
-    def from_string(cls, symbol: str) -> "StockSymbol":
-        """
-        Factory method for explicit string conversion.
-
-        Args:
-            symbol: Symbol string
-
-        Returns:
-            StockSymbol instance
-        """
-        return cls(symbol)

@@ -122,26 +122,27 @@ class TestStockSymbol:
         with pytest.raises(AttributeError):
             symbol.value = "MSFT"
 
-    def test_stock_symbol_ordering(self):
-        """Should support lexicographic ordering."""
+    def test_stock_symbol_sorting_with_key_function(self):
+        """Should support sorting using key function (recommended approach)."""
+        symbols = [StockSymbol("MSFT"), StockSymbol("AAPL"), StockSymbol("GOOGL")]
+
+        # Sort by symbol value using key parameter
+        sorted_symbols = sorted(symbols, key=lambda s: s.value)
+        expected_order = ["AAPL", "GOOGL", "MSFT"]
+
+        assert [s.value for s in sorted_symbols] == expected_order
+
+    def test_stock_symbol_no_direct_comparison_operators(self):
+        """Should not support direct comparison operators (use key-based sorting instead)."""
         aapl = StockSymbol("AAPL")
         msft = StockSymbol("MSFT")
-        googl = StockSymbol("GOOGL")
 
-        assert aapl < googl < msft
-        assert msft > googl > aapl
-        assert aapl <= aapl
-        assert msft >= msft
-
-    def test_stock_symbol_ordering_with_non_stock_symbol_raises_error(self):
-        """Should raise error when comparing with non-StockSymbol objects."""
-        symbol = StockSymbol("AAPL")
+        # These operations should raise TypeError since we removed comparison operators
+        with pytest.raises(TypeError):
+            aapl < msft
 
         with pytest.raises(TypeError):
-            symbol < "MSFT"
-
-        with pytest.raises(TypeError):
-            symbol > 123
+            msft > aapl
 
     def test_stock_symbol_is_valid_class_method(self):
         """Should provide class method to validate symbols without creating instance."""
@@ -156,12 +157,6 @@ class TestStockSymbol:
         assert StockSymbol.normalize("aapl") == "AAPL"
         assert StockSymbol.normalize("  MSFT  ") == "MSFT"
         assert StockSymbol.normalize("GOOGL") == "GOOGL"
-
-    def test_stock_symbol_from_string_factory_method(self):
-        """Should provide factory method for explicit string conversion."""
-        symbol = StockSymbol.from_string("aapl")
-        assert symbol.value == "AAPL"
-        assert isinstance(symbol, StockSymbol)
 
     def test_stock_symbol_common_symbols_validation(self):
         """Should accept common stock symbols."""
