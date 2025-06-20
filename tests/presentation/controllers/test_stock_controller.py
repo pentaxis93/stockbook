@@ -11,13 +11,13 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from application.commands.stock_commands import CreateStockCommand
-from application.dto.stock_dto import StockDto
-from application.services.stock_application_service import StockApplicationService
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
-from presentation.controllers.stock_controller import StockController
-from presentation.view_models.stock_view_models import (
+from src.application.commands.stock_commands import CreateStockCommand
+from src.application.dto.stock_dto import StockDto
+from src.application.services.stock_application_service import StockApplicationService
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects.stock_symbol import StockSymbol
+from src.presentation.controllers.stock_controller import StockController
+from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,
@@ -414,7 +414,7 @@ class TestStockController:
     def test_search_stocks_success(self):
         """Should search stocks successfully with filters."""
         # Arrange
-        from presentation.view_models.stock_view_models import StockSearchRequest
+        from src.presentation.view_models.stock_view_models import StockSearchRequest
 
         search_request = StockSearchRequest(
             symbol_filter="APP",
@@ -462,7 +462,7 @@ class TestStockController:
     def test_search_stocks_no_filters_fallback(self):
         """Should fallback to get_stock_list when no filters are provided."""
         # Arrange
-        from presentation.view_models.stock_view_models import StockSearchRequest
+        from src.presentation.view_models.stock_view_models import StockSearchRequest
 
         search_request = StockSearchRequest()  # No filters
 
@@ -505,7 +505,7 @@ class TestStockController:
     def test_search_stocks_validation_error(self):
         """Should handle validation errors in search request."""
         # Arrange
-        from presentation.view_models.stock_view_models import StockSearchRequest
+        from src.presentation.view_models.stock_view_models import StockSearchRequest
 
         search_request = StockSearchRequest(
             grade_filter="Z",  # Invalid grade
@@ -526,7 +526,7 @@ class TestStockController:
     def test_search_stocks_empty_results(self):
         """Should handle empty search results gracefully."""
         # Arrange
-        from presentation.view_models.stock_view_models import StockSearchRequest
+        from src.presentation.view_models.stock_view_models import StockSearchRequest
 
         search_request = StockSearchRequest(symbol_filter="NOTFOUND")
 
@@ -545,7 +545,7 @@ class TestStockController:
     def test_search_stocks_service_error(self):
         """Should handle application service errors in search."""
         # Arrange
-        from presentation.view_models.stock_view_models import StockSearchRequest
+        from src.presentation.view_models.stock_view_models import StockSearchRequest
 
         search_request = StockSearchRequest(symbol_filter="AAPL")
 
@@ -562,7 +562,7 @@ class TestStockController:
     def test_search_stocks_filter_message_formatting(self):
         """Should format filter messages correctly based on filter count."""
         # Arrange
-        from presentation.view_models.stock_view_models import StockSearchRequest
+        from src.presentation.view_models.stock_view_models import StockSearchRequest
 
         # Test single filter
         search_request_single = StockSearchRequest(symbol_filter="AAPL")
@@ -585,7 +585,7 @@ class TestStockController:
     def test_update_stock_with_valid_request(self):
         """Should update stock successfully with valid request."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(
             stock_id=1,
@@ -618,7 +618,7 @@ class TestStockController:
     def test_update_stock_with_validation_errors(self):
         """Should return validation errors for invalid update request."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(
             stock_id=1,
@@ -637,7 +637,7 @@ class TestStockController:
     def test_update_stock_with_nonexistent_stock(self):
         """Should handle update of nonexistent stock."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(stock_id=999, grade="A")
 
@@ -656,7 +656,7 @@ class TestStockController:
     def test_update_stock_with_no_fields_to_update(self):
         """Should handle update request with no fields to update."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(stock_id=1)  # No fields to update
 
@@ -670,7 +670,7 @@ class TestStockController:
     def test_update_stock_with_service_error(self):
         """Should handle application service errors during update."""
         # Arrange
-        from presentation.view_models.stock_view_models import UpdateStockRequest
+        from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(stock_id=1, grade="A")
 

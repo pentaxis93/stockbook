@@ -4,7 +4,7 @@ Test suite for Grade value object.
 
 import pytest
 
-from domain.value_objects.grade import Grade
+from src.domain.value_objects.grade import Grade
 
 
 class TestGradeValueObject:

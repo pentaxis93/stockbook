@@ -10,19 +10,21 @@ from typing import List
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.services.exceptions import CalculationError, InsufficientDataError
+from shared_kernel.value_objects import Money, Quantity
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.services.exceptions import CalculationError, InsufficientDataError
 
 # These imports now exist after implementation
-from domain.services.portfolio_calculation_service import PortfolioCalculationService
-from domain.services.value_objects.portfolio_metrics import (
+from src.domain.services.portfolio_calculation_service import (
+    PortfolioCalculationService,
+)
+from src.domain.services.value_objects.portfolio_metrics import (
     PortfolioAllocation,
     PortfolioMetrics,
 )
-from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
-from domain.value_objects.sector import Sector
-from domain.value_objects.stock_symbol import StockSymbol
-from shared_kernel.value_objects import Money, Quantity
+from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from src.domain.value_objects.sector import Sector
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 # Test data helpers

@@ -7,20 +7,21 @@ our clean architecture layers together.
 
 import pytest
 
-from application.services.stock_application_service import StockApplicationService
-
 # These imports now exist after implementation
 from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
+from src.application.services.stock_application_service import StockApplicationService
 
 # Application imports - these exist
-from domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
-from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from presentation.controllers.stock_controller import StockController
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
+from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+from src.infrastructure.repositories.sqlite_stock_repository import (
+    SqliteStockRepository,
+)
+from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from src.presentation.controllers.stock_controller import StockController
+from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 
 class TestCompositionRoot:

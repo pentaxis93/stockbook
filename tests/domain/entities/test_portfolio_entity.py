@@ -9,9 +9,9 @@ from datetime import date
 
 import pytest
 
-from domain.entities.portfolio_entity import PortfolioEntity
-from domain.value_objects import Notes
-from domain.value_objects.portfolio_name import PortfolioName
+from src.domain.entities.portfolio_entity import PortfolioEntity
+from src.domain.value_objects import Notes
+from src.domain.value_objects.portfolio_name import PortfolioName
 
 
 class TestPortfolioEntity:

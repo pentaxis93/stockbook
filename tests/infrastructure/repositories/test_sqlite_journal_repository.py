@@ -11,11 +11,11 @@ from pathlib import Path
 
 import pytest
 
-from domain.entities.journal_entry_entity import JournalEntryEntity
-from domain.repositories.interfaces import IJournalRepository
-from domain.value_objects import JournalContent
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_journal_repository import (
+from src.domain.entities.journal_entry_entity import JournalEntryEntity
+from src.domain.repositories.interfaces import IJournalRepository
+from src.domain.value_objects import JournalContent
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.repositories.sqlite_journal_repository import (
     SqliteJournalRepository,
 )
 

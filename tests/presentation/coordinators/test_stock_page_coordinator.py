@@ -10,11 +10,13 @@ from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
-from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from presentation.controllers.stock_controller import StockController
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
-from presentation.view_models.stock_view_models import (
+from src.presentation.adapters.stock_presentation_adapter import (
+    StockPresentationAdapter,
+)
+from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from src.presentation.controllers.stock_controller import StockController
+from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
+from src.presentation.view_models.stock_view_models import (
     CreateStockResponse,
     StockDetailResponse,
     StockListResponse,
@@ -118,7 +120,9 @@ class TestStockPageCoordinator:
             StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
         ]
 
-        stock_list_response = StockListResponse.create_success(stocks, "Retrieved 3 stocks")
+        stock_list_response = StockListResponse.create_success(
+            stocks, "Retrieved 3 stocks"
+        )
         self.mock_adapter.render_stock_list.return_value = stock_list_response
 
         # Act
@@ -141,8 +145,8 @@ class TestStockPageCoordinator:
         mock_sidebar.return_value.__exit__.return_value = None
 
         self.mock_adapter.render_sidebar_navigation.return_value = "list"
-        self.mock_adapter.render_stock_list.return_value = StockListResponse.create_success(
-            [], "No stocks"
+        self.mock_adapter.render_stock_list.return_value = (
+            StockListResponse.create_success([], "No stocks")
         )
 
         # Act
@@ -425,7 +429,9 @@ class TestStockPageCoordinator:
     def test_coordinator_multi_action_workflow(self):
         """Should coordinate multi-step workflows."""
         # Arrange - Simulate create stock followed by view detail workflow
-        create_response = CreateStockResponse.create_success(1, "AAPL", "Created successfully")
+        create_response = CreateStockResponse.create_success(
+            1, "AAPL", "Created successfully"
+        )
         detail_response = StockDetailResponse.create_success(
             StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
             "Stock retrieved",

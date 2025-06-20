@@ -11,9 +11,9 @@ from unittest.mock import MagicMock, Mock, patch
 import pytest
 import streamlit as st
 
-from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from presentation.controllers.stock_controller import StockController
-from presentation.view_models.stock_view_models import (
+from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from src.presentation.controllers.stock_controller import StockController
+from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,
@@ -241,7 +241,9 @@ class TestStreamlitStockAdapter:
             notes="High quality stock",
         )
 
-        response = StockDetailResponse.create_success(stock, "Stock retrieved successfully")
+        response = StockDetailResponse.create_success(
+            stock, "Stock retrieved successfully"
+        )
         self.mock_controller.get_stock_by_symbol.return_value = response
 
         mock_columns.return_value = [MagicMock(), MagicMock()]

@@ -10,12 +10,12 @@ from typing import Dict
 
 import pytest
 
-from domain.services.value_objects.diversification_metrics import (
+from shared_kernel.value_objects import Money
+from src.domain.services.value_objects.diversification_metrics import (
     CorrelationMatrix,
     DiversificationScore,
     SectorAllocation,
 )
-from shared_kernel.value_objects import Money
 
 
 class TestSectorAllocation:

@@ -8,22 +8,28 @@ following clean architecture principles.
 from typing import Any, Callable, Dict, Optional
 
 # Application layer imports
-from application.services.stock_application_service import StockApplicationService
+from src.application.services.stock_application_service import StockApplicationService
 
 # Domain layer imports
-from domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
+from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
 
 # Infrastructure layer imports
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
-from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
-from presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from presentation.adapters.streamlit_ui_operations import StreamlitUIOperationsFacade
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+from src.infrastructure.repositories.sqlite_stock_repository import (
+    SqliteStockRepository,
+)
+from src.presentation.adapters.stock_presentation_adapter import (
+    StockPresentationAdapter,
+)
+from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
+from src.presentation.adapters.streamlit_ui_operations import (
+    StreamlitUIOperationsFacade,
+)
 
 # Presentation layer imports
-from presentation.controllers.stock_controller import StockController
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
+from src.presentation.controllers.stock_controller import StockController
+from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 from .di_container import DIContainer
 

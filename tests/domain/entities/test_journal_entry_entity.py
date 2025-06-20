@@ -9,7 +9,7 @@ from datetime import date
 
 import pytest
 
-from domain.entities.journal_entry_entity import JournalEntryEntity
+from src.domain.entities.journal_entry_entity import JournalEntryEntity
 
 
 class TestJournalEntryEntity:
@@ -17,7 +17,7 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_value_objects(self):
         """Test creating a journal entry with all value objects."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -40,7 +40,7 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_minimal_data(self):
         """Test creating journal entry with only required fields."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -55,7 +55,7 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_invalid_portfolio_id_raises_error(self):
         """Should raise error for invalid portfolio ID."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Portfolio ID must be positive"):
             JournalEntryEntity(
@@ -66,7 +66,7 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_invalid_stock_id_raises_error(self):
         """Should raise error for invalid stock ID."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Stock ID must be positive"):
             JournalEntryEntity(
@@ -77,7 +77,7 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_invalid_transaction_id_raises_error(self):
         """Should raise error for invalid transaction ID."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Transaction ID must be positive"):
             JournalEntryEntity(
@@ -88,14 +88,14 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_invalid_content_raises_error(self):
         """Should raise error for invalid content through JournalContent value object."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Journal content cannot be empty"):
             JournalContent("")  # Error happens at JournalContent construction
 
     def test_journal_entry_equality(self):
         """Should compare journal entries based on business identity (entry_date, content hash)."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry1 = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -118,7 +118,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_hash(self):
         """Should hash consistently based on business identity."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry1 = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -135,7 +135,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_string_representation(self):
         """Should have informative string representation."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -150,7 +150,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_repr(self):
         """Should have detailed repr representation."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -163,7 +163,7 @@ class TestJournalEntryEntity:
     # Business behavior tests
     def test_journal_entry_is_related_to_portfolio(self):
         """Should check if entry is related to a portfolio."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         portfolio_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -181,7 +181,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_is_related_to_stock(self):
         """Should check if entry is related to a stock."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         stock_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -199,7 +199,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_is_related_to_transaction(self):
         """Should check if entry is related to a transaction."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         transaction_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -217,7 +217,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_get_content_preview(self):
         """Should provide content preview for display."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         short_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -238,7 +238,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_update_content(self):
         """Should be able to update entry content."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -255,7 +255,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_set_id(self):
         """Should allow setting entry ID."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -267,7 +267,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_set_id_with_invalid_id_raises_error(self):
         """Should raise error when setting invalid ID."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -279,7 +279,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_set_id_when_already_set_raises_error(self):
         """Should raise error when trying to change existing ID."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
@@ -296,7 +296,7 @@ class TestJournalContent:
 
     def test_valid_journal_content_accepted(self):
         """Test that valid journal content is accepted."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         valid_contents = [
             "Short entry.",
@@ -309,14 +309,14 @@ class TestJournalContent:
 
     def test_journal_content_strips_whitespace(self):
         """Test that journal content strips leading/trailing whitespace."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         content = JournalContent("  Market analysis with spaces  ")
         assert content.value == "Market analysis with spaces"
 
     def test_empty_journal_content_rejected(self):
         """Test that empty journal content is rejected."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         empty_contents = ["", "   ", "\t", "\n"]
         for empty_content in empty_contents:
@@ -325,7 +325,7 @@ class TestJournalContent:
 
     def test_too_long_journal_content_rejected(self):
         """Test that excessively long journal content is rejected."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         long_content = "A" * 10001  # Max is 10000 characters
         with pytest.raises(
@@ -335,7 +335,7 @@ class TestJournalContent:
 
     def test_max_length_journal_content_accepted(self):
         """Test that journal content at max length is accepted."""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         max_length_content = "A" * 10000  # Exactly 10000 characters
         journal_content = JournalContent(max_length_content)

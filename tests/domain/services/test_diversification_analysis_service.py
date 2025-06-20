@@ -10,18 +10,18 @@ from typing import Dict, List
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
-from domain.value_objects.sector import Sector
-from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from src.domain.value_objects.sector import Sector
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 # These imports will exist after implementation
-# from domain.services.diversification_analysis_service import DiversificationAnalysisService
-# from domain.services.value_objects.diversification_metrics import (
+# from src.domain.services.diversification_analysis_service import DiversificationAnalysisService
+# from src.domain.services.value_objects.diversification_metrics import (
 #     DiversificationScore, SectorAllocation, CorrelationMatrix, DiversificationReport
 # )
-# from domain.services.exceptions import InsufficientDataError, AnalysisError
+# from src.domain.services.exceptions import InsufficientDataError, AnalysisError
 
 
 # Test data helpers

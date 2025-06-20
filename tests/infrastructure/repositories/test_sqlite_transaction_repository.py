@@ -12,14 +12,14 @@ from pathlib import Path
 
 import pytest
 
-from domain.entities.transaction_entity import TransactionEntity
-from domain.repositories.interfaces import ITransactionRepository
-from domain.value_objects import Notes, TransactionType
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_transaction_repository import (
+from shared_kernel.value_objects import Money, Quantity
+from src.domain.entities.transaction_entity import TransactionEntity
+from src.domain.repositories.interfaces import ITransactionRepository
+from src.domain.value_objects import Notes, TransactionType
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.repositories.sqlite_transaction_repository import (
     SqliteTransactionRepository,
 )
-from shared_kernel.value_objects import Money, Quantity
 
 
 @pytest.fixture

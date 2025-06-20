@@ -7,7 +7,7 @@ of the CompanyName value object with validation.
 
 import pytest
 
-from domain.value_objects.company_name import CompanyName
+from src.domain.value_objects.company_name import CompanyName
 
 
 class TestCompanyName:

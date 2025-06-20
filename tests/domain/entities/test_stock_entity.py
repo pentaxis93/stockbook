@@ -9,11 +9,11 @@ from decimal import Decimal
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
-from domain.value_objects.sector import Sector
-from domain.value_objects.stock_symbol import StockSymbol
 from shared_kernel.value_objects import Money, Quantity
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from src.domain.value_objects.sector import Sector
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestStockEntity:

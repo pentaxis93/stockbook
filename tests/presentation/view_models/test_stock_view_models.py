@@ -11,8 +11,8 @@ from typing import Any, Dict, List, Optional
 
 import pytest
 
-from application.dto.stock_dto import StockDto
-from presentation.view_models.stock_view_models import (
+from src.application.dto.stock_dto import StockDto
+from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,

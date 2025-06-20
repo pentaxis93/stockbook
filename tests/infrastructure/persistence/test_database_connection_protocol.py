@@ -14,8 +14,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.persistence.unit_of_work import TransactionalDatabaseConnection
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.unit_of_work import TransactionalDatabaseConnection
 
 
 class TestIDatabaseConnectionProtocol:
@@ -29,14 +29,14 @@ class TestIDatabaseConnectionProtocol:
     def test_protocol_interface_requirements(self):
         """Test that protocol defines required interface methods."""
         # Protocol should now exist and be importable
-        from infrastructure.persistence.interfaces import IDatabaseConnection
+        from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         # Protocol should be runtime checkable
         assert hasattr(IDatabaseConnection, "__protocol_attrs__")
 
     def test_get_connection_method_required(self):
         """Test that protocol requires get_connection method."""
-        from infrastructure.persistence.interfaces import IDatabaseConnection
+        from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         # Mock implementation to test protocol contract
         class MockConnection:
@@ -56,7 +56,7 @@ class TestIDatabaseConnectionProtocol:
 
     def test_transaction_method_required(self):
         """Test that protocol requires transaction context manager method."""
-        from infrastructure.persistence.interfaces import IDatabaseConnection
+        from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         class MockConnection:
             def get_connection(self):
@@ -75,7 +75,7 @@ class TestIDatabaseConnectionProtocol:
 
     def test_initialize_schema_method_required(self):
         """Test that protocol requires initialize_schema method."""
-        from infrastructure.persistence.interfaces import IDatabaseConnection
+        from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         class MockConnection:
             def get_connection(self):
@@ -113,7 +113,7 @@ class TestDatabaseConnectionProtocolImplementation:
 
     def test_database_connection_implements_protocol(self):
         """Test that DatabaseConnection implements IDatabaseConnection protocol."""
-        from infrastructure.persistence.interfaces import IDatabaseConnection
+        from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         db_conn = DatabaseConnection(self.db_path)
         assert isinstance(db_conn, IDatabaseConnection)
@@ -174,7 +174,7 @@ class TestTransactionalDatabaseConnectionProtocolImplementation:
 
     def test_transactional_connection_implements_protocol(self):
         """Test that TransactionalDatabaseConnection implements IDatabaseConnection protocol."""
-        from infrastructure.persistence.interfaces import IDatabaseConnection
+        from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         trans_conn = TransactionalDatabaseConnection(
             self.mock_connection, self.original_db_conn
@@ -242,7 +242,7 @@ class TestRepositoryProtocolCompatibility:
     def test_stock_repository_accepts_protocol_interface(self):
         """Test that SqliteStockRepository accepts IDatabaseConnection protocol."""
         # This will fail until we update repository type hints
-        from infrastructure.repositories.sqlite_stock_repository import (
+        from src.infrastructure.repositories.sqlite_stock_repository import (
             SqliteStockRepository,
         )
 
@@ -260,22 +260,22 @@ class TestRepositoryProtocolCompatibility:
 
     def test_all_repositories_accept_protocol_interface(self):
         """Test that all repositories accept IDatabaseConnection protocol."""
-        from infrastructure.repositories.sqlite_balance_repository import (
+        from src.infrastructure.repositories.sqlite_balance_repository import (
             SqlitePortfolioBalanceRepository,
         )
-        from infrastructure.repositories.sqlite_journal_repository import (
+        from src.infrastructure.repositories.sqlite_journal_repository import (
             SqliteJournalRepository,
         )
-        from infrastructure.repositories.sqlite_portfolio_repository import (
+        from src.infrastructure.repositories.sqlite_portfolio_repository import (
             SqlitePortfolioRepository,
         )
-        from infrastructure.repositories.sqlite_stock_repository import (
+        from src.infrastructure.repositories.sqlite_stock_repository import (
             SqliteStockRepository,
         )
-        from infrastructure.repositories.sqlite_target_repository import (
+        from src.infrastructure.repositories.sqlite_target_repository import (
             SqliteTargetRepository,
         )
-        from infrastructure.repositories.sqlite_transaction_repository import (
+        from src.infrastructure.repositories.sqlite_transaction_repository import (
             SqliteTransactionRepository,
         )
 
@@ -322,7 +322,7 @@ class TestUnitOfWorkProtocolIntegration:
 
     def test_unit_of_work_creates_protocol_compatible_repositories(self):
         """Test that UoW creates repositories compatible with protocol."""
-        from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+        from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
         uow = SqliteUnitOfWork(self.db_conn)
 
@@ -337,7 +337,7 @@ class TestUnitOfWorkProtocolIntegration:
 
     def test_unit_of_work_provides_consistent_connection_interface(self):
         """Test that UoW provides consistent connection interface to all repositories."""
-        from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+        from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
         uow = SqliteUnitOfWork(self.db_conn)
 
@@ -355,7 +355,7 @@ class TestUnitOfWorkProtocolIntegration:
 
     def test_unit_of_work_transaction_isolation(self):
         """Test that UoW maintains transaction isolation through protocol."""
-        from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+        from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
         uow = SqliteUnitOfWork(self.db_conn)
 
@@ -394,7 +394,7 @@ class TestProtocolTypeCompatibility:
         # This test verifies the main issue is resolved
         # Will fail until protocol is implemented and type hints updated
 
-        from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+        from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
         # This should not cause type errors after protocol implementation
         db_conn = DatabaseConnection(":memory:")
@@ -412,7 +412,7 @@ class TestProtocolTypeCompatibility:
     def test_repository_constructor_type_safety(self):
         """Test that repository constructors are type-safe with protocol."""
         # This will fail until we update repository type hints
-        from infrastructure.repositories.sqlite_stock_repository import (
+        from src.infrastructure.repositories.sqlite_stock_repository import (
             SqliteStockRepository,
         )
 

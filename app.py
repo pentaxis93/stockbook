@@ -13,7 +13,7 @@ import streamlit as st
 from config import config
 from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
-from presentation.coordinators.stock_page_coordinator import StockPageCoordinator
+from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 
 class StockBookApp:

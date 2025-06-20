@@ -14,10 +14,10 @@ from pathlib import Path
 import pytest
 
 from config import config
-from domain.entities import PortfolioEntity
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from infrastructure.repositories.sqlite_portfolio_repository import (
+from src.domain.entities import PortfolioEntity
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+from src.infrastructure.repositories.sqlite_portfolio_repository import (
     SqlitePortfolioRepository,
 )
 

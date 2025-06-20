@@ -4,7 +4,7 @@ Test suite for SectorIndustryService domain service.
 
 import pytest
 
-from domain.services.sector_industry_service import SectorIndustryService
+from src.domain.services.sector_industry_service import SectorIndustryService
 
 
 class TestSectorIndustryService:

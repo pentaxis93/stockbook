@@ -10,14 +10,16 @@ from unittest.mock import Mock
 
 import pytest
 
-from presentation.adapters.stock_presentation_adapter import StockPresentationAdapter
-from presentation.controllers.stock_controller import StockController
-from presentation.interfaces.ui_operations import (
+from src.presentation.adapters.stock_presentation_adapter import (
+    StockPresentationAdapter,
+)
+from src.presentation.controllers.stock_controller import StockController
+from src.presentation.interfaces.ui_operations import (
     IUILayoutOperations,
     IUIOperations,
     IUIValidationOperations,
 )
-from presentation.view_models.stock_view_models import (
+from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,
@@ -209,7 +211,9 @@ class TestStockPresentationAdapter:
             notes="High quality stock",
         )
 
-        response = StockDetailResponse.create_success(stock, "Stock retrieved successfully")
+        response = StockDetailResponse.create_success(
+            stock, "Stock retrieved successfully"
+        )
         self.mock_controller.get_stock_by_symbol.return_value = response
 
         # Mock layout operations

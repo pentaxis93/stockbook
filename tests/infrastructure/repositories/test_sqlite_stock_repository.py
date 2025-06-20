@@ -11,12 +11,14 @@ from pathlib import Path
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
-from domain.value_objects.sector import Sector
-from domain.value_objects.stock_symbol import StockSymbol
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from src.domain.value_objects.sector import Sector
+from src.domain.value_objects.stock_symbol import StockSymbol
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.repositories.sqlite_stock_repository import (
+    SqliteStockRepository,
+)
 
 
 class TestSqliteStockRepository:

@@ -7,7 +7,7 @@ before implementation.
 
 import pytest
 
-from domain.value_objects.stock_symbol import StockSymbol
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestStockSymbol:

@@ -12,12 +12,14 @@ from pathlib import Path
 
 import pytest
 
-from domain.entities.target_entity import TargetEntity
-from domain.repositories.interfaces import ITargetRepository
-from domain.value_objects import Notes, TargetStatus
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_target_repository import SqliteTargetRepository
 from shared_kernel.value_objects import Money
+from src.domain.entities.target_entity import TargetEntity
+from src.domain.repositories.interfaces import ITargetRepository
+from src.domain.value_objects import Notes, TargetStatus
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.repositories.sqlite_target_repository import (
+    SqliteTargetRepository,
+)
 
 
 @pytest.fixture

@@ -4,7 +4,7 @@ Test suite for Sector value object.
 
 import pytest
 
-from domain.value_objects.sector import Sector
+from src.domain.value_objects.sector import Sector
 
 
 class TestSectorValueObject:

@@ -7,7 +7,7 @@ of the Notes value object with validation.
 
 import pytest
 
-from domain.value_objects.notes import Notes
+from src.domain.value_objects.notes import Notes
 
 
 class TestNotes:

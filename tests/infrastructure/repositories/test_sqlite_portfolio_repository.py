@@ -11,11 +11,11 @@ from pathlib import Path
 
 import pytest
 
-from domain.entities.portfolio_entity import PortfolioEntity
-from domain.repositories.interfaces import IPortfolioRepository
-from domain.value_objects import Notes, PortfolioName
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.repositories.sqlite_portfolio_repository import (
+from src.domain.entities.portfolio_entity import PortfolioEntity
+from src.domain.repositories.interfaces import IPortfolioRepository
+from src.domain.value_objects import Notes, PortfolioName
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.repositories.sqlite_portfolio_repository import (
     SqlitePortfolioRepository,
 )
 

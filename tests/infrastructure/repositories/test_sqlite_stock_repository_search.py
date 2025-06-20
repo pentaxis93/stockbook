@@ -9,9 +9,11 @@ from unittest.mock import Mock
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
-from infrastructure.repositories.sqlite_stock_repository import SqliteStockRepository
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects.stock_symbol import StockSymbol
+from src.infrastructure.repositories.sqlite_stock_repository import (
+    SqliteStockRepository,
+)
 
 
 class TestSqliteStockRepositorySearch:

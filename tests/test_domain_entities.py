@@ -8,7 +8,8 @@ from decimal import Decimal
 
 import pytest
 
-from domain.entities import (
+from shared_kernel.value_objects import Money, Quantity
+from src.domain.entities import (
     JournalEntryEntity,
     PortfolioBalanceEntity,
     PortfolioEntity,
@@ -16,9 +17,8 @@ from domain.entities import (
     TargetEntity,
     TransactionEntity,
 )
-from domain.value_objects import CompanyName, Grade
-from domain.value_objects.stock_symbol import StockSymbol
-from shared_kernel.value_objects import Money, Quantity
+from src.domain.value_objects import CompanyName, Grade
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestStockEntity:
@@ -26,8 +26,8 @@ class TestStockEntity:
 
     def test_valid_stock_creation(self):
         """Test creating a valid stock with all fields"""
-        from domain.value_objects import IndustryGroup, Notes
-        from domain.value_objects.sector import Sector
+        from src.domain.value_objects import IndustryGroup, Notes
+        from src.domain.value_objects.sector import Sector
 
         stock = StockEntity(
             symbol=StockSymbol("AAPL"),
@@ -93,7 +93,7 @@ class TestPortfolioEntity:
 
     def test_valid_portfolio_creation(self):
         """Test creating a valid portfolio"""
-        from domain.value_objects import Notes, PortfolioName
+        from src.domain.value_objects import Notes, PortfolioName
 
         portfolio = PortfolioEntity(
             name=PortfolioName("My Portfolio"),
@@ -106,7 +106,7 @@ class TestPortfolioEntity:
 
     def test_minimal_portfolio_creation(self):
         """Test creating portfolio with only required fields"""
-        from domain.value_objects import PortfolioName
+        from src.domain.value_objects import PortfolioName
 
         portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
         assert portfolio.name.value == "Test Portfolio"
@@ -114,14 +114,14 @@ class TestPortfolioEntity:
 
     def test_empty_name_rejected(self):
         """Test that empty name is rejected"""
-        from domain.value_objects import PortfolioName
+        from src.domain.value_objects import PortfolioName
 
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
             PortfolioName("")  # Error happens at value object level
 
     def test_long_name_rejected(self):
         """Test that excessively long names are rejected"""
-        from domain.value_objects import PortfolioName
+        from src.domain.value_objects import PortfolioName
 
         long_name = "A" * 101
         with pytest.raises(
@@ -135,7 +135,7 @@ class TestTransactionEntity:
 
     def test_valid_buy_transaction(self):
         """Test creating a valid buy transaction"""
-        from domain.value_objects import Notes, TransactionType
+        from src.domain.value_objects import Notes, TransactionType
 
         transaction = TransactionEntity(
             portfolio_id=1,
@@ -153,7 +153,7 @@ class TestTransactionEntity:
 
     def test_valid_sell_transaction(self):
         """Test creating a valid sell transaction"""
-        from domain.value_objects import TransactionType
+        from src.domain.value_objects import TransactionType
 
         transaction = TransactionEntity(
             portfolio_id=1,
@@ -169,7 +169,7 @@ class TestTransactionEntity:
 
     def test_invalid_transaction_type_rejected(self):
         """Test that invalid transaction types are rejected"""
-        from domain.value_objects import TransactionType
+        from src.domain.value_objects import TransactionType
 
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
@@ -178,7 +178,7 @@ class TestTransactionEntity:
 
     def test_invalid_portfolio_id_rejected(self):
         """Test that invalid portfolio ID is rejected"""
-        from domain.value_objects import TransactionType
+        from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Portfolio ID must be positive"):
             TransactionEntity(
@@ -192,7 +192,7 @@ class TestTransactionEntity:
 
     def test_invalid_stock_id_rejected(self):
         """Test that invalid stock ID is rejected"""
-        from domain.value_objects import TransactionType
+        from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Stock ID must be positive"):
             TransactionEntity(
@@ -210,7 +210,7 @@ class TestTargetEntity:
 
     def test_target_entity_creation_with_value_objects(self):
         """Test that TargetEntity can be instantiated with value objects"""
-        from domain.value_objects import TargetStatus
+        from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
             portfolio_id=1,
@@ -232,7 +232,7 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_entity_creation_with_value_objects(self):
         """Test that PortfolioBalanceEntity can be instantiated with value objects"""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
@@ -254,7 +254,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_entity_creation_with_value_objects(self):
         """Test that JournalEntryEntity can be instantiated with value objects"""
-        from domain.value_objects import JournalContent
+        from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date.today(),

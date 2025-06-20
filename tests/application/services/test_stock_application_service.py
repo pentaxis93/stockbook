@@ -9,14 +9,17 @@ from unittest.mock import Mock
 
 import pytest
 
-from application.commands.stock_commands import CreateStockCommand, UpdateStockCommand
-from application.dto.stock_dto import StockDto
-from application.services.stock_application_service import StockApplicationService
-from domain.entities.stock_entity import StockEntity
-from domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
-from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
-from domain.value_objects.sector import Sector
-from domain.value_objects.stock_symbol import StockSymbol
+from src.application.commands.stock_commands import (
+    CreateStockCommand,
+    UpdateStockCommand,
+)
+from src.application.dto.stock_dto import StockDto
+from src.application.services.stock_application_service import StockApplicationService
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
+from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from src.domain.value_objects.sector import Sector
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestStockApplicationService:

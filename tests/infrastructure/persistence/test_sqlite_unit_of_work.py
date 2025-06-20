@@ -10,12 +10,12 @@ import tempfile
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.repositories.interfaces import IStockRepository
-from domain.value_objects import CompanyName
-from domain.value_objects.stock_symbol import StockSymbol
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.repositories.interfaces import IStockRepository
+from src.domain.value_objects import CompanyName
+from src.domain.value_objects.stock_symbol import StockSymbol
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
 
 class TestSqliteUnitOfWork:

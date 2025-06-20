@@ -10,8 +10,8 @@ from decimal import Decimal
 
 import pytest
 
-from domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 from shared_kernel.value_objects import Money
+from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 
 
 class TestPortfolioBalanceEntity:
@@ -19,7 +19,7 @@ class TestPortfolioBalanceEntity:
 
     def test_create_portfolio_balance_with_value_objects(self):
         """Test creating a portfolio balance with all value objects."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
@@ -80,7 +80,7 @@ class TestPortfolioBalanceEntity:
 
     def test_create_portfolio_balance_with_invalid_index_change_raises_error(self):
         """Should raise error for invalid index change through IndexChange value object."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         with pytest.raises(ValueError, match="Index change cannot exceed"):
             IndexChange(150.0)  # Error happens at IndexChange construction (over 100%)
@@ -162,7 +162,7 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_has_positive_change(self):
         """Should check if portfolio has positive index change."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         positive_balance = PortfolioBalanceEntity(
             portfolio_id=1,
@@ -190,7 +190,7 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_has_negative_change(self):
         """Should check if portfolio has negative index change."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         negative_balance = PortfolioBalanceEntity(
             portfolio_id=1,
@@ -281,7 +281,7 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_update_index_change(self):
         """Should be able to update index change."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
@@ -307,7 +307,7 @@ class TestIndexChange:
 
     def test_valid_index_changes_accepted(self):
         """Test that valid index changes are accepted."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         valid_changes = [0.0, 5.25, -2.5, 50.0, -25.0, 99.99, -99.99]
         for change in valid_changes:
@@ -316,7 +316,7 @@ class TestIndexChange:
 
     def test_extreme_index_changes_rejected(self):
         """Test that extreme index changes are rejected."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         extreme_changes = [150.0, -150.0, 200.0, -200.0]
         for change in extreme_changes:
@@ -325,7 +325,7 @@ class TestIndexChange:
 
     def test_index_change_precision(self):
         """Test that index change values are properly rounded."""
-        from domain.value_objects import IndexChange
+        from src.domain.value_objects import IndexChange
 
         # Should round to 2 decimal places
         change = IndexChange(5.123456)

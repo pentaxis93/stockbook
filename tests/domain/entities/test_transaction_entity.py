@@ -10,10 +10,10 @@ from decimal import Decimal
 
 import pytest
 
-from domain.entities.transaction_entity import TransactionEntity
-from domain.value_objects import Notes
-from domain.value_objects.transaction_type import TransactionType
 from shared_kernel.value_objects import Money, Quantity
+from src.domain.entities.transaction_entity import TransactionEntity
+from src.domain.value_objects import Notes
+from src.domain.value_objects.transaction_type import TransactionType
 
 
 class TestTransactionEntity:

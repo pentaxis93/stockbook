@@ -11,15 +11,15 @@ from unittest.mock import patch
 
 import pytest
 
-from domain.services.value_objects.price_analysis import (
+from shared_kernel.value_objects.money import Money
+from src.domain.services.value_objects.price_analysis import (
     AlertType,
     PriceAlert,
     PriceAnalysis,
     PriceTrend,
     TrendDirection,
 )
-from domain.value_objects.stock_symbol import StockSymbol
-from shared_kernel.value_objects.money import Money
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestTrendDirection:
@@ -402,7 +402,7 @@ class TestPriceAlert:
         assert low_alert.severity == "low"
         assert high_alert.severity == "high"
 
-    @patch("domain.services.value_objects.price_analysis.datetime")
+    @patch("src.domain.services.value_objects.price_analysis.datetime")
     def test_price_alert_auto_timestamp(self, mock_datetime):
         """Should automatically set timestamp when not provided."""
         fixed_datetime = datetime(2023, 6, 15, 14, 30, 0)

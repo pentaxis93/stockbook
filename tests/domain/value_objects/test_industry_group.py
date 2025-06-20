@@ -7,7 +7,7 @@ of the IndustryGroup value object with validation.
 
 import pytest
 
-from domain.value_objects.industry_group import IndustryGroup
+from src.domain.value_objects.industry_group import IndustryGroup
 
 
 class TestIndustryGroup:

@@ -9,9 +9,9 @@ from datetime import datetime, timezone
 
 import pytest
 
-from domain.events.base import DomainEvent
-from domain.events.stock_events import StockAddedEvent
-from domain.value_objects.stock_symbol import StockSymbol
+from src.domain.events.base import DomainEvent
+from src.domain.events.stock_events import StockAddedEvent
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class TestDomainEvent:

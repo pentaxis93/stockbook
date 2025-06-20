@@ -10,14 +10,20 @@ from pathlib import Path
 
 import pytest
 
-from domain.entities.portfolio_entity import PortfolioEntity
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects import CompanyName, Grade, IndustryGroup, Notes, PortfolioName
-from domain.value_objects.sector import Sector
-from domain.value_objects.stock_symbol import StockSymbol
-from infrastructure.persistence.database_connection import DatabaseConnection
-from infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 from shared_kernel.value_objects import Money
+from src.domain.entities.portfolio_entity import PortfolioEntity
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects import (
+    CompanyName,
+    Grade,
+    IndustryGroup,
+    Notes,
+    PortfolioName,
+)
+from src.domain.value_objects.sector import Sector
+from src.domain.value_objects.stock_symbol import StockSymbol
+from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
 
 @pytest.fixture

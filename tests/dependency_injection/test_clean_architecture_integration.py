@@ -9,12 +9,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from application.commands.stock_commands import CreateStockCommand
-from application.dto.stock_dto import StockDto
+from src.application.commands.stock_commands import CreateStockCommand
+from src.application.dto.stock_dto import StockDto
 
 # Clean architecture imports - these exist
-from domain.entities.stock_entity import StockEntity
-from domain.value_objects.stock_symbol import StockSymbol
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects.stock_symbol import StockSymbol
 
 # These imports will exist after implementation
 # from dependency_injection.composition_root import CompositionRoot
@@ -46,7 +46,7 @@ class TestCleanArchitectureWiring:
 
         # Application service should depend on IUnitOfWork, not SQLiteUnitOfWork
         # assert hasattr(stock_service, '_unit_of_work')
-        # from domain.repositories.interfaces import IUnitOfWork
+        # from src.domain.repositories.interfaces import IUnitOfWork
         # assert isinstance(stock_service._unit_of_work, IUnitOfWork)
         pass
 
@@ -77,7 +77,7 @@ class TestEndToEndWorkflow:
         # coordinator = container.resolve(StockPageCoordinator)
 
         # Act - simulate stock creation workflow
-        # from presentation.view_models.stock_view_models import CreateStockRequest
+        # from src.presentation.view_models.stock_view_models import CreateStockRequest
         # request = CreateStockRequest(
         #     symbol="AAPL",
         #     name="Apple Inc.",
@@ -122,7 +122,7 @@ class TestLayerIsolationTesting:
     def test_mock_infrastructure_layer(self):
         """Should allow mocking infrastructure layer for testing."""
         # from dependency_injection.di_container import DIContainer
-        # from domain.repositories.interfaces import IUnitOfWork
+        # from src.domain.repositories.interfaces import IUnitOfWork
 
         # # Create test container with mocked infrastructure
         # container = DIContainer()

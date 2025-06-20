@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.database_connection import DatabaseConnection
 
 
 class TestDatabaseConnection:
