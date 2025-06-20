@@ -45,19 +45,11 @@ if [ -n "$TEST_FILES" ]; then
     fi
 fi
 
-# TEMPORARILY DISABLED: pyright (type checker)
-# Disabled due to architectural issues with database connection patterns
-# See TECHNICAL_DEBT.md for details on the database connection architecture flaw
-# 
-# TODO: Re-enable once the DatabaseConnection/TransactionalDatabaseConnection
-#       architecture is refactored to use a common interface
-#
-# echo "Running pyright type checker..."
-# if ! pyright; then
-#     echo "❌ Pyright type check failed. Fix the type issues before committing."
-#     exit 1
-# fi
-echo "⚠️  Pyright type checking TEMPORARILY DISABLED (see TECHNICAL_DEBT.md)"
+echo "Running pyright type checker..."
+if ! pyright; then
+    echo "❌ Pyright type check failed. Fix the type issues before committing."
+    exit 1
+fi
 
 # Run pytest with coverage (configured in pyproject.toml)
 echo "Running tests with pytest and coverage requirements..."
