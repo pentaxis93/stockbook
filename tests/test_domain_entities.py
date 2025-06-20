@@ -141,7 +141,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("150.25"), "USD"),
+            price=Money(Decimal("150.25")),
             transaction_date=date(2024, 1, 15),
             notes=Notes("Initial purchase"),
         )
@@ -159,7 +159,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("175.00"), "USD"),
+            price=Money(Decimal("175.00")),
             transaction_date=date(2024, 2, 15),
         )
         assert transaction.transaction_type.value == "sell"
@@ -185,7 +185,7 @@ class TestTransactionEntity:
                 stock_id=1,
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
-                price=Money(Decimal("150.00"), "USD"),
+                price=Money(Decimal("150.00")),
                 transaction_date=date.today(),
             )
 
@@ -199,7 +199,7 @@ class TestTransactionEntity:
                 stock_id=0,
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
-                price=Money(Decimal("150.00"), "USD"),
+                price=Money(Decimal("150.00")),
                 transaction_date=date.today(),
             )
 
@@ -214,8 +214,8 @@ class TestTargetEntity:
         target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("80.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
@@ -236,9 +236,9 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date.today(),
-            final_balance=Money(Decimal("10000.00"), "USD"),
-            deposits=Money(Decimal("1000.00"), "USD"),
-            withdrawals=Money(Decimal("500.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
+            deposits=Money(Decimal("1000.00")),
+            withdrawals=Money(Decimal("500.00")),
             index_change=IndexChange(5.25),
         )
         assert balance.portfolio_id == 1
@@ -302,7 +302,7 @@ class TestSharedKernelValueObjects:
 
     def test_money_creation(self):
         """Test Money value object creation"""
-        money = Money(Decimal("150.25"), "USD")
+        money = Money(Decimal("150.25"))
         assert money.amount == Decimal("150.25")
 
     def test_quantity_creation(self):
@@ -332,7 +332,7 @@ class TestSharedKernelValueObjects:
         # Note: Based on actual implementation, negative money might be allowed
         # This test may need adjustment based on business rules
         try:
-            money = Money(Decimal("-150.00"), "USD")
+            money = Money(Decimal("-150.00"))
             # If no exception, negative is allowed in this implementation
             assert money.amount == Decimal("-150.00")
         except ValueError:
@@ -344,7 +344,7 @@ class TestSharedKernelValueObjects:
         # Note: Based on actual implementation, zero money might be allowed
         # This test may need adjustment based on business rules
         try:
-            money = Money(Decimal("0.00"), "USD")
+            money = Money(Decimal("0.00"))
             # If no exception, zero is allowed in this implementation
             assert money.amount == Decimal("0.00")
         except ValueError:

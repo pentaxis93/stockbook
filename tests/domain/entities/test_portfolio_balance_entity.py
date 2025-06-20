@@ -24,9 +24,9 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            withdrawals=Money(Decimal("500.00"), "USD"),
-            deposits=Money(Decimal("1000.00"), "USD"),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            withdrawals=Money(Decimal("500.00")),
+            deposits=Money(Decimal("1000.00")),
+            final_balance=Money(Decimal("10500.00")),
             index_change=IndexChange(5.25),  # 5.25% change
         )
 
@@ -42,7 +42,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         assert balance.portfolio_id == 1
@@ -57,7 +57,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
             withdrawals=None,
             deposits=None,
             index_change=None,
@@ -75,7 +75,7 @@ class TestPortfolioBalanceEntity:
             PortfolioBalanceEntity(
                 portfolio_id=0,  # Invalid
                 balance_date=date(2024, 1, 15),
-                final_balance=Money(Decimal("10000.00"), "USD"),
+                final_balance=Money(Decimal("10000.00")),
             )
 
     def test_create_portfolio_balance_with_invalid_index_change_raises_error(self):
@@ -90,19 +90,19 @@ class TestPortfolioBalanceEntity:
         balance1 = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         balance2 = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("15000.00"), "USD"),  # Different amount
+            final_balance=Money(Decimal("15000.00")),  # Different amount
         )
 
         balance3 = PortfolioBalanceEntity(
             portfolio_id=2,  # Different portfolio
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         assert balance1 == balance2  # Same portfolio and date
@@ -113,13 +113,13 @@ class TestPortfolioBalanceEntity:
         balance1 = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         balance2 = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("20000.00"), "USD"),  # Different amount
+            final_balance=Money(Decimal("20000.00")),  # Different amount
         )
 
         assert hash(balance1) == hash(balance2)  # Same portfolio and date
@@ -129,7 +129,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            final_balance=Money(Decimal("10500.00")),
         )
 
         assert "2024-01-15" in str(balance)
@@ -140,7 +140,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            final_balance=Money(Decimal("10500.00")),
         )
 
         expected = "PortfolioBalanceEntity(portfolio_id=1, date=2024-01-15)"
@@ -152,9 +152,9 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            withdrawals=Money(Decimal("500.00"), "USD"),
-            deposits=Money(Decimal("1000.00"), "USD"),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            withdrawals=Money(Decimal("500.00")),
+            deposits=Money(Decimal("1000.00")),
+            final_balance=Money(Decimal("10500.00")),
         )
 
         net_flow = balance.calculate_net_flow()
@@ -167,21 +167,21 @@ class TestPortfolioBalanceEntity:
         positive_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            final_balance=Money(Decimal("10500.00")),
             index_change=IndexChange(5.25),
         )
 
         negative_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("9500.00"), "USD"),
+            final_balance=Money(Decimal("9500.00")),
             index_change=IndexChange(-2.5),
         )
 
         no_change_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         assert positive_balance.has_positive_change() is True
@@ -195,14 +195,14 @@ class TestPortfolioBalanceEntity:
         negative_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("9500.00"), "USD"),
+            final_balance=Money(Decimal("9500.00")),
             index_change=IndexChange(-2.5),
         )
 
         positive_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            final_balance=Money(Decimal("10500.00")),
             index_change=IndexChange(5.25),
         )
 
@@ -214,14 +214,14 @@ class TestPortfolioBalanceEntity:
         balance_with_deposits = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            deposits=Money(Decimal("1000.00"), "USD"),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            deposits=Money(Decimal("1000.00")),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         balance_without_deposits = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         assert balance_with_deposits.had_deposits() is True
@@ -232,14 +232,14 @@ class TestPortfolioBalanceEntity:
         balance_with_withdrawals = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            withdrawals=Money(Decimal("500.00"), "USD"),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            withdrawals=Money(Decimal("500.00")),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         balance_without_withdrawals = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         assert balance_with_withdrawals.had_withdrawals() is True
@@ -250,7 +250,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         balance.set_id(123)
@@ -261,7 +261,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         with pytest.raises(ValueError, match="ID must be a positive integer"):
@@ -272,7 +272,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
             balance_id=123,
         )
 
@@ -286,7 +286,7 @@ class TestPortfolioBalanceEntity:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            final_balance=Money(Decimal("10000.00")),
         )
 
         # Update with IndexChange value object

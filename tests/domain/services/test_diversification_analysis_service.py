@@ -123,7 +123,7 @@ class TestSectorDiversificationAnalysis:
         # # Use market benchmark (e.g., S&P 500 sector weights)
         # benchmark_allocation = service.calculate_ideal_sector_allocation(
         #     benchmark="SP500",
-        #     portfolio_size=Money(Decimal("100000"), "USD")
+        #     portfolio_size=Money(Decimal("100000"))
         # )
         #
         # assert benchmark_allocation.get_sector_percentage("Technology") > 15

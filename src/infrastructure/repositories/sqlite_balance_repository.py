@@ -223,16 +223,16 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
         entity = PortfolioBalanceEntity(
             portfolio_id=row["portfolio_id"],
             balance_date=balance_date,
-            final_balance=Money(Decimal(str(row["final_balance"])), "USD"),
+            final_balance=Money(Decimal(str(row["final_balance"]))),
             withdrawals=(
-                Money(Decimal(str(row["withdrawals"])), "USD")
+                Money(Decimal(str(row["withdrawals"])))
                 if row["withdrawals"]
-                else Money.zero("USD")
+                else Money.zero()
             ),
             deposits=(
-                Money(Decimal(str(row["deposits"])), "USD")
+                Money(Decimal(str(row["deposits"])))
                 if row["deposits"]
-                else Money.zero("USD")
+                else Money.zero()
             ),
             index_change=(
                 IndexChange(row["index_change"])

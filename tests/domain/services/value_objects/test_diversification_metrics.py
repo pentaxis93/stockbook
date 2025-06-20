@@ -28,7 +28,7 @@ class TestSectorAllocation:
             "Healthcare": Decimal("0.30"),
             "Financial": Decimal("0.30"),
         }
-        total_value = Money(Decimal("10000.00"), "USD")
+        total_value = Money(Decimal("10000.00"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value
@@ -40,7 +40,7 @@ class TestSectorAllocation:
     def test_create_sector_allocation_with_empty_allocations(self):
         """Should create SectorAllocation with empty allocations."""
         allocations = {}
-        total_value = Money(Decimal("0.00"), "USD")
+        total_value = Money(Decimal("0.00"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value
@@ -56,7 +56,7 @@ class TestSectorAllocation:
             "Healthcare": Decimal("0.30"),
             "Financial": Decimal("0.30"),
         }
-        total_value = Money(Decimal("10000.00"), "USD")
+        total_value = Money(Decimal("10000.00"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value
@@ -69,7 +69,7 @@ class TestSectorAllocation:
     def test_get_sector_percentage_non_existing_sector(self):
         """Should return zero for non-existing sector."""
         allocations = {"Technology": Decimal("0.50")}
-        total_value = Money(Decimal("5000.00"), "USD")
+        total_value = Money(Decimal("5000.00"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value
@@ -81,7 +81,7 @@ class TestSectorAllocation:
     def test_get_sector_percentage_empty_allocations(self):
         """Should return zero for any sector when allocations are empty."""
         allocations = {}
-        total_value = Money(Decimal("0.00"), "USD")
+        total_value = Money(Decimal("0.00"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value
@@ -93,7 +93,7 @@ class TestSectorAllocation:
     def test_sector_allocation_is_immutable(self):
         """SectorAllocation should be immutable (frozen dataclass)."""
         allocations = {"Technology": Decimal("0.50")}
-        total_value = Money(Decimal("5000.00"), "USD")
+        total_value = Money(Decimal("5000.00"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value
@@ -104,12 +104,12 @@ class TestSectorAllocation:
             sector_allocation.allocations = {}
 
         with pytest.raises(AttributeError):
-            sector_allocation.total_value = Money(Decimal("0.00"), "USD")
+            sector_allocation.total_value = Money(Decimal("0.00"))
 
     def test_sector_allocation_equality(self):
         """Should compare SectorAllocation objects for equality."""
         allocations = {"Technology": Decimal("0.50")}
-        total_value = Money(Decimal("5000.00"), "USD")
+        total_value = Money(Decimal("5000.00"))
 
         allocation1 = SectorAllocation(allocations=allocations, total_value=total_value)
         allocation2 = SectorAllocation(allocations=allocations, total_value=total_value)
@@ -123,7 +123,7 @@ class TestSectorAllocation:
     def test_sector_allocation_hash(self):
         """Should handle hashability appropriately (dictionaries are not hashable)."""
         allocations = {"Technology": Decimal("0.50")}
-        total_value = Money(Decimal("5000.00"), "USD")
+        total_value = Money(Decimal("5000.00"))
 
         allocation1 = SectorAllocation(allocations=allocations, total_value=total_value)
 
@@ -142,7 +142,7 @@ class TestSectorAllocation:
             "Healthcare": Decimal("0.333333"),
             "Financial": Decimal("0.333334"),  # Adds to 1.0
         }
-        total_value = Money(Decimal("9999.99"), "USD")
+        total_value = Money(Decimal("9999.99"))
 
         sector_allocation = SectorAllocation(
             allocations=allocations, total_value=total_value

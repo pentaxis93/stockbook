@@ -306,7 +306,7 @@ class TestPriceAlert:
     def test_create_price_alert_with_required_fields(self):
         """Should create PriceAlert with required fields."""
         symbol = StockSymbol("AAPL")
-        current_price = Money(Decimal("150.00"), "USD")
+        current_price = Money(Decimal("150.00"))
 
         alert = PriceAlert(
             symbol=symbol,
@@ -326,8 +326,8 @@ class TestPriceAlert:
     def test_create_price_alert_with_all_fields(self):
         """Should create PriceAlert with all fields specified."""
         symbol = StockSymbol("MSFT")
-        current_price = Money(Decimal("300.00"), "USD")
-        trigger_value = Money(Decimal("295.00"), "USD")
+        current_price = Money(Decimal("300.00"))
+        trigger_value = Money(Decimal("295.00"))
         timestamp = datetime(2023, 6, 15, 10, 30, 0)
 
         alert = PriceAlert(
@@ -351,7 +351,7 @@ class TestPriceAlert:
     def test_create_price_alert_with_different_alert_types(self):
         """Should create PriceAlert with different alert types."""
         symbol = StockSymbol("GOOGL")
-        current_price = Money(Decimal("120.00"), "USD")
+        current_price = Money(Decimal("120.00"))
 
         threshold_alert = PriceAlert(
             symbol=symbol,
@@ -381,7 +381,7 @@ class TestPriceAlert:
     def test_create_price_alert_with_different_severities(self):
         """Should create PriceAlert with different severity levels."""
         symbol = StockSymbol("TSLA")
-        current_price = Money(Decimal("200.00"), "USD")
+        current_price = Money(Decimal("200.00"))
 
         low_alert = PriceAlert(
             symbol=symbol,
@@ -409,7 +409,7 @@ class TestPriceAlert:
         mock_datetime.now.return_value = fixed_datetime
 
         symbol = StockSymbol("NVDA")
-        current_price = Money(Decimal("400.00"), "USD")
+        current_price = Money(Decimal("400.00"))
 
         alert = PriceAlert(
             symbol=symbol,
@@ -425,7 +425,7 @@ class TestPriceAlert:
     def test_price_alert_explicit_timestamp_not_overridden(self):
         """Should not override explicitly provided timestamp."""
         symbol = StockSymbol("AMD")
-        current_price = Money(Decimal("100.00"), "USD")
+        current_price = Money(Decimal("100.00"))
         explicit_timestamp = datetime(2023, 5, 10, 9, 15, 0)
 
         alert = PriceAlert(
@@ -441,7 +441,7 @@ class TestPriceAlert:
     def test_price_alert_is_immutable(self):
         """PriceAlert should be immutable (frozen dataclass)."""
         symbol = StockSymbol("INTC")
-        current_price = Money(Decimal("50.00"), "USD")
+        current_price = Money(Decimal("50.00"))
 
         alert = PriceAlert(
             symbol=symbol,
@@ -461,12 +461,12 @@ class TestPriceAlert:
             alert.message = "Modified message"
 
         with pytest.raises(AttributeError):
-            alert.current_price = Money(Decimal("60.00"), "USD")
+            alert.current_price = Money(Decimal("60.00"))
 
     def test_price_alert_equality(self):
         """Should compare PriceAlert objects for equality."""
         symbol = StockSymbol("ORCL")
-        current_price = Money(Decimal("80.00"), "USD")
+        current_price = Money(Decimal("80.00"))
         timestamp = datetime(2023, 6, 1, 12, 0, 0)
 
         alert1 = PriceAlert(
@@ -494,34 +494,35 @@ class TestPriceAlert:
         assert alert1 == alert2
         assert alert1 != alert3
 
-    def test_price_alert_with_different_currencies(self):
-        """Should handle price alerts with different currencies."""
+    def test_price_alert_with_different_prices(self):
+        """Should handle price alerts with different prices."""
         symbol = StockSymbol("SHOP")
-        usd_price = Money(Decimal("50.00"), "USD")
-        cad_price = Money(Decimal("65.00"), "CAD")
+        low_price = Money(Decimal("50.00"))
+        high_price = Money(Decimal("65.00"))
 
-        usd_alert = PriceAlert(
+        low_alert = PriceAlert(
             symbol=symbol,
             alert_type=AlertType.PRICE_THRESHOLD,
-            message="USD alert",
-            current_price=usd_price,
+            message="Low price alert",
+            current_price=low_price,
         )
 
-        cad_alert = PriceAlert(
+        high_alert = PriceAlert(
             symbol=symbol,
             alert_type=AlertType.PRICE_THRESHOLD,
-            message="CAD alert",
-            current_price=cad_price,
+            message="High price alert",
+            current_price=high_price,
         )
 
-        assert usd_alert.current_price.currency == "USD"
-        assert cad_alert.current_price.currency == "CAD"
+        assert low_alert.current_price < high_alert.current_price
+        assert low_alert.current_price.amount == Decimal("50.00")
+        assert high_alert.current_price.amount == Decimal("65.00")
 
     def test_price_alert_with_trigger_value(self):
         """Should handle price alerts with trigger values."""
         symbol = StockSymbol("CRM")
-        current_price = Money(Decimal("200.00"), "USD")
-        trigger_value = Money(Decimal("190.00"), "USD")
+        current_price = Money(Decimal("200.00"))
+        trigger_value = Money(Decimal("190.00"))
 
         alert = PriceAlert(
             symbol=symbol,
@@ -541,7 +542,7 @@ class TestPriceAnalysis:
     def test_create_price_analysis_with_all_fields(self):
         """Should create PriceAnalysis with all required fields."""
         symbol = StockSymbol("AAPL")
-        current_price = Money(Decimal("150.00"), "USD")
+        current_price = Money(Decimal("150.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.8"),
@@ -549,12 +550,12 @@ class TestPriceAnalysis:
             confidence_level=Decimal("0.85"),
         )
         support_levels = [
-            Money(Decimal("145.00"), "USD"),
-            Money(Decimal("140.00"), "USD"),
+            Money(Decimal("145.00")),
+            Money(Decimal("140.00")),
         ]
         resistance_levels = [
-            Money(Decimal("155.00"), "USD"),
-            Money(Decimal("160.00"), "USD"),
+            Money(Decimal("155.00")),
+            Money(Decimal("160.00")),
         ]
         momentum_indicators = {
             "rsi": Decimal("65.0"),
@@ -593,7 +594,7 @@ class TestPriceAnalysis:
     def test_create_price_analysis_with_empty_collections(self):
         """Should create PriceAnalysis with empty support/resistance/alerts."""
         symbol = StockSymbol("MSFT")
-        current_price = Money(Decimal("300.00"), "USD")
+        current_price = Money(Decimal("300.00"))
         trend = PriceTrend(
             direction=TrendDirection.SIDEWAYS,
             strength=Decimal("0.3"),
@@ -620,7 +621,7 @@ class TestPriceAnalysis:
     def test_is_overbought_with_high_rsi(self):
         """Should identify overbought condition when RSI >= 70."""
         symbol = StockSymbol("TSLA")
-        current_price = Money(Decimal("200.00"), "USD")
+        current_price = Money(Decimal("200.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.9"),
@@ -645,7 +646,7 @@ class TestPriceAnalysis:
     def test_is_overbought_at_boundary(self):
         """Should identify overbought condition at RSI = 70 boundary."""
         symbol = StockSymbol("NVDA")
-        current_price = Money(Decimal("400.00"), "USD")
+        current_price = Money(Decimal("400.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.7"),
@@ -670,7 +671,7 @@ class TestPriceAnalysis:
     def test_is_overbought_with_low_rsi(self):
         """Should not identify overbought condition when RSI < 70."""
         symbol = StockSymbol("AMD")
-        current_price = Money(Decimal("100.00"), "USD")
+        current_price = Money(Decimal("100.00"))
         trend = PriceTrend(
             direction=TrendDirection.SIDEWAYS,
             strength=Decimal("0.5"),
@@ -695,7 +696,7 @@ class TestPriceAnalysis:
     def test_is_overbought_without_rsi(self):
         """Should default to not overbought when RSI is not provided."""
         symbol = StockSymbol("INTC")
-        current_price = Money(Decimal("50.00"), "USD")
+        current_price = Money(Decimal("50.00"))
         trend = PriceTrend(
             direction=TrendDirection.DOWNWARD,
             strength=Decimal("0.6"),
@@ -720,7 +721,7 @@ class TestPriceAnalysis:
     def test_is_oversold_with_low_rsi(self):
         """Should identify oversold condition when RSI <= 30."""
         symbol = StockSymbol("ORCL")
-        current_price = Money(Decimal("80.00"), "USD")
+        current_price = Money(Decimal("80.00"))
         trend = PriceTrend(
             direction=TrendDirection.DOWNWARD,
             strength=Decimal("0.8"),
@@ -745,7 +746,7 @@ class TestPriceAnalysis:
     def test_is_oversold_at_boundary(self):
         """Should identify oversold condition at RSI = 30 boundary."""
         symbol = StockSymbol("CRM")
-        current_price = Money(Decimal("200.00"), "USD")
+        current_price = Money(Decimal("200.00"))
         trend = PriceTrend(
             direction=TrendDirection.DOWNWARD,
             strength=Decimal("0.7"),
@@ -770,7 +771,7 @@ class TestPriceAnalysis:
     def test_is_oversold_with_high_rsi(self):
         """Should not identify oversold condition when RSI > 30."""
         symbol = StockSymbol("GOOGL")
-        current_price = Money(Decimal("120.00"), "USD")
+        current_price = Money(Decimal("120.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.6"),
@@ -795,7 +796,7 @@ class TestPriceAnalysis:
     def test_is_oversold_without_rsi(self):
         """Should default to not oversold when RSI is not provided."""
         symbol = StockSymbol("SHOP")
-        current_price = Money(Decimal("50.00"), "USD")
+        current_price = Money(Decimal("50.00"))
         trend = PriceTrend(
             direction=TrendDirection.SIDEWAYS,
             strength=Decimal("0.3"),
@@ -820,7 +821,7 @@ class TestPriceAnalysis:
     def test_rsi_neutral_zone(self):
         """Should be neither overbought nor oversold in neutral RSI range."""
         symbol = StockSymbol("BABA")
-        current_price = Money(Decimal("90.00"), "USD")
+        current_price = Money(Decimal("90.00"))
         trend = PriceTrend(
             direction=TrendDirection.SIDEWAYS,
             strength=Decimal("0.4"),
@@ -846,7 +847,7 @@ class TestPriceAnalysis:
     def test_price_analysis_is_immutable(self):
         """PriceAnalysis should be immutable (frozen dataclass)."""
         symbol = StockSymbol("V")
-        current_price = Money(Decimal("250.00"), "USD")
+        current_price = Money(Decimal("250.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.7"),
@@ -870,7 +871,7 @@ class TestPriceAnalysis:
             analysis.symbol = StockSymbol("MA")
 
         with pytest.raises(AttributeError):
-            analysis.current_price = Money(Decimal("260.00"), "USD")
+            analysis.current_price = Money(Decimal("260.00"))
 
         with pytest.raises(AttributeError):
             analysis.volatility_score = Decimal("0.8")
@@ -878,7 +879,7 @@ class TestPriceAnalysis:
     def test_price_analysis_equality(self):
         """Should compare PriceAnalysis objects for equality."""
         symbol = StockSymbol("JPM")
-        current_price = Money(Decimal("140.00"), "USD")
+        current_price = Money(Decimal("140.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.6"),
@@ -890,8 +891,8 @@ class TestPriceAnalysis:
             symbol=symbol,
             current_price=current_price,
             trend_analysis=trend,
-            support_levels=[Money(Decimal("135.00"), "USD")],
-            resistance_levels=[Money(Decimal("145.00"), "USD")],
+            support_levels=[Money(Decimal("135.00"))],
+            resistance_levels=[Money(Decimal("145.00"))],
             volatility_score=Decimal("0.5"),
             momentum_indicators={"rsi": Decimal("55.0")},
             alerts=[],
@@ -900,8 +901,8 @@ class TestPriceAnalysis:
             symbol=symbol,
             current_price=current_price,
             trend_analysis=trend,
-            support_levels=[Money(Decimal("135.00"), "USD")],
-            resistance_levels=[Money(Decimal("145.00"), "USD")],
+            support_levels=[Money(Decimal("135.00"))],
+            resistance_levels=[Money(Decimal("145.00"))],
             volatility_score=Decimal("0.5"),
             momentum_indicators={"rsi": Decimal("55.0")},
             alerts=[],
@@ -910,8 +911,8 @@ class TestPriceAnalysis:
             symbol=symbol,
             current_price=current_price,
             trend_analysis=trend,
-            support_levels=[Money(Decimal("130.00"), "USD")],  # Different support
-            resistance_levels=[Money(Decimal("145.00"), "USD")],
+            support_levels=[Money(Decimal("130.00"))],  # Different support
+            resistance_levels=[Money(Decimal("145.00"))],
             volatility_score=Decimal("0.5"),
             momentum_indicators={"rsi": Decimal("55.0")},
             alerts=[],
@@ -923,7 +924,7 @@ class TestPriceAnalysis:
     def test_price_analysis_with_multiple_momentum_indicators(self):
         """Should handle multiple momentum indicators correctly."""
         symbol = StockSymbol("WMT")
-        current_price = Money(Decimal("160.00"), "USD")
+        current_price = Money(Decimal("160.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.65"),
@@ -958,7 +959,7 @@ class TestPriceAnalysis:
     def test_price_analysis_with_multiple_alerts(self):
         """Should handle multiple price alerts correctly."""
         symbol = StockSymbol("DIS")
-        current_price = Money(Decimal("100.00"), "USD")
+        current_price = Money(Decimal("100.00"))
         trend = PriceTrend(
             direction=TrendDirection.DOWNWARD,
             strength=Decimal("0.7"),
@@ -992,8 +993,8 @@ class TestPriceAnalysis:
             symbol=symbol,
             current_price=current_price,
             trend_analysis=trend,
-            support_levels=[Money(Decimal("95.00"), "USD")],
-            resistance_levels=[Money(Decimal("105.00"), "USD")],
+            support_levels=[Money(Decimal("95.00"))],
+            resistance_levels=[Money(Decimal("105.00"))],
             volatility_score=Decimal("0.9"),
             momentum_indicators={"rsi": Decimal("25.0")},
             alerts=[alert1, alert2, alert3],
@@ -1008,7 +1009,7 @@ class TestPriceAnalysis:
     def test_price_analysis_with_multiple_support_resistance_levels(self):
         """Should handle multiple support and resistance levels."""
         symbol = StockSymbol("KO")
-        current_price = Money(Decimal("60.00"), "USD")
+        current_price = Money(Decimal("60.00"))
         trend = PriceTrend(
             direction=TrendDirection.UPWARD,
             strength=Decimal("0.6"),
@@ -1017,14 +1018,14 @@ class TestPriceAnalysis:
         )
 
         support_levels = [
-            Money(Decimal("58.50"), "USD"),
-            Money(Decimal("57.00"), "USD"),
-            Money(Decimal("55.50"), "USD"),
+            Money(Decimal("58.50")),
+            Money(Decimal("57.00")),
+            Money(Decimal("55.50")),
         ]
         resistance_levels = [
-            Money(Decimal("61.50"), "USD"),
-            Money(Decimal("63.00"), "USD"),
-            Money(Decimal("65.00"), "USD"),
+            Money(Decimal("61.50")),
+            Money(Decimal("63.00")),
+            Money(Decimal("65.00")),
         ]
 
         analysis = PriceAnalysis(
@@ -1040,13 +1041,13 @@ class TestPriceAnalysis:
 
         assert len(analysis.support_levels) == 3
         assert len(analysis.resistance_levels) == 3
-        assert analysis.support_levels[0] == Money(Decimal("58.50"), "USD")
-        assert analysis.resistance_levels[0] == Money(Decimal("61.50"), "USD")
+        assert analysis.support_levels[0] == Money(Decimal("58.50"))
+        assert analysis.resistance_levels[0] == Money(Decimal("61.50"))
 
     def test_price_analysis_edge_cases(self):
         """Should handle edge cases correctly."""
         symbol = StockSymbol("F")
-        current_price = Money(Decimal("12.00"), "USD")
+        current_price = Money(Decimal("12.00"))
         trend = PriceTrend(
             direction=TrendDirection.SIDEWAYS,
             strength=Decimal("0.1"),  # Very weak trend

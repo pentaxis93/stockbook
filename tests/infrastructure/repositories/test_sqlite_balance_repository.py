@@ -59,9 +59,9 @@ def sample_balance():
     return PortfolioBalanceEntity(
         portfolio_id=1,
         balance_date=date(2024, 1, 15),
-        withdrawals=Money(Decimal("0.00"), "USD"),
-        deposits=Money(Decimal("1000.00"), "USD"),
-        final_balance=Money(Decimal("10500.00"), "USD"),
+        withdrawals=Money(Decimal("0.00")),
+        deposits=Money(Decimal("1000.00")),
+        final_balance=Money(Decimal("10500.00")),
         index_change=IndexChange(2.5),
     )
 
@@ -114,16 +114,16 @@ class TestPortfolioBalanceRepositoryRead:
             PortfolioBalanceEntity(
                 portfolio_id=1,
                 balance_date=date(2024, 1, 1),
-                withdrawals=Money(Decimal("0.00"), "USD"),
-                deposits=Money(Decimal("1000.00"), "USD"),
-                final_balance=Money(Decimal("10000.00"), "USD"),
+                withdrawals=Money(Decimal("0.00")),
+                deposits=Money(Decimal("1000.00")),
+                final_balance=Money(Decimal("10000.00")),
             ),
             PortfolioBalanceEntity(
                 portfolio_id=1,
                 balance_date=date(2024, 1, 2),
-                withdrawals=Money(Decimal("0.00"), "USD"),
-                deposits=Money(Decimal("0.00"), "USD"),
-                final_balance=Money(Decimal("10100.00"), "USD"),
+                withdrawals=Money(Decimal("0.00")),
+                deposits=Money(Decimal("0.00")),
+                final_balance=Money(Decimal("10100.00")),
             ),
         ]
 
@@ -144,16 +144,16 @@ class TestPortfolioBalanceRepositoryRead:
         old_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 1),
-            withdrawals=Money(Decimal("0.00"), "USD"),
-            deposits=Money(Decimal("1000.00"), "USD"),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            withdrawals=Money(Decimal("0.00")),
+            deposits=Money(Decimal("1000.00")),
+            final_balance=Money(Decimal("10000.00")),
         )
         new_balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 15),
-            withdrawals=Money(Decimal("0.00"), "USD"),
-            deposits=Money(Decimal("0.00"), "USD"),
-            final_balance=Money(Decimal("10500.00"), "USD"),
+            withdrawals=Money(Decimal("0.00")),
+            deposits=Money(Decimal("0.00")),
+            final_balance=Money(Decimal("10500.00")),
         )
 
         balance_repository.create(old_balance)
@@ -177,9 +177,9 @@ class TestPortfolioBalanceRepositoryIntegration:
         balance = PortfolioBalanceEntity(
             portfolio_id=1,
             balance_date=date(2024, 1, 1),
-            withdrawals=Money(Decimal("100.00"), "USD"),
-            deposits=Money(Decimal("1000.00"), "USD"),
-            final_balance=Money(Decimal("10000.00"), "USD"),
+            withdrawals=Money(Decimal("100.00")),
+            deposits=Money(Decimal("1000.00")),
+            final_balance=Money(Decimal("10000.00")),
             index_change=IndexChange(1.5),
         )
         balance_id = balance_repository.create(balance)

@@ -28,7 +28,7 @@ class PortfolioAllocation:
         """Get allocation value for a specific category."""
         percentage = self.get_allocation_percentage(category)
         allocation_amount = self.total_value.amount * (percentage / Decimal("100"))
-        return Money(allocation_amount, self.total_value.currency)
+        return Money(allocation_amount)
 
 
 @dataclass(frozen=True)

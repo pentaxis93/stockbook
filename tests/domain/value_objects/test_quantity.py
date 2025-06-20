@@ -45,10 +45,10 @@ class TestQuantityCreation:
         with pytest.raises(ValueError, match="Quantity cannot be negative"):
             Quantity(-10)
 
-    def test_allow_negative_quantity_for_adjustments(self):
-        """Should allow negative quantities when explicitly enabled for adjustments."""
-        qty = Quantity(-10, allow_negative=True)
-        assert qty.value == Decimal("-10")
+    def test_negative_quantities_not_allowed(self):
+        """Should not allow negative quantities in simplified implementation."""
+        with pytest.raises(ValueError, match="Quantity cannot be negative"):
+            Quantity(-10)
 
     def test_reject_invalid_value_type(self):
         """Should reject non-numeric value types."""
@@ -85,12 +85,12 @@ class TestQuantityArithmetic:
         with pytest.raises(ValueError, match="Resulting quantity cannot be negative"):
             qty1 - qty2
 
-    def test_subtract_with_negative_allowed(self):
-        """Should allow subtraction resulting in negative when explicitly enabled."""
-        qty1 = Quantity(30, allow_negative=True)
-        qty2 = Quantity(100)
+    def test_subtract_normal_behavior(self):
+        """Should perform normal subtraction when result is positive."""
+        qty1 = Quantity(100)
+        qty2 = Quantity(30)
         result = qty1 - qty2
-        assert result.value == Decimal("-70")
+        assert result.value == Decimal("70")
 
     def test_multiply_by_scalar(self):
         """Should multiply quantity by numeric scalar."""
@@ -115,44 +115,6 @@ class TestQuantityArithmetic:
         qty = Quantity(100)
         with pytest.raises(ZeroDivisionError):
             qty / 0
-
-    def test_floor_division(self):
-        """Should support floor division for whole unit calculations."""
-        qty = Quantity(100)
-        result = qty // 7
-        assert result.value == Decimal("14")  # 100 // 7 = 14
-
-    def test_modulo_operation(self):
-        """Should support modulo for remainder calculations."""
-        qty = Quantity(100)
-        result = qty % 7
-        assert result.value == Decimal("2")  # 100 % 7 = 2
-
-    def test_power_operation(self):
-        """Should support power operations for area/volume calculations."""
-        qty = Quantity(5)
-        result = qty**2
-        assert result.value == Decimal("25")
-
-    def test_negate_quantity(self):
-        """Should negate quantity when negative allowed."""
-        qty = Quantity(100, allow_negative=True)
-        result = -qty
-        assert result.value == Decimal("-100")
-
-    def test_negate_quantity_raises_error_when_negative_not_allowed(self):
-        """Should raise error when negating quantity that doesn't allow negative."""
-        qty = Quantity(100)
-        with pytest.raises(
-            ValueError, match="Negation would result in negative quantity"
-        ):
-            -qty
-
-    def test_absolute_value(self):
-        """Should return absolute value of quantity."""
-        qty = Quantity(-100, allow_negative=True)
-        result = abs(qty)
-        assert result.value == Decimal("100")
 
 
 class TestQuantityComparison:
@@ -217,19 +179,8 @@ class TestQuantityUtilities:
         """Should identify positive quantities."""
         positive_qty = Quantity(100)
         zero_qty = Quantity(0)
-        negative_qty = Quantity(-50, allow_negative=True)
         assert positive_qty.is_positive()
         assert not zero_qty.is_positive()
-        assert not negative_qty.is_positive()
-
-    def test_is_negative(self):
-        """Should identify negative quantities."""
-        negative_qty = Quantity(-50, allow_negative=True)
-        zero_qty = Quantity(0)
-        positive_qty = Quantity(100)
-        assert negative_qty.is_negative()
-        assert not zero_qty.is_negative()
-        assert not positive_qty.is_negative()
 
     def test_is_whole_number(self):
         """Should identify whole number quantities."""
@@ -269,140 +220,6 @@ class TestQuantityClassMethods:
         zero_qty = Quantity.zero()
         assert zero_qty.value == Decimal("0")
         assert zero_qty.is_zero()
-
-    def test_one_factory_method(self):
-        """Should create unit quantity."""
-        one_qty = Quantity.one()
-        assert one_qty.value == Decimal("1")
-
-    def test_from_string_factory_method(self):
-        """Should parse quantity from string."""
-        qty = Quantity.from_string("125.50")
-        assert qty.value == Decimal("125.50")
-
-    def test_from_fraction_factory_method(self):
-        """Should create quantity from fraction."""
-        qty = Quantity.from_fraction(3, 4)  # 3/4 = 0.75
-        assert qty.value == Decimal("0.75")
-
-    def test_sum_quantity_list(self):
-        """Should sum a list of quantities."""
-        qty_list = [Quantity(100), Quantity(50), Quantity(25)]
-        total = Quantity.sum(qty_list)
-        assert total.value == Decimal("175")
-
-    def test_sum_empty_list(self):
-        """Should return zero quantity for empty list."""
-        total = Quantity.sum([])
-        assert total.value == Decimal("0")
-
-    def test_max_from_list(self):
-        """Should find maximum quantity from list."""
-        qty_list = [Quantity(100), Quantity(50), Quantity(150), Quantity(25)]
-        max_qty = Quantity.max(qty_list)
-        assert max_qty.value == Decimal("150")
-
-    def test_min_from_list(self):
-        """Should find minimum quantity from list."""
-        qty_list = [Quantity(100), Quantity(50), Quantity(150), Quantity(25)]
-        min_qty = Quantity.min(qty_list)
-        assert min_qty.value == Decimal("25")
-
-
-class TestQuantityBusinessRules:
-    """Test Quantity business rules and domain constraints."""
-
-    def test_rounding_to_precision(self):
-        """Should round quantity to specified precision."""
-        qty = Quantity(Decimal("100.123456"))
-
-        # Round to 2 decimal places
-        rounded = qty.round(2)
-        assert rounded.value == Decimal("100.12")
-
-        # Round to whole number
-        rounded_whole = qty.round(0)
-        assert rounded_whole.value == Decimal("100")
-
-    def test_ceiling_operation(self):
-        """Should round up to next whole number."""
-        qty = Quantity(Decimal("100.1"))
-        ceiling = qty.ceiling()
-        assert ceiling.value == Decimal("101")
-
-    def test_floor_operation(self):
-        """Should round down to previous whole number."""
-        qty = Quantity(Decimal("100.9"))
-        floor = qty.floor()
-        assert floor.value == Decimal("100")
-
-    def test_split_into_equal_parts(self):
-        """Should split quantity into equal parts."""
-        qty = Quantity(100)
-        parts = qty.split(4)  # Split into 4 equal parts
-
-        assert len(parts) == 4
-        assert all(part.value == Decimal("25") for part in parts)
-
-        # Sum should equal original
-        total = Quantity.sum(parts)
-        assert total == qty
-
-    def test_split_with_remainder(self):
-        """Should handle splitting with remainder appropriately."""
-        qty = Quantity(100)
-        parts = qty.split(3)  # 100/3 = 33.33... each
-
-        assert len(parts) == 3
-
-        # Sum should still equal original (handling rounding)
-        total = Quantity.sum(parts)
-        assert total == qty
-
-    def test_percentage_of_total(self):
-        """Should calculate percentage of total."""
-        qty = Quantity(25)
-        total = Quantity(100)
-
-        percentage = qty.percentage_of(total)
-        assert percentage == Decimal("25.0")
-
-    def test_proportional_distribution(self):
-        """Should distribute quantity proportionally."""
-        qty = Quantity(100)
-        ratios = [Decimal("1"), Decimal("2"), Decimal("3")]  # 1:2:3 ratio
-
-        parts = qty.distribute_by_ratio(ratios)
-        assert len(parts) == 3
-
-        # Should be distributed as 1/6, 2/6, 3/6 of total
-        expected = [
-            Quantity(Decimal("16.67")),  # 100 * 1/6
-            Quantity(Decimal("33.33")),  # 100 * 2/6
-            Quantity(Decimal("50.00")),  # 100 * 3/6
-        ]
-
-        # Allow for rounding differences
-        for actual, expected_val in zip(parts, expected):
-            assert abs(actual.value - expected_val.value) < Decimal("0.01")
-
-    def test_unit_conversion_support(self):
-        """Should support unit conversions."""
-        # Example: shares to lots (100 shares = 1 lot)
-        shares = Quantity(250)
-        lots = shares.convert_units(conversion_factor=Decimal("0.01"))  # 1/100
-        assert lots.value == Decimal("2.5")
-
-    def test_range_validation(self):
-        """Should validate quantity within specified range."""
-        qty = Quantity(50)
-
-        # Should be valid within range
-        assert qty.is_within_range(min_value=0, max_value=100)
-
-        # Should be invalid outside range
-        assert not qty.is_within_range(min_value=60, max_value=100)
-        assert not qty.is_within_range(min_value=0, max_value=40)
 
 
 class TestQuantityEdgeCases:

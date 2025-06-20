@@ -70,7 +70,7 @@ def sample_transaction():
         stock_id=1,
         transaction_type=TransactionType("buy"),
         quantity=Quantity(100),
-        price=Money(Decimal("150.50"), "USD"),
+        price=Money(Decimal("150.50")),
         transaction_date=date(2024, 1, 15),
         notes=Notes("Test transaction"),
     )
@@ -98,7 +98,7 @@ class TestTransactionRepositoryCreate:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(50),
-            price=Money(Decimal("100.25"), "USD"),
+            price=Money(Decimal("100.25")),
             transaction_date=date(2024, 2, 1),
             notes=Notes("Buy order"),
         )
@@ -121,7 +121,7 @@ class TestTransactionRepositoryCreate:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(25),
-            price=Money(Decimal("105.75"), "USD"),
+            price=Money(Decimal("105.75")),
             transaction_date=date(2024, 2, 15),
             notes=Notes("Sell order"),
         )
@@ -143,7 +143,7 @@ class TestTransactionRepositoryCreate:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(10),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date.today(),
         )
 
@@ -203,7 +203,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
         transaction2 = TransactionEntity(
@@ -211,7 +211,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("55.00"), "USD"),
+            price=Money(Decimal("55.00")),
             transaction_date=date(2024, 1, 15),
         )
 
@@ -236,7 +236,7 @@ class TestTransactionRepositoryRead:
                 stock_id=1,
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
-                price=Money(Decimal("50.00"), "USD"),
+                price=Money(Decimal("50.00")),
                 transaction_date=date(2024, 1, i + 1),
             )
             transaction_repository.create(transaction)
@@ -255,7 +255,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
         transaction_id = transaction_repository.create(transaction)
@@ -275,7 +275,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
         transaction_id = transaction_repository.create(transaction)
@@ -299,7 +299,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
         middle_transaction = TransactionEntity(
@@ -307,7 +307,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("55.00"), "USD"),
+            price=Money(Decimal("55.00")),
             transaction_date=date(2024, 1, 15),
         )
         late_transaction = TransactionEntity(
@@ -315,7 +315,7 @@ class TestTransactionRepositoryRead:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(25),
-            price=Money(Decimal("60.00"), "USD"),
+            price=Money(Decimal("60.00")),
             transaction_date=date(2024, 2, 1),
         )
 
@@ -350,7 +350,7 @@ class TestTransactionRepositoryUpdate:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(75),
-            price=Money(Decimal("155.25"), "USD"),
+            price=Money(Decimal("155.25")),
             transaction_date=date(2024, 1, 20),
             notes=Notes("Updated transaction"),
         )
@@ -376,7 +376,7 @@ class TestTransactionRepositoryUpdate:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(10),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date.today(),
         )
 
@@ -427,7 +427,7 @@ class TestTransactionRepositoryIntegration:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("50.00"), "USD"),
+            price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
             notes=Notes("Lifecycle test"),
         )
@@ -444,7 +444,7 @@ class TestTransactionRepositoryIntegration:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("55.00"), "USD"),
+            price=Money(Decimal("55.00")),
             transaction_date=date(2024, 1, 15),
             notes=Notes("Updated lifecycle test"),
         )
@@ -478,7 +478,7 @@ class TestTransactionRepositoryErrorHandling:
                 stock_id=1,
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
-                price=Money(Decimal("50.00"), "USD"),
+                price=Money(Decimal("50.00")),
                 transaction_date=date.today(),
             )
             transaction_repository.create(invalid_transaction)

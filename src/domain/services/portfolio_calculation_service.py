@@ -48,10 +48,9 @@ class PortfolioCalculationService:
     ) -> Money:
         """Calculate total portfolio market value."""
         if not portfolio:
-            return Money.zero(self.config.default_currency)
+            return Money.zero()
 
         total_amount = Decimal("0")
-        currency = None
 
         for stock, quantity in portfolio:
             symbol_str = str(stock.symbol)
@@ -66,24 +65,13 @@ class PortfolioCalculationService:
             position_value = current_price.amount * Decimal(str(quantity.value))
             total_amount += position_value
 
-            # Use the currency from the first stock
-            if currency is None:
-                currency = current_price.currency
-            elif currency != current_price.currency:
-                raise CalculationError(
-                    "Multi-currency portfolios require currency conversion",
-                    calculation_type="total_value",
-                )
-
-        return Money(total_amount, currency or self.config.default_currency)
+        return Money(total_amount)
 
     def calculate_position_value(
         self, _stock: StockEntity, quantity: Quantity, current_price: Money
     ) -> Money:
         """Calculate individual position value."""
-        return Money(
-            current_price.amount * Decimal(str(quantity.value)), current_price.currency
-        )
+        return Money(current_price.amount * Decimal(str(quantity.value)))
 
     def calculate_position_allocations(
         self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]
@@ -120,7 +108,7 @@ class PortfolioCalculationService:
     ) -> PortfolioAllocation:
         """Calculate allocation by industry sectors."""
         if not portfolio:
-            return PortfolioAllocation({}, Money.zero(self.config.default_currency))
+            return PortfolioAllocation({}, Money.zero())
 
         total_value = self.calculate_total_value(portfolio, prices)
         industry_values: Dict[str, Decimal] = {}

@@ -116,7 +116,7 @@ def create_test_prices(portfolio: List) -> Dict[str, Money]:
     prices = {}
     for stock, _ in portfolio:
         # Use a default price since we don't need actual prices for stub tests
-        prices[str(stock.symbol)] = Money(Decimal("100.00"), "USD")
+        prices[str(stock.symbol)] = Money(Decimal("100.00"))
     return prices
 
 

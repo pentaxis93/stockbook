@@ -40,8 +40,8 @@ class PortfolioBalanceEntity(BaseEntity):
         self._portfolio_id = portfolio_id
         self._balance_date = balance_date
         self._final_balance = final_balance
-        self._withdrawals = withdrawals or Money.zero("USD")
-        self._deposits = deposits or Money.zero("USD")
+        self._withdrawals = withdrawals or Money.zero()
+        self._deposits = deposits or Money.zero()
         self._index_change = index_change
         if balance_id is not None:
             self.set_id(balance_id)

@@ -24,7 +24,7 @@ class TestTransactionEntity:
         stock_id = 2
         transaction_type = TransactionType("buy")
         quantity = Quantity(100)
-        price = Money(Decimal("150.25"), "USD")
+        price = Money(Decimal("150.25"))
         transaction_date = date(2024, 1, 15)
         notes = Notes("Initial purchase")
 
@@ -53,7 +53,7 @@ class TestTransactionEntity:
         stock_id = 2
         transaction_type = TransactionType("sell")
         quantity = Quantity(50)
-        price = Money(Decimal("175.50"), "USD")
+        price = Money(Decimal("175.50"))
         transaction_date = date(2024, 2, 1)
 
         transaction = TransactionEntity(
@@ -77,7 +77,7 @@ class TestTransactionEntity:
         """Should store and return value objects directly."""
         transaction_type = TransactionType("buy")
         quantity = Quantity(75)
-        price = Money(Decimal("200.00"), "USD")
+        price = Money(Decimal("200.00"))
         notes = Notes("Test transaction")
 
         transaction = TransactionEntity(
@@ -109,7 +109,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
             notes=None,
         )
@@ -131,7 +131,7 @@ class TestTransactionEntity:
                 stock_id=1,
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
-                price=Money(Decimal("100.00"), "USD"),
+                price=Money(Decimal("100.00")),
                 transaction_date=date.today(),
             )
 
@@ -143,7 +143,7 @@ class TestTransactionEntity:
                 stock_id=-1,  # Invalid
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
-                price=Money(Decimal("100.00"), "USD"),
+                price=Money(Decimal("100.00")),
                 transaction_date=date.today(),
             )
 
@@ -154,7 +154,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date(2024, 1, 1),
         )
 
@@ -163,7 +163,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date(2024, 1, 1),
         )
 
@@ -172,7 +172,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date(2024, 1, 1),
         )
 
@@ -187,11 +187,11 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("150.50"), "USD"),
+            price=Money(Decimal("150.50")),
             transaction_date=date(2024, 1, 15),
         )
 
-        expected = "buy 100 @ 150.50 USD on 2024-01-15"
+        expected = "buy 100 @ $150.50 on 2024-01-15"
         assert str(transaction) == expected
 
     def test_transaction_repr(self):
@@ -201,11 +201,11 @@ class TestTransactionEntity:
             stock_id=2,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("200.00"), "USD"),
+            price=Money(Decimal("200.00")),
             transaction_date=date(2024, 2, 1),
         )
 
-        expected = "TransactionEntity(portfolio_id=1, stock_id=2, type='sell', quantity=50, price=200.00 USD)"
+        expected = "TransactionEntity(portfolio_id=1, stock_id=2, type='sell', quantity=50, price=$200.00)"
         assert repr(transaction) == expected
 
     def test_calculate_total_value(self):
@@ -215,13 +215,13 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("150.50"), "USD"),
+            price=Money(Decimal("150.50")),
             transaction_date=date.today(),
         )
 
         total_value = transaction.calculate_total_value()
 
-        assert total_value == Money(Decimal("15050.00"), "USD")
+        assert total_value == Money(Decimal("15050.00"))
         assert isinstance(total_value, Money)
 
     def test_is_buy_transaction(self):
@@ -231,7 +231,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 
@@ -240,7 +240,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("110.00"), "USD"),
+            price=Money(Decimal("110.00")),
             transaction_date=date.today(),
         )
 
@@ -254,7 +254,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 
@@ -263,7 +263,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
-            price=Money(Decimal("110.00"), "USD"),
+            price=Money(Decimal("110.00")),
             transaction_date=date.today(),
         )
 
@@ -277,7 +277,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
             notes=Notes("Important transaction"),
         )
@@ -287,7 +287,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 
@@ -301,7 +301,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 
@@ -317,7 +317,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 
@@ -337,7 +337,7 @@ class TestTransactionEntity:
             stock_id=1,
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
-            price=Money(Decimal("100.00"), "USD"),
+            price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 

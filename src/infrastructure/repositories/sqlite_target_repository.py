@@ -263,10 +263,10 @@ class SqliteTargetRepository(ITargetRepository):
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
             pivot_price=Money(
-                Decimal(str(row["pivot_price"])), "USD"
+                Decimal(str(row["pivot_price"]))
             ),  # TODO: Store currency in DB
             failure_price=Money(
-                Decimal(str(row["failure_price"])), "USD"
+                Decimal(str(row["failure_price"]))
             ),  # TODO: Store currency in DB
             status=TargetStatus(row["status"]),
             created_date=created_date,

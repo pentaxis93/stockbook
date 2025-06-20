@@ -288,9 +288,7 @@ class SqliteTransactionRepository(ITransactionRepository):
             stock_id=row["stock_id"],
             transaction_type=TransactionType(row["type"]),  # Wrap in TransactionType
             quantity=Quantity(row["quantity"]),
-            price=Money(
-                Decimal(str(row["price"])), "USD"
-            ),  # TODO: Store currency in DB
+            price=Money(Decimal(str(row["price"]))),  # TODO: Store currency in DB
             transaction_date=transaction_date,
             notes=Notes(row["notes"] or ""),  # Wrap in Notes value object
         )

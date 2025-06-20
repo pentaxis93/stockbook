@@ -68,8 +68,8 @@ def sample_target():
     return TargetEntity(
         portfolio_id=1,
         stock_id=1,
-        pivot_price=Money(Decimal("150.00"), "USD"),
-        failure_price=Money(Decimal("140.00"), "USD"),
+        pivot_price=Money(Decimal("150.00")),
+        failure_price=Money(Decimal("140.00")),
         status=TargetStatus("active"),
         created_date=date(2024, 1, 1),
         notes=Notes("Test target"),
@@ -94,8 +94,8 @@ class TestTargetRepositoryCreate:
         active_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("95.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
             notes=Notes("Active target test"),
@@ -117,8 +117,8 @@ class TestTargetRepositoryCreate:
         minimal_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("50.00"), "USD"),
-            failure_price=Money(Decimal("45.00"), "USD"),
+            pivot_price=Money(Decimal("50.00")),
+            failure_price=Money(Decimal("45.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
         )
@@ -172,16 +172,16 @@ class TestTargetRepositoryRead:
         active_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("95.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
         )
         inactive_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("105.00"), "USD"),
-            failure_price=Money(Decimal("98.00"), "USD"),
+            pivot_price=Money(Decimal("105.00")),
+            failure_price=Money(Decimal("98.00")),
             status=TargetStatus("hit"),
             created_date=date(2024, 1, 1),
         )
@@ -203,8 +203,8 @@ class TestTargetRepositoryRead:
         target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("95.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
         )
@@ -223,16 +223,16 @@ class TestTargetRepositoryRead:
         target1 = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("95.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
         target2 = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("110.00"), "USD"),
-            failure_price=Money(Decimal("105.00"), "USD"),
+            pivot_price=Money(Decimal("110.00")),
+            failure_price=Money(Decimal("105.00")),
             status=TargetStatus("failed"),
             created_date=date.today(),
         )
@@ -258,8 +258,8 @@ class TestTargetRepositoryUpdate:
         updated_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("160.00"), "USD"),
-            failure_price=Money(Decimal("145.00"), "USD"),
+            pivot_price=Money(Decimal("160.00")),
+            failure_price=Money(Decimal("145.00")),
             status=TargetStatus("hit"),
             created_date=date.today(),
             notes=Notes("Updated target"),
@@ -284,8 +284,8 @@ class TestTargetRepositoryUpdate:
         target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("95.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
         )
@@ -329,8 +329,8 @@ class TestTargetRepositoryIntegration:
         target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("100.00"), "USD"),
-            failure_price=Money(Decimal("95.00"), "USD"),
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
             notes=Notes("Lifecycle test"),
@@ -346,8 +346,8 @@ class TestTargetRepositoryIntegration:
         updated_target = TargetEntity(
             portfolio_id=1,
             stock_id=1,
-            pivot_price=Money(Decimal("105.00"), "USD"),
-            failure_price=Money(Decimal("98.00"), "USD"),
+            pivot_price=Money(Decimal("105.00")),
+            failure_price=Money(Decimal("98.00")),
             status=TargetStatus("hit"),
             created_date=date(2024, 1, 1),
             notes=Notes("Updated lifecycle test"),
@@ -375,24 +375,24 @@ class TestTargetRepositoryIntegration:
             TargetEntity(
                 portfolio_id=1,
                 stock_id=1,
-                pivot_price=Money(Decimal("100.00"), "USD"),
-                failure_price=Money(Decimal("95.00"), "USD"),
+                pivot_price=Money(Decimal("100.00")),
+                failure_price=Money(Decimal("95.00")),
                 status=TargetStatus("active"),
                 created_date=date(2024, 1, 1),
             ),
             TargetEntity(
                 portfolio_id=1,
                 stock_id=1,
-                pivot_price=Money(Decimal("110.00"), "USD"),
-                failure_price=Money(Decimal("105.00"), "USD"),
+                pivot_price=Money(Decimal("110.00")),
+                failure_price=Money(Decimal("105.00")),
                 status=TargetStatus("hit"),
                 created_date=date(2024, 1, 1),
             ),
             TargetEntity(
                 portfolio_id=1,
                 stock_id=1,
-                pivot_price=Money(Decimal("120.00"), "USD"),
-                failure_price=Money(Decimal("115.00"), "USD"),
+                pivot_price=Money(Decimal("120.00")),
+                failure_price=Money(Decimal("115.00")),
                 status=TargetStatus("active"),
                 created_date=date(2024, 1, 1),
             ),
@@ -419,8 +419,8 @@ class TestTargetRepositoryErrorHandling:
             invalid_target = TargetEntity(
                 portfolio_id=0,  # Invalid portfolio ID
                 stock_id=1,
-                pivot_price=Money(Decimal("100.00"), "USD"),
-                failure_price=Money(Decimal("95.00"), "USD"),
+                pivot_price=Money(Decimal("100.00")),
+                failure_price=Money(Decimal("95.00")),
                 status=TargetStatus("active"),
                 created_date=date(2024, 1, 1),
             )
@@ -432,8 +432,8 @@ class TestTargetRepositoryErrorHandling:
             invalid_target = TargetEntity(
                 portfolio_id=1,
                 stock_id=1,
-                pivot_price=Money(Decimal("100.00"), "USD"),
-                failure_price=Money(Decimal("95.00"), "USD"),
+                pivot_price=Money(Decimal("100.00")),
+                failure_price=Money(Decimal("95.00")),
                 status=TargetStatus("invalid_status"),  # Invalid status
                 created_date=date(2024, 1, 1),
             )

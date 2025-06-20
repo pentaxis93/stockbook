@@ -43,7 +43,7 @@ def create_test_stock(symbol="AAPL", price=100.00, quantity=10, grade="B"):
         industry_group=IndustryGroup("Software"),
         grade=Grade(grade),
     )
-    return stock, Quantity(quantity), Money(Decimal(str(price)), "USD")
+    return stock, Quantity(quantity), Money(Decimal(str(price)))
 
 
 def create_test_portfolio():
@@ -75,7 +75,7 @@ class TestPortfolioValueCalculations:
 
         total_value = service.calculate_total_value(portfolio, prices)
 
-        expected = Money(Decimal("8500.00"), "USD")  # 1500 + 5000 + 1000 + 1000
+        expected = Money(Decimal("8500.00"))  # 1500 + 5000 + 1000 + 1000
         assert total_value == expected
 
     def test_calculate_position_values(self):
@@ -87,7 +87,7 @@ class TestPortfolioValueCalculations:
             stock, quantity, current_price
         )
 
-        expected = Money(Decimal("1500.00"), "USD")
+        expected = Money(Decimal("1500.00"))
         assert position_value == expected
 
     def test_calculate_portfolio_with_different_currencies(self):
@@ -97,7 +97,7 @@ class TestPortfolioValueCalculations:
         # us_stock = StockEntity(
         #     symbol=StockSymbol("AAPL"),
         #     name="Apple Inc",
-        #     current_price=Money(Decimal("150.00"), "USD")
+        #     current_price=Money(Decimal("150.00"))
         # )
         #
         # uk_stock = StockEntity(

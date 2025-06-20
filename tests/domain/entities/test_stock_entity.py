@@ -222,20 +222,25 @@ class TestStockEntity:
         stock = StockEntity(symbol=symbol, company_name=company_name)
 
         quantity = Quantity(100)
-        price = Money("150.50", "USD")
+        price = Money("150.50")
 
         total_value = stock.calculate_position_value(quantity, price)
 
-        assert total_value == Money("15050.00", "USD")
+        assert total_value == Money("15050.00")
         assert isinstance(total_value, Money)
 
     def test_calculate_position_value_with_zero_quantity(self):
         """Should handle zero quantity gracefully."""
         symbol = StockSymbol("AAPL")
-        # Note: For stock shares, use for_shares factory which enforces positive quantities
+        company_name = CompanyName("Apple Inc.")
+        stock = StockEntity(symbol=symbol, company_name=company_name)
 
-        with pytest.raises(ValueError):
-            Quantity.for_shares(0)  # This should fail for share quantities
+        # Zero quantities are allowed
+        quantity = Quantity(0)
+        price = Money("150.50")
+
+        total_value = stock.calculate_position_value(quantity, price)
+        assert total_value == Money("0.00")
 
     def test_has_notes(self):
         """Should check if stock has notes."""

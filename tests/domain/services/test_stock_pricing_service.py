@@ -45,9 +45,9 @@ class TestStockPriceValidation:
         #
         # # Mock current market price
         # market_context = MarketContext(
-        #     current_market_price=Money(Decimal("152.00"), "USD"),
-        #     day_high=Money(Decimal("155.00"), "USD"),
-        #     day_low=Money(Decimal("148.00"), "USD")
+        #     current_market_price=Money(Decimal("152.00")),
+        #     day_high=Money(Decimal("155.00")),
+        #     day_low=Money(Decimal("148.00"))
         # )
         #
         # is_valid = service.validate_price_against_market(stock, market_context)
@@ -60,7 +60,7 @@ class TestStockPriceValidation:
         # stock = create_test_stock("AAPL", 500.00)  # Unusually high
         #
         # historical_context = HistoricalPriceContext(
-        #     average_30_day=Money(Decimal("150.00"), "USD"),
+        #     average_30_day=Money(Decimal("150.00")),
         #     volatility_30_day=0.15
         # )
         #
@@ -90,7 +90,7 @@ class TestStockPriceValidation:
         # high_value_stock = StockEntity(
         #     symbol=StockSymbol("BRK.A"),
         #     name="Berkshire Hathaway",
-        #     current_price=Money(Decimal("450000.123456"), "USD"),  # Too precise
+        #     current_price=Money(Decimal("450000.123456")),  # Too precise
         #     grade="A+"
         # )
         #
@@ -159,7 +159,7 @@ class TestPriceCalculations:
         # dividend_stock = create_test_stock("DIV", 100.00)
         #
         # dividend_info = DividendInfo(
-        #     annual_dividend=Money(Decimal("4.00"), "USD"),
+        #     annual_dividend=Money(Decimal("4.00")),
         #     dividend_yield=0.04,
         #     payout_ratio=0.6,
         #     ex_dividend_date=datetime.now() + timedelta(days=5)
@@ -183,11 +183,11 @@ class TestPriceTrendAnalysis:
         # stock = create_test_stock("TREND", 100.00)
         #
         # price_history = [
-        #     Money(Decimal("95.00"), "USD"),   # 5 days ago
-        #     Money(Decimal("97.00"), "USD"),   # 4 days ago
-        #     Money(Decimal("98.50"), "USD"),   # 3 days ago
-        #     Money(Decimal("99.00"), "USD"),   # 2 days ago
-        #     Money(Decimal("100.00"), "USD"),  # Today
+        #     Money(Decimal("95.00")),   # 5 days ago
+        #     Money(Decimal("97.00")),   # 4 days ago
+        #     Money(Decimal("98.50")),   # 3 days ago
+        #     Money(Decimal("99.00")),   # 2 days ago
+        #     Money(Decimal("100.00")),  # Today
         # ]
         #
         # trend_analysis = service.analyze_price_trend(stock, price_history)
@@ -251,13 +251,13 @@ class TestPriceAlertGeneration:
         # stock = create_test_stock("ALERT", 105.00)
         #
         # alert_config = PriceAlertConfig(
-        #     upper_threshold=Money(Decimal("110.00"), "USD"),
-        #     lower_threshold=Money(Decimal("95.00"), "USD"),
+        #     upper_threshold=Money(Decimal("110.00")),
+        #     lower_threshold=Money(Decimal("95.00")),
         #     percentage_change_threshold=0.05
         # )
         #
         # # Previous price was $100, now $105 (5% increase)
-        # previous_price = Money(Decimal("100.00"), "USD")
+        # previous_price = Money(Decimal("100.00"))
         #
         # alerts = service.generate_price_alerts(stock, previous_price, alert_config)
         #
@@ -342,10 +342,10 @@ class TestPriceHistoryAnalysis:
         # stock = create_test_stock("HISTORICAL", 100.00)
         #
         # historical_context = HistoricalRangeContext(
-        #     one_year_high=Money(Decimal("120.00"), "USD"),
-        #     one_year_low=Money(Decimal("80.00"), "USD"),
-        #     all_time_high=Money(Decimal("150.00"), "USD"),
-        #     all_time_low=Money(Decimal("25.00"), "USD")
+        #     one_year_high=Money(Decimal("120.00")),
+        #     one_year_low=Money(Decimal("80.00")),
+        #     all_time_high=Money(Decimal("150.00")),
+        #     all_time_low=Money(Decimal("25.00"))
         # )
         #
         # comparison = service.compare_to_historical_ranges(stock, historical_context)
@@ -365,7 +365,7 @@ class TestPricingServiceIntegration:
         # service = StockPricingService(market_data_feed=market_feed)
         #
         # stock = create_test_stock("LIVE", 100.00)
-        # market_feed.set_live_price("LIVE", Money(Decimal("102.50"), "USD"))
+        # market_feed.set_live_price("LIVE", Money(Decimal("102.50")))
         #
         # price_analysis = service.analyze_with_live_data(stock)
         #
