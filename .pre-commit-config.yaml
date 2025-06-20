@@ -20,7 +20,7 @@ repos:
       - id: pyright
         name: Type check all business logic layers with pyright
         args: ["--project", "pyproject.toml"]
-        files: ^(infrastructure/persistence|infrastructure/repositories|application|domain|shared_kernel|presentation)/.*\.py$
+        files: ^(src/infrastructure/persistence|src/infrastructure/repositories|src/application|src/domain|src/presentation)/.*\.py$
         additional_dependencies: []
 
   # Custom quality checks (pylint, tests) that don't modify files

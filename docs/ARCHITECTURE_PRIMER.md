@@ -57,11 +57,6 @@ StockBook is built using **Clean Architecture** principles with **Domain-Driven 
 │  │(Implementations)│ Connections │  │  Services   │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
 └─────────────────────────────────────────────────────────────┘
-              ┌─────────────────────────────────┐
-              │         Shared Kernel           │
-              │   Value Objects | Events        │
-              │   Exceptions   | Interfaces     │
-              └─────────────────────────────────┘
 ```
 
 ---
@@ -370,14 +365,14 @@ class StreamlitStockAdapter:
 
 ## Core Components
 
-### Shared Kernel (`shared_kernel/`)
+### Domain Value Objects
 
-Contains reusable components used across multiple bounded contexts:
+Core domain components that provide business value:
 
-#### Value Objects
+#### Value Objects (`domain/value_objects/`)
 ```python
 class Money:
-    """Immutable money representation with currency"""
+    \"\"\"Immutable money representation with currency\"\"\"
     
     def __init__(self, amount: Decimal, currency: str):
         self.amount = amount
@@ -389,11 +384,11 @@ class Money:
         return Money(self.amount + other.amount, self.currency)
 
 class Quantity:
-    """Represents quantities with validation"""
+    \"\"\"Represents quantities with validation\"\"\"
     
     def __init__(self, value: int):
         if value < 0:
-            raise ValueError("Quantity cannot be negative")
+            raise ValueError(\"Quantity cannot be negative\")
         self.value = value
 ```
 

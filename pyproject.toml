@@ -92,19 +92,18 @@ exclude_lines = [
 [tool.pyright]
 # Check all core business logic layers except problematic streamlit UI operations
 include = [
-    "infrastructure/persistence",
-    "infrastructure/repositories", 
-    "application",
-    "domain",
-    "shared_kernel",
-    "presentation"
+    "src/infrastructure/persistence",
+    "src/infrastructure/repositories", 
+    "src/application",
+    "src/domain",
+    "src/presentation"
 ]
 
 # Exclude files with streamlit dependencies or type issues
 exclude = [
-    "presentation/adapters/streamlit_ui_operations.py",
-    "presentation/adapters/streamlit_stock_adapter.py", 
-    "presentation/coordinators/stock_page_coordinator.py"
+    "src/presentation/adapters/streamlit_ui_operations.py",
+    "src/presentation/adapters/streamlit_stock_adapter.py", 
+    "src/presentation/coordinators/stock_page_coordinator.py"
 ]
 
 # Use basic type checking - just catch the most important errors

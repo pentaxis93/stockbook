@@ -76,12 +76,8 @@ stockbook/
 │   ├── adapters/            # Framework adapters
 │   └── coordinators/        # UI workflow coordination
 ├── dependency_injection/     # IoC container and composition root
-├── shared_kernel/           # Shared components across bounded contexts
-│   ├── value_objects/       # Common value objects (Money, Quantity)
-│   ├── events/              # Domain event infrastructure
-│   ├── exceptions/          # Domain exception hierarchy
-│   └── interfaces/          # Common interfaces (Unit of Work)
-├── tests/                   # Comprehensive test suite (829 tests)
+
+├── tests/                   # Comprehensive test suite
 ├── config.py                # Centralized configuration management
 ├── requirements.txt         # Python dependencies
 └── docs/                    # Documentation and roadmap
@@ -100,12 +96,11 @@ stockbook/
 - Repository pattern with clean separation of concerns
 - Comprehensive error handling and validation
 
-**Shared Kernel & Domain-Driven Design**
-- Value objects (Money, Quantity) with arithmetic operations and business rules
-- Domain events infrastructure with serialization and ordering
-- Domain exception hierarchy with context and severity levels
+**Domain-Driven Design**
+- Rich domain layer with value objects (Money, Quantity) and business rules
+- Domain events infrastructure for event-driven architecture
 - Domain services for portfolio calculation, stock validation, and risk assessment
-- Test-driven development with 183 shared kernel tests
+- Clean single-context approach with consolidated domain components
 
 **Legacy Foundation (Phase 1)**
 - Database schema with 6 tables and relationships  
@@ -116,7 +111,7 @@ stockbook/
 
 ### Current Phase: Integration & Feature Development
 
-**Test Coverage**: 829 tests (695 passing, 134 placeholder)
+**Test Coverage**: Comprehensive test suite with high coverage
 **Architecture Compliance**: 100% clean architecture principles
 **Code Quality**: Type-safe with comprehensive error handling
 

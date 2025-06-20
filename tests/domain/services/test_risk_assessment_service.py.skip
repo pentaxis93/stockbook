@@ -27,7 +27,8 @@ from domain.services.value_objects.risk_metrics import (
     RiskProfile,
 )
 from domain.value_objects.stock_symbol import StockSymbol
-from shared_kernel.value_objects import Money, Quantity
+from domain.value_objects.money import Money
+from domain.value_objects.quantity import Quantity
 
 
 # Test data helpers
