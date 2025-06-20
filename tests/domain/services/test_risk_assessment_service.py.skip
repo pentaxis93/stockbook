@@ -11,13 +11,13 @@ from typing import Dict, List
 
 import pytest
 
-from domain.entities.stock_entity import StockEntity
-from domain.services.exceptions import InsufficientDataError
-from domain.services.risk_assessment_service import (
+from src.domain.entities.stock_entity import StockEntity
+from src.domain.services.exceptions import InsufficientDataError
+from src.domain.services.risk_assessment_service import (
     RiskAssessmentConfig,
     RiskAssessmentService,
 )
-from domain.services.value_objects.risk_metrics import (
+from src.domain.services.value_objects.risk_metrics import (
     ConcentrationLevel,
     ConcentrationRisk,
     PortfolioRisk,
@@ -26,9 +26,9 @@ from domain.services.value_objects.risk_metrics import (
     RiskMetrics,
     RiskProfile,
 )
-from domain.value_objects.stock_symbol import StockSymbol
-from domain.value_objects.money import Money
-from domain.value_objects.quantity import Quantity
+from src.domain.value_objects.stock_symbol import StockSymbol
+from src.domain.value_objects.money import Money
+from src.domain.value_objects.quantity import Quantity
 
 
 # Test data helpers
