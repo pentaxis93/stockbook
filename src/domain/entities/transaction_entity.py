@@ -8,8 +8,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional
 
-from shared_kernel.value_objects import Money, Quantity
-from src.domain.value_objects import Notes, TransactionType
+from src.domain.value_objects import Money, Notes, Quantity, TransactionType
 
 
 class TransactionEntity:

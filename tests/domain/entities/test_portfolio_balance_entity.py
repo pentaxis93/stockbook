@@ -10,8 +10,8 @@ from decimal import Decimal
 
 import pytest
 
-from shared_kernel.value_objects import Money
 from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
+from src.domain.value_objects import Money
 
 
 class TestPortfolioBalanceEntity:

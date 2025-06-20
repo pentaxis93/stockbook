@@ -8,7 +8,6 @@ from decimal import Decimal
 
 import pytest
 
-from shared_kernel.value_objects import Money, Quantity
 from src.domain.entities import (
     JournalEntryEntity,
     PortfolioBalanceEntity,
@@ -17,7 +16,7 @@ from src.domain.entities import (
     TargetEntity,
     TransactionEntity,
 )
-from src.domain.value_objects import CompanyName, Grade
+from src.domain.value_objects import CompanyName, Grade, Money, Quantity
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 

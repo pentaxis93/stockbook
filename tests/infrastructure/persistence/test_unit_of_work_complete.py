@@ -10,13 +10,13 @@ from pathlib import Path
 
 import pytest
 
-from shared_kernel.value_objects import Money
 from src.domain.entities.portfolio_entity import PortfolioEntity
 from src.domain.entities.stock_entity import StockEntity
 from src.domain.value_objects import (
     CompanyName,
     Grade,
     IndustryGroup,
+    Money,
     Notes,
     PortfolioName,
 )

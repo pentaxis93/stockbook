@@ -11,7 +11,6 @@ from unittest.mock import patch
 
 import pytest
 
-from shared_kernel.value_objects.money import Money
 from src.domain.services.value_objects.price_analysis import (
     AlertType,
     PriceAlert,
@@ -19,6 +18,7 @@ from src.domain.services.value_objects.price_analysis import (
     PriceTrend,
     TrendDirection,
 )
+from src.domain.value_objects.money import Money
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 

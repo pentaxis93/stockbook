@@ -8,8 +8,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional, Union
 
-from shared_kernel.value_objects import Money
-from src.domain.value_objects import IndexChange
+from src.domain.value_objects import IndexChange, Money
 
 
 class PortfolioBalanceEntity:

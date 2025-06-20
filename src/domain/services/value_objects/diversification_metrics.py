@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Dict, Optional
 
-from shared_kernel.value_objects import Money
+from src.domain.value_objects import Money
 
 
 @dataclass(frozen=True)

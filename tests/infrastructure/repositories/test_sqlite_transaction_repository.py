@@ -12,10 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from shared_kernel.value_objects import Money, Quantity
 from src.domain.entities.transaction_entity import TransactionEntity
 from src.domain.repositories.interfaces import ITransactionRepository
-from src.domain.value_objects import Notes, TransactionType
+from src.domain.value_objects import Money, Notes, Quantity, TransactionType
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.repositories.sqlite_transaction_repository import (
     SqliteTransactionRepository,

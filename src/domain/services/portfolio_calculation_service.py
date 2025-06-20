@@ -8,8 +8,8 @@ across multiple stocks and provide aggregated insights.
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
-from shared_kernel.value_objects import Money, Quantity
 from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects import Money, Quantity
 
 from .exceptions import CalculationError
 from .value_objects.portfolio_metrics import (

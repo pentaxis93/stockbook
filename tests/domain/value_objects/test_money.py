@@ -1,7 +1,7 @@
 """
-Comprehensive test suite for Money value object in shared kernel.
+Comprehensive test suite for Money value object in domain layer.
 
-Tests the Money value object as a reusable component across all bounded contexts.
+Tests the Money value object as a foundational domain component.
 This follows TDD approach by defining all expected behavior before implementation.
 """
 
@@ -9,7 +9,7 @@ from decimal import Decimal
 
 import pytest
 
-from shared_kernel.value_objects.money import Money
+from src.domain.value_objects.money import Money
 
 
 class TestMoneyCreation:

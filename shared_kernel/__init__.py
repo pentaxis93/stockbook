@@ -4,13 +4,15 @@ Shared Kernel - Common components across bounded contexts.
 The shared kernel contains foundational components that are reused across
 multiple bounded contexts in the stockbook application. This includes:
 
-- Common value objects (Money, Quantity)
 - Base domain events infrastructure
 - Common domain exceptions
 - Common interfaces (Unit of Work pattern)
 
 These components follow domain-driven design principles and are designed
 to be stable, well-tested, and reusable across different domains.
+
+Note: Value objects (Money, Quantity) have been moved to src.domain.value_objects
+for single-context thinking approach.
 """
 
 # Domain Events
@@ -29,13 +31,7 @@ from .exceptions import (
 # Interfaces
 from .interfaces import IUnitOfWork
 
-# Value Objects
-from .value_objects import Money, Quantity
-
 __all__ = [
-    # Value Objects
-    "Money",
-    "Quantity",
     # Domain Events
     "DomainEvent",
     # Domain Exceptions

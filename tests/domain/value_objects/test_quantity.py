@@ -1,7 +1,7 @@
 """
-Comprehensive test suite for Quantity value object in shared kernel.
+Comprehensive test suite for Quantity value object in domain layer.
 
-Tests the Quantity value object as a reusable component across all bounded contexts.
+Tests the Quantity value object as a foundational domain component.
 This follows TDD approach by defining all expected behavior before implementation.
 """
 
@@ -9,7 +9,7 @@ from decimal import Decimal
 
 import pytest
 
-from shared_kernel.value_objects.quantity import Quantity
+from src.domain.value_objects.quantity import Quantity
 
 
 class TestQuantityCreation:

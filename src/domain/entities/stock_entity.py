@@ -7,8 +7,14 @@ and validation rules encapsulated within the entity.
 
 from typing import Optional
 
-from shared_kernel.value_objects import Money, Quantity
-from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
+from src.domain.value_objects import (
+    CompanyName,
+    Grade,
+    IndustryGroup,
+    Money,
+    Notes,
+    Quantity,
+)
 from src.domain.value_objects.sector import Sector
 from src.domain.value_objects.stock_symbol import StockSymbol
 

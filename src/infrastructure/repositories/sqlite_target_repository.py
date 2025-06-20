@@ -10,9 +10,9 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import List, Optional
 
-from shared_kernel.value_objects import Money
 from src.domain.entities.target_entity import TargetEntity
 from src.domain.repositories.interfaces import ITargetRepository
+from src.domain.value_objects import Money
 from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
 

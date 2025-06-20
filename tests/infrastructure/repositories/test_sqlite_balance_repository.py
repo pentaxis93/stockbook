@@ -12,10 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from shared_kernel.value_objects import Money
 from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 from src.domain.repositories.interfaces import IPortfolioBalanceRepository
-from src.domain.value_objects import IndexChange
+from src.domain.value_objects import IndexChange, Money
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.repositories.sqlite_balance_repository import (
     SqlitePortfolioBalanceRepository,

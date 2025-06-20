@@ -8,8 +8,8 @@ including various risk metrics and risk management analysis.
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
-from shared_kernel.value_objects import Money, Quantity
 from src.domain.entities.stock_entity import StockEntity
+from src.domain.value_objects import Money, Quantity
 
 from .exceptions import InsufficientDataError
 from .value_objects.risk_metrics import (
