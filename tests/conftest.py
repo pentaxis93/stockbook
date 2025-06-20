@@ -22,7 +22,7 @@ from src.infrastructure.repositories.sqlite_portfolio_repository import (
 )
 
 # Add the project root to Python path so we can import our modules
-# This allows tests to import from 'utils' and other project packages
+# This allows tests to import from project packages
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
