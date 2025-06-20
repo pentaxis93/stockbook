@@ -19,6 +19,8 @@ class BaseEntity(ABC):
         """Get entity ID."""
         return self._id
 
+    # Is set_id() needed? The id is a primary key in the database.
+    # That means it will be set by the database and not by the user.
     def set_id(self, entity_id: int) -> None:
         """Set entity ID (for persistence layer)."""
         if not isinstance(entity_id, int) or entity_id <= 0:
@@ -32,12 +34,6 @@ class BaseEntity(ABC):
         if not isinstance(other, self.__class__):
             return False
         return self._id == other._id and self._id is not None
-
-    def __hash__(self) -> int:
-        """Hash based on entity type and ID."""
-        if self._id is None:
-            return hash(id(self))
-        return hash((self.__class__, self._id))
 
     def __str__(self) -> str:
         """String representation of entity."""
