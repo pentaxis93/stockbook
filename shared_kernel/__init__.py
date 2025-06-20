@@ -16,7 +16,7 @@ for single-context thinking approach.
 """
 
 # Domain Events
-from .events import DomainEvent
+from src.domain.events.base import DomainEvent
 
 # Domain Exceptions
 from .exceptions import (

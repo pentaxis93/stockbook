@@ -1,1 +1,0 @@
-# Shared kernel events tests
