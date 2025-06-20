@@ -1,104 +1,66 @@
 """
-Exceptions for domain services.
+Domain service exceptions - simplified starter kit.
 
-Provides specialized exceptions for different types of domain service errors
-with clear error messages and appropriate error handling context.
+Provides a focused set of exceptions with clear patterns for common
+domain service error scenarios. Designed to teach best practices
+for exception handling in domain-driven design.
 """
 
-from typing import Any, List, Optional
+from typing import Optional
 
 
 class DomainServiceError(Exception):
-    """Base exception for all domain service errors."""
+    """
+    Base exception for all domain service errors.
 
-    def __init__(self, message: str, details: Optional[dict] = None):
+    Provides common error handling patterns with optional context details.
+    All domain service exceptions should inherit from this class.
+    """
+
+    def __init__(self, message: str, context: Optional[dict] = None):
         self.message = message
-        self.details = details or {}
+        self.context = context or {}
         super().__init__(message)
 
 
 class ValidationError(DomainServiceError):
-    """Raised when validation rules are violated."""
+    """
+    Raised when input validation fails.
 
-    def __init__(self, message: str, field: Optional[str] = None, value: Any = None):
-        self.field = field
-        self.value = value
-        super().__init__(message, {"field": field, "value": value})
+    Use this when data doesn't meet business rules or format requirements.
+    Includes optional field and value context for debugging.
+    """
 
-
-class BusinessRuleViolationError(DomainServiceError):
-    """Raised when business rules are violated."""
-
-    def __init__(self, message: str, rule_name: str, context: Optional[dict] = None):
-        self.rule_name = rule_name
-        self.context = context or {}
-        super().__init__(message, {"rule": rule_name, "context": context})
+    def __init__(self, message: str, field: Optional[str] = None, value=None):
+        context = {}
+        if field:
+            context["field"] = field
+        if value is not None:
+            context["value"] = str(value)
+        super().__init__(message, context)
 
 
 class CalculationError(DomainServiceError):
-    """Raised when calculations cannot be performed or produce invalid results."""
+    """
+    Raised when business calculations fail.
 
-    def __init__(
-        self, message: str, calculation_type: str, input_data: Optional[dict] = None
-    ):
-        self.calculation_type = calculation_type
-        self.input_data = input_data or {}
-        super().__init__(
-            message, {"calculation_type": calculation_type, "input_data": input_data}
-        )
+    Use this when mathematical operations cannot be completed
+    due to invalid inputs, missing data, or calculation constraints.
+    """
+
+    def __init__(self, message: str, operation: Optional[str] = None):
+        context = {"operation": operation} if operation else {}
+        super().__init__(message, context)
 
 
 class InsufficientDataError(DomainServiceError):
-    """Raised when insufficient data is available for analysis or calculations."""
+    """
+    Raised when required data is missing for operations.
 
-    def __init__(
-        self,
-        message: str,
-        required_data: List[str],
-        available_data: Optional[List[str]] = None,
-    ):
-        self.required_data = required_data
-        self.available_data = available_data or []
-        super().__init__(
-            message, {"required": required_data, "available": available_data}
-        )
+    Use this when analysis or calculations cannot proceed
+    due to missing required information.
+    """
 
-
-class PricingError(DomainServiceError):
-    """Raised when price-related calculations or validations fail."""
-
-    def __init__(
-        self,
-        message: str,
-        symbol: Optional[str] = None,
-        price_value: Optional[str] = None,
-    ):
-        self.symbol = symbol
-        self.price_value = price_value
-        super().__init__(message, {"symbol": symbol, "price": price_value})
-
-
-class InvalidPriceDataError(PricingError):
-    """Raised when price data is invalid or corrupted."""
-
-    pass
-
-
-class RiskAnalysisError(DomainServiceError):
-    """Raised when risk analysis cannot be completed."""
-
-    def __init__(
-        self,
-        message: str,
-        risk_type: Optional[str] = None,
-        analysis_context: Optional[dict] = None,
-    ):
-        self.risk_type = risk_type
-        self.analysis_context = analysis_context or {}
-        super().__init__(message, {"risk_type": risk_type, "context": analysis_context})
-
-
-class AnalysisError(DomainServiceError):
-    """Raised when general analysis operations fail."""
-
-    pass
+    def __init__(self, message: str, required_fields: Optional[list] = None):
+        context = {"required_fields": required_fields or []}
+        super().__init__(message, context)

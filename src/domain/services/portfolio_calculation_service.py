@@ -57,8 +57,7 @@ class PortfolioCalculationService:
             if symbol_str not in prices:
                 raise CalculationError(
                     f"Stock {stock.symbol} missing current price",
-                    calculation_type="total_value",
-                    input_data={"symbol": symbol_str},
+                    operation="total_value",
                 )
 
             current_price = prices[symbol_str]

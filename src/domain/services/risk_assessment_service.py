@@ -67,8 +67,7 @@ class RiskAssessmentService:
         if not portfolio:
             raise InsufficientDataError(
                 "Cannot assess risk of empty portfolio",
-                required_data=["portfolio_positions"],
-                available_data=[],
+                required_fields=["portfolio_positions"],
             )
 
         # TODO: Implement comprehensive portfolio risk assessment logic
