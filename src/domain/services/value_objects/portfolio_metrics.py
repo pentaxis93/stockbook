@@ -79,9 +79,6 @@ class PortfolioSummary:
     position_count: int
     top_holding: Optional[PositionAllocation]
     industry_breakdown: Dict[str, Decimal]  # Industry -> percentage
-    grade_breakdown: Dict[str, Decimal]  # Grade -> percentage
-    risk_level: str  # "Low", "Medium", "High"
-    diversification_grade: str  # A+, A, B+, etc.
 
     def get_top_industries(self, limit: int = 3) -> List[tuple]:
         """Get top industries by allocation percentage."""

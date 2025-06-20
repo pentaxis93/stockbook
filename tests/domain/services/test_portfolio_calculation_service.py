@@ -148,16 +148,33 @@ class TestPortfolioAllocationAnalysis:
         tech_allocation = industry_allocations.get_allocation_percentage("Software")
         assert tech_allocation == Decimal("100.0")  # All are Software
 
-    def test_calculate_allocation_by_grade(self):
-        """Should calculate allocation by stock grades."""
+    def test_calculate_grade_allocations_method_removed(self):
+        """Grade allocation method should be removed from service."""
         service = PortfolioCalculationService()
-        portfolio, prices = create_test_portfolio()
 
-        grade_allocations = service.calculate_grade_allocations(portfolio, prices)
+        # Method should not exist
+        assert not hasattr(service, "calculate_grade_allocations")
 
-        a_grade_allocation = grade_allocations.get_allocation_percentage("A")
-        # AAPL (1500) + GOOGL (5000) = 6500 out of 8500 total = 76.47%
-        assert abs(a_grade_allocation - Decimal("76.47")) < Decimal("0.1")
+    def test_calculate_diversity_score_method_removed(self):
+        """Diversity score method should be removed from service."""
+        service = PortfolioCalculationService()
+
+        # Method should not exist
+        assert not hasattr(service, "calculate_diversity_score")
+
+    def test_calculate_weighted_average_grade_method_removed(self):
+        """Weighted average grade method should be removed from service."""
+        service = PortfolioCalculationService()
+
+        # Method should not exist
+        assert not hasattr(service, "calculate_weighted_average_grade")
+
+    def test_generate_portfolio_summary_method_removed(self):
+        """Portfolio summary generation method should be removed from service."""
+        service = PortfolioCalculationService()
+
+        # Method should not exist
+        assert not hasattr(service, "generate_portfolio_summary")
 
     def test_identify_concentration_risks(self):
         """Should identify positions that are overly concentrated."""
@@ -178,33 +195,6 @@ class TestPortfolioAllocationAnalysis:
 @pytest.mark.skip(reason="TDD - implementation pending")
 class TestPortfolioPerformanceMetrics:
     """Test portfolio performance and risk metrics."""
-
-    def test_calculate_portfolio_diversity_score(self):
-        """Should calculate how well diversified the portfolio is."""
-        # service = PortfolioCalculationService()
-        #
-        # # Well diversified portfolio
-        # diversified_portfolio = create_balanced_portfolio()
-        # diversity_score = service.calculate_diversity_score(diversified_portfolio)
-        # assert diversity_score.score >= 0.8
-        #
-        # # Concentrated portfolio
-        # concentrated_portfolio = [create_test_stock("ONLY", 1000.00, 100, "A")]
-        # diversity_score = service.calculate_diversity_score(concentrated_portfolio)
-        # assert diversity_score.score <= 0.2
-        pass
-
-    def test_calculate_weighted_average_grade(self):
-        """Should calculate portfolio's weighted average grade."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_test_portfolio()
-        #
-        # avg_grade = service.calculate_weighted_average_grade(portfolio)
-        #
-        # # Should be weighted by position value, not just count
-        # assert avg_grade.letter_grade in ["A-", "B+", "B"]
-        # assert avg_grade.numeric_score > 0
-        pass
 
     def test_calculate_portfolio_risk_metrics(self):
         """Should calculate comprehensive risk metrics."""
@@ -291,19 +281,6 @@ class TestPortfolioRebalancingAnalysis:
 @pytest.mark.skip(reason="TDD - implementation pending")
 class TestPortfolioReporting:
     """Test portfolio reporting and summary generation."""
-
-    def test_generate_portfolio_summary(self):
-        """Should generate comprehensive portfolio summary."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_test_portfolio()
-        #
-        # summary = service.generate_portfolio_summary(portfolio)
-        #
-        # assert summary.total_value == Money(Decimal("8500.00"), "USD")
-        # assert summary.position_count == 4
-        # assert summary.top_holding.symbol == "GOOGL"
-        # assert len(summary.industry_breakdown) > 0
-        pass
 
     def test_generate_allocation_report(self):
         """Should generate detailed allocation breakdown report."""
