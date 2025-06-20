@@ -8,10 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional
 
+from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
 
 
-class TransactionEntity:
+class TransactionEntity(BaseEntity):
     """
     Transaction aggregate root representing a stock trade.
 
@@ -38,7 +39,7 @@ class TransactionEntity:
             raise ValueError("Stock ID must be positive")
 
         # Store validated attributes
-        self._id = transaction_id
+        super().__init__()
         self._portfolio_id = portfolio_id
         self._stock_id = stock_id
         self._transaction_type = transaction_type
@@ -46,12 +47,8 @@ class TransactionEntity:
         self._price = price
         self._transaction_date = transaction_date
         self._notes = notes or Notes("")
-
-    # Identity
-    @property
-    def id(self) -> Optional[int]:
-        """Get transaction ID."""
-        return self._id
+        if transaction_id is not None:
+            self.set_id(transaction_id)
 
     # Core attributes
     @property
@@ -105,14 +102,6 @@ class TransactionEntity:
     def has_notes(self) -> bool:
         """Check if transaction has notes."""
         return self._notes.has_content()
-
-    def set_id(self, transaction_id: int) -> None:
-        """Set transaction ID (for persistence layer)."""
-        if not isinstance(transaction_id, int) or transaction_id <= 0:
-            raise ValueError("ID must be a positive integer")
-        if self._id is not None:
-            raise ValueError("ID is already set and cannot be changed")
-        self._id = transaction_id
 
     # Equality and representation
     def __eq__(self, other) -> bool:

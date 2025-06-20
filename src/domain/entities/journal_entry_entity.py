@@ -8,10 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional, Union
 
+from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import JournalContent
 
 
-class JournalEntryEntity:
+class JournalEntryEntity(BaseEntity):
     """
     Journal Entry entity representing notes and observations about investments.
 
@@ -42,18 +43,14 @@ class JournalEntryEntity:
             raise ValueError("Transaction ID must be positive")
 
         # Store validated attributes
-        self._id = entry_id
+        super().__init__()
         self._entry_date = entry_date
         self._content = content
         self._portfolio_id = portfolio_id
         self._stock_id = stock_id
         self._transaction_id = transaction_id
-
-    # Identity
-    @property
-    def id(self) -> Optional[int]:
-        """Get entry ID."""
-        return self._id
+        if entry_id is not None:
+            self.set_id(entry_id)
 
     # Core attributes
     @property
@@ -104,14 +101,6 @@ class JournalEntryEntity:
             self._content = JournalContent(content)
         else:
             self._content = content
-
-    def set_id(self, entry_id: int) -> None:
-        """Set entry ID (for persistence layer)."""
-        if not isinstance(entry_id, int) or entry_id <= 0:
-            raise ValueError("ID must be a positive integer")
-        if self._id is not None:
-            raise ValueError("ID is already set and cannot be changed")
-        self._id = entry_id
 
     # Equality and representation
     def __eq__(self, other) -> bool:

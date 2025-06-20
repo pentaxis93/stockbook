@@ -7,6 +7,7 @@ and validation rules encapsulated within the entity.
 
 from typing import Optional
 
+from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import (
     CompanyName,
     Grade,
@@ -19,7 +20,7 @@ from src.domain.value_objects.sector import Sector
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 
-class StockEntity:
+class StockEntity(BaseEntity):
     """
     Rich domain entity representing a stock/security.
 
@@ -58,13 +59,15 @@ class StockEntity:
         self._sector_industry_service = SectorIndustryService()
 
         # Store value objects directly (they're already validated)
+        super().__init__()
         self._symbol = symbol
         self._company_name = company_name
         self._sector_vo = sector
         self._industry_group_vo = industry_group
         self._grade_vo = grade
         self._notes_vo = notes if notes is not None else Notes("")
-        self._id = stock_id
+        if stock_id is not None:
+            self.set_id(stock_id)
 
         # Validate domain business rules (sector-industry relationship)
         sector_str = sector.value if sector else None
@@ -100,11 +103,6 @@ class StockEntity:
     def notes(self) -> Notes:
         """Get the notes value object."""
         return self._notes_vo
-
-    @property
-    def id(self) -> Optional[int]:
-        """Get the database ID."""
-        return self._id
 
     def __eq__(self, other) -> bool:
         """
@@ -220,24 +218,6 @@ class StockEntity:
             self._grade_vo = temp_values["grade_vo"]
         if "notes_vo" in temp_values:
             self._notes_vo = temp_values["notes_vo"]
-
-    def set_id(self, stock_id: int) -> None:
-        """
-        Set the database ID (for persistence layer).
-
-        Args:
-            stock_id: Database ID
-
-        Raises:
-            ValueError: If ID is invalid or already set
-        """
-        if not isinstance(stock_id, int) or stock_id <= 0:
-            raise ValueError("ID must be a positive integer")
-
-        if self._id is not None:
-            raise ValueError("ID is already set and cannot be changed")
-
-        self._id = stock_id
 
     def _validate_sector_industry_combination(
         self, sector: Optional[str], industry_group: Optional[str]

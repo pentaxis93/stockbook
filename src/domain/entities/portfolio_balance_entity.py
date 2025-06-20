@@ -8,10 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional, Union
 
+from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import IndexChange, Money
 
 
-class PortfolioBalanceEntity:
+class PortfolioBalanceEntity(BaseEntity):
     """
     Portfolio Balance entity representing portfolio value at a specific date.
 
@@ -35,19 +36,15 @@ class PortfolioBalanceEntity:
             raise ValueError("Portfolio ID must be positive")
 
         # Store validated attributes
-        self._id = balance_id
+        super().__init__()
         self._portfolio_id = portfolio_id
         self._balance_date = balance_date
         self._final_balance = final_balance
         self._withdrawals = withdrawals or Money.zero("USD")
         self._deposits = deposits or Money.zero("USD")
         self._index_change = index_change
-
-    # Identity
-    @property
-    def id(self) -> Optional[int]:
-        """Get balance ID."""
-        return self._id
+        if balance_id is not None:
+            self.set_id(balance_id)
 
     @property
     def portfolio_id(self) -> int:
@@ -111,14 +108,6 @@ class PortfolioBalanceEntity:
             self._index_change = IndexChange(index_change)
         else:
             self._index_change = index_change
-
-    def set_id(self, balance_id: int) -> None:
-        """Set balance ID (for persistence layer)."""
-        if not isinstance(balance_id, int) or balance_id <= 0:
-            raise ValueError("ID must be a positive integer")
-        if self._id is not None:
-            raise ValueError("ID is already set and cannot be changed")
-        self._id = balance_id
 
     # Equality and representation
     def __eq__(self, other) -> bool:

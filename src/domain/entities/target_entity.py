@@ -8,10 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional, Union
 
+from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import Money, Notes, TargetStatus
 
 
-class TargetEntity:
+class TargetEntity(BaseEntity):
     """
     Target aggregate root representing investment price targets.
 
@@ -38,7 +39,7 @@ class TargetEntity:
             raise ValueError("Stock ID must be positive")
 
         # Store validated attributes
-        self._id = target_id
+        super().__init__()
         self._portfolio_id = portfolio_id
         self._stock_id = stock_id
         self._pivot_price = pivot_price
@@ -46,12 +47,8 @@ class TargetEntity:
         self._status = status
         self._created_date = created_date
         self._notes = notes or Notes("")
-
-    # Identity
-    @property
-    def id(self) -> Optional[int]:
-        """Get target ID."""
-        return self._id
+        if target_id is not None:
+            self.set_id(target_id)
 
     @property
     def portfolio_id(self) -> int:
@@ -132,14 +129,6 @@ class TargetEntity:
             self._notes = Notes(notes)
         else:
             self._notes = notes
-
-    def set_id(self, target_id: int) -> None:
-        """Set target ID (for persistence layer)."""
-        if not isinstance(target_id, int) or target_id <= 0:
-            raise ValueError("ID must be a positive integer")
-        if self._id is not None:
-            raise ValueError("ID is already set and cannot be changed")
-        self._id = target_id
 
     # Equality and representation
     def __eq__(self, other) -> bool:

@@ -8,10 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Optional, Union
 
+from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import Notes, PortfolioName
 
 
-class PortfolioEntity:
+class PortfolioEntity(BaseEntity):
     """
     Portfolio aggregate root representing a collection of investments.
 
@@ -29,17 +30,13 @@ class PortfolioEntity:
     ):
         """Initialize portfolio with required value objects and validation."""
         # Store validated attributes
-        self._id = portfolio_id
+        super().__init__()
         self._name = name
         self._description = description or Notes("")
         self._created_date = created_date
         self._is_active = is_active
-
-    # Identity
-    @property
-    def id(self) -> Optional[int]:
-        """Get portfolio ID."""
-        return self._id
+        if portfolio_id is not None:
+            self.set_id(portfolio_id)
 
     # Core attributes
     @property
@@ -85,14 +82,6 @@ class PortfolioEntity:
             self._description = Notes(description)
         else:
             self._description = description
-
-    def set_id(self, portfolio_id: int) -> None:
-        """Set portfolio ID (for persistence layer)."""
-        if not isinstance(portfolio_id, int) or portfolio_id <= 0:
-            raise ValueError("ID must be a positive integer")
-        if self._id is not None:
-            raise ValueError("ID is already set and cannot be changed")
-        self._id = portfolio_id
 
     def set_created_date(self, created_date: date) -> None:
         """Set created date (for persistence layer)."""
