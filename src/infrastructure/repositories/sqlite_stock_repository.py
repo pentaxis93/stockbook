@@ -304,40 +304,11 @@ class SqliteStockRepository(IStockRepository):
         """
         conn = self.db_connection.get_connection()
         try:
-            # Build dynamic query based on provided filters
-            where_clauses = []
-            parameters = []
+            where_clauses, parameters = self._build_search_filters(
+                symbol_filter, name_filter, sector_filter, industry_filter, grade_filter
+            )
 
-            if symbol_filter:
-                where_clauses.append("UPPER(symbol) LIKE UPPER(?)")
-                parameters.append(f"%{symbol_filter}%")
-
-            if name_filter:
-                where_clauses.append("UPPER(name) LIKE UPPER(?)")
-                parameters.append(f"%{name_filter}%")
-
-            if sector_filter:
-                where_clauses.append("UPPER(sector) LIKE UPPER(?)")
-                parameters.append(f"%{sector_filter}%")
-
-            if industry_filter:
-                where_clauses.append("UPPER(industry_group) LIKE UPPER(?)")
-                parameters.append(f"%{industry_filter}%")
-
-            if grade_filter:
-                where_clauses.append("grade = ?")
-                parameters.append(grade_filter)
-
-            # Build the complete query
-            base_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock"
-
-            if where_clauses:
-                query = (
-                    f"{base_query} WHERE {' AND '.join(where_clauses)} ORDER BY symbol"
-                )
-            else:
-                query = f"{base_query} ORDER BY symbol"
-
+            query = self._build_search_query(where_clauses)
             cursor = conn.execute(query, parameters)
             rows = cursor.fetchall()
 
@@ -346,6 +317,50 @@ class SqliteStockRepository(IStockRepository):
             # Only close if not in a transactional context
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
+
+    def _build_search_filters(
+        self,
+        symbol_filter: Optional[str],
+        name_filter: Optional[str],
+        sector_filter: Optional[str],
+        industry_filter: Optional[str],
+        grade_filter: Optional[str],
+    ) -> tuple[List[str], List[str]]:
+        """Build WHERE clauses and parameters for search filters."""
+        where_clauses = []
+        parameters = []
+
+        if symbol_filter:
+            where_clauses.append("UPPER(symbol) LIKE UPPER(?)")
+            parameters.append(f"%{symbol_filter}%")
+
+        if name_filter:
+            where_clauses.append("UPPER(name) LIKE UPPER(?)")
+            parameters.append(f"%{name_filter}%")
+
+        if sector_filter:
+            where_clauses.append("UPPER(sector) LIKE UPPER(?)")
+            parameters.append(f"%{sector_filter}%")
+
+        if industry_filter:
+            where_clauses.append("UPPER(industry_group) LIKE UPPER(?)")
+            parameters.append(f"%{industry_filter}%")
+
+        if grade_filter:
+            where_clauses.append("grade = ?")
+            parameters.append(grade_filter)
+
+        return where_clauses, parameters
+
+    def _build_search_query(self, where_clauses: List[str]) -> str:
+        """Build the complete SQL query for stock search."""
+        base_query = (
+            "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock"
+        )
+
+        if where_clauses:
+            return f"{base_query} WHERE {' AND '.join(where_clauses)} ORDER BY symbol"
+        return f"{base_query} ORDER BY symbol"
 
     def _row_to_entity(self, row: sqlite3.Row) -> StockEntity:
         """
