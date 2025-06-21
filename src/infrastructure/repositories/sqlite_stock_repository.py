@@ -330,27 +330,40 @@ class SqliteStockRepository(IStockRepository):
         where_clauses = []
         parameters = []
 
-        if symbol_filter:
-            where_clauses.append("UPPER(symbol) LIKE UPPER(?)")
-            parameters.append(f"%{symbol_filter}%")
-
-        if name_filter:
-            where_clauses.append("UPPER(name) LIKE UPPER(?)")
-            parameters.append(f"%{name_filter}%")
-
-        if sector_filter:
-            where_clauses.append("UPPER(sector) LIKE UPPER(?)")
-            parameters.append(f"%{sector_filter}%")
-
-        if industry_filter:
-            where_clauses.append("UPPER(industry_group) LIKE UPPER(?)")
-            parameters.append(f"%{industry_filter}%")
-
-        if grade_filter:
-            where_clauses.append("grade = ?")
-            parameters.append(grade_filter)
+        # Add all filter types using helper method
+        self._add_like_filter(where_clauses, parameters, "UPPER(symbol)", symbol_filter)
+        self._add_like_filter(where_clauses, parameters, "UPPER(name)", name_filter)
+        self._add_like_filter(where_clauses, parameters, "UPPER(sector)", sector_filter)
+        self._add_like_filter(
+            where_clauses, parameters, "UPPER(industry_group)", industry_filter
+        )
+        self._add_exact_filter(where_clauses, parameters, "grade", grade_filter)
 
         return where_clauses, parameters
+
+    def _add_like_filter(
+        self,
+        where_clauses: List[str],
+        parameters: List[str],
+        column: str,
+        filter_value: Optional[str],
+    ) -> None:
+        """Add a LIKE filter to the where clauses if filter value is provided."""
+        if filter_value:
+            where_clauses.append(f"{column} LIKE UPPER(?)")
+            parameters.append(f"%{filter_value}%")
+
+    def _add_exact_filter(
+        self,
+        where_clauses: List[str],
+        parameters: List[str],
+        column: str,
+        filter_value: Optional[str],
+    ) -> None:
+        """Add an exact match filter to the where clauses if filter value is provided."""
+        if filter_value:
+            where_clauses.append(f"{column} = ?")
+            parameters.append(filter_value)
 
     def _build_search_query(self, where_clauses: List[str]) -> str:
         """Build the complete SQL query for stock search."""

@@ -49,26 +49,13 @@ class CreateStockCommand:
         Raises:
             ValueError: If validation fails
         """
-        # Normalize and validate inputs
-        symbol = self._normalize_symbol(symbol)
-        name = self._normalize_name(name)
-        sector = self._normalize_sector(sector)
-        industry_group = self._normalize_industry_group(industry_group)
-        notes = self._normalize_notes(notes)
+        # Normalize and validate all inputs
+        normalized_inputs = self._normalize_and_validate_inputs(
+            symbol, name, sector, industry_group, grade, notes
+        )
 
-        # Validate inputs
-        self._validate_symbol(symbol)
-        self._validate_name(name)
-        self._validate_grade(grade)
-        self._validate_sector_industry_combination(sector, industry_group)
-
-        # Use object.__setattr__ to bypass immutability during initialization
-        object.__setattr__(self, "_symbol", symbol)
-        object.__setattr__(self, "_name", name)
-        object.__setattr__(self, "_sector", sector)
-        object.__setattr__(self, "_industry_group", industry_group)
-        object.__setattr__(self, "_grade", grade)
-        object.__setattr__(self, "_notes", notes)
+        # Set all attributes using the normalized values
+        self._set_attributes(normalized_inputs)
 
     @property
     def symbol(self) -> str:
@@ -144,6 +131,47 @@ class CreateStockCommand:
             f"sector={self.sector!r}, industry_group={self.industry_group!r}, grade={self.grade!r}, "
             f"notes='{self.notes}')"
         )
+
+    def _normalize_and_validate_inputs(
+        self,
+        symbol: str,
+        name: str,
+        sector: Optional[str],
+        industry_group: Optional[str],
+        grade: Optional[str],
+        notes: str,
+    ) -> dict:
+        """Normalize and validate all inputs, returning normalized values."""
+        # Normalize inputs
+        symbol = self._normalize_symbol(symbol)
+        name = self._normalize_name(name)
+        sector = self._normalize_sector(sector)
+        industry_group = self._normalize_industry_group(industry_group)
+        notes = self._normalize_notes(notes)
+
+        # Validate inputs
+        self._validate_symbol(symbol)
+        self._validate_name(name)
+        self._validate_grade(grade)
+        self._validate_sector_industry_combination(sector, industry_group)
+
+        return {
+            "symbol": symbol,
+            "name": name,
+            "sector": sector,
+            "industry_group": industry_group,
+            "grade": grade,
+            "notes": notes,
+        }
+
+    def _set_attributes(self, normalized_inputs: dict) -> None:
+        """Set all attributes using normalized inputs."""
+        object.__setattr__(self, "_symbol", normalized_inputs["symbol"])
+        object.__setattr__(self, "_name", normalized_inputs["name"])
+        object.__setattr__(self, "_sector", normalized_inputs["sector"])
+        object.__setattr__(self, "_industry_group", normalized_inputs["industry_group"])
+        object.__setattr__(self, "_grade", normalized_inputs["grade"])
+        object.__setattr__(self, "_notes", normalized_inputs["notes"])
 
     @staticmethod
     def _normalize_symbol(symbol: str) -> str:
@@ -272,33 +300,13 @@ class UpdateStockCommand:
         Raises:
             ValueError: If validation fails
         """
-        # Validate stock_id
-        self._validate_stock_id(stock_id)
+        # Validate and normalize all inputs
+        normalized_inputs = self._validate_and_normalize_inputs(
+            stock_id, name, sector, industry_group, grade, notes
+        )
 
-        # Normalize and validate inputs
-        if name is not None:
-            name = self._normalize_name(name)
-            self._validate_name(name)
-
-        if sector is not None:
-            sector = self._normalize_sector(sector)
-
-        if industry_group is not None:
-            industry_group = self._normalize_industry_group(industry_group)
-
-        if notes is not None:
-            notes = self._normalize_notes(notes)
-
-        # Validate grade
-        self._validate_grade(grade)
-
-        # Use object.__setattr__ to bypass immutability during initialization
-        object.__setattr__(self, "_stock_id", stock_id)
-        object.__setattr__(self, "_name", name)
-        object.__setattr__(self, "_sector", sector)
-        object.__setattr__(self, "_industry_group", industry_group)
-        object.__setattr__(self, "_grade", grade)
-        object.__setattr__(self, "_notes", notes)
+        # Set all attributes using the normalized values
+        self._set_attributes(normalized_inputs)
 
     @property
     def stock_id(self) -> str:
@@ -404,6 +412,54 @@ class UpdateStockCommand:
             f"industry_group={self.industry_group!r}, grade={self.grade!r}, "
             f"notes={self.notes!r})"
         )
+
+    def _validate_and_normalize_inputs(
+        self,
+        stock_id: str,
+        name: Optional[str],
+        sector: Optional[str],
+        industry_group: Optional[str],
+        grade: Optional[str],
+        notes: Optional[str],
+    ) -> dict:
+        """Validate and normalize all inputs, returning normalized values."""
+        # Validate stock_id
+        self._validate_stock_id(stock_id)
+
+        # Normalize and validate inputs
+        if name is not None:
+            name = self._normalize_name(name)
+            self._validate_name(name)
+
+        if sector is not None:
+            sector = self._normalize_sector(sector)
+
+        if industry_group is not None:
+            industry_group = self._normalize_industry_group(industry_group)
+
+        if notes is not None:
+            notes = self._normalize_notes(notes)
+
+        # Validate grade
+        self._validate_grade(grade)
+
+        return {
+            "stock_id": stock_id,
+            "name": name,
+            "sector": sector,
+            "industry_group": industry_group,
+            "grade": grade,
+            "notes": notes,
+        }
+
+    def _set_attributes(self, normalized_inputs: dict) -> None:
+        """Set all attributes using normalized inputs."""
+        object.__setattr__(self, "_stock_id", normalized_inputs["stock_id"])
+        object.__setattr__(self, "_name", normalized_inputs["name"])
+        object.__setattr__(self, "_sector", normalized_inputs["sector"])
+        object.__setattr__(self, "_industry_group", normalized_inputs["industry_group"])
+        object.__setattr__(self, "_grade", normalized_inputs["grade"])
+        object.__setattr__(self, "_notes", normalized_inputs["notes"])
 
     @staticmethod
     def _validate_stock_id(stock_id: str) -> None:

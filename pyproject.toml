@@ -68,16 +68,17 @@ disable = [
     # "consider-using-f-string",  # Now enabled for better string formatting
     # "consider-using-dict-items",  # Now enabled for better dictionary iteration
     # "unused-import",  # Now enabled for cleaner imports
+    # "raise-missing-from",  # Now enabled for better exception chaining
 ]
 
 # Improve duplicate code detection
 min-similarity-lines = 8  # Improved: reduced from 10 for better duplicate detection
 
 max-args = 12  # Exception classes need context parameters
-max-locals = 6  # Improved: reduced from 8 for cleaner function design
+max-locals = 5  # Improved: reduced from 6 for cleaner function design
 max-returns = 8  # Allow reasonable branching in business logic
 max-branches = 8  # Improved: reduced from 10 for simpler logic
-max-statements = 20  # Improved: reduced from 25 to encourage smaller methods
+max-statements = 15  # Improved: reduced from 20 to encourage smaller methods
 max-positional-arguments = 8  # Domain entities need many fields
 good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
 allowed-redefined-builtins = ["id"]
@@ -121,7 +122,7 @@ disable = [
     "fixme",
     "too-many-lines",
     "unused-import",  # Test files legitimately have unused imports
-    # Improved: enable raise-missing-from for better exception chaining
+    # "raise-missing-from",  # Now enabled for better exception chaining in tests
 ]
 
 allowed-redefined-builtins = ["id"]
@@ -148,14 +149,15 @@ disable = [
     # "missing-class-docstring",  # Now enabled - controllers should have docstrings
     "consider-using-join",  # UI string concatenation patterns vary
     "reimported",  # UI modules may reimport for different contexts
+    # "raise-missing-from",  # Now enabled for better exception chaining
 ]
 
 # More reasonable complexity for presentation layer
-max-args = 8  # Improved: reduced from 10, UI should be well-designed
+max-args = 6  # Improved: reduced from 8, UI should be well-designed
 max-locals = 10  # Improved: reduced from 12 for better organization
 max-returns = 8  # Add explicit return limit
 max-branches = 15  # Add explicit branch limit
-max-statements = 35  # Improved: reduced from 40 for better method design
+max-statements = 30  # Improved: reduced from 35 for better method design
 allowed-redefined-builtins = ["id"]
 
 # Require docstrings for public controller methods (but not UI components)
@@ -211,7 +213,7 @@ addopts = [
     "--cov=.",  # coverage for all source code
     "--cov-report=term-missing",  # show missing lines in terminal
     "--cov-report=html:htmlcov",  # generate HTML coverage report
-    "--cov-fail-under=80",  # fail if coverage below 80%
+    "--cov-fail-under=84",  # fail if coverage below 84%
     "--dist=worksteal",  # better load balancing for parallel execution
     "--maxfail=5",  # stop after 5 failures to fail fast
 ]

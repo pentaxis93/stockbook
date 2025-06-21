@@ -154,22 +154,30 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
         self._nesting_level -= 1
 
         if self._nesting_level == 0:
-            # Outermost context - handle transaction
-            if self._connection:
-                try:
-                    if exc_type is None:
-                        self._connection.commit()
-                    else:
-                        self._connection.rollback()
-                finally:
-                    self._connection.close()
-                    self._connection = None
-                    self._stocks = None
-                    self._portfolios = None
-                    self._transactions = None
-                    self._targets = None
-                    self._balances = None
-                    self._journal = None
+            # Outermost context - handle transaction and cleanup
+            self._handle_transaction_completion(exc_type)
+            self._cleanup_resources()
+
+    def _handle_transaction_completion(self, exc_type) -> None:
+        """Handle transaction commit or rollback based on exception status."""
+        if self._connection:
+            try:
+                if exc_type is None:
+                    self._connection.commit()
+                else:
+                    self._connection.rollback()
+            finally:
+                self._connection.close()
+
+    def _cleanup_resources(self) -> None:
+        """Clean up all resources after transaction completion."""
+        self._connection = None
+        self._stocks = None
+        self._portfolios = None
+        self._transactions = None
+        self._targets = None
+        self._balances = None
+        self._journal = None
 
     def commit(self) -> None:
         """

@@ -169,30 +169,11 @@ class StockApplicationService:
         """
         try:
             with self._unit_of_work:
-                # Check if stock exists
-                stock_entity = self._unit_of_work.stocks.get_by_id(command.stock_id)
+                # Validate command and retrieve stock entity
+                stock_entity = self._validate_update_command_and_get_stock(command)
 
-                if stock_entity is None:
-                    raise ValueError(f"Stock with ID {command.stock_id} not found")
-
-                if stock_entity.id is None:
-                    raise ValueError("Stock entity missing ID - cannot update")
-
-                # Validate that there are fields to update
-                if not command.has_updates():
-                    raise ValueError("No fields to update")
-
-                # Get the fields to update and apply them to the entity
-                update_fields = command.get_update_fields()
-                stock_entity.update_fields(**update_fields)
-
-                # Persist changes
-                update_success = self._unit_of_work.stocks.update(
-                    stock_entity.id, stock_entity
-                )
-
-                if not update_success:
-                    raise ValueError("Failed to update stock")
+                # Apply updates and save
+                self._apply_updates_and_save(command, stock_entity)
 
                 # Commit transaction
                 self._unit_of_work.commit()
@@ -202,3 +183,32 @@ class StockApplicationService:
         except Exception:
             self._unit_of_work.rollback()
             raise
+
+    def _validate_update_command_and_get_stock(self, command: UpdateStockCommand):
+        """Validate update command and retrieve stock entity."""
+        # Check if stock exists
+        stock_entity = self._unit_of_work.stocks.get_by_id(command.stock_id)
+
+        if stock_entity is None:
+            raise ValueError(f"Stock with ID {command.stock_id} not found")
+
+        if stock_entity.id is None:
+            raise ValueError("Stock entity missing ID - cannot update")
+
+        # Validate that there are fields to update
+        if not command.has_updates():
+            raise ValueError("No fields to update")
+
+        return stock_entity
+
+    def _apply_updates_and_save(self, command: UpdateStockCommand, stock_entity):
+        """Apply updates to stock entity and save to repository."""
+        # Get the fields to update and apply them to the entity
+        update_fields = command.get_update_fields()
+        stock_entity.update_fields(**update_fields)
+
+        # Persist changes
+        update_success = self._unit_of_work.stocks.update(stock_entity.id, stock_entity)
+
+        if not update_success:
+            raise ValueError("Failed to update stock")
