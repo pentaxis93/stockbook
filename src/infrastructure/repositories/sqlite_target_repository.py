@@ -272,6 +272,6 @@ class SqliteTargetRepository(ITargetRepository):
             status=TargetStatus(row["status"]),
             created_date=created_date,
             notes=Notes(row["notes"] or ""),
-            entity_id=row["id"],
+            id=row["id"],
         )
         return entity

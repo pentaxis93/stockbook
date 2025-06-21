@@ -254,7 +254,7 @@ class TestPortfolioBalanceEntity:
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
-            entity_id=test_id,
+            id=test_id,
         )
 
         assert balance.id == test_id
@@ -265,7 +265,7 @@ class TestPortfolioBalanceEntity:
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
-            entity_id="test-id-1",
+            id="test-id-1",
         )
 
         # ID property should not have a setter

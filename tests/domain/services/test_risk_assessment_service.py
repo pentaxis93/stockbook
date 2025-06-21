@@ -54,7 +54,7 @@ def create_test_stock(
         sector=Sector(sector) if sector else None,
         industry_group=IndustryGroup(industry_group) if industry_group else None,
         grade=Grade(grade) if grade else None,
-        entity_id=f"stock-{symbol.lower()}-test",
+        id=f"stock-{symbol.lower()}-test",
     )
     return stock
 

@@ -13,9 +13,9 @@ import nanoid
 class BaseEntity(ABC):
     """Base class for all domain entities with immutable string IDs."""
 
-    def __init__(self, entity_id: Optional[str] = None) -> None:
+    def __init__(self, id: Optional[str] = None) -> None:
         """Initialize entity with either provided ID or generate new nanoid."""
-        self._id: str = entity_id if entity_id is not None else nanoid.generate()
+        self._id: str = id if id is not None else nanoid.generate()
 
     @property
     def id(self) -> str:
@@ -23,10 +23,10 @@ class BaseEntity(ABC):
         return self._id
 
     @classmethod
-    def from_persistence(cls, entity_id: str, **kwargs):
+    def from_persistence(cls, id: str, **kwargs):
         """Create entity from persistence layer with existing ID."""
-        # This will call the subclass constructor with the entity_id parameter
-        return cls(entity_id=entity_id, **kwargs)
+        # This will call the subclass constructor with the id parameter
+        return cls(id=id, **kwargs)
 
     def __eq__(self, other: Any) -> bool:
         """Entities are equal if they are the same type and have the same ID."""

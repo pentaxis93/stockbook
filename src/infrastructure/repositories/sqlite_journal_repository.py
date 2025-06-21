@@ -321,6 +321,6 @@ class SqliteJournalRepository(IJournalRepository):
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
             transaction_id=row["transaction_id"],
-            entity_id=row["id"],
+            id=row["id"],
         )
         return entity

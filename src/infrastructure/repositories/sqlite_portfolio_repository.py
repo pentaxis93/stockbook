@@ -217,7 +217,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
                 created_date = None
 
         return PortfolioEntity(
-            entity_id=row["id"],
+            id=row["id"],
             name=PortfolioName(row["name"]),
             description=Notes(row["description"] or ""),
             created_date=created_date,

@@ -288,7 +288,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                 pass
 
         return TransactionEntity(
-            entity_id=row["id"],  # Use id parameter
+            id=row["id"],  # Use id parameter
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
             transaction_type=TransactionType(row["type"]),  # Wrap in TransactionType

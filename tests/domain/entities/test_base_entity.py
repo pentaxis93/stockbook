@@ -13,8 +13,8 @@ from src.domain.entities.base import BaseEntity
 class ConcreteEntity(BaseEntity):
     """Concrete implementation of BaseEntity for testing."""
 
-    def __init__(self, name: str = "test", entity_id: str = None) -> None:
-        super().__init__(entity_id=entity_id)
+    def __init__(self, name: str = "test", id: str = None) -> None:
+        super().__init__(id=id)
         self.name = name
 
 
@@ -31,12 +31,12 @@ class TestBaseEntity:
     def test_create_entity_with_provided_id(self):
         """Should create entity with provided string ID."""
         test_id = "test-id-123"
-        entity = ConcreteEntity(entity_id=test_id)
+        entity = ConcreteEntity(id=test_id)
         assert entity.id == test_id
 
     def test_id_is_immutable(self):
         """Should not be able to change ID after creation."""
-        entity = ConcreteEntity(entity_id="test-id-1")
+        entity = ConcreteEntity(id="test-id-1")
         # The ID property should not have a setter
         with pytest.raises(AttributeError):
             entity.id = "different-id"
@@ -51,14 +51,14 @@ class TestBaseEntity:
     def test_equality_with_same_id_same_type(self):
         """Should be equal when same type and same ID."""
         test_id = "same-id-789"
-        entity1 = ConcreteEntity("first", entity_id=test_id)
-        entity2 = ConcreteEntity("second", entity_id=test_id)
+        entity1 = ConcreteEntity("first", id=test_id)
+        entity2 = ConcreteEntity("second", id=test_id)
         assert entity1 == entity2
 
     def test_equality_with_different_ids(self):
         """Should not be equal when different IDs."""
-        entity1 = ConcreteEntity(entity_id="id-1")
-        entity2 = ConcreteEntity(entity_id="id-2")
+        entity1 = ConcreteEntity(id="id-1")
+        entity2 = ConcreteEntity(id="id-2")
         assert entity1 != entity2
 
     def test_equality_with_generated_ids(self):
@@ -74,19 +74,19 @@ class TestBaseEntity:
             pass
 
         test_id = "same-id-123"
-        entity1 = ConcreteEntity(entity_id=test_id)
-        entity2 = AnotherEntity(entity_id=test_id)
+        entity1 = ConcreteEntity(id=test_id)
+        entity2 = AnotherEntity(id=test_id)
         assert entity1 != entity2
 
     def test_equality_with_non_entity_object(self):
         """Should not be equal to non-entity objects."""
-        entity = ConcreteEntity(entity_id="test-id-1")
+        entity = ConcreteEntity(id="test-id-1")
         assert entity != "not an entity"
         assert entity != "test-id-1"
 
     def test_entities_not_hashable(self):
         """Should not be hashable after removing __hash__ method."""
-        entity = ConcreteEntity(entity_id="test-id-1")
+        entity = ConcreteEntity(id="test-id-1")
 
         # Entities should not be usable as dict keys
         with pytest.raises(TypeError, match="unhashable type"):
@@ -99,12 +99,12 @@ class TestBaseEntity:
     def test_str_representation_with_id(self):
         """Should display class name and ID in string representation."""
         test_id = "test-id-42"
-        entity = ConcreteEntity(entity_id=test_id)
+        entity = ConcreteEntity(id=test_id)
         assert str(entity) == f"ConcreteEntity(id={test_id})"
 
     def test_repr_same_as_str(self):
         """Should have same repr as str representation."""
-        entity = ConcreteEntity(entity_id="test-id-1")
+        entity = ConcreteEntity(id="test-id-1")
         assert repr(entity) == str(entity)
 
 
@@ -160,7 +160,7 @@ class TestBaseEntityArchitecturalConcerns:
         assert entity.name == "from_database"
 
         # The entity works exactly like any other entity
-        other_entity = ConcreteEntity("other", entity_id=db_id)
+        other_entity = ConcreteEntity("other", id=db_id)
         assert entity == other_entity
 
     def test_nanoid_provides_unique_identifiers(self):
@@ -187,7 +187,7 @@ class TestBaseEntityArchitecturalConcerns:
         used as dictionary keys or in sets, which violates Python's
         hash contract for mutable objects.
         """
-        entity = ConcreteEntity("test", entity_id="test-id-1")
+        entity = ConcreteEntity("test", id="test-id-1")
 
         # Entities can no longer be misused as dict keys
         with pytest.raises(TypeError, match="unhashable type"):
@@ -198,7 +198,7 @@ class TestBaseEntityArchitecturalConcerns:
             {entity}
 
         # But equality still works fine for proper comparisons
-        other_entity = ConcreteEntity("other", entity_id="test-id-1")
+        other_entity = ConcreteEntity("other", id="test-id-1")
         assert entity == other_entity
 
     def test_entity_collections_work_properly_without_hash(self):
@@ -209,8 +209,8 @@ class TestBaseEntityArchitecturalConcerns:
         but are prevented from being misused in hash-based collections.
         """
         test_id = "collection-test-id"
-        entity1 = ConcreteEntity(entity_id=test_id)
-        entity2 = ConcreteEntity(entity_id=test_id)
+        entity1 = ConcreteEntity(id=test_id)
+        entity2 = ConcreteEntity(id=test_id)
 
         # Equality works fine without hash
         assert entity1 == entity2

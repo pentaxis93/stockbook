@@ -305,7 +305,7 @@ class TestTransactionEntity:
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
             transaction_date=date.today(),
-            entity_id=test_id,
+            id=test_id,
         )
 
         assert transaction.id == test_id
@@ -319,7 +319,7 @@ class TestTransactionEntity:
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
             transaction_date=date.today(),
-            entity_id="test-id-1",
+            id="test-id-1",
         )
 
         # ID property should not have a setter

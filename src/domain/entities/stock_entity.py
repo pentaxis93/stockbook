@@ -36,7 +36,7 @@ class StockEntity(BaseEntity):
         industry_group: Optional[IndustryGroup] = None,
         grade: Optional[Grade] = None,
         notes: Optional[Notes] = None,
-        entity_id: Optional[str] = None,
+        id: Optional[str] = None,
     ):
         """
         Initialize Stock entity with value objects.
@@ -59,7 +59,7 @@ class StockEntity(BaseEntity):
         self._sector_industry_service = SectorIndustryService()
 
         # Store value objects directly (they're already validated)
-        super().__init__(entity_id=entity_id)
+        super().__init__(id=id)
         self._symbol = symbol
         self._company_name = company_name
         self._sector_vo = sector

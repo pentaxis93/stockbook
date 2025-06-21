@@ -227,7 +227,7 @@ class TestSqliteStockRepository:
             company_name=stock.company_name,
             grade=Grade("A"),
             notes=Notes("Excellent company"),
-            entity_id=stock_id,
+            id=stock_id,
         )
 
         # Act
@@ -333,7 +333,7 @@ class TestSqliteStockRepository:
         with pytest.raises(Exception):  # Should raise some database-related error
             invalid_repository.create(stock)
 
-    def test_repository_preserves_entity_identity(self):
+    def test_repository_preserves_identity(self):
         """Should preserve entity identity and value object types."""
         # Arrange
         original_symbol = StockSymbol("JNJ")

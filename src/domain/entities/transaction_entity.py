@@ -29,7 +29,7 @@ class TransactionEntity(BaseEntity):
         price: Money,
         transaction_date: date,
         notes: Optional[Notes] = None,
-        entity_id: Optional[str] = None,
+        id: Optional[str] = None,
     ):
         """Initialize transaction with required value objects and validation."""
         # Validate foreign key IDs are not empty
@@ -39,7 +39,7 @@ class TransactionEntity(BaseEntity):
             raise ValueError("Stock ID must be a non-empty string")
 
         # Store validated attributes
-        super().__init__(entity_id=entity_id)
+        super().__init__(id=id)
         self._portfolio_id = portfolio_id
         self._stock_id = stock_id
         self._transaction_type = transaction_type

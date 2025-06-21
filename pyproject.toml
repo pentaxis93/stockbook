@@ -31,6 +31,10 @@ max-positional-arguments = 8  # Allow more positional args for domain objects
 [tool.pylint.BASIC]
 # Good naming patterns
 good-names = ["i", "j", "k", "ex", "Run", "_", "id", "db", "ui"]
+# Allow 'id' to be used as parameter name for entity identifiers
+# This provides targeted permission for domain entities to use standard 'id' nomenclature
+# while still catching dangerous redefinitions of other built-ins (list, dict, str, etc.)
+allowed-redefined-builtins = ["id"]
 # Require docstrings for public modules, classes, and functions
 docstring-min-length = 10
 

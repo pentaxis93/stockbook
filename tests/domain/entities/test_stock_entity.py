@@ -355,7 +355,7 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         test_id = "stock-id-123"
-        stock = StockEntity(symbol=symbol, company_name=company_name, entity_id=test_id)
+        stock = StockEntity(symbol=symbol, company_name=company_name, id=test_id)
 
         assert stock.id == test_id
 
@@ -363,9 +363,7 @@ class TestStockEntity:
         """Should not be able to change ID after creation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(
-            symbol=symbol, company_name=company_name, entity_id="test-id-1"
-        )
+        stock = StockEntity(symbol=symbol, company_name=company_name, id="test-id-1")
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):

@@ -87,7 +87,7 @@ class TestStockApplicationService:
         existing_stock = StockEntity(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Existing Apple Inc."),
-            entity_id="stock-id-456",
+            id="stock-id-456",
         )
         self.mock_stock_repository.get_by_symbol.return_value = existing_stock
 
@@ -125,7 +125,7 @@ class TestStockApplicationService:
             industry_group=IndustryGroup("Software"),
             grade=Grade("A"),
             notes=Notes("Great company"),
-            entity_id="stock-id-123",
+            id="stock-id-123",
         )
         self.mock_stock_repository.get_by_symbol.return_value = stock_entity
 
@@ -170,12 +170,12 @@ class TestStockApplicationService:
         stock1 = StockEntity(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
-            entity_id="stock-1",
+            id="stock-1",
         )
         stock2 = StockEntity(
             symbol=StockSymbol("MSFT"),
             company_name=CompanyName("Microsoft Corp."),
-            entity_id="stock-2",
+            id="stock-2",
         )
 
         self.mock_stock_repository.get_all.return_value = [stock1, stock2]
@@ -250,7 +250,7 @@ class TestStockApplicationService:
 
         mock_entities = [
             StockEntity(
-                entity_id="stock-1",
+                id="stock-1",
                 symbol=StockSymbol("AAPL"),
                 company_name=CompanyName("Apple Inc."),
                 sector=Sector("Technology"),
@@ -287,7 +287,7 @@ class TestStockApplicationService:
         # Arrange
         mock_entities = [
             StockEntity(
-                entity_id="stock-1",
+                id="stock-1",
                 symbol=StockSymbol("AAPL"),
                 company_name=CompanyName("Apple Inc."),
                 sector=Sector("Technology"),
@@ -296,7 +296,7 @@ class TestStockApplicationService:
                 notes=Notes(""),
             ),
             StockEntity(
-                entity_id="stock-2",
+                id="stock-2",
                 symbol=StockSymbol("GOOGL"),
                 company_name=CompanyName("Alphabet Inc."),
                 sector=Sector("Technology"),
@@ -354,7 +354,7 @@ class TestStockApplicationService:
         )
 
         existing_stock = StockEntity(
-            entity_id="stock-1",
+            id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -393,7 +393,7 @@ class TestStockApplicationService:
         )
 
         existing_stock = StockEntity(
-            entity_id="stock-1",
+            id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -446,7 +446,7 @@ class TestStockApplicationService:
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
         existing_stock = StockEntity(
-            entity_id="stock-1",
+            id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("B"),
@@ -468,7 +468,7 @@ class TestStockApplicationService:
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
         existing_stock = StockEntity(
-            entity_id="stock-1",
+            id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("B"),

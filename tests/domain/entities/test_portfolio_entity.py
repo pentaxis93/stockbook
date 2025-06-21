@@ -188,16 +188,14 @@ class TestPortfolioEntity:
     def test_create_portfolio_with_id(self):
         """Should create portfolio with provided ID."""
         test_id = "portfolio-id-123"
-        portfolio = PortfolioEntity(
-            name=PortfolioName("Test Portfolio"), entity_id=test_id
-        )
+        portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"), id=test_id)
 
         assert portfolio.id == test_id
 
     def test_portfolio_id_immutability(self):
         """Should not be able to change ID after creation."""
         portfolio = PortfolioEntity(
-            name=PortfolioName("Test Portfolio"), entity_id="test-id-1"
+            name=PortfolioName("Test Portfolio"), id="test-id-1"
         )
 
         # ID property should not have a setter

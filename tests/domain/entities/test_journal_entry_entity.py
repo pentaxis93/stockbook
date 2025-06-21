@@ -263,7 +263,7 @@ class TestJournalEntryEntity:
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content."),
-            entity_id=test_id,
+            id=test_id,
         )
 
         assert entry.id == test_id
@@ -275,7 +275,7 @@ class TestJournalEntryEntity:
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content."),
-            entity_id="test-id-1",
+            id="test-id-1",
         )
 
         # ID property should not have a setter

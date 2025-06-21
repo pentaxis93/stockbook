@@ -240,6 +240,6 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 if row["index_change"] is not None
                 else None
             ),
-            entity_id=row["id"],
+            id=row["id"],
         )
         return entity

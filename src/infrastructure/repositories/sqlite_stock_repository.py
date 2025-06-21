@@ -358,7 +358,7 @@ class SqliteStockRepository(IStockRepository):
             Stock entity populated from row data
         """
         return StockEntity(
-            entity_id=row["id"],
+            id=row["id"],
             symbol=StockSymbol(row["symbol"]),
             company_name=CompanyName(row["name"] or ""),
             sector=Sector(row["sector"]) if row["sector"] else None,

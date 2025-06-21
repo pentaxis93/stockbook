@@ -28,7 +28,7 @@ class PortfolioBalanceEntity(BaseEntity):
         withdrawals: Optional[Money] = None,
         deposits: Optional[Money] = None,
         index_change: Optional[IndexChange] = None,
-        entity_id: Optional[str] = None,
+        id: Optional[str] = None,
     ):
         """Initialize portfolio balance with required value objects and validation."""
         # Validate foreign key ID is not empty
@@ -36,7 +36,7 @@ class PortfolioBalanceEntity(BaseEntity):
             raise ValueError("Portfolio ID must be a non-empty string")
 
         # Store validated attributes
-        super().__init__(entity_id=entity_id)
+        super().__init__(id=id)
         self._portfolio_id = portfolio_id
         self._balance_date = balance_date
         self._final_balance = final_balance

@@ -375,7 +375,7 @@ class TestTargetEntity:
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
-            entity_id=test_id,
+            id=test_id,
         )
 
         assert target.id == test_id
@@ -391,7 +391,7 @@ class TestTargetEntity:
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
-            entity_id="test-id-1",
+            id="test-id-1",
         )
 
         # ID property should not have a setter

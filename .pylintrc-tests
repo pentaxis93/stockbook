@@ -40,3 +40,7 @@ disable=
 
 [FORMAT]
 max-line-length=88
+
+[BASIC]
+# Allow 'id' to be used as parameter name for entity identifiers in tests
+allowed-redefined-builtins=id

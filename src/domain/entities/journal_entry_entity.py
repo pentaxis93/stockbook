@@ -27,7 +27,7 @@ class JournalEntryEntity(BaseEntity):
         portfolio_id: Optional[str] = None,
         stock_id: Optional[str] = None,
         transaction_id: Optional[str] = None,
-        entity_id: Optional[str] = None,
+        id: Optional[str] = None,
     ):
         """Initialize journal entry with required value objects and validation."""
         # Validate optional foreign key IDs
@@ -43,7 +43,7 @@ class JournalEntryEntity(BaseEntity):
             raise ValueError("Transaction ID must be a non-empty string")
 
         # Store validated attributes
-        super().__init__(entity_id=entity_id)
+        super().__init__(id=id)
         self._entry_date = entry_date
         self._content = content
         self._portfolio_id = portfolio_id

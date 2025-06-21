@@ -156,7 +156,8 @@
       "mcp__serena__summarize_changes",
       "Bash(pip install:*)",
       "mcp__serena__list_dir",
-      "Bash(npx pyright:*)"
+      "Bash(npx pyright:*)",
+      "mcp__serena__write_memory"
     ],
     "deny": []
   }

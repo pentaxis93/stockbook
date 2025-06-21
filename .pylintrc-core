@@ -50,5 +50,9 @@ max-positional-arguments=8  # Domain entities need many fields
 
 [BASIC]
 # Require good naming and documentation for core logic
-good-names=["i", "j", "k", "ex", "Run", "_", "id"]
+good-names=i,j,k,ex,Run,_,id
+# Allow 'id' to be used as parameter name for entity identifiers
+# This provides targeted permission for domain entities to use standard 'id' nomenclature
+# while still catching dangerous redefinitions of other built-ins (list, dict, str, etc.)
+allowed-redefined-builtins=id
 docstring-min-length=10
