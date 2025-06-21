@@ -20,8 +20,8 @@ class TestTransactionEntity:
 
     def test_create_transaction_with_value_objects(self):
         """Should create Transaction entity with value objects only."""
-        portfolio_id = 1
-        stock_id = 2
+        portfolio_id = "portfolio-1"
+        stock_id = "stock-2"
         transaction_type = TransactionType("buy")
         quantity = Quantity(100)
         price = Money(Decimal("150.25"))
@@ -45,12 +45,13 @@ class TestTransactionEntity:
         assert transaction.price == price
         assert transaction.transaction_date == transaction_date
         assert transaction.notes == notes
-        assert transaction.id is None  # Not yet persisted
+        assert transaction.id is not None  # Generated nanoid
+        assert isinstance(transaction.id, str)
 
     def test_create_transaction_with_minimal_data(self):
         """Should create Transaction with only required fields."""
-        portfolio_id = 1
-        stock_id = 2
+        portfolio_id = "portfolio-1"
+        stock_id = "stock-2"
         transaction_type = TransactionType("sell")
         quantity = Quantity(50)
         price = Money(Decimal("175.50"))
@@ -81,8 +82,8 @@ class TestTransactionEntity:
         notes = Notes("Test transaction")
 
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=transaction_type,
             quantity=quantity,
             price=price,
@@ -105,8 +106,8 @@ class TestTransactionEntity:
     def test_create_transaction_with_none_notes_allowed(self):
         """Should allow creating transaction with None for notes."""
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -125,10 +126,10 @@ class TestTransactionEntity:
 
     def test_create_transaction_with_invalid_portfolio_id_raises_error(self):
         """Should raise error for invalid portfolio ID."""
-        with pytest.raises(ValueError, match="Portfolio ID must be positive"):
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             TransactionEntity(
-                portfolio_id=0,  # Invalid
-                stock_id=1,
+                portfolio_id="",  # Invalid empty string
+                stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
                 price=Money(Decimal("100.00")),
@@ -137,10 +138,10 @@ class TestTransactionEntity:
 
     def test_create_transaction_with_invalid_stock_id_raises_error(self):
         """Should raise error for invalid stock ID."""
-        with pytest.raises(ValueError, match="Stock ID must be positive"):
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             TransactionEntity(
-                portfolio_id=1,
-                stock_id=-1,  # Invalid
+                portfolio_id="portfolio-id-1",
+                stock_id="",  # Invalid empty string
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
                 price=Money(Decimal("100.00")),
@@ -150,8 +151,8 @@ class TestTransactionEntity:
     def test_transaction_equality(self):
         """Should compare transactions based on business identity."""
         transaction1 = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -159,8 +160,8 @@ class TestTransactionEntity:
         )
 
         transaction2 = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -168,8 +169,8 @@ class TestTransactionEntity:
         )
 
         transaction3 = TransactionEntity(
-            portfolio_id=2,  # Different portfolio
-            stock_id=1,
+            portfolio_id="portfolio-id-2",  # Different portfolio
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -183,8 +184,8 @@ class TestTransactionEntity:
     def test_transaction_string_representation(self):
         """Should have meaningful string representation."""
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("150.50")),
@@ -197,22 +198,22 @@ class TestTransactionEntity:
     def test_transaction_repr(self):
         """Should have detailed repr representation."""
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=2,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-2",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("200.00")),
             transaction_date=date(2024, 2, 1),
         )
 
-        expected = "TransactionEntity(portfolio_id=1, stock_id=2, type='sell', quantity=50, price=$200.00)"
+        expected = "TransactionEntity(portfolio_id=portfolio-id-1, stock_id=stock-id-2, type='sell', quantity=50, price=$200.00)"
         assert repr(transaction) == expected
 
     def test_calculate_total_value(self):
         """Should calculate total transaction value."""
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("150.50")),
@@ -227,8 +228,8 @@ class TestTransactionEntity:
     def test_is_buy_transaction(self):
         """Should check if transaction is a buy."""
         buy_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -236,8 +237,8 @@ class TestTransactionEntity:
         )
 
         sell_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("110.00")),
@@ -250,8 +251,8 @@ class TestTransactionEntity:
     def test_is_sell_transaction(self):
         """Should check if transaction is a sell."""
         buy_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -259,8 +260,8 @@ class TestTransactionEntity:
         )
 
         sell_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("110.00")),
@@ -273,8 +274,8 @@ class TestTransactionEntity:
     def test_has_notes(self):
         """Should check if transaction has notes."""
         transaction_with_notes = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -283,8 +284,8 @@ class TestTransactionEntity:
         )
 
         transaction_without_notes = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
@@ -294,57 +295,53 @@ class TestTransactionEntity:
         assert transaction_with_notes.has_notes() is True
         assert transaction_without_notes.has_notes() is False
 
-    def test_set_id(self):
-        """Should allow setting ID (for persistence layer)."""
+    def test_transaction_create_with_id(self):
+        """Should create transaction with provided ID."""
+        test_id = "transaction-id-123"
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            transaction_type=TransactionType("buy"),
+            quantity=Quantity(100),
+            price=Money(Decimal("100.00")),
+            transaction_date=date.today(),
+            entity_id=test_id,
+        )
+
+        assert transaction.id == test_id
+
+    def test_transaction_id_immutability(self):
+        """Should not be able to change ID after creation."""
+        transaction = TransactionEntity(
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            transaction_type=TransactionType("buy"),
+            quantity=Quantity(100),
+            price=Money(Decimal("100.00")),
+            transaction_date=date.today(),
+            entity_id="test-id-1",
+        )
+
+        # ID property should not have a setter
+        with pytest.raises(AttributeError):
+            transaction.id = "different-id"
+
+    def test_transaction_from_persistence(self):
+        """Should create transaction from persistence with existing ID."""
+        test_id = "persistence-id-456"
+        transaction = TransactionEntity.from_persistence(
+            test_id,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("100.00")),
             transaction_date=date.today(),
         )
 
-        assert transaction.id is None
-
-        transaction.set_id(123)
-        assert transaction.id == 123
-
-    def test_set_id_with_invalid_id_raises_error(self):
-        """Should raise error for invalid ID."""
-        transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
-        )
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            transaction.set_id(0)
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            transaction.set_id(-1)
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            transaction.set_id("123")
-
-    def test_set_id_when_already_set_raises_error(self):
-        """Should raise error when trying to change existing ID."""
-        transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
-        )
-
-        transaction.set_id(123)
-
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            transaction.set_id(456)
+        assert transaction.id == test_id
+        assert transaction.portfolio_id == "portfolio-id-1"
+        assert transaction.stock_id == "stock-id-1"
 
 
 class TestTransactionType:

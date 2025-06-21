@@ -36,7 +36,7 @@ def db_connection():
         conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
-            VALUES (1, 'Test Portfolio', 'Test portfolio for balances', 50, 0.02, 1)
+            VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for balances', 50, 0.02, 1)
         """
         )
 
@@ -57,7 +57,7 @@ def balance_repository(db_connection):
 def sample_balance():
     """Create sample balance entity for testing."""
     return PortfolioBalanceEntity(
-        portfolio_id=1,
+        portfolio_id="portfolio-id-1",
         balance_date=date(2024, 1, 15),
         withdrawals=Money(Decimal("0.00")),
         deposits=Money(Decimal("1000.00")),
@@ -75,8 +75,8 @@ class TestPortfolioBalanceRepositoryCreate:
         balance_id = balance_repository.create(sample_balance)
 
         # Assert
-        assert isinstance(balance_id, int)
-        assert balance_id > 0
+        assert isinstance(balance_id, str)
+        assert balance_id
 
     def test_create_and_retrieve_balance(self, balance_repository, sample_balance):
         """Should create and retrieve balance correctly."""
@@ -100,11 +100,13 @@ class TestPortfolioBalanceRepositoryRead:
         balance_repository.create(sample_balance)
 
         # Act
-        retrieved = balance_repository.get_by_portfolio_and_date(1, date(2024, 1, 15))
+        retrieved = balance_repository.get_by_portfolio_and_date(
+            "portfolio-id-1", date(2024, 1, 15)
+        )
 
         # Assert
         assert retrieved is not None
-        assert retrieved.portfolio_id == 1
+        assert retrieved.portfolio_id == "portfolio-id-1"
         assert retrieved.balance_date == date(2024, 1, 15)
 
     def test_get_history(self, balance_repository):
@@ -112,14 +114,14 @@ class TestPortfolioBalanceRepositoryRead:
         # Arrange
         balances = [
             PortfolioBalanceEntity(
-                portfolio_id=1,
+                portfolio_id="portfolio-id-1",
                 balance_date=date(2024, 1, 1),
                 withdrawals=Money(Decimal("0.00")),
                 deposits=Money(Decimal("1000.00")),
                 final_balance=Money(Decimal("10000.00")),
             ),
             PortfolioBalanceEntity(
-                portfolio_id=1,
+                portfolio_id="portfolio-id-1",
                 balance_date=date(2024, 1, 2),
                 withdrawals=Money(Decimal("0.00")),
                 deposits=Money(Decimal("0.00")),
@@ -131,7 +133,7 @@ class TestPortfolioBalanceRepositoryRead:
             balance_repository.create(balance)
 
         # Act
-        history = balance_repository.get_history(1)
+        history = balance_repository.get_history("portfolio-id-1")
 
         # Assert
         assert len(history) == 2
@@ -142,14 +144,14 @@ class TestPortfolioBalanceRepositoryRead:
         """Should retrieve latest balance for portfolio."""
         # Arrange
         old_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 1),
             withdrawals=Money(Decimal("0.00")),
             deposits=Money(Decimal("1000.00")),
             final_balance=Money(Decimal("10000.00")),
         )
         new_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             withdrawals=Money(Decimal("0.00")),
             deposits=Money(Decimal("0.00")),
@@ -160,7 +162,7 @@ class TestPortfolioBalanceRepositoryRead:
         balance_repository.create(new_balance)
 
         # Act
-        latest = balance_repository.get_latest_balance(1)
+        latest = balance_repository.get_latest_balance("portfolio-id-1")
 
         # Assert
         assert latest is not None
@@ -175,7 +177,7 @@ class TestPortfolioBalanceRepositoryIntegration:
         """Test complete balance operations."""
         # Create
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 1),
             withdrawals=Money(Decimal("100.00")),
             deposits=Money(Decimal("1000.00")),
@@ -190,9 +192,11 @@ class TestPortfolioBalanceRepositoryIntegration:
         assert retrieved.index_change.value == 1.5
 
         # Test portfolio queries
-        by_date = balance_repository.get_by_portfolio_and_date(1, date(2024, 1, 1))
+        by_date = balance_repository.get_by_portfolio_and_date(
+            "portfolio-id-1", date(2024, 1, 1)
+        )
         assert by_date is not None
 
-        latest = balance_repository.get_latest_balance(1)
+        latest = balance_repository.get_latest_balance("portfolio-id-1")
         assert latest is not None
         assert latest.id == balance_id

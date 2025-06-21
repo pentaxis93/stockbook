@@ -63,8 +63,8 @@ class TestPortfolioRepositoryCreate:
         portfolio_id = portfolio_repository.create(sample_portfolio)
 
         # Assert
-        assert isinstance(portfolio_id, int)
-        assert portfolio_id > 0
+        assert isinstance(portfolio_id, str)
+        assert portfolio_id
 
     def test_create_portfolio_with_minimal_data(self, portfolio_repository):
         """Should create portfolio with only required fields."""
@@ -133,7 +133,7 @@ class TestPortfolioRepositoryRead:
     def test_get_by_id_nonexistent_portfolio(self, portfolio_repository):
         """Should return None for non-existent portfolio."""
         # Act
-        result = portfolio_repository.get_by_id(999)
+        result = portfolio_repository.get_by_id("nonexistent-id")
 
         # Assert
         assert result is None
@@ -221,7 +221,7 @@ class TestPortfolioRepositoryUpdate:
         portfolio = PortfolioEntity(name=PortfolioName("Non-existent"))
 
         # Act
-        result = portfolio_repository.update(999, portfolio)
+        result = portfolio_repository.update("nonexistent-id", portfolio)
 
         # Assert
         assert result is False
@@ -269,7 +269,7 @@ class TestPortfolioRepositoryDeactivate:
     def test_deactivate_nonexistent_portfolio(self, portfolio_repository):
         """Should return False when deactivating non-existent portfolio."""
         # Act
-        result = portfolio_repository.deactivate(999)
+        result = portfolio_repository.deactivate("nonexistent-id")
 
         # Assert
         assert result is False

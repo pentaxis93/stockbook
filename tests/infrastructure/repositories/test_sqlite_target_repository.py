@@ -37,7 +37,7 @@ def db_connection():
         conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
-            VALUES (1, 'Test Portfolio', 'Test portfolio for targets', 50, 0.02, 1)
+            VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for targets', 50, 0.02, 1)
         """
         )
 
@@ -45,7 +45,7 @@ def db_connection():
         conn.execute(
             """
             INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
-            VALUES (1, 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
+            VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
         """
         )
 
@@ -66,8 +66,8 @@ def target_repository(db_connection):
 def sample_target():
     """Create sample target entity for testing."""
     return TargetEntity(
-        portfolio_id=1,
-        stock_id=1,
+        portfolio_id="portfolio-id-1",
+        stock_id="stock-id-1",
         pivot_price=Money(Decimal("150.00")),
         failure_price=Money(Decimal("140.00")),
         status=TargetStatus("active"),
@@ -85,15 +85,15 @@ class TestTargetRepositoryCreate:
         target_id = target_repository.create(sample_target)
 
         # Assert
-        assert isinstance(target_id, int)
-        assert target_id > 0
+        assert isinstance(target_id, str)
+        assert target_id
 
     def test_create_active_target(self, target_repository):
         """Should create active target with all fields."""
         # Arrange
         active_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
@@ -115,8 +115,8 @@ class TestTargetRepositoryCreate:
         """Should create target with minimal required data."""
         # Arrange
         minimal_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("50.00")),
             failure_price=Money(Decimal("45.00")),
             status=TargetStatus("active"),
@@ -153,7 +153,7 @@ class TestTargetRepositoryRead:
     def test_get_by_id_nonexistent_target(self, target_repository):
         """Should return None for non-existent target."""
         # Act
-        result = target_repository.get_by_id(999)
+        result = target_repository.get_by_id("nonexistent-id")
 
         # Assert
         assert result is None
@@ -161,7 +161,7 @@ class TestTargetRepositoryRead:
     def test_get_active_by_portfolio_empty(self, target_repository):
         """Should return empty list when no active targets exist for portfolio."""
         # Act
-        targets = target_repository.get_active_by_portfolio(1)
+        targets = target_repository.get_active_by_portfolio("portfolio-id-1")
 
         # Assert
         assert targets == []
@@ -170,16 +170,16 @@ class TestTargetRepositoryRead:
         """Should return only active targets for specific portfolio."""
         # Arrange
         active_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
         )
         inactive_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("105.00")),
             failure_price=Money(Decimal("98.00")),
             status=TargetStatus("hit"),
@@ -190,7 +190,7 @@ class TestTargetRepositoryRead:
         target_repository.create(inactive_target)
 
         # Act
-        active_targets = target_repository.get_active_by_portfolio(1)
+        active_targets = target_repository.get_active_by_portfolio("portfolio-id-1")
 
         # Assert
         assert len(active_targets) == 1
@@ -201,8 +201,8 @@ class TestTargetRepositoryRead:
         """Should return active targets for specific stock."""
         # Arrange
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
@@ -211,7 +211,7 @@ class TestTargetRepositoryRead:
         target_id = target_repository.create(target)
 
         # Act
-        stock_targets = target_repository.get_active_by_stock(1)
+        stock_targets = target_repository.get_active_by_stock("stock-id-1")
 
         # Assert
         assert len(stock_targets) == 1
@@ -221,16 +221,16 @@ class TestTargetRepositoryRead:
         """Should return all active targets across portfolios."""
         # Arrange
         target1 = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
         target2 = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("110.00")),
             failure_price=Money(Decimal("105.00")),
             status=TargetStatus("failed"),
@@ -256,8 +256,8 @@ class TestTargetRepositoryUpdate:
         # Arrange
         target_id = target_repository.create(sample_target)
         updated_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("160.00")),
             failure_price=Money(Decimal("145.00")),
             status=TargetStatus("hit"),
@@ -282,8 +282,8 @@ class TestTargetRepositoryUpdate:
         """Should return False when updating non-existent target."""
         # Arrange
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
@@ -291,7 +291,7 @@ class TestTargetRepositoryUpdate:
         )
 
         # Act
-        result = target_repository.update(999, target)
+        result = target_repository.update("nonexistent-id", target)
 
         # Assert
         assert result is False
@@ -314,7 +314,7 @@ class TestTargetRepositoryUpdate:
     def test_update_status_nonexistent_target(self, target_repository):
         """Should return False when updating status of non-existent target."""
         # Act
-        result = target_repository.update_status(999, "hit")
+        result = target_repository.update_status("nonexistent-id", "hit")
 
         # Assert
         assert result is False
@@ -327,8 +327,8 @@ class TestTargetRepositoryIntegration:
         """Test complete CRUD operations in sequence."""
         # Create
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("95.00")),
             status=TargetStatus("active"),
@@ -344,8 +344,8 @@ class TestTargetRepositoryIntegration:
 
         # Update
         updated_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("105.00")),
             failure_price=Money(Decimal("98.00")),
             status=TargetStatus("hit"),
@@ -373,24 +373,24 @@ class TestTargetRepositoryIntegration:
         # Create targets with different statuses
         targets = [
             TargetEntity(
-                portfolio_id=1,
-                stock_id=1,
+                portfolio_id="portfolio-id-1",
+                stock_id="stock-id-1",
                 pivot_price=Money(Decimal("100.00")),
                 failure_price=Money(Decimal("95.00")),
                 status=TargetStatus("active"),
                 created_date=date(2024, 1, 1),
             ),
             TargetEntity(
-                portfolio_id=1,
-                stock_id=1,
+                portfolio_id="portfolio-id-1",
+                stock_id="stock-id-1",
                 pivot_price=Money(Decimal("110.00")),
                 failure_price=Money(Decimal("105.00")),
                 status=TargetStatus("hit"),
                 created_date=date(2024, 1, 1),
             ),
             TargetEntity(
-                portfolio_id=1,
-                stock_id=1,
+                portfolio_id="portfolio-id-1",
+                stock_id="stock-id-1",
                 pivot_price=Money(Decimal("120.00")),
                 failure_price=Money(Decimal("115.00")),
                 status=TargetStatus("active"),
@@ -402,7 +402,7 @@ class TestTargetRepositoryIntegration:
             target_repository.create(target)
 
         # Test get_active_by_portfolio
-        active_targets = target_repository.get_active_by_portfolio(1)
+        active_targets = target_repository.get_active_by_portfolio("portfolio-id-1")
         assert len(active_targets) == 2
 
         # Test get_all_active
@@ -417,8 +417,8 @@ class TestTargetRepositoryErrorHandling:
         """Should raise validation error for invalid target entity."""
         with pytest.raises(ValueError):
             invalid_target = TargetEntity(
-                portfolio_id=0,  # Invalid portfolio ID
-                stock_id=1,
+                portfolio_id="",  # Invalid portfolio ID
+                stock_id="stock-id-1",
                 pivot_price=Money(Decimal("100.00")),
                 failure_price=Money(Decimal("95.00")),
                 status=TargetStatus("active"),
@@ -430,8 +430,8 @@ class TestTargetRepositoryErrorHandling:
         """Should raise validation error for invalid status."""
         with pytest.raises(ValueError):
             invalid_target = TargetEntity(
-                portfolio_id=1,
-                stock_id=1,
+                portfolio_id="portfolio-id-1",
+                stock_id="stock-id-1",
                 pivot_price=Money(Decimal("100.00")),
                 failure_price=Money(Decimal("95.00")),
                 status=TargetStatus("invalid_status"),  # Invalid status

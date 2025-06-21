@@ -13,8 +13,8 @@ from src.domain.entities.base import BaseEntity
 class ConcreteEntity(BaseEntity):
     """Concrete implementation of BaseEntity for testing."""
 
-    def __init__(self, name: str = "test") -> None:
-        super().__init__()
+    def __init__(self, name: str = "test", entity_id: str = None) -> None:
+        super().__init__(entity_id=entity_id)
         self.name = name
 
 
@@ -22,68 +22,49 @@ class TestBaseEntity:
     """Test suite for BaseEntity domain entity."""
 
     def test_create_entity_without_id(self):
-        """Should create entity with None ID by default."""
+        """Should create entity with generated nanoid by default."""
         entity = ConcreteEntity()
-        assert entity.id is None
+        assert entity.id is not None
+        assert isinstance(entity.id, str)
+        assert len(entity.id) > 0
 
-    def test_set_id_with_valid_positive_integer(self):
-        """Should set ID with valid positive integer."""
-        entity = ConcreteEntity()
-        entity.set_id(1)
-        assert entity.id == 1
+    def test_create_entity_with_provided_id(self):
+        """Should create entity with provided string ID."""
+        test_id = "test-id-123"
+        entity = ConcreteEntity(entity_id=test_id)
+        assert entity.id == test_id
 
-    def test_set_id_with_zero_raises_error(self):
-        """Should raise ValueError when setting ID to zero."""
-        entity = ConcreteEntity()
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            entity.set_id(0)
+    def test_id_is_immutable(self):
+        """Should not be able to change ID after creation."""
+        entity = ConcreteEntity(entity_id="test-id-1")
+        # The ID property should not have a setter
+        with pytest.raises(AttributeError):
+            entity.id = "different-id"
 
-    def test_set_id_with_negative_raises_error(self):
-        """Should raise ValueError when setting negative ID."""
-        entity = ConcreteEntity()
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            entity.set_id(-1)
-
-    def test_set_id_with_non_integer_raises_error(self):
-        """Should raise ValueError when setting non-integer ID."""
-        entity = ConcreteEntity()
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            entity.set_id("1")  # type: ignore
-
-    def test_set_id_twice_raises_error(self):
-        """Should raise ValueError when trying to set ID twice."""
-        entity = ConcreteEntity()
-        entity.set_id(1)
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            entity.set_id(2)
+    def test_from_persistence_creates_entity_with_id(self):
+        """Should create entity from persistence with existing ID."""
+        test_id = "persistence-id-456"
+        entity = ConcreteEntity.from_persistence(test_id, name="from_db")
+        assert entity.id == test_id
+        assert entity.name == "from_db"
 
     def test_equality_with_same_id_same_type(self):
         """Should be equal when same type and same ID."""
-        entity1 = ConcreteEntity("first")
-        entity2 = ConcreteEntity("second")
-        entity1.set_id(1)
-        entity2.set_id(1)
+        test_id = "same-id-789"
+        entity1 = ConcreteEntity("first", entity_id=test_id)
+        entity2 = ConcreteEntity("second", entity_id=test_id)
         assert entity1 == entity2
 
     def test_equality_with_different_ids(self):
         """Should not be equal when different IDs."""
-        entity1 = ConcreteEntity()
-        entity2 = ConcreteEntity()
-        entity1.set_id(1)
-        entity2.set_id(2)
+        entity1 = ConcreteEntity(entity_id="id-1")
+        entity2 = ConcreteEntity(entity_id="id-2")
         assert entity1 != entity2
 
-    def test_equality_with_none_ids(self):
-        """Should not be equal when both IDs are None."""
+    def test_equality_with_generated_ids(self):
+        """Should not be equal when both have generated IDs."""
         entity1 = ConcreteEntity()
         entity2 = ConcreteEntity()
-        assert entity1 != entity2
-
-    def test_equality_with_one_none_id(self):
-        """Should not be equal when one ID is None."""
-        entity1 = ConcreteEntity()
-        entity2 = ConcreteEntity()
-        entity1.set_id(1)
         assert entity1 != entity2
 
     def test_equality_with_different_types(self):
@@ -92,23 +73,20 @@ class TestBaseEntity:
         class AnotherEntity(BaseEntity):
             pass
 
-        entity1 = ConcreteEntity()
-        entity2 = AnotherEntity()
-        entity1.set_id(1)
-        entity2.set_id(1)
+        test_id = "same-id-123"
+        entity1 = ConcreteEntity(entity_id=test_id)
+        entity2 = AnotherEntity(entity_id=test_id)
         assert entity1 != entity2
 
     def test_equality_with_non_entity_object(self):
         """Should not be equal to non-entity objects."""
-        entity = ConcreteEntity()
-        entity.set_id(1)
+        entity = ConcreteEntity(entity_id="test-id-1")
         assert entity != "not an entity"
-        assert entity != 1
+        assert entity != "test-id-1"
 
     def test_entities_not_hashable(self):
         """Should not be hashable after removing __hash__ method."""
-        entity = ConcreteEntity()
-        entity.set_id(1)
+        entity = ConcreteEntity(entity_id="test-id-1")
 
         # Entities should not be usable as dict keys
         with pytest.raises(TypeError, match="unhashable type"):
@@ -120,19 +98,13 @@ class TestBaseEntity:
 
     def test_str_representation_with_id(self):
         """Should display class name and ID in string representation."""
-        entity = ConcreteEntity()
-        entity.set_id(42)
-        assert str(entity) == "ConcreteEntity(id=42)"
-
-    def test_str_representation_without_id(self):
-        """Should display class name and None ID in string representation."""
-        entity = ConcreteEntity()
-        assert str(entity) == "ConcreteEntity(id=None)"
+        test_id = "test-id-42"
+        entity = ConcreteEntity(entity_id=test_id)
+        assert str(entity) == f"ConcreteEntity(id={test_id})"
 
     def test_repr_same_as_str(self):
         """Should have same repr as str representation."""
-        entity = ConcreteEntity()
-        entity.set_id(1)
+        entity = ConcreteEntity(entity_id="test-id-1")
         assert repr(entity) == str(entity)
 
 
@@ -140,37 +112,72 @@ class TestBaseEntityArchitecturalConcerns:
     """
     Test suite focusing on architectural concerns about BaseEntity design.
 
-    These tests highlight design questions:
-    1. Is set_id() needed if IDs are managed by the database?
-    2. Is __hash__() method necessary for domain entities?
+    These tests highlight design decisions:
+    1. String IDs with nanoid provide immutable, unique identifiers
+    2. from_persistence() method handles entity reconstruction from database
+    3. __hash__() method removal prevents misuse of mutable entities
     """
 
-    def test_set_id_design_concern_database_managed_ids(self):
+    def test_id_immutability_design_improvement(self):
         """
-        DESIGN CONCERN: Should set_id() exist if database manages IDs?
+        DESIGN IMPROVEMENT: IDs are now immutable by design.
 
-        In DDD, entities typically don't manage their own persistence IDs.
-        The database/ORM typically assigns IDs during persistence.
-        This test demonstrates the concern about exposing set_id() publicly.
+        The new implementation eliminates the set_id() method that caused
+        architectural concerns. IDs are set during construction and cannot
+        be changed, which better aligns with DDD principles.
 
-        CURRENT USAGE: set_id() is widely used in:
-        - Entity constructors (when loading from database)
-        - Infrastructure layer (after database persistence)
-        - Application services (when retrieving entities)
-
-        ALTERNATIVE APPROACH: Use private _set_id() method that only
-        the persistence layer can access, keeping ID management
-        out of the domain layer's public API.
+        BENEFITS:
+        - No public ID mutation methods
+        - IDs are set once during entity creation
+        - from_persistence() method handles database reconstruction
+        - Immutable IDs prevent accidental changes
         """
+        # IDs are generated automatically
         entity = ConcreteEntity()
+        original_id = entity.id
+        assert original_id is not None
+        assert isinstance(original_id, str)
 
-        # This works, but should it be allowed in domain layer?
-        entity.set_id(1)
-        assert entity.id == 1
+        # IDs cannot be changed after creation
+        with pytest.raises(AttributeError):
+            entity.id = "different-id"
 
-        # The concern: Domain entities shouldn't manage persistence details
-        # The reality: Current architecture requires this for entity hydration
-        # TODO: Consider refactoring to use factory pattern or private method
+        # ID remains unchanged
+        assert entity.id == original_id
+
+    def test_from_persistence_handles_database_reconstruction(self):
+        """
+        DESIGN SOLUTION: from_persistence() handles database entity creation.
+
+        This class method provides a clean way for the infrastructure layer
+        to create entities with known IDs from database records, without
+        exposing ID mutation in the domain layer.
+        """
+        db_id = "db-entity-id-123"
+        entity = ConcreteEntity.from_persistence(db_id, name="from_database")
+
+        assert entity.id == db_id
+        assert entity.name == "from_database"
+
+        # The entity works exactly like any other entity
+        other_entity = ConcreteEntity("other", entity_id=db_id)
+        assert entity == other_entity
+
+    def test_nanoid_provides_unique_identifiers(self):
+        """
+        DESIGN DECISION: nanoid generates unique string identifiers.
+
+        Using nanoid eliminates the need for database-generated integer IDs
+        in many scenarios, allowing entities to have IDs before persistence.
+        """
+        entities = [ConcreteEntity() for _ in range(100)]
+        ids = [entity.id for entity in entities]
+
+        # All IDs should be unique
+        assert len(set(ids)) == len(ids)
+
+        # All IDs should be non-empty strings
+        assert all(isinstance(id, str) and len(id) > 0 for id in ids)
 
     def test_hash_removal_prevents_misuse(self):
         """
@@ -180,8 +187,7 @@ class TestBaseEntityArchitecturalConcerns:
         used as dictionary keys or in sets, which violates Python's
         hash contract for mutable objects.
         """
-        entity = ConcreteEntity("test")
-        entity.set_id(1)
+        entity = ConcreteEntity("test", entity_id="test-id-1")
 
         # Entities can no longer be misused as dict keys
         with pytest.raises(TypeError, match="unhashable type"):
@@ -192,8 +198,7 @@ class TestBaseEntityArchitecturalConcerns:
             {entity}
 
         # But equality still works fine for proper comparisons
-        other_entity = ConcreteEntity("other")
-        other_entity.set_id(1)
+        other_entity = ConcreteEntity("other", entity_id="test-id-1")
         assert entity == other_entity
 
     def test_entity_collections_work_properly_without_hash(self):
@@ -203,10 +208,9 @@ class TestBaseEntityArchitecturalConcerns:
         Shows that entities can still be compared for equality and used in lists,
         but are prevented from being misused in hash-based collections.
         """
-        entity1 = ConcreteEntity()
-        entity2 = ConcreteEntity()
-        entity1.set_id(1)
-        entity2.set_id(1)
+        test_id = "collection-test-id"
+        entity1 = ConcreteEntity(entity_id=test_id)
+        entity2 = ConcreteEntity(entity_id=test_id)
 
         # Equality works fine without hash
         assert entity1 == entity2

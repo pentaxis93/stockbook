@@ -22,24 +22,24 @@ class TransactionEntity(BaseEntity):
 
     def __init__(
         self,
-        portfolio_id: int,
-        stock_id: int,
+        portfolio_id: str,
+        stock_id: str,
         transaction_type: TransactionType,
         quantity: Quantity,
         price: Money,
         transaction_date: date,
         notes: Optional[Notes] = None,
-        transaction_id: Optional[int] = None,
+        entity_id: Optional[str] = None,
     ):
         """Initialize transaction with required value objects and validation."""
-        # Validate primitive IDs
-        if not isinstance(portfolio_id, int) or portfolio_id <= 0:
-            raise ValueError("Portfolio ID must be positive")
-        if not isinstance(stock_id, int) or stock_id <= 0:
-            raise ValueError("Stock ID must be positive")
+        # Validate foreign key IDs are not empty
+        if not portfolio_id or not isinstance(portfolio_id, str):
+            raise ValueError("Portfolio ID must be a non-empty string")
+        if not stock_id or not isinstance(stock_id, str):
+            raise ValueError("Stock ID must be a non-empty string")
 
         # Store validated attributes
-        super().__init__()
+        super().__init__(entity_id=entity_id)
         self._portfolio_id = portfolio_id
         self._stock_id = stock_id
         self._transaction_type = transaction_type
@@ -47,17 +47,15 @@ class TransactionEntity(BaseEntity):
         self._price = price
         self._transaction_date = transaction_date
         self._notes = notes or Notes("")
-        if transaction_id is not None:
-            self.set_id(transaction_id)
 
     # Core attributes
     @property
-    def portfolio_id(self) -> int:
+    def portfolio_id(self) -> str:
         """Get portfolio ID."""
         return self._portfolio_id
 
     @property
-    def stock_id(self) -> int:
+    def stock_id(self) -> str:
         """Get stock ID."""
         return self._stock_id
 

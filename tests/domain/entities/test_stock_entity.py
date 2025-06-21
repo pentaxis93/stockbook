@@ -49,7 +49,8 @@ class TestStockEntity:
         assert stock.industry_group == industry_group
         assert stock.grade == grade
         assert stock.notes == notes
-        assert stock.id is None  # Not yet persisted
+        assert stock.id is not None  # Generated nanoid
+        assert isinstance(stock.id, str)
 
     def test_create_stock_with_minimal_data(self):
         """Should create Stock with only required fields."""
@@ -349,42 +350,44 @@ class TestStockEntity:
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
             stock.update_fields(notes=long_notes)
 
-    def test_set_id(self):
-        """Should allow setting ID (for persistence layer)."""
+    def test_create_stock_with_id(self):
+        """Should create stock with provided ID."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        test_id = "stock-id-123"
+        stock = StockEntity(symbol=symbol, company_name=company_name, entity_id=test_id)
 
-        assert stock.id is None
+        assert stock.id == test_id
 
-        stock.set_id(123)
-        assert stock.id == 123
-
-    def test_set_id_with_invalid_id_raises_error(self):
-        """Should raise error for invalid ID."""
+    def test_stock_id_immutability(self):
+        """Should not be able to change ID after creation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = StockEntity(
+            symbol=symbol, company_name=company_name, entity_id="test-id-1"
+        )
 
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            stock.set_id(0)
+        # ID property should not have a setter
+        with pytest.raises(AttributeError):
+            stock.id = "different-id"
 
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            stock.set_id(-1)
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            stock.set_id("123")
-
-    def test_set_id_when_already_set_raises_error(self):
-        """Should raise error when trying to change existing ID."""
+    def test_stock_from_persistence(self):
+        """Should create stock from persistence with existing ID."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        test_id = "persistence-id-456"
 
-        stock.set_id(123)
+        stock = StockEntity.from_persistence(
+            test_id,
+            symbol=symbol,
+            company_name=company_name,
+            sector=Sector("Technology"),
+            grade=Grade("A"),
+        )
 
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            stock.set_id(456)
+        assert stock.id == test_id
+        assert stock.symbol.value == "AAPL"
+        assert stock.sector.value == "Technology"
 
     # New tests for sector functionality
     def test_create_stock_with_sector_and_industry_group(self):

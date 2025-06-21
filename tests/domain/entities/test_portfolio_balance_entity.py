@@ -22,7 +22,7 @@ class TestPortfolioBalanceEntity:
         from src.domain.value_objects import IndexChange
 
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             withdrawals=Money(Decimal("500.00")),
             deposits=Money(Decimal("1000.00")),
@@ -30,7 +30,7 @@ class TestPortfolioBalanceEntity:
             index_change=IndexChange(5.25),  # 5.25% change
         )
 
-        assert balance.portfolio_id == 1
+        assert balance.portfolio_id == "portfolio-id-1"
         assert balance.balance_date == date(2024, 1, 15)
         assert balance.withdrawals.amount == Decimal("500.00")
         assert balance.deposits.amount == Decimal("1000.00")
@@ -40,12 +40,12 @@ class TestPortfolioBalanceEntity:
     def test_create_portfolio_balance_with_minimal_data(self):
         """Test creating portfolio balance with only required fields."""
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
 
-        assert balance.portfolio_id == 1
+        assert balance.portfolio_id == "portfolio-id-1"
         assert balance.balance_date == date(2024, 1, 15)
         assert balance.final_balance.amount == Decimal("10000.00")
         assert balance.withdrawals.amount == Decimal("0.00")  # Defaults to zero
@@ -55,7 +55,7 @@ class TestPortfolioBalanceEntity:
     def test_create_portfolio_balance_with_none_optionals_allowed(self):
         """Should allow creating portfolio balance with None for optional fields."""
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
             withdrawals=None,
@@ -71,9 +71,9 @@ class TestPortfolioBalanceEntity:
 
     def test_create_portfolio_balance_with_invalid_portfolio_id_raises_error(self):
         """Should raise error for invalid portfolio ID."""
-        with pytest.raises(ValueError, match="Portfolio ID must be positive"):
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             PortfolioBalanceEntity(
-                portfolio_id=0,  # Invalid
+                portfolio_id="",  # Invalid empty string
                 balance_date=date(2024, 1, 15),
                 final_balance=Money(Decimal("10000.00")),
             )
@@ -88,19 +88,19 @@ class TestPortfolioBalanceEntity:
     def test_portfolio_balance_equality(self):
         """Should compare portfolio balances based on business identity (portfolio_id, date)."""
         balance1 = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
 
         balance2 = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("15000.00")),  # Different amount
         )
 
         balance3 = PortfolioBalanceEntity(
-            portfolio_id=2,  # Different portfolio
+            portfolio_id="portfolio-id-2",  # Different portfolio
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
@@ -111,13 +111,13 @@ class TestPortfolioBalanceEntity:
     def test_portfolio_balance_hash(self):
         """Should hash consistently based on business identity."""
         balance1 = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
 
         balance2 = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("20000.00")),  # Different amount
         )
@@ -127,7 +127,7 @@ class TestPortfolioBalanceEntity:
     def test_portfolio_balance_string_representation(self):
         """Should have informative string representation."""
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10500.00")),
         )
@@ -138,19 +138,21 @@ class TestPortfolioBalanceEntity:
     def test_portfolio_balance_repr(self):
         """Should have detailed repr representation."""
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10500.00")),
         )
 
-        expected = "PortfolioBalanceEntity(portfolio_id=1, date=2024-01-15)"
+        expected = (
+            "PortfolioBalanceEntity(portfolio_id=portfolio-id-1, date=2024-01-15)"
+        )
         assert repr(balance) == expected
 
     # Business behavior tests
     def test_portfolio_balance_calculate_net_flow(self):
         """Should calculate net cash flow (deposits - withdrawals)."""
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             withdrawals=Money(Decimal("500.00")),
             deposits=Money(Decimal("1000.00")),
@@ -165,21 +167,21 @@ class TestPortfolioBalanceEntity:
         from src.domain.value_objects import IndexChange
 
         positive_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10500.00")),
             index_change=IndexChange(5.25),
         )
 
         negative_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("9500.00")),
             index_change=IndexChange(-2.5),
         )
 
         no_change_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
@@ -193,14 +195,14 @@ class TestPortfolioBalanceEntity:
         from src.domain.value_objects import IndexChange
 
         negative_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("9500.00")),
             index_change=IndexChange(-2.5),
         )
 
         positive_balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10500.00")),
             index_change=IndexChange(5.25),
@@ -212,14 +214,14 @@ class TestPortfolioBalanceEntity:
     def test_portfolio_balance_had_deposits(self):
         """Should check if portfolio had deposits."""
         balance_with_deposits = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             deposits=Money(Decimal("1000.00")),
             final_balance=Money(Decimal("10000.00")),
         )
 
         balance_without_deposits = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
@@ -230,14 +232,14 @@ class TestPortfolioBalanceEntity:
     def test_portfolio_balance_had_withdrawals(self):
         """Should check if portfolio had withdrawals."""
         balance_with_withdrawals = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             withdrawals=Money(Decimal("500.00")),
             final_balance=Money(Decimal("10000.00")),
         )
 
         balance_without_withdrawals = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
@@ -245,46 +247,49 @@ class TestPortfolioBalanceEntity:
         assert balance_with_withdrawals.had_withdrawals() is True
         assert balance_without_withdrawals.had_withdrawals() is False
 
-    def test_portfolio_balance_set_id(self):
-        """Should allow setting balance ID."""
+    def test_portfolio_balance_create_with_id(self):
+        """Should create portfolio balance with provided ID."""
+        test_id = "balance-id-123"
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
+            balance_date=date(2024, 1, 15),
+            final_balance=Money(Decimal("10000.00")),
+            entity_id=test_id,
+        )
+
+        assert balance.id == test_id
+
+    def test_portfolio_balance_id_immutability(self):
+        """Should not be able to change ID after creation."""
+        balance = PortfolioBalanceEntity(
+            portfolio_id="portfolio-id-1",
+            balance_date=date(2024, 1, 15),
+            final_balance=Money(Decimal("10000.00")),
+            entity_id="test-id-1",
+        )
+
+        # ID property should not have a setter
+        with pytest.raises(AttributeError):
+            balance.id = "different-id"
+
+    def test_portfolio_balance_from_persistence(self):
+        """Should create portfolio balance from persistence with existing ID."""
+        test_id = "persistence-id-456"
+        balance = PortfolioBalanceEntity.from_persistence(
+            test_id,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )
 
-        balance.set_id(123)
-        assert balance.id == 123
-
-    def test_portfolio_balance_set_id_with_invalid_id_raises_error(self):
-        """Should raise error when setting invalid ID."""
-        balance = PortfolioBalanceEntity(
-            portfolio_id=1,
-            balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00")),
-        )
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            balance.set_id(0)
-
-    def test_portfolio_balance_set_id_when_already_set_raises_error(self):
-        """Should raise error when trying to change existing ID."""
-        balance = PortfolioBalanceEntity(
-            portfolio_id=1,
-            balance_date=date(2024, 1, 15),
-            final_balance=Money(Decimal("10000.00")),
-            balance_id=123,
-        )
-
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            balance.set_id(456)
+        assert balance.id == test_id
 
     def test_portfolio_balance_update_index_change(self):
         """Should be able to update index change."""
         from src.domain.value_objects import IndexChange
 
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
             final_balance=Money(Decimal("10000.00")),
         )

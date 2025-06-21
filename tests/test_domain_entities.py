@@ -137,8 +137,8 @@ class TestTransactionEntity:
         from src.domain.value_objects import Notes, TransactionType
 
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("150.25")),
@@ -155,8 +155,8 @@ class TestTransactionEntity:
         from src.domain.value_objects import TransactionType
 
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("175.00")),
@@ -179,10 +179,10 @@ class TestTransactionEntity:
         """Test that invalid portfolio ID is rejected"""
         from src.domain.value_objects import TransactionType
 
-        with pytest.raises(ValueError, match="Portfolio ID must be positive"):
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             TransactionEntity(
-                portfolio_id=0,
-                stock_id=1,
+                portfolio_id="",
+                stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
                 price=Money(Decimal("150.00")),
@@ -193,10 +193,10 @@ class TestTransactionEntity:
         """Test that invalid stock ID is rejected"""
         from src.domain.value_objects import TransactionType
 
-        with pytest.raises(ValueError, match="Stock ID must be positive"):
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             TransactionEntity(
-                portfolio_id=1,
-                stock_id=0,
+                portfolio_id="portfolio-id-1",
+                stock_id="",
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(100),
                 price=Money(Decimal("150.00")),
@@ -212,15 +212,15 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
-        assert target.portfolio_id == 1
-        assert target.stock_id == 1
+        assert target.portfolio_id == "portfolio-id-1"
+        assert target.stock_id == "stock-id-1"
         assert target.pivot_price.amount == Decimal("100.00")
         assert target.failure_price.amount == Decimal("80.00")
         assert target.status.value == "active"
@@ -234,14 +234,14 @@ class TestPortfolioBalanceEntity:
         from src.domain.value_objects import IndexChange
 
         balance = PortfolioBalanceEntity(
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
             balance_date=date.today(),
             final_balance=Money(Decimal("10000.00")),
             deposits=Money(Decimal("1000.00")),
             withdrawals=Money(Decimal("500.00")),
             index_change=IndexChange(5.25),
         )
-        assert balance.portfolio_id == 1
+        assert balance.portfolio_id == "portfolio-id-1"
         assert balance.final_balance.amount == Decimal("10000.00")
         assert balance.deposits.amount == Decimal("1000.00")
         assert balance.withdrawals.amount == Decimal("500.00")
@@ -260,16 +260,16 @@ class TestJournalEntryEntity:
             content=JournalContent(
                 "This is a detailed market analysis and observations."
             ),
-            portfolio_id=1,
-            stock_id=2,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-2",
         )
         assert entry.entry_date == date.today()
         assert (
             entry.content.value
             == "This is a detailed market analysis and observations."
         )
-        assert entry.portfolio_id == 1
-        assert entry.stock_id == 2
+        assert entry.portfolio_id == "portfolio-id-1"
+        assert entry.stock_id == "stock-id-2"
         assert entry.transaction_id is None
 
 

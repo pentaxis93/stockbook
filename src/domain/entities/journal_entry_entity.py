@@ -24,33 +24,31 @@ class JournalEntryEntity(BaseEntity):
         self,
         entry_date: date,
         content: JournalContent,
-        portfolio_id: Optional[int] = None,
-        stock_id: Optional[int] = None,
-        transaction_id: Optional[int] = None,
-        entry_id: Optional[int] = None,
+        portfolio_id: Optional[str] = None,
+        stock_id: Optional[str] = None,
+        transaction_id: Optional[str] = None,
+        entity_id: Optional[str] = None,
     ):
         """Initialize journal entry with required value objects and validation."""
-        # Validate optional primitive IDs
+        # Validate optional foreign key IDs
         if portfolio_id is not None and (
-            not isinstance(portfolio_id, int) or portfolio_id <= 0
+            not isinstance(portfolio_id, str) or not portfolio_id
         ):
-            raise ValueError("Portfolio ID must be positive")
-        if stock_id is not None and (not isinstance(stock_id, int) or stock_id <= 0):
-            raise ValueError("Stock ID must be positive")
+            raise ValueError("Portfolio ID must be a non-empty string")
+        if stock_id is not None and (not isinstance(stock_id, str) or not stock_id):
+            raise ValueError("Stock ID must be a non-empty string")
         if transaction_id is not None and (
-            not isinstance(transaction_id, int) or transaction_id <= 0
+            not isinstance(transaction_id, str) or not transaction_id
         ):
-            raise ValueError("Transaction ID must be positive")
+            raise ValueError("Transaction ID must be a non-empty string")
 
         # Store validated attributes
-        super().__init__()
+        super().__init__(entity_id=entity_id)
         self._entry_date = entry_date
         self._content = content
         self._portfolio_id = portfolio_id
         self._stock_id = stock_id
         self._transaction_id = transaction_id
-        if entry_id is not None:
-            self.set_id(entry_id)
 
     # Core attributes
     @property
@@ -64,17 +62,17 @@ class JournalEntryEntity(BaseEntity):
         return self._content
 
     @property
-    def portfolio_id(self) -> Optional[int]:
+    def portfolio_id(self) -> Optional[str]:
         """Get portfolio ID."""
         return self._portfolio_id
 
     @property
-    def stock_id(self) -> Optional[int]:
+    def stock_id(self) -> Optional[str]:
         """Get stock ID."""
         return self._stock_id
 
     @property
-    def transaction_id(self) -> Optional[int]:
+    def transaction_id(self) -> Optional[str]:
         """Get transaction ID."""
         return self._transaction_id
 

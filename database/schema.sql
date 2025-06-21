@@ -3,7 +3,7 @@
 
 -- Stock information
 CREATE TABLE IF NOT EXISTS stock (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     symbol TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     sector TEXT,
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS stock (
 
 -- Portfolio accounts
 CREATE TABLE IF NOT EXISTS portfolio (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     max_positions INTEGER DEFAULT 10,
     max_risk_per_trade DECIMAL(3,1) DEFAULT 2.0, -- percentage
@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS portfolio (
 
 -- Watchlist/Target stocks
 CREATE TABLE IF NOT EXISTS target (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    stock_id INTEGER NOT NULL,
-    portfolio_id INTEGER NOT NULL,
+    id TEXT PRIMARY KEY,
+    stock_id TEXT NOT NULL,
+    portfolio_id TEXT NOT NULL,
     pivot_price DECIMAL(10,2) NOT NULL,
     failure_price DECIMAL(10,2) NOT NULL,
     notes TEXT,
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS target (
 
 -- Buy/Sell transactions
 CREATE TABLE IF NOT EXISTS stock_transaction (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    portfolio_id INTEGER NOT NULL,
-    stock_id INTEGER NOT NULL,
+    id TEXT PRIMARY KEY,
+    portfolio_id TEXT NOT NULL,
+    stock_id TEXT NOT NULL,
     type TEXT NOT NULL CHECK(type IN ('buy', 'sell')),
     quantity INTEGER NOT NULL,
     price DECIMAL(10,2) NOT NULL,
@@ -57,8 +57,8 @@ CREATE TABLE IF NOT EXISTS stock_transaction (
 
 -- Portfolio balance history
 CREATE TABLE IF NOT EXISTS portfolio_balance (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    portfolio_id INTEGER NOT NULL,
+    id TEXT PRIMARY KEY,
+    portfolio_id TEXT NOT NULL,
     balance_date DATE NOT NULL,
     withdrawals DECIMAL(12,2) DEFAULT 0,
     deposits DECIMAL(12,2) DEFAULT 0,
@@ -71,12 +71,12 @@ CREATE TABLE IF NOT EXISTS portfolio_balance (
 
 -- Trading journal
 CREATE TABLE IF NOT EXISTS journal_entry (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id TEXT PRIMARY KEY,
     entry_date DATE NOT NULL,
     content TEXT NOT NULL,
-    stock_id INTEGER,
-    portfolio_id INTEGER,
-    transaction_id INTEGER,
+    stock_id TEXT,
+    portfolio_id TEXT,
+    transaction_id TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (stock_id) REFERENCES stock(id),

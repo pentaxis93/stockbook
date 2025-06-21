@@ -24,9 +24,9 @@ class TestJournalEntryEntity:
             content=JournalContent(
                 "This is an important market observation about the current trends."
             ),
-            portfolio_id=1,
-            stock_id=2,
-            transaction_id=3,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-2",
+            transaction_id="transaction-id-3",
         )
 
         assert entry.entry_date == date(2024, 1, 15)
@@ -34,9 +34,9 @@ class TestJournalEntryEntity:
             entry.content.value
             == "This is an important market observation about the current trends."
         )
-        assert entry.portfolio_id == 1
-        assert entry.stock_id == 2
-        assert entry.transaction_id == 3
+        assert entry.portfolio_id == "portfolio-id-1"
+        assert entry.stock_id == "stock-id-2"
+        assert entry.transaction_id == "transaction-id-3"
 
     def test_create_journal_entry_with_minimal_data(self):
         """Test creating journal entry with only required fields."""
@@ -57,33 +57,35 @@ class TestJournalEntryEntity:
         """Should raise error for invalid portfolio ID."""
         from src.domain.value_objects import JournalContent
 
-        with pytest.raises(ValueError, match="Portfolio ID must be positive"):
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             JournalEntryEntity(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
-                portfolio_id=0,  # Invalid
+                portfolio_id="",  # Invalid empty string
             )
 
     def test_create_journal_entry_with_invalid_stock_id_raises_error(self):
         """Should raise error for invalid stock ID."""
         from src.domain.value_objects import JournalContent
 
-        with pytest.raises(ValueError, match="Stock ID must be positive"):
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             JournalEntryEntity(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
-                stock_id=-1,  # Invalid
+                stock_id="",  # Invalid empty string
             )
 
     def test_create_journal_entry_with_invalid_transaction_id_raises_error(self):
         """Should raise error for invalid transaction ID."""
         from src.domain.value_objects import JournalContent
 
-        with pytest.raises(ValueError, match="Transaction ID must be positive"):
+        with pytest.raises(
+            ValueError, match="Transaction ID must be a non-empty string"
+        ):
             JournalEntryEntity(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
-                transaction_id=0,  # Invalid
+                transaction_id="",  # Invalid empty string
             )
 
     def test_create_journal_entry_with_invalid_content_raises_error(self):
@@ -105,7 +107,7 @@ class TestJournalEntryEntity:
         entry2 = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation about trends."),
-            portfolio_id=1,  # Different metadata
+            portfolio_id="portfolio-id-1",  # Different metadata
         )
 
         entry3 = JournalEntryEntity(
@@ -128,7 +130,7 @@ class TestJournalEntryEntity:
         entry2 = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation."),
-            portfolio_id=1,  # Different metadata
+            portfolio_id="portfolio-id-1",  # Different metadata
         )
 
         assert hash(entry1) == hash(entry2)  # Same date and content
@@ -168,7 +170,7 @@ class TestJournalEntryEntity:
         portfolio_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Portfolio analysis."),
-            portfolio_id=1,
+            portfolio_id="portfolio-id-1",
         )
 
         general_entry = JournalEntryEntity(
@@ -186,7 +188,7 @@ class TestJournalEntryEntity:
         stock_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Stock analysis."),
-            stock_id=1,
+            stock_id="stock-id-1",
         )
 
         general_entry = JournalEntryEntity(
@@ -204,7 +206,7 @@ class TestJournalEntryEntity:
         transaction_entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Transaction analysis."),
-            transaction_id=1,
+            transaction_id="transaction-id-1",
         )
 
         general_entry = JournalEntryEntity(
@@ -253,42 +255,47 @@ class TestJournalEntryEntity:
         entry.update_content("String content.")
         assert entry.content.value == "String content."
 
-    def test_journal_entry_set_id(self):
-        """Should allow setting entry ID."""
+    def test_journal_entry_create_with_id(self):
+        """Should create journal entry with provided ID."""
+        from src.domain.value_objects import JournalContent
+
+        test_id = "journal-entry-id-123"
+        entry = JournalEntryEntity(
+            entry_date=date(2024, 1, 15),
+            content=JournalContent("Test content."),
+            entity_id=test_id,
+        )
+
+        assert entry.id == test_id
+
+    def test_journal_entry_id_immutability(self):
+        """Should not be able to change ID after creation."""
         from src.domain.value_objects import JournalContent
 
         entry = JournalEntryEntity(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content."),
+            entity_id="test-id-1",
         )
 
-        entry.set_id(123)
-        assert entry.id == 123
+        # ID property should not have a setter
+        with pytest.raises(AttributeError):
+            entry.id = "different-id"
 
-    def test_journal_entry_set_id_with_invalid_id_raises_error(self):
-        """Should raise error when setting invalid ID."""
+    def test_journal_entry_from_persistence(self):
+        """Should create journal entry from persistence with existing ID."""
         from src.domain.value_objects import JournalContent
 
-        entry = JournalEntryEntity(
+        test_id = "persistence-id-456"
+        entry = JournalEntryEntity.from_persistence(
+            test_id,
             entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content."),
+            content=JournalContent("Test content from database."),
+            portfolio_id="portfolio-id-1",
         )
 
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            entry.set_id(0)
-
-    def test_journal_entry_set_id_when_already_set_raises_error(self):
-        """Should raise error when trying to change existing ID."""
-        from src.domain.value_objects import JournalContent
-
-        entry = JournalEntryEntity(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content."),
-            entry_id=123,
-        )
-
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            entry.set_id(456)
+        assert entry.id == test_id
+        assert entry.portfolio_id == "portfolio-id-1"
 
 
 class TestJournalContent:

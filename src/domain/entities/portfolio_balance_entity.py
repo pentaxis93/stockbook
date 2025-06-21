@@ -22,32 +22,30 @@ class PortfolioBalanceEntity(BaseEntity):
 
     def __init__(
         self,
-        portfolio_id: int,
+        portfolio_id: str,
         balance_date: date,
         final_balance: Money,
         withdrawals: Optional[Money] = None,
         deposits: Optional[Money] = None,
         index_change: Optional[IndexChange] = None,
-        balance_id: Optional[int] = None,
+        entity_id: Optional[str] = None,
     ):
         """Initialize portfolio balance with required value objects and validation."""
-        # Validate primitive IDs
-        if not isinstance(portfolio_id, int) or portfolio_id <= 0:
-            raise ValueError("Portfolio ID must be positive")
+        # Validate foreign key ID is not empty
+        if not portfolio_id or not isinstance(portfolio_id, str):
+            raise ValueError("Portfolio ID must be a non-empty string")
 
         # Store validated attributes
-        super().__init__()
+        super().__init__(entity_id=entity_id)
         self._portfolio_id = portfolio_id
         self._balance_date = balance_date
         self._final_balance = final_balance
         self._withdrawals = withdrawals or Money.zero()
         self._deposits = deposits or Money.zero()
         self._index_change = index_change
-        if balance_id is not None:
-            self.set_id(balance_id)
 
     @property
-    def portfolio_id(self) -> int:
+    def portfolio_id(self) -> str:
         """Get portfolio ID."""
         return self._portfolio_id
 

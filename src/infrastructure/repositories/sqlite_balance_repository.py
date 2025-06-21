@@ -33,7 +33,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
         """
         self.db_connection = db_connection
 
-    def create(self, balance: PortfolioBalanceEntity) -> int:
+    def create(self, balance: PortfolioBalanceEntity) -> str:
         """
         Create or update portfolio balance for a date.
 
@@ -45,13 +45,14 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
         """
         with self.db_connection.transaction() as conn:
             # Try to insert, replace if exists
-            cursor = conn.execute(
+            conn.execute(
                 """
                 INSERT OR REPLACE INTO portfolio_balance 
-                (portfolio_id, balance_date, withdrawals, deposits, final_balance, index_change)
-                VALUES (?, ?, ?, ?, ?, ?)
+                (id, portfolio_id, balance_date, withdrawals, deposits, final_balance, index_change)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
+                    balance.id,
                     balance.portfolio_id,
                     balance.balance_date.isoformat() if balance.balance_date else "",
                     float(balance.withdrawals.amount) if balance.withdrawals else 0.0,
@@ -64,9 +65,9 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                     balance.index_change.value if balance.index_change else None,
                 ),
             )
-            return cursor.lastrowid or 0
+            return balance.id
 
-    def get_by_id(self, balance_id: int) -> Optional[PortfolioBalanceEntity]:
+    def get_by_id(self, balance_id: str) -> Optional[PortfolioBalanceEntity]:
         """
         Retrieve portfolio balance by ID.
 
@@ -97,7 +98,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 conn.close()
 
     def get_by_portfolio_and_date(
-        self, portfolio_id: int, balance_date: date
+        self, portfolio_id: str, balance_date: date
     ) -> Optional[PortfolioBalanceEntity]:
         """
         Retrieve portfolio balance for a specific date.
@@ -130,7 +131,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 conn.close()
 
     def get_history(
-        self, portfolio_id: int, limit: Optional[int] = None
+        self, portfolio_id: str, limit: Optional[int] = None
     ) -> List[PortfolioBalanceEntity]:
         """
         Retrieve balance history for a portfolio.
@@ -151,7 +152,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 ORDER BY balance_date DESC
             """
 
-            params = [portfolio_id]
+            params: list = [portfolio_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -164,7 +165,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def get_latest_balance(self, portfolio_id: int) -> Optional[PortfolioBalanceEntity]:
+    def get_latest_balance(self, portfolio_id: str) -> Optional[PortfolioBalanceEntity]:
         """
         Retrieve the most recent balance for a portfolio.
 
@@ -239,6 +240,6 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 if row["index_change"] is not None
                 else None
             ),
-            balance_id=row["id"],
+            entity_id=row["id"],
         )
         return entity

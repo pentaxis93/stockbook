@@ -97,7 +97,7 @@ class CreateStockRequest:
 class UpdateStockRequest:
     """Request model for updating an existing stock."""
 
-    stock_id: int
+    stock_id: str
     name: Optional[str] = field(default=None)
     sector: Optional[str] = field(default=None)
     industry_group: Optional[str] = field(default=None)
@@ -109,8 +109,8 @@ class UpdateStockRequest:
         errors = {}
 
         # Validate stock_id
-        if not isinstance(self.stock_id, int) or self.stock_id <= 0:
-            errors["stock_id"] = "Stock ID must be a positive integer"
+        if not isinstance(self.stock_id, str) or not self.stock_id.strip():
+            errors["stock_id"] = "Stock ID must be a non-empty string"
 
         # Only validate name if it's being updated
         if self.name is not None:
@@ -172,7 +172,7 @@ class UpdateStockRequest:
 class StockViewModel:
     """View model for displaying stock information."""
 
-    id: int
+    id: str
     symbol: str
     name: str
     sector: Optional[str] = field(default=None)
@@ -336,7 +336,7 @@ class CreateStockResponse:
         self,
         success: bool,
         message: str,
-        stock_id: Optional[int] = None,
+        stock_id: Optional[str] = None,
         symbol: Optional[str] = None,
         errors: Optional[Dict[str, str]] = None,
     ):
@@ -348,7 +348,7 @@ class CreateStockResponse:
 
     @classmethod
     def create_success(
-        cls, stock_id: int, symbol: str, message: str
+        cls, stock_id: str, symbol: str, message: str
     ) -> "CreateStockResponse":
         """Create successful response."""
         return cls(success=True, stock_id=stock_id, symbol=symbol, message=message)
@@ -371,7 +371,7 @@ class UpdateStockResponse:
         self,
         success: bool,
         message: str,
-        stock_id: Optional[int] = None,
+        stock_id: Optional[str] = None,
         errors: Optional[Dict[str, str]] = None,
     ):
         self.success = success
@@ -380,7 +380,7 @@ class UpdateStockResponse:
         self.errors = errors
 
     @classmethod
-    def create_success(cls, stock_id: int, message: str) -> "UpdateStockResponse":
+    def create_success(cls, stock_id: str, message: str) -> "UpdateStockResponse":
         """Create successful response."""
         return cls(success=True, stock_id=stock_id, message=message)
 

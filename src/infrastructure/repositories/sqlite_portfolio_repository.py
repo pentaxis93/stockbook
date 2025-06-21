@@ -32,7 +32,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
         """
         self.db_connection = db_connection
 
-    def create(self, portfolio: PortfolioEntity) -> int:
+    def create(self, portfolio: PortfolioEntity) -> str:
         """
         Create a new portfolio record in the database.
 
@@ -46,22 +46,23 @@ class SqlitePortfolioRepository(IPortfolioRepository):
             ValueError: If portfolio data is invalid
         """
         with self.db_connection.transaction() as conn:
-            cursor = conn.execute(
+            conn.execute(
                 """
-                INSERT INTO portfolio (name, description, max_positions, max_risk_per_trade, is_active)
-                VALUES (?, ?, ?, ?, ?)
-                """,
+                    INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
                 (
+                    portfolio.id,
                     portfolio.name.value,
                     portfolio.description.value if portfolio.description else None,
-                    50,  # Default max positions - TODO: make configurable
-                    0.02,  # Default 2% max risk - TODO: make configurable
+                    10,  # Default max positions
+                    2.0,  # Default 2% max risk
                     portfolio.is_active,
                 ),
             )
-            return cursor.lastrowid or 0
+            return portfolio.id
 
-    def get_by_id(self, portfolio_id: int) -> Optional[PortfolioEntity]:
+    def get_by_id(self, portfolio_id: str) -> Optional[PortfolioEntity]:
         """
         Retrieve portfolio by database ID.
 
@@ -144,7 +145,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def update(self, portfolio_id: int, portfolio: PortfolioEntity) -> bool:
+    def update(self, portfolio_id: str, portfolio: PortfolioEntity) -> bool:
         """
         Update an existing portfolio record.
 
@@ -159,19 +160,21 @@ class SqlitePortfolioRepository(IPortfolioRepository):
             cursor = conn.execute(
                 """
                 UPDATE portfolio 
-                SET name = ?, description = ?, is_active = ?
+                SET name = ?, description = ?, max_positions = ?, max_risk_per_trade = ?, is_active = ?
                 WHERE id = ?
                 """,
                 (
                     portfolio.name.value,
                     portfolio.description.value if portfolio.description else None,
+                    10,  # Default max positions
+                    2.0,  # Default 2% max risk
                     portfolio.is_active,
                     portfolio_id,
                 ),
             )
             return cursor.rowcount > 0
 
-    def deactivate(self, portfolio_id: int) -> bool:
+    def deactivate(self, portfolio_id: str) -> bool:
         """
         Deactivate portfolio (soft delete).
 
@@ -214,7 +217,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
                 created_date = None
 
         return PortfolioEntity(
-            portfolio_id=row["id"],
+            entity_id=row["id"],
             name=PortfolioName(row["name"]),
             description=Notes(row["description"] or ""),
             created_date=created_date,

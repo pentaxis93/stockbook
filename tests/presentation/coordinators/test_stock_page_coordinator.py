@@ -81,7 +81,11 @@ class TestStockPageCoordinator:
         mock_tabs.return_value = [mock_tab1, mock_tab2, mock_tab3]
 
         stock_list_response = StockListResponse.create_success(
-            [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")],
+            [
+                StockViewModel(
+                    id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+                )
+            ],
             "Retrieved 1 stock",
         )
 
@@ -115,9 +119,15 @@ class TestStockPageCoordinator:
         mock_columns.return_value = [mock_col1, mock_col2, mock_col3]
 
         stocks = [
-            StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
-            StockViewModel(id=2, symbol="GOOGL", name="Alphabet Inc.", grade="A"),
-            StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
+            StockViewModel(
+                id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-2", symbol="GOOGL", name="Alphabet Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-3", symbol="MSFT", name="Microsoft Corp.", grade="B"
+            ),
         ]
 
         stock_list_response = StockListResponse.create_success(
@@ -187,7 +197,7 @@ class TestStockPageCoordinator:
         """Should render stock detail page successfully."""
         # Arrange
         stock = StockViewModel(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             industry_group="Technology",
@@ -275,10 +285,16 @@ class TestStockPageCoordinator:
         """Should calculate stock metrics correctly."""
         # Arrange
         stocks = [
-            StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
-            StockViewModel(id=2, symbol="GOOGL", name="Alphabet Inc.", grade="A"),
-            StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
-            StockViewModel(id=4, symbol="IBM", name="IBM Corp.", grade="C"),
+            StockViewModel(
+                id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-2", symbol="GOOGL", name="Alphabet Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-3", symbol="MSFT", name="Microsoft Corp.", grade="B"
+            ),
+            StockViewModel(id="stock-id-4", symbol="IBM", name="IBM Corp.", grade="C"),
         ]
 
         # Act
@@ -414,7 +430,7 @@ class TestStockPageCoordinator:
         """Should coordinate page refreshes after actions."""
         # Arrange
         success_response = CreateStockResponse.create_success(
-            1, "AAPL", "Created successfully"
+            "stock-id-1", "AAPL", "Created successfully"
         )
 
         # Act
@@ -430,10 +446,12 @@ class TestStockPageCoordinator:
         """Should coordinate multi-step workflows."""
         # Arrange - Simulate create stock followed by view detail workflow
         create_response = CreateStockResponse.create_success(
-            1, "AAPL", "Created successfully"
+            "stock-id-1", "AAPL", "Created successfully"
         )
         detail_response = StockDetailResponse.create_success(
-            StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
+            StockViewModel(
+                id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+            ),
             "Stock retrieved",
         )
 

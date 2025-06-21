@@ -37,7 +37,7 @@ def db_connection():
         conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
-            VALUES (1, 'Test Portfolio', 'Test portfolio for transactions', 50, 0.02, 1)
+            VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for transactions', 50, 0.02, 1)
         """
         )
 
@@ -45,7 +45,7 @@ def db_connection():
         conn.execute(
             """
             INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
-            VALUES (1, 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
+            VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
         """
         )
 
@@ -66,8 +66,8 @@ def transaction_repository(db_connection):
 def sample_transaction():
     """Create sample transaction entity for testing."""
     return TransactionEntity(
-        portfolio_id=1,
-        stock_id=1,
+        portfolio_id="portfolio-id-1",
+        stock_id="stock-id-1",
         transaction_type=TransactionType("buy"),
         quantity=Quantity(100),
         price=Money(Decimal("150.50")),
@@ -87,15 +87,15 @@ class TestTransactionRepositoryCreate:
         transaction_id = transaction_repository.create(sample_transaction)
 
         # Assert
-        assert isinstance(transaction_id, int)
-        assert transaction_id > 0
+        assert isinstance(transaction_id, str)
+        assert transaction_id
 
     def test_create_buy_transaction(self, transaction_repository):
         """Should create buy transaction with all fields."""
         # Arrange
         buy_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(50),
             price=Money(Decimal("100.25")),
@@ -117,8 +117,8 @@ class TestTransactionRepositoryCreate:
         """Should create sell transaction."""
         # Arrange
         sell_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(25),
             price=Money(Decimal("105.75")),
@@ -139,8 +139,8 @@ class TestTransactionRepositoryCreate:
         """Should create transaction with minimal required data."""
         # Arrange
         minimal_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(10),
             price=Money(Decimal("50.00")),
@@ -182,7 +182,7 @@ class TestTransactionRepositoryRead:
     def test_get_by_id_nonexistent_transaction(self, transaction_repository):
         """Should return None for non-existent transaction."""
         # Act
-        result = transaction_repository.get_by_id(999)
+        result = transaction_repository.get_by_id("nonexistent-id")
 
         # Assert
         assert result is None
@@ -190,7 +190,7 @@ class TestTransactionRepositoryRead:
     def test_get_by_portfolio_empty(self, transaction_repository):
         """Should return empty list when no transactions exist for portfolio."""
         # Act
-        transactions = transaction_repository.get_by_portfolio(1)
+        transactions = transaction_repository.get_by_portfolio("portfolio-id-1")
 
         # Assert
         assert transactions == []
@@ -199,16 +199,16 @@ class TestTransactionRepositoryRead:
         """Should return transactions for specific portfolio."""
         # Arrange
         transaction1 = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
         transaction2 = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("55.00")),
@@ -219,7 +219,9 @@ class TestTransactionRepositoryRead:
         id2 = transaction_repository.create(transaction2)
 
         # Act
-        portfolio_transactions = transaction_repository.get_by_portfolio(1)
+        portfolio_transactions = transaction_repository.get_by_portfolio(
+            "portfolio-id-1"
+        )
 
         # Assert
         assert len(portfolio_transactions) == 2
@@ -232,8 +234,8 @@ class TestTransactionRepositoryRead:
         # Arrange - create 5 transactions
         for i in range(5):
             transaction = TransactionEntity(
-                portfolio_id=1,
-                stock_id=1,
+                portfolio_id="portfolio-id-1",
+                stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
                 price=Money(Decimal("50.00")),
@@ -242,7 +244,9 @@ class TestTransactionRepositoryRead:
             transaction_repository.create(transaction)
 
         # Act
-        limited_transactions = transaction_repository.get_by_portfolio(1, limit=3)
+        limited_transactions = transaction_repository.get_by_portfolio(
+            "portfolio-id-1", limit=3
+        )
 
         # Assert
         assert len(limited_transactions) == 3
@@ -251,8 +255,8 @@ class TestTransactionRepositoryRead:
         """Should return transactions for specific stock."""
         # Arrange
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00")),
@@ -261,7 +265,7 @@ class TestTransactionRepositoryRead:
         transaction_id = transaction_repository.create(transaction)
 
         # Act
-        stock_transactions = transaction_repository.get_by_stock(1)
+        stock_transactions = transaction_repository.get_by_stock("stock-id-1")
 
         # Assert
         assert len(stock_transactions) == 1
@@ -271,8 +275,8 @@ class TestTransactionRepositoryRead:
         """Should filter stock transactions by portfolio."""
         # Arrange - create transaction for stock 1 in portfolio 1
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00")),
@@ -281,9 +285,11 @@ class TestTransactionRepositoryRead:
         transaction_id = transaction_repository.create(transaction)
 
         # Act
-        filtered_transactions = transaction_repository.get_by_stock(1, portfolio_id=1)
+        filtered_transactions = transaction_repository.get_by_stock(
+            "stock-id-1", portfolio_id="portfolio-id-1"
+        )
         unfiltered_transactions = transaction_repository.get_by_stock(
-            1, portfolio_id=999
+            "stock-id-1", portfolio_id="stock-id-999"
         )
 
         # Assert
@@ -295,24 +301,24 @@ class TestTransactionRepositoryRead:
         """Should return transactions within date range."""
         # Arrange
         early_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
         middle_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("55.00")),
             transaction_date=date(2024, 1, 15),
         )
         late_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(25),
             price=Money(Decimal("60.00")),
@@ -346,8 +352,8 @@ class TestTransactionRepositoryUpdate:
         # Arrange
         transaction_id = transaction_repository.create(sample_transaction)
         updated_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(75),
             price=Money(Decimal("155.25")),
@@ -372,8 +378,8 @@ class TestTransactionRepositoryUpdate:
         """Should return False when updating non-existent transaction."""
         # Arrange
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(10),
             price=Money(Decimal("50.00")),
@@ -381,7 +387,7 @@ class TestTransactionRepositoryUpdate:
         )
 
         # Act
-        result = transaction_repository.update(999, transaction)
+        result = transaction_repository.update("nonexistent-id", transaction)
 
         # Assert
         assert result is False
@@ -423,8 +429,8 @@ class TestTransactionRepositoryIntegration:
         """Test complete CRUD operations in sequence."""
         # Create
         transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
             quantity=Quantity(100),
             price=Money(Decimal("50.00")),
@@ -440,8 +446,8 @@ class TestTransactionRepositoryIntegration:
 
         # Update
         updated_transaction = TransactionEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
             quantity=Quantity(50),
             price=Money(Decimal("55.00")),
@@ -475,7 +481,7 @@ class TestTransactionRepositoryErrorHandling:
         with pytest.raises(ValueError):
             invalid_transaction = TransactionEntity(
                 portfolio_id=0,  # Invalid portfolio ID
-                stock_id=1,
+                stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
                 price=Money(Decimal("50.00")),

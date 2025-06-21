@@ -33,7 +33,7 @@ class SqliteStockRepository(IStockRepository):
         """
         self.db_connection = db_connection
 
-    def create(self, stock: StockEntity) -> int:
+    def create(self, stock: StockEntity) -> str:
         """
         Create a new stock record in the database.
 
@@ -48,12 +48,13 @@ class SqliteStockRepository(IStockRepository):
         """
         try:
             with self.db_connection.transaction() as conn:
-                cursor = conn.execute(
+                conn.execute(
                     """
-                    INSERT INTO stock (symbol, name, sector, industry_group, grade, notes)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    """,
+                        INSERT INTO stock (id, symbol, name, sector, industry_group, grade, notes)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                        """,
                     (
+                        stock.id,
                         stock.symbol.value,
                         stock.company_name.value,
                         stock.sector.value if stock.sector else None,
@@ -62,7 +63,7 @@ class SqliteStockRepository(IStockRepository):
                         stock.notes.value,
                     ),
                 )
-                return cursor.lastrowid or 0
+                return stock.id
         except sqlite3.IntegrityError as e:
             if "UNIQUE constraint failed: stock.symbol" in str(e):
                 raise ValueError(
@@ -70,7 +71,7 @@ class SqliteStockRepository(IStockRepository):
                 ) from e
             raise
 
-    def get_by_id(self, stock_id: int) -> Optional[StockEntity]:
+    def get_by_id(self, stock_id: str) -> Optional[StockEntity]:
         """
         Retrieve stock by database ID.
 
@@ -144,7 +145,7 @@ class SqliteStockRepository(IStockRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def update(self, stock_id: int, stock: StockEntity) -> bool:
+    def update(self, stock_id: str, stock: StockEntity) -> bool:
         """
         Update an existing stock record.
 
@@ -173,7 +174,7 @@ class SqliteStockRepository(IStockRepository):
             )
             return cursor.rowcount > 0
 
-    def delete(self, stock_id: int) -> bool:
+    def delete(self, stock_id: str) -> bool:
         """
         Delete a stock by ID.
 
@@ -357,7 +358,7 @@ class SqliteStockRepository(IStockRepository):
             Stock entity populated from row data
         """
         return StockEntity(
-            stock_id=row["id"],
+            entity_id=row["id"],
             symbol=StockSymbol(row["symbol"]),
             company_name=CompanyName(row["name"] or ""),
             sector=Sector(row["sector"]) if row["sector"] else None,

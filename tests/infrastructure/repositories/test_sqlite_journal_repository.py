@@ -35,13 +35,13 @@ def db_connection():
         conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
-            VALUES (1, 'Test Portfolio', 'Test portfolio for journals', 50, 0.02, 1)
+            VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for journals', 50, 0.02, 1)
         """
         )
         conn.execute(
             """
             INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
-            VALUES (1, 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
+            VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
         """
         )
 
@@ -62,8 +62,8 @@ def journal_repository(db_connection):
 def sample_entry():
     """Create sample journal entry for testing."""
     return JournalEntryEntity(
-        portfolio_id=1,
-        stock_id=1,
+        portfolio_id="portfolio-id-1",
+        stock_id="stock-id-1",
         entry_date=date(2024, 1, 15),
         content=JournalContent(
             "This is a test journal entry about Apple stock analysis."
@@ -80,8 +80,8 @@ class TestJournalRepositoryBasic:
         entry_id = journal_repository.create(sample_entry)
 
         # Assert
-        assert isinstance(entry_id, int)
-        assert entry_id > 0
+        assert isinstance(entry_id, str)
+        assert entry_id
 
     def test_get_by_id(self, journal_repository, sample_entry):
         """Should retrieve journal entry by ID."""
@@ -102,12 +102,12 @@ class TestJournalRepositoryBasic:
         # Arrange
         entries = [
             JournalEntryEntity(
-                portfolio_id=1,
+                portfolio_id="portfolio-id-1",
                 entry_date=date(2024, 1, 1),
                 content=JournalContent("First entry"),
             ),
             JournalEntryEntity(
-                portfolio_id=1,
+                portfolio_id="portfolio-id-1",
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Latest entry"),
             ),
@@ -131,7 +131,7 @@ class TestJournalRepositoryBasic:
         entry_id = journal_repository.create(sample_entry)
 
         # Act
-        portfolio_entries = journal_repository.get_by_portfolio(1)
+        portfolio_entries = journal_repository.get_by_portfolio("portfolio-id-1")
 
         # Assert
         assert len(portfolio_entries) == 1
@@ -142,8 +142,8 @@ class TestJournalRepositoryBasic:
         # Arrange
         entry_id = journal_repository.create(sample_entry)
         updated_entry = JournalEntryEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             entry_date=date(2024, 1, 15),
             content=JournalContent("Updated journal entry content."),
         )

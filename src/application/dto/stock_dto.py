@@ -18,7 +18,7 @@ class StockDto:
     without exposing domain entity internals.
     """
 
-    id: Optional[int]
+    id: Optional[str]
     symbol: str
     name: str
     sector: Optional[str] = None
@@ -34,8 +34,8 @@ class StockDto:
         if not self.name:
             raise ValueError("Name cannot be empty")
 
-        if self.id is not None and self.id <= 0:
-            raise ValueError("ID must be positive")
+        if self.id is not None and not isinstance(self.id, str):
+            raise ValueError("ID must be a string")
 
     @classmethod
     def from_entity(cls, entity) -> "StockDto":

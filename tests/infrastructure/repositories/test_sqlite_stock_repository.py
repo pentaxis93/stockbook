@@ -57,8 +57,8 @@ class TestSqliteStockRepository:
         stock_id = self.repository.create(stock)
 
         # Assert
-        assert isinstance(stock_id, int)
-        assert stock_id > 0
+        assert isinstance(stock_id, str)
+        assert stock_id
 
         # Verify stock was actually created
         retrieved_stock = self.repository.get_by_id(stock_id)
@@ -126,7 +126,7 @@ class TestSqliteStockRepository:
     def test_get_by_id_not_found(self):
         """Should return None when stock ID not found."""
         # Act
-        result = self.repository.get_by_id(999)
+        result = self.repository.get_by_id("nonexistent-id")
 
         # Assert
         assert result is None
@@ -221,12 +221,17 @@ class TestSqliteStockRepository:
         )
         stock_id = self.repository.create(stock)
 
-        # Modify the entity
-        stock.set_id(stock_id)
-        stock.update_fields(grade="A", notes="Excellent company")
+        # Create updated entity (since IDs are immutable)
+        updated_stock = StockEntity(
+            symbol=stock.symbol,
+            company_name=stock.company_name,
+            grade=Grade("A"),
+            notes=Notes("Excellent company"),
+            entity_id=stock_id,
+        )
 
         # Act
-        success = self.repository.update(stock_id, stock)
+        success = self.repository.update(stock_id, updated_stock)
 
         # Assert
         assert success is True
@@ -246,7 +251,7 @@ class TestSqliteStockRepository:
         )
 
         # Act
-        success = self.repository.update(999, stock)
+        success = self.repository.update("nonexistent-id", stock)
 
         # Assert
         assert success is False
@@ -274,7 +279,7 @@ class TestSqliteStockRepository:
     def test_delete_nonexistent_stock_returns_false(self):
         """Should return False when trying to delete non-existent stock."""
         # Act
-        success = self.repository.delete(999)
+        success = self.repository.delete("nonexistent-id")
 
         # Assert
         assert success is False

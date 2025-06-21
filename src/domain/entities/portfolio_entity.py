@@ -26,17 +26,15 @@ class PortfolioEntity(BaseEntity):
         description: Optional[Notes] = None,
         created_date: Optional[date] = None,
         is_active: bool = True,
-        portfolio_id: Optional[int] = None,
+        entity_id: Optional[str] = None,
     ):
         """Initialize portfolio with required value objects and validation."""
         # Store validated attributes
-        super().__init__()
+        super().__init__(entity_id=entity_id)
         self._name = name
         self._description = description or Notes("")
         self._created_date = created_date
         self._is_active = is_active
-        if portfolio_id is not None:
-            self.set_id(portfolio_id)
 
     # Core attributes
     @property

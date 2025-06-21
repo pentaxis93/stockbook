@@ -44,13 +44,13 @@ class DatabaseConnection(IDatabaseConnection):
         schema_sql = """
         -- Stock table
         CREATE TABLE IF NOT EXISTS stock (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id TEXT PRIMARY KEY,
             symbol TEXT NOT NULL UNIQUE,
             name TEXT NOT NULL,
             sector TEXT,
             industry_group TEXT,
             grade TEXT CHECK(grade IN ('A', 'B', 'C', NULL)),
-            notes TEXT DEFAULT '',
+            notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
@@ -65,76 +65,105 @@ class DatabaseConnection(IDatabaseConnection):
             UPDATE stock SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
         END;
         
-        -- Portfolio table (placeholder for future implementation)
+        -- Portfolio table
         CREATE TABLE IF NOT EXISTS portfolio (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
             description TEXT,
-            max_positions INTEGER NOT NULL,
-            max_risk_per_trade REAL NOT NULL,
+            max_positions INTEGER DEFAULT 10,
+            max_risk_per_trade DECIMAL(3,1) DEFAULT 2.0,
             is_active BOOLEAN DEFAULT TRUE,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         
-        -- Stock transaction table (placeholder for future implementation)
+        -- Create trigger to update portfolio timestamp
+        CREATE TRIGGER IF NOT EXISTS update_portfolio_timestamp
+        AFTER UPDATE ON portfolio
+        BEGIN
+            UPDATE portfolio SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+        END;
+        
+        -- Stock transaction table
         CREATE TABLE IF NOT EXISTS stock_transaction (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            portfolio_id INTEGER NOT NULL,
-            stock_id INTEGER NOT NULL,
-            type TEXT NOT NULL,
+            id TEXT PRIMARY KEY,
+            portfolio_id TEXT NOT NULL,
+            stock_id TEXT NOT NULL,
+            type TEXT NOT NULL CHECK(type IN ('buy', 'sell')),
             quantity INTEGER NOT NULL,
             price DECIMAL(10,2) NOT NULL,
             transaction_date DATE NOT NULL,
-            notes TEXT DEFAULT '',
+            notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
             FOREIGN KEY (stock_id) REFERENCES stock(id)
         );
         
-        -- Target table (placeholder for future implementation)
+        -- Target table
         CREATE TABLE IF NOT EXISTS target (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            stock_id INTEGER NOT NULL,
-            portfolio_id INTEGER NOT NULL,
+            id TEXT PRIMARY KEY,
+            stock_id TEXT NOT NULL,
+            portfolio_id TEXT NOT NULL,
             pivot_price DECIMAL(10,2) NOT NULL,
             failure_price DECIMAL(10,2) NOT NULL,
-            notes TEXT DEFAULT '',
-            status TEXT DEFAULT 'active',
+            notes TEXT,
+            status TEXT DEFAULT 'active' CHECK(status IN ('active', 'hit', 'failed', 'cancelled')),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (stock_id) REFERENCES stock(id),
             FOREIGN KEY (portfolio_id) REFERENCES portfolio(id)
         );
         
-        -- Portfolio balance table (placeholder for future implementation)
+        -- Create trigger to update target timestamp
+        CREATE TRIGGER IF NOT EXISTS update_target_timestamp
+        AFTER UPDATE ON target
+        BEGIN
+            UPDATE target SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+        END;
+        
+        -- Portfolio balance table
         CREATE TABLE IF NOT EXISTS portfolio_balance (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            portfolio_id INTEGER NOT NULL,
+            id TEXT PRIMARY KEY,
+            portfolio_id TEXT NOT NULL,
             balance_date DATE NOT NULL,
-            withdrawals DECIMAL(10,2) DEFAULT 0.00,
-            deposits DECIMAL(10,2) DEFAULT 0.00,
-            final_balance DECIMAL(10,2) NOT NULL,
+            withdrawals DECIMAL(12,2) DEFAULT 0,
+            deposits DECIMAL(12,2) DEFAULT 0,
+            final_balance DECIMAL(12,2) NOT NULL,
             index_change DECIMAL(5,2),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
             UNIQUE(portfolio_id, balance_date)
         );
         
-        -- Journal entry table (placeholder for future implementation)
+        -- Journal entry table
         CREATE TABLE IF NOT EXISTS journal_entry (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id TEXT PRIMARY KEY,
             entry_date DATE NOT NULL,
             content TEXT NOT NULL,
-            stock_id INTEGER,
-            portfolio_id INTEGER,
-            transaction_id INTEGER,
+            stock_id TEXT,
+            portfolio_id TEXT,
+            transaction_id TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (stock_id) REFERENCES stock(id),
             FOREIGN KEY (portfolio_id) REFERENCES portfolio(id),
             FOREIGN KEY (transaction_id) REFERENCES stock_transaction(id)
         );
+        
+        -- Create trigger to update journal entry timestamp
+        CREATE TRIGGER IF NOT EXISTS update_journal_entry_timestamp
+        AFTER UPDATE ON journal_entry
+        BEGIN
+            UPDATE journal_entry SET updated_at = CURRENT_TIMESTAMP WHERE id = NEW.id;
+        END;
+        
+        -- Indexes for performance
+        CREATE INDEX IF NOT EXISTS idx_transaction_portfolio ON stock_transaction(portfolio_id);
+        CREATE INDEX IF NOT EXISTS idx_transaction_stock ON stock_transaction(stock_id);
+        CREATE INDEX IF NOT EXISTS idx_transaction_date ON stock_transaction(transaction_date);
+        CREATE INDEX IF NOT EXISTS idx_target_status ON target(status);
+        CREATE INDEX IF NOT EXISTS idx_portfolio_balance_date ON portfolio_balance(balance_date);
+        CREATE INDEX IF NOT EXISTS idx_journal_entry_date ON journal_entry(entry_date);
         """
 
         with self.get_connection() as conn:

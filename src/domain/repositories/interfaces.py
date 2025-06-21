@@ -25,7 +25,7 @@ class IStockRepository(ABC):
     """Abstract interface for stock data operations."""
 
     @abstractmethod
-    def create(self, stock: StockEntity) -> int:
+    def create(self, stock: StockEntity) -> str:
         """
         Create a new stock record.
 
@@ -42,7 +42,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, stock_id: int) -> Optional[StockEntity]:
+    def get_by_id(self, stock_id: str) -> Optional[StockEntity]:
         """
         Retrieve stock by ID.
 
@@ -78,7 +78,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, stock_id: int, stock: StockEntity) -> bool:
+    def update(self, stock_id: str, stock: StockEntity) -> bool:
         """
         Update existing stock.
 
@@ -96,7 +96,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, stock_id: int) -> bool:
+    def delete(self, stock_id: str) -> bool:
         """
         Delete stock by ID.
 
@@ -193,7 +193,7 @@ class IPortfolioRepository(ABC):
     """Abstract interface for portfolio data operations."""
 
     @abstractmethod
-    def create(self, portfolio: PortfolioEntity) -> int:
+    def create(self, portfolio: PortfolioEntity) -> str:
         """
         Create a new portfolio.
 
@@ -210,7 +210,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, portfolio_id: int) -> Optional[PortfolioEntity]:
+    def get_by_id(self, portfolio_id: str) -> Optional[PortfolioEntity]:
         """
         Retrieve portfolio by ID.
 
@@ -243,7 +243,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, portfolio_id: int, portfolio: PortfolioEntity) -> bool:
+    def update(self, portfolio_id: str, portfolio: PortfolioEntity) -> bool:
         """
         Update existing portfolio.
 
@@ -261,7 +261,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def deactivate(self, portfolio_id: int) -> bool:
+    def deactivate(self, portfolio_id: str) -> bool:
         """
         Deactivate portfolio (soft delete).
 
@@ -278,7 +278,7 @@ class ITransactionRepository(ABC):
     """Abstract interface for transaction data operations."""
 
     @abstractmethod
-    def create(self, transaction: TransactionEntity) -> int:
+    def create(self, transaction: TransactionEntity) -> str:
         """
         Create a new transaction.
 
@@ -296,7 +296,7 @@ class ITransactionRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, transaction_id: int) -> Optional[TransactionEntity]:
+    def get_by_id(self, transaction_id: str) -> Optional[TransactionEntity]:
         """
         Retrieve transaction by ID.
 
@@ -310,7 +310,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio(
-        self, portfolio_id: int, limit: Optional[int] = None
+        self, portfolio_id: str, limit: Optional[int] = None
     ) -> List[TransactionEntity]:
         """
         Retrieve transactions for a specific portfolio.
@@ -326,7 +326,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_stock(
-        self, stock_id: int, portfolio_id: Optional[int] = None
+        self, stock_id: str, portfolio_id: Optional[str] = None
     ) -> List[TransactionEntity]:
         """
         Retrieve transactions for a specific stock.
@@ -342,7 +342,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_date_range(
-        self, start_date: date, end_date: date, portfolio_id: Optional[int] = None
+        self, start_date: date, end_date: date, portfolio_id: Optional[str] = None
     ) -> List[TransactionEntity]:
         """
         Retrieve transactions within a date range.
@@ -358,7 +358,7 @@ class ITransactionRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, transaction_id: int, transaction: TransactionEntity) -> bool:
+    def update(self, transaction_id: str, transaction: TransactionEntity) -> bool:
         """
         Update existing transaction.
 
@@ -377,7 +377,7 @@ class ITransactionRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, transaction_id: int) -> bool:
+    def delete(self, transaction_id: str) -> bool:
         """
         Delete transaction by ID.
 
@@ -397,7 +397,7 @@ class ITargetRepository(ABC):
     """Abstract interface for target data operations."""
 
     @abstractmethod
-    def create(self, target: TargetEntity) -> int:
+    def create(self, target: TargetEntity) -> str:
         """
         Create a new target.
 
@@ -414,7 +414,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, target_id: int) -> Optional[TargetEntity]:
+    def get_by_id(self, target_id: str) -> Optional[TargetEntity]:
         """
         Retrieve target by ID.
 
@@ -427,7 +427,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_active_by_portfolio(self, portfolio_id: int) -> List[TargetEntity]:
+    def get_active_by_portfolio(self, portfolio_id: str) -> List[TargetEntity]:
         """
         Retrieve active targets for a portfolio.
 
@@ -440,7 +440,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_active_by_stock(self, stock_id: int) -> List[TargetEntity]:
+    def get_active_by_stock(self, stock_id: str) -> List[TargetEntity]:
         """
         Retrieve active targets for a stock.
 
@@ -463,7 +463,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, target_id: int, target: TargetEntity) -> bool:
+    def update(self, target_id: str, target: TargetEntity) -> bool:
         """
         Update existing target.
 
@@ -481,7 +481,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def update_status(self, target_id: int, status: str) -> bool:
+    def update_status(self, target_id: str, status: str) -> bool:
         """
         Update target status.
 
@@ -499,7 +499,7 @@ class IPortfolioBalanceRepository(ABC):
     """Abstract interface for portfolio balance data operations."""
 
     @abstractmethod
-    def create(self, balance: PortfolioBalanceEntity) -> int:
+    def create(self, balance: PortfolioBalanceEntity) -> str:
         """
         Create or update portfolio balance for a date.
 
@@ -516,7 +516,7 @@ class IPortfolioBalanceRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, balance_id: int) -> Optional[PortfolioBalanceEntity]:
+    def get_by_id(self, balance_id: str) -> Optional[PortfolioBalanceEntity]:
         """
         Retrieve portfolio balance by ID.
 
@@ -530,7 +530,7 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio_and_date(
-        self, portfolio_id: int, balance_date: date
+        self, portfolio_id: str, balance_date: date
     ) -> Optional[PortfolioBalanceEntity]:
         """
         Retrieve portfolio balance for a specific date.
@@ -546,7 +546,7 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_history(
-        self, portfolio_id: int, limit: Optional[int] = None
+        self, portfolio_id: str, limit: Optional[int] = None
     ) -> List[PortfolioBalanceEntity]:
         """
         Retrieve balance history for a portfolio.
@@ -561,7 +561,7 @@ class IPortfolioBalanceRepository(ABC):
         pass
 
     @abstractmethod
-    def get_latest_balance(self, portfolio_id: int) -> Optional[PortfolioBalanceEntity]:
+    def get_latest_balance(self, portfolio_id: str) -> Optional[PortfolioBalanceEntity]:
         """
         Retrieve the most recent balance for a portfolio.
 
@@ -578,7 +578,7 @@ class IJournalRepository(ABC):
     """Abstract interface for journal entry data operations."""
 
     @abstractmethod
-    def create(self, entry: JournalEntryEntity) -> int:
+    def create(self, entry: JournalEntryEntity) -> str:
         """
         Create a new journal entry.
 
@@ -595,7 +595,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, entry_id: int) -> Optional[JournalEntryEntity]:
+    def get_by_id(self, entry_id: str) -> Optional[JournalEntryEntity]:
         """
         Retrieve journal entry by ID.
 
@@ -622,7 +622,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio(
-        self, portfolio_id: int, limit: Optional[int] = None
+        self, portfolio_id: str, limit: Optional[int] = None
     ) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries for a specific portfolio.
@@ -638,7 +638,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_stock(
-        self, stock_id: int, limit: Optional[int] = None
+        self, stock_id: str, limit: Optional[int] = None
     ) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries for a specific stock.
@@ -653,7 +653,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_transaction(self, transaction_id: int) -> List[JournalEntryEntity]:
+    def get_by_transaction(self, transaction_id: str) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries for a specific transaction.
 
@@ -682,7 +682,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, entry_id: int, entry: JournalEntryEntity) -> bool:
+    def update(self, entry_id: str, entry: JournalEntryEntity) -> bool:
         """
         Update existing journal entry.
 
@@ -700,7 +700,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def delete(self, entry_id: int) -> bool:
+    def delete(self, entry_id: str) -> bool:
         """
         Delete journal entry by ID.
 

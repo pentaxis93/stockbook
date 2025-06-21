@@ -22,8 +22,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -31,8 +31,8 @@ class TestTargetEntity:
             notes=Notes("Important target level"),
         )
 
-        assert target.portfolio_id == 1
-        assert target.stock_id == 1
+        assert target.portfolio_id == "portfolio-id-1"
+        assert target.stock_id == "stock-id-1"
         assert target.pivot_price.amount == Decimal("100.00")
         assert target.failure_price.amount == Decimal("80.00")
         assert target.status.value == "active"
@@ -44,16 +44,16 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("150.00")),
             failure_price=Money(Decimal("120.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
 
-        assert target.portfolio_id == 1
-        assert target.stock_id == 1
+        assert target.portfolio_id == "portfolio-id-1"
+        assert target.stock_id == "stock-id-1"
         assert target.pivot_price.amount == Decimal("150.00")
         assert target.failure_price.amount == Decimal("120.00")
         assert target.status.value == "active"
@@ -64,8 +64,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -79,10 +79,10 @@ class TestTargetEntity:
         """Should raise error for invalid portfolio ID."""
         from src.domain.value_objects import TargetStatus
 
-        with pytest.raises(ValueError, match="Portfolio ID must be positive"):
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             TargetEntity(
-                portfolio_id=0,  # Invalid
-                stock_id=1,
+                portfolio_id="",  # Invalid empty string
+                stock_id="stock-id-1",
                 pivot_price=Money(Decimal("100.00")),
                 failure_price=Money(Decimal("80.00")),
                 status=TargetStatus("active"),
@@ -93,10 +93,10 @@ class TestTargetEntity:
         """Should raise error for invalid stock ID."""
         from src.domain.value_objects import TargetStatus
 
-        with pytest.raises(ValueError, match="Stock ID must be positive"):
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             TargetEntity(
-                portfolio_id=1,
-                stock_id=-1,  # Invalid
+                portfolio_id="portfolio-id-1",
+                stock_id="",  # Invalid empty string
                 pivot_price=Money(Decimal("100.00")),
                 failure_price=Money(Decimal("80.00")),
                 status=TargetStatus("active"),
@@ -115,8 +115,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target1 = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -124,8 +124,8 @@ class TestTargetEntity:
         )
 
         target2 = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("110.00")),  # Different price
             failure_price=Money(Decimal("85.00")),
             status=TargetStatus("hit"),  # Different status
@@ -133,8 +133,8 @@ class TestTargetEntity:
         )
 
         target3 = TargetEntity(
-            portfolio_id=2,  # Different portfolio
-            stock_id=1,
+            portfolio_id="portfolio-id-2",  # Different portfolio
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -149,8 +149,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target1 = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -158,8 +158,8 @@ class TestTargetEntity:
         )
 
         target2 = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("150.00")),  # Different price
             failure_price=Money(Decimal("90.00")),
             status=TargetStatus("hit"),
@@ -173,8 +173,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -190,15 +190,15 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
 
-        expected = "TargetEntity(portfolio_id=1, stock_id=1, status='active')"
+        expected = "TargetEntity(portfolio_id=portfolio-id-1, stock_id=stock-id-1, status='active')"
         assert repr(target) == expected
 
     # Business behavior tests
@@ -207,8 +207,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("cancelled"),
@@ -223,8 +223,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -239,8 +239,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -255,8 +255,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -271,8 +271,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         active_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -280,8 +280,8 @@ class TestTargetEntity:
         )
 
         hit_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("hit"),
@@ -296,8 +296,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         hit_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("hit"),
@@ -305,8 +305,8 @@ class TestTargetEntity:
         )
 
         active_target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -321,8 +321,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target_with_notes = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -331,8 +331,8 @@ class TestTargetEntity:
         )
 
         target_without_notes = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -347,8 +347,8 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
@@ -363,54 +363,59 @@ class TestTargetEntity:
         target.update_notes("String notes")
         assert target.notes.value == "String notes"
 
-    def test_target_set_id(self):
-        """Should allow setting target ID."""
+    def test_target_create_with_id(self):
+        """Should create target with provided ID."""
+        from src.domain.value_objects import TargetStatus
+
+        test_id = "target-id-123"
+        target = TargetEntity(
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("80.00")),
+            status=TargetStatus("active"),
+            created_date=date.today(),
+            entity_id=test_id,
+        )
+
+        assert target.id == test_id
+
+    def test_target_id_immutability(self):
+        """Should not be able to change ID after creation."""
         from src.domain.value_objects import TargetStatus
 
         target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("80.00")),
+            status=TargetStatus("active"),
+            created_date=date.today(),
+            entity_id="test-id-1",
+        )
+
+        # ID property should not have a setter
+        with pytest.raises(AttributeError):
+            target.id = "different-id"
+
+    def test_target_from_persistence(self):
+        """Should create target from persistence with existing ID."""
+        from src.domain.value_objects import TargetStatus
+
+        test_id = "persistence-id-456"
+        target = TargetEntity.from_persistence(
+            test_id,
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
             failure_price=Money(Decimal("80.00")),
             status=TargetStatus("active"),
             created_date=date.today(),
         )
 
-        target.set_id(123)
-        assert target.id == 123
-
-    def test_target_set_id_with_invalid_id_raises_error(self):
-        """Should raise error when setting invalid ID."""
-        from src.domain.value_objects import TargetStatus
-
-        target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-        )
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            target.set_id(0)
-
-    def test_target_set_id_when_already_set_raises_error(self):
-        """Should raise error when trying to change existing ID."""
-        from src.domain.value_objects import TargetStatus
-
-        target = TargetEntity(
-            portfolio_id=1,
-            stock_id=1,
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            target_id=123,
-        )
-
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            target.set_id(456)
+        assert target.id == test_id
+        assert target.portfolio_id == "portfolio-id-1"
+        assert target.stock_id == "stock-id-1"
 
 
 class TestTargetStatus:

@@ -36,7 +36,7 @@ class StockEntity(BaseEntity):
         industry_group: Optional[IndustryGroup] = None,
         grade: Optional[Grade] = None,
         notes: Optional[Notes] = None,
-        stock_id: Optional[int] = None,
+        entity_id: Optional[str] = None,
     ):
         """
         Initialize Stock entity with value objects.
@@ -48,7 +48,7 @@ class StockEntity(BaseEntity):
             industry_group: Industry classification value object (must belong to sector if provided)
             grade: Stock grade value object (A/B/C/D/F or None)
             notes: Additional notes value object
-            stock_id: Database ID (for persistence)
+            id: Entity ID (string)
 
         Raises:
             ValueError: If any validation fails
@@ -59,15 +59,13 @@ class StockEntity(BaseEntity):
         self._sector_industry_service = SectorIndustryService()
 
         # Store value objects directly (they're already validated)
-        super().__init__()
+        super().__init__(entity_id=entity_id)
         self._symbol = symbol
         self._company_name = company_name
         self._sector_vo = sector
         self._industry_group_vo = industry_group
         self._grade_vo = grade
         self._notes_vo = notes if notes is not None else Notes("")
-        if stock_id is not None:
-            self.set_id(stock_id)
 
         # Validate domain business rules (sector-industry relationship)
         sector_str = sector.value if sector else None

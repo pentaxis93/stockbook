@@ -103,7 +103,7 @@ class TestStockPresentationAdapter:
         self.mock_ui_operations.create_form_submit_button.return_value = True
 
         success_response = CreateStockResponse.create_success(
-            stock_id=1, symbol="AAPL", message="Stock created successfully"
+            stock_id="stock-id-1", symbol="AAPL", message="Stock created successfully"
         )
         self.mock_controller.create_stock.return_value = success_response
 
@@ -152,9 +152,15 @@ class TestStockPresentationAdapter:
         """Should render stock list successfully using UI operations."""
         # Arrange
         stocks = [
-            StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
-            StockViewModel(id=2, symbol="GOOGL", name="Alphabet Inc.", grade="A"),
-            StockViewModel(id=3, symbol="MSFT", name="Microsoft Corp.", grade="B"),
+            StockViewModel(
+                id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-2", symbol="GOOGL", name="Alphabet Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-3", symbol="MSFT", name="Microsoft Corp.", grade="B"
+            ),
         ]
 
         response = StockListResponse.create_success(stocks, "Retrieved 3 stocks")
@@ -203,7 +209,7 @@ class TestStockPresentationAdapter:
         """Should render stock detail view successfully using UI operations."""
         # Arrange
         stock = StockViewModel(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             industry_group="Technology",
@@ -274,7 +280,11 @@ class TestStockPresentationAdapter:
         self.mock_ui_operations.create_button.return_value = True
 
         filtered_response = StockListResponse.create_success(
-            [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")],
+            [
+                StockViewModel(
+                    id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+                )
+            ],
             "Retrieved 1 stock with grade A",
         )
         self.mock_controller.search_stocks.return_value = filtered_response
@@ -372,7 +382,7 @@ class TestStockPresentationAdapter:
         # Arrange
         stocks = [
             StockViewModel(
-                id=1,
+                id="stock-id-1",
                 symbol="AAPL",
                 name="Apple Inc.",
                 grade="A",
@@ -380,7 +390,7 @@ class TestStockPresentationAdapter:
                 notes="Good stock",
             ),
             StockViewModel(
-                id=2,
+                id="stock-id-2",
                 symbol="GOOGL",
                 name="Alphabet Inc.",
                 grade="A",
@@ -409,7 +419,9 @@ class TestStockPresentationAdapter:
         # and doesn't import or use framework-specific modules directly
 
         # Arrange - All operations go through the mocked interfaces
-        stocks = [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")]
+        stocks = [
+            StockViewModel(id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A")
+        ]
         response = StockListResponse.create_success(stocks, "Retrieved 1 stock")
         self.mock_controller.get_stock_list.return_value = response
         self.mock_ui_operations.create_columns.return_value = [Mock(), Mock(), Mock()]

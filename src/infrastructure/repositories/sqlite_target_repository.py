@@ -33,7 +33,7 @@ class SqliteTargetRepository(ITargetRepository):
         """
         self.db_connection = db_connection
 
-    def create(self, target: TargetEntity) -> int:
+    def create(self, target: TargetEntity) -> str:
         """
         Create a new target record in the database.
 
@@ -48,12 +48,13 @@ class SqliteTargetRepository(ITargetRepository):
             DatabaseError: If creation fails
         """
         with self.db_connection.transaction() as conn:
-            cursor = conn.execute(
+            conn.execute(
                 """
-                INSERT INTO target (stock_id, portfolio_id, pivot_price, failure_price, notes, status)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO target (id, stock_id, portfolio_id, pivot_price, failure_price, notes, status)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
+                    target.id,
                     target.stock_id,
                     target.portfolio_id,
                     float(target.pivot_price.amount) if target.pivot_price else 0.0,
@@ -62,9 +63,9 @@ class SqliteTargetRepository(ITargetRepository):
                     target.status.value,
                 ),
             )
-            return cursor.lastrowid or 0
+            return target.id
 
-    def get_by_id(self, target_id: int) -> Optional[TargetEntity]:
+    def get_by_id(self, target_id: str) -> Optional[TargetEntity]:
         """
         Retrieve target by database ID.
 
@@ -95,7 +96,7 @@ class SqliteTargetRepository(ITargetRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def get_active_by_portfolio(self, portfolio_id: int) -> List[TargetEntity]:
+    def get_active_by_portfolio(self, portfolio_id: str) -> List[TargetEntity]:
         """
         Retrieve active targets for a portfolio.
 
@@ -124,7 +125,7 @@ class SqliteTargetRepository(ITargetRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def get_active_by_stock(self, stock_id: int) -> List[TargetEntity]:
+    def get_active_by_stock(self, stock_id: str) -> List[TargetEntity]:
         """
         Retrieve active targets for a stock.
 
@@ -178,7 +179,7 @@ class SqliteTargetRepository(ITargetRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def update(self, target_id: int, target: TargetEntity) -> bool:
+    def update(self, target_id: str, target: TargetEntity) -> bool:
         """
         Update an existing target record.
 
@@ -209,7 +210,7 @@ class SqliteTargetRepository(ITargetRepository):
             )
             return cursor.rowcount > 0
 
-    def update_status(self, target_id: int, status: str) -> bool:
+    def update_status(self, target_id: str, status: str) -> bool:
         """
         Update target status.
 
@@ -271,6 +272,6 @@ class SqliteTargetRepository(ITargetRepository):
             status=TargetStatus(row["status"]),
             created_date=created_date,
             notes=Notes(row["notes"] or ""),
-            target_id=row["id"],
+            entity_id=row["id"],
         )
         return entity

@@ -10,3 +10,4 @@
 - Always update the ROADMAP.md, TECHNICAL_DEBT.md, and README.md files in the project root with the latest changes.
 - ALWAYS call Serena and read Serena's initial instructions before starting any work.
 - NEVER disable the pre-commit hooks.
+- NEVER force a commit if the pre-commit hooks fail.

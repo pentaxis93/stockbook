@@ -31,6 +31,7 @@ MarkupSafe==3.0.2
 mccabe==0.7.0
 mdurl==0.1.2
 mypy_extensions==1.1.0
+nanoid==2.0.0
 narwhals==1.42.1
 nodeenv==1.9.1
 numpy==1.26.4

@@ -42,7 +42,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -74,7 +74,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -105,7 +105,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -114,7 +114,7 @@ class TestSqliteStockRepositorySearch:
                 "notes": "",
             },
             {
-                "id": 2,
+                "id": "stock-id-2",
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
                 "sector": "Technology",
@@ -144,7 +144,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -153,7 +153,7 @@ class TestSqliteStockRepositorySearch:
                 "notes": "",
             },
             {
-                "id": 2,
+                "id": "stock-id-2",
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
                 "sector": "Technology",
@@ -185,7 +185,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 2,
+                "id": "stock-id-2",
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
                 "sector": "Technology",
@@ -226,7 +226,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -261,7 +261,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -270,7 +270,7 @@ class TestSqliteStockRepositorySearch:
                 "notes": "",
             },
             {
-                "id": 2,
+                "id": "stock-id-2",
                 "symbol": "GOOGL",
                 "name": "Alphabet Inc.",
                 "sector": "Technology",
@@ -279,7 +279,7 @@ class TestSqliteStockRepositorySearch:
                 "notes": "",
             },
             {
-                "id": 3,
+                "id": "stock-id-3",
                 "symbol": "MSFT",
                 "name": "Microsoft Corp.",
                 "sector": "Technology",
@@ -328,7 +328,7 @@ class TestSqliteStockRepositorySearch:
         # Mock database results
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -355,7 +355,7 @@ class TestSqliteStockRepositorySearch:
         symbol_filter = "AAPL"
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -382,7 +382,7 @@ class TestSqliteStockRepositorySearch:
         symbol_filter = "AAPL"
         mock_rows = [
             {
-                "id": 1,
+                "id": "stock-id-1",
                 "symbol": "AAPL",
                 "name": "Apple Inc.",
                 "sector": "Technology",
@@ -401,7 +401,7 @@ class TestSqliteStockRepositorySearch:
         stock = results[0]
         assert isinstance(stock, StockEntity)
         assert isinstance(stock.symbol, StockSymbol)
-        assert stock.id == 1
+        assert stock.id == "stock-id-1"
         assert stock.symbol.value == "AAPL"
         assert stock.company_name.value == "Apple Inc."
         assert stock.sector.value == "Technology"

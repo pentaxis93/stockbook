@@ -51,14 +51,15 @@ class TestStockApplicationService:
 
         # Mock repository to return None (stock doesn't exist)
         self.mock_stock_repository.get_by_symbol.return_value = None
-        self.mock_stock_repository.create.return_value = 123
 
         # Act
         result = self.service.create_stock(command)
 
         # Assert
         assert isinstance(result, StockDto)
-        assert result.id == 123
+        assert result.id is not None
+        assert isinstance(result.id, str)
+        assert len(result.id) > 0
         assert result.symbol == "AAPL"
         assert result.name == "Apple Inc."
         assert result.sector == "Technology"
@@ -86,7 +87,7 @@ class TestStockApplicationService:
         existing_stock = StockEntity(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Existing Apple Inc."),
-            stock_id=456,
+            entity_id="stock-id-456",
         )
         self.mock_stock_repository.get_by_symbol.return_value = existing_stock
 
@@ -124,7 +125,7 @@ class TestStockApplicationService:
             industry_group=IndustryGroup("Software"),
             grade=Grade("A"),
             notes=Notes("Great company"),
-            stock_id=123,
+            entity_id="stock-id-123",
         )
         self.mock_stock_repository.get_by_symbol.return_value = stock_entity
 
@@ -133,7 +134,7 @@ class TestStockApplicationService:
 
         # Assert
         assert isinstance(result, StockDto)
-        assert result.id == 123
+        assert result.id == "stock-id-123"
         assert result.symbol == "AAPL"
         assert result.name == "Apple Inc."
         assert result.sector == "Technology"
@@ -169,12 +170,12 @@ class TestStockApplicationService:
         stock1 = StockEntity(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
-            stock_id=1,
+            entity_id="stock-1",
         )
         stock2 = StockEntity(
             symbol=StockSymbol("MSFT"),
             company_name=CompanyName("Microsoft Corp."),
-            stock_id=2,
+            entity_id="stock-2",
         )
 
         self.mock_stock_repository.get_all.return_value = [stock1, stock2]
@@ -249,7 +250,7 @@ class TestStockApplicationService:
 
         mock_entities = [
             StockEntity(
-                stock_id=1,
+                entity_id="stock-1",
                 symbol=StockSymbol("AAPL"),
                 company_name=CompanyName("Apple Inc."),
                 sector=Sector("Technology"),
@@ -286,7 +287,7 @@ class TestStockApplicationService:
         # Arrange
         mock_entities = [
             StockEntity(
-                stock_id=1,
+                entity_id="stock-1",
                 symbol=StockSymbol("AAPL"),
                 company_name=CompanyName("Apple Inc."),
                 sector=Sector("Technology"),
@@ -295,7 +296,7 @@ class TestStockApplicationService:
                 notes=Notes(""),
             ),
             StockEntity(
-                stock_id=2,
+                entity_id="stock-2",
                 symbol=StockSymbol("GOOGL"),
                 company_name=CompanyName("Alphabet Inc."),
                 sector=Sector("Technology"),
@@ -344,7 +345,7 @@ class TestStockApplicationService:
         """Should update stock successfully with valid command."""
         # Arrange
         command = UpdateStockCommand(
-            stock_id=1,
+            stock_id="stock-1",
             name="Apple Inc. (Updated)",
             sector="Technology",
             industry_group="Hardware",
@@ -353,7 +354,7 @@ class TestStockApplicationService:
         )
 
         existing_stock = StockEntity(
-            stock_id=1,
+            entity_id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -371,7 +372,7 @@ class TestStockApplicationService:
 
         # Assert
         assert isinstance(result, StockDto)
-        assert result.id == 1
+        assert result.id == "stock-1"
         assert result.name == "Apple Inc. (Updated)"
         assert result.sector == "Technology"
         assert result.industry_group == "Hardware"
@@ -379,7 +380,7 @@ class TestStockApplicationService:
         assert result.notes == "Updated notes"
 
         # Verify repository interactions
-        self.mock_stock_repository.get_by_id.assert_called_once_with(1)
+        self.mock_stock_repository.get_by_id.assert_called_once_with("stock-1")
         self.mock_stock_repository.update.assert_called_once()
         self.mock_unit_of_work.commit.assert_called_once()
 
@@ -387,12 +388,12 @@ class TestStockApplicationService:
         """Should update only specified fields."""
         # Arrange
         command = UpdateStockCommand(
-            stock_id=1,
+            stock_id="stock-1",
             grade="A",  # Only updating grade
         )
 
         existing_stock = StockEntity(
-            stock_id=1,
+            entity_id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -420,11 +421,11 @@ class TestStockApplicationService:
     def test_update_stock_with_nonexistent_stock_raises_error(self):
         """Should raise error when stock doesn't exist."""
         # Arrange
-        command = UpdateStockCommand(stock_id=999, grade="A")
+        command = UpdateStockCommand(stock_id="stock-999", grade="A")
         self.mock_stock_repository.get_by_id.return_value = None
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Stock with ID 999 not found"):
+        with pytest.raises(ValueError, match="Stock with ID stock-999 not found"):
             self.service.update_stock(command)
 
         # Verify rollback was called
@@ -433,7 +434,7 @@ class TestStockApplicationService:
     def test_update_stock_with_empty_command_raises_error(self):
         """Should raise error when no fields to update."""
         # Arrange
-        command = UpdateStockCommand(stock_id=1)  # No fields to update
+        command = UpdateStockCommand(stock_id="stock-1")  # No fields to update
 
         # Act & Assert
         with pytest.raises(ValueError, match="No fields to update"):
@@ -442,10 +443,10 @@ class TestStockApplicationService:
     def test_update_stock_with_repository_failure_raises_error(self):
         """Should handle repository update failure."""
         # Arrange
-        command = UpdateStockCommand(stock_id=1, grade="A")
+        command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
         existing_stock = StockEntity(
-            stock_id=1,
+            entity_id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("B"),
@@ -464,10 +465,10 @@ class TestStockApplicationService:
     def test_update_stock_with_exception_rolls_back_transaction(self):
         """Should rollback transaction on any exception."""
         # Arrange
-        command = UpdateStockCommand(stock_id=1, grade="A")
+        command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
         existing_stock = StockEntity(
-            stock_id=1,
+            entity_id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("B"),

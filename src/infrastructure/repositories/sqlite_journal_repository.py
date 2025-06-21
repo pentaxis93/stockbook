@@ -31,7 +31,7 @@ class SqliteJournalRepository(IJournalRepository):
         """
         self.db_connection = db_connection
 
-    def create(self, entry: JournalEntryEntity) -> int:
+    def create(self, entry: JournalEntryEntity) -> str:
         """
         Create a new journal entry.
 
@@ -42,12 +42,13 @@ class SqliteJournalRepository(IJournalRepository):
             ID of the created entry
         """
         with self.db_connection.transaction() as conn:
-            cursor = conn.execute(
+            conn.execute(
                 """
-                INSERT INTO journal_entry (entry_date, content, stock_id, portfolio_id, transaction_id)
-                VALUES (?, ?, ?, ?, ?)
+                INSERT INTO journal_entry (id, entry_date, content, stock_id, portfolio_id, transaction_id)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
                 (
+                    entry.id,
                     entry.entry_date.isoformat() if entry.entry_date else "",
                     entry.content.value,
                     entry.stock_id,
@@ -55,9 +56,9 @@ class SqliteJournalRepository(IJournalRepository):
                     entry.transaction_id,
                 ),
             )
-            return cursor.lastrowid or 0
+            return entry.id
 
-    def get_by_id(self, entry_id: int) -> Optional[JournalEntryEntity]:
+    def get_by_id(self, entry_id: str) -> Optional[JournalEntryEntity]:
         """
         Retrieve journal entry by ID.
 
@@ -105,7 +106,7 @@ class SqliteJournalRepository(IJournalRepository):
                 ORDER BY entry_date DESC, created_at DESC
             """
 
-            params = []
+            params: list = []
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -119,7 +120,7 @@ class SqliteJournalRepository(IJournalRepository):
                 conn.close()
 
     def get_by_portfolio(
-        self, portfolio_id: int, limit: Optional[int] = None
+        self, portfolio_id: str, limit: Optional[int] = None
     ) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries for a specific portfolio.
@@ -140,7 +141,7 @@ class SqliteJournalRepository(IJournalRepository):
                 ORDER BY entry_date DESC, created_at DESC
             """
 
-            params = [portfolio_id]
+            params: list = [portfolio_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -154,7 +155,7 @@ class SqliteJournalRepository(IJournalRepository):
                 conn.close()
 
     def get_by_stock(
-        self, stock_id: int, limit: Optional[int] = None
+        self, stock_id: str, limit: Optional[int] = None
     ) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries for a specific stock.
@@ -175,7 +176,7 @@ class SqliteJournalRepository(IJournalRepository):
                 ORDER BY entry_date DESC, created_at DESC
             """
 
-            params = [stock_id]
+            params: list = [stock_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -188,7 +189,7 @@ class SqliteJournalRepository(IJournalRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def get_by_transaction(self, transaction_id: int) -> List[JournalEntryEntity]:
+    def get_by_transaction(self, transaction_id: str) -> List[JournalEntryEntity]:
         """
         Retrieve journal entries for a specific transaction.
 
@@ -247,7 +248,7 @@ class SqliteJournalRepository(IJournalRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def update(self, entry_id: int, entry: JournalEntryEntity) -> bool:
+    def update(self, entry_id: str, entry: JournalEntryEntity) -> bool:
         """
         Update existing journal entry.
 
@@ -276,7 +277,7 @@ class SqliteJournalRepository(IJournalRepository):
             )
             return cursor.rowcount > 0
 
-    def delete(self, entry_id: int) -> bool:
+    def delete(self, entry_id: str) -> bool:
         """
         Delete journal entry by ID.
 
@@ -320,6 +321,6 @@ class SqliteJournalRepository(IJournalRepository):
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
             transaction_id=row["transaction_id"],
-            entry_id=row["id"],
+            entity_id=row["id"],
         )
         return entity

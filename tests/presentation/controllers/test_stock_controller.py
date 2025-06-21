@@ -56,7 +56,7 @@ class TestStockController:
         )
 
         expected_dto = StockDto(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             sector="Technology",
@@ -73,7 +73,7 @@ class TestStockController:
         # Assert
         assert isinstance(response, CreateStockResponse)
         assert response.success is True
-        assert response.stock_id == 1
+        assert response.stock_id == "stock-id-1"
         assert response.symbol == "AAPL"
         assert response.message == "Stock created successfully"
         assert response.errors is None
@@ -183,7 +183,7 @@ class TestStockController:
         # Arrange
         mock_stocks = [
             StockDto(
-                id=1,
+                id="stock-id-1",
                 symbol="AAPL",
                 name="Apple Inc.",
                 sector="Technology",
@@ -192,7 +192,7 @@ class TestStockController:
                 notes="",
             ),
             StockDto(
-                id=2,
+                id="stock-id-2",
                 symbol="GOOGL",
                 name="Alphabet Inc.",
                 sector="Technology",
@@ -201,7 +201,7 @@ class TestStockController:
                 notes="",
             ),
             StockDto(
-                id=3,
+                id="stock-id-3",
                 symbol="MSFT",
                 name="Microsoft Corp.",
                 sector="Technology",
@@ -259,7 +259,7 @@ class TestStockController:
         # Arrange
         symbol = "AAPL"
         mock_stock = StockDto(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             sector="Technology",
@@ -350,7 +350,7 @@ class TestStockController:
         )
 
         expected_dto = StockDto(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             sector="Technology",
@@ -391,7 +391,7 @@ class TestStockController:
         # Simulate concurrent access scenario
         self.mock_stock_service.create_stock.side_effect = [
             StockDto(
-                id=1,
+                id="stock-id-1",
                 symbol="AAPL",
                 name="Apple Inc.",
                 sector="Technology",
@@ -424,7 +424,7 @@ class TestStockController:
 
         mock_stocks = [
             StockDto(
-                id=1,
+                id="stock-id-1",
                 symbol="AAPL",
                 name="Apple Inc.",
                 sector="Technology",
@@ -468,7 +468,7 @@ class TestStockController:
 
         mock_stocks = [
             StockDto(
-                id=1,
+                id="stock-id-1",
                 symbol="AAPL",
                 name="Apple Inc.",
                 sector="Technology",
@@ -477,7 +477,7 @@ class TestStockController:
                 notes="",
             ),
             StockDto(
-                id=2,
+                id="stock-id-2",
                 symbol="GOOGL",
                 name="Alphabet Inc.",
                 sector="Technology",
@@ -567,7 +567,7 @@ class TestStockController:
         # Test single filter
         search_request_single = StockSearchRequest(symbol_filter="AAPL")
         self.mock_stock_service.search_stocks.return_value = [
-            StockDto(id=1, symbol="AAPL", name="Apple Inc.", grade="A")
+            StockDto(id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A")
         ]
 
         response_single = self.controller.search_stocks(search_request_single)
@@ -576,7 +576,7 @@ class TestStockController:
         # Test multiple filters
         search_request_multi = StockSearchRequest(symbol_filter="A", grade_filter="A")
         self.mock_stock_service.search_stocks.return_value = [
-            StockDto(id=1, symbol="AAPL", name="Apple Inc.", grade="A")
+            StockDto(id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A")
         ]
 
         response_multi = self.controller.search_stocks(search_request_multi)
@@ -588,7 +588,7 @@ class TestStockController:
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(
-            stock_id=1,
+            stock_id="stock-id-1",
             name="Apple Inc. (Updated)",
             industry_group="Consumer Electronics",
             grade="A",
@@ -596,7 +596,7 @@ class TestStockController:
         )
 
         expected_dto = StockDto(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc. (Updated)",
             industry_group="Consumer Electronics",
@@ -612,7 +612,7 @@ class TestStockController:
         # Assert
         assert isinstance(response, UpdateStockResponse)
         assert response.success is True
-        assert response.stock_id == 1
+        assert response.stock_id == "stock-id-1"
         assert "Stock updated successfully" in response.message
 
     def test_update_stock_with_validation_errors(self):
@@ -621,7 +621,7 @@ class TestStockController:
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
         request = UpdateStockRequest(
-            stock_id=1,
+            stock_id="stock-id-1",
             name="",  # Invalid empty name
             grade="Z",  # Invalid grade
         )
@@ -639,10 +639,10 @@ class TestStockController:
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
-        request = UpdateStockRequest(stock_id=999, grade="A")
+        request = UpdateStockRequest(stock_id="stock-id-999", grade="A")
 
         self.mock_stock_service.update_stock.side_effect = ValueError(
-            "Stock with ID 999 not found"
+            "Stock with ID stock-id-999 not found"
         )
 
         # Act
@@ -651,14 +651,14 @@ class TestStockController:
         # Assert
         assert isinstance(response, UpdateStockResponse)
         assert response.success is False
-        assert "Stock with ID 999 not found" in response.message
+        assert "Stock with ID stock-id-999 not found" in response.message
 
     def test_update_stock_with_no_fields_to_update(self):
         """Should handle update request with no fields to update."""
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
-        request = UpdateStockRequest(stock_id=1)  # No fields to update
+        request = UpdateStockRequest(stock_id="stock-id-1")  # No fields to update
 
         # Act
         response = self.controller.update_stock(request)
@@ -672,7 +672,7 @@ class TestStockController:
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
 
-        request = UpdateStockRequest(stock_id=1, grade="A")
+        request = UpdateStockRequest(stock_id="stock-id-1", grade="A")
 
         self.mock_stock_service.update_stock.side_effect = Exception("Database error")
 

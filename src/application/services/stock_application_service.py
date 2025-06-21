@@ -75,8 +75,7 @@ class StockApplicationService:
                 )
 
                 # Persist entity
-                stock_id = self._unit_of_work.stocks.create(stock_entity)
-                stock_entity.set_id(stock_id)
+                self._unit_of_work.stocks.create(stock_entity)
 
                 # Commit transaction
                 self._unit_of_work.commit()

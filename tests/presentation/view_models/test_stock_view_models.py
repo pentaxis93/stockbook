@@ -199,7 +199,7 @@ class TestStockViewModel:
         """Should create view model from DTO."""
         # Arrange
         dto = StockDto(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             industry_group="Technology",
@@ -211,7 +211,7 @@ class TestStockViewModel:
         view_model = StockViewModel.from_dto(dto)
 
         # Assert
-        assert view_model.id == 1
+        assert view_model.id == "stock-id-1"
         assert view_model.symbol == "AAPL"
         assert view_model.name == "Apple Inc."
         assert view_model.industry_group == "Technology"
@@ -223,7 +223,7 @@ class TestStockViewModel:
         """Should provide computed display properties."""
         # Arrange
         dto = StockDto(
-            id=1,
+            id="stock-id-1",
             symbol="AAPL",
             name="Apple Inc.",
             industry_group="Technology",
@@ -243,19 +243,21 @@ class TestStockViewModel:
     def test_stock_view_model_grade_display_formatting(self):
         """Should format grade display correctly."""
         # Test Grade A
-        dto_a = StockDto(id=1, symbol="AAPL", name="Apple Inc.", grade="A")
+        dto_a = StockDto(id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A")
         view_model_a = StockViewModel.from_dto(dto_a)
         assert view_model_a.grade_display == "Grade A"
         assert view_model_a.is_high_grade is True
 
         # Test Grade B
-        dto_b = StockDto(id=2, symbol="MSFT", name="Microsoft", grade="B")
+        dto_b = StockDto(id="stock-id-2", symbol="MSFT", name="Microsoft", grade="B")
         view_model_b = StockViewModel.from_dto(dto_b)
         assert view_model_b.grade_display == "Grade B"
         assert view_model_b.is_high_grade is False
 
         # Test No Grade
-        dto_none = StockDto(id=3, symbol="TEST", name="Test Corp", grade=None)
+        dto_none = StockDto(
+            id="stock-id-3", symbol="TEST", name="Test Corp", grade=None
+        )
         view_model_none = StockViewModel.from_dto(dto_none)
         assert view_model_none.grade_display == "No Grade"
         assert view_model_none.is_high_grade is False
@@ -264,14 +266,16 @@ class TestStockViewModel:
         """Should handle notes properly."""
         # With notes
         dto_with_notes = StockDto(
-            id=1, symbol="AAPL", name="Apple Inc.", notes="Good stock"
+            id="stock-id-1", symbol="AAPL", name="Apple Inc.", notes="Good stock"
         )
         view_model_with = StockViewModel.from_dto(dto_with_notes)
         assert view_model_with.has_notes is True
         assert view_model_with.notes_preview == "Good stock"
 
         # Without notes
-        dto_no_notes = StockDto(id=2, symbol="MSFT", name="Microsoft", notes="")
+        dto_no_notes = StockDto(
+            id="stock-id-2", symbol="MSFT", name="Microsoft", notes=""
+        )
         view_model_without = StockViewModel.from_dto(dto_no_notes)
         assert view_model_without.has_notes is False
         assert view_model_without.notes_preview == "No notes"
@@ -280,7 +284,9 @@ class TestStockViewModel:
         """Should truncate long notes for preview."""
         # Arrange
         long_notes = "This is a very long note that exceeds the preview limit " * 5
-        dto = StockDto(id=1, symbol="AAPL", name="Apple Inc.", notes=long_notes)
+        dto = StockDto(
+            id="stock-id-1", symbol="AAPL", name="Apple Inc.", notes=long_notes
+        )
 
         # Act
         view_model = StockViewModel.from_dto(dto)
@@ -297,8 +303,12 @@ class TestStockListResponse:
         """Should create successful response with stock list."""
         # Arrange
         stocks = [
-            StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A"),
-            StockViewModel(id=2, symbol="GOOGL", name="Alphabet Inc.", grade="A"),
+            StockViewModel(
+                id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+            ),
+            StockViewModel(
+                id="stock-id-2", symbol="GOOGL", name="Alphabet Inc.", grade="A"
+            ),
         ]
 
         # Act
@@ -336,7 +346,9 @@ class TestStockListResponse:
     def test_stock_list_response_filtering_info(self):
         """Should include filtering information."""
         # Arrange
-        stocks = [StockViewModel(id=1, symbol="AAPL", name="Apple Inc.", grade="A")]
+        stocks = [
+            StockViewModel(id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A")
+        ]
 
         # Act
         response = StockListResponse.create_success(
@@ -355,12 +367,12 @@ class TestCreateStockResponse:
         """Should create successful response."""
         # Act
         response = CreateStockResponse.create_success(
-            stock_id=1, symbol="AAPL", message="Stock created successfully"
+            stock_id="stock-id-1", symbol="AAPL", message="Stock created successfully"
         )
 
         # Assert
         assert response.success is True
-        assert response.stock_id == 1
+        assert response.stock_id == "stock-id-1"
         assert response.symbol == "AAPL"
         assert response.message == "Stock created successfully"
         assert response.errors is None

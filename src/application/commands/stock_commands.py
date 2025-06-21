@@ -242,7 +242,7 @@ class UpdateStockCommand:
     """
 
     # Private attributes for type checking
-    _stock_id: int
+    _stock_id: str
     _name: Optional[str]
     _sector: Optional[str]
     _industry_group: Optional[str]
@@ -251,7 +251,7 @@ class UpdateStockCommand:
 
     def __init__(
         self,
-        stock_id: int,
+        stock_id: str,
         name: Optional[str] = None,
         sector: Optional[str] = None,
         industry_group: Optional[str] = None,
@@ -301,7 +301,7 @@ class UpdateStockCommand:
         object.__setattr__(self, "_notes", notes)
 
     @property
-    def stock_id(self) -> int:
+    def stock_id(self) -> str:
         """Get the stock ID."""
         return self._stock_id
 
@@ -406,10 +406,10 @@ class UpdateStockCommand:
         )
 
     @staticmethod
-    def _validate_stock_id(stock_id: int) -> None:
+    def _validate_stock_id(stock_id: str) -> None:
         """Validate stock ID."""
-        if not isinstance(stock_id, int) or stock_id <= 0:
-            raise ValueError("Stock ID must be a positive integer")
+        if not isinstance(stock_id, str) or not stock_id.strip():
+            raise ValueError("Stock ID must be a non-empty string")
 
     @staticmethod
     def _normalize_name(name: str) -> str:

@@ -33,7 +33,7 @@ class SqliteTransactionRepository(ITransactionRepository):
         """
         self.db_connection = db_connection
 
-    def create(self, transaction: TransactionEntity) -> int:
+    def create(self, transaction: TransactionEntity) -> str:
         """
         Create a new transaction record in the database.
 
@@ -48,12 +48,13 @@ class SqliteTransactionRepository(ITransactionRepository):
             DatabaseError: If creation fails
         """
         with self.db_connection.transaction() as conn:
-            cursor = conn.execute(
+            conn.execute(
                 """
-                INSERT INTO stock_transaction (portfolio_id, stock_id, type, quantity, price, transaction_date, notes)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
+                    INSERT INTO stock_transaction (id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
                 (
+                    transaction.id,
                     transaction.portfolio_id,
                     transaction.stock_id,
                     transaction.transaction_type.value,  # Extract value from TransactionType
@@ -63,9 +64,9 @@ class SqliteTransactionRepository(ITransactionRepository):
                     transaction.notes.value,  # Extract value from Notes
                 ),
             )
-            return cursor.lastrowid or 0
+            return transaction.id
 
-    def get_by_id(self, transaction_id: int) -> Optional[TransactionEntity]:
+    def get_by_id(self, transaction_id: str) -> Optional[TransactionEntity]:
         """
         Retrieve transaction by database ID.
 
@@ -97,7 +98,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                 conn.close()
 
     def get_by_portfolio(
-        self, portfolio_id: int, limit: Optional[int] = None
+        self, portfolio_id: str, limit: Optional[int] = None
     ) -> List[TransactionEntity]:
         """
         Retrieve transactions for a specific portfolio.
@@ -118,7 +119,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                 ORDER BY transaction_date DESC, created_at DESC
             """
 
-            params = [portfolio_id]
+            params: list = [portfolio_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -133,7 +134,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                 conn.close()
 
     def get_by_stock(
-        self, stock_id: int, portfolio_id: Optional[int] = None
+        self, stock_id: str, portfolio_id: Optional[str] = None
     ) -> List[TransactionEntity]:
         """
         Retrieve transactions for a specific stock.
@@ -154,7 +155,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE stock_id = ? AND portfolio_id = ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params = [stock_id, portfolio_id]
+                params: list = [stock_id, portfolio_id]
             else:
                 query = """
                     SELECT id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes, created_at
@@ -162,7 +163,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE stock_id = ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params = [stock_id]
+                params: list = [stock_id]
 
             cursor = conn.execute(query, params)
             rows = cursor.fetchall()
@@ -174,7 +175,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                 conn.close()
 
     def get_by_date_range(
-        self, start_date: date, end_date: date, portfolio_id: Optional[int] = None
+        self, start_date: date, end_date: date, portfolio_id: Optional[str] = None
     ) -> List[TransactionEntity]:
         """
         Retrieve transactions within a date range.
@@ -196,7 +197,11 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE transaction_date >= ? AND transaction_date <= ? AND portfolio_id = ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params = [start_date.isoformat(), end_date.isoformat(), portfolio_id]
+                params: list = [
+                    start_date.isoformat(),
+                    end_date.isoformat(),
+                    portfolio_id,
+                ]
             else:
                 query = """
                     SELECT id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes, created_at
@@ -204,7 +209,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE transaction_date >= ? AND transaction_date <= ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params = [start_date.isoformat(), end_date.isoformat()]
+                params: list = [start_date.isoformat(), end_date.isoformat()]
 
             cursor = conn.execute(query, params)
             rows = cursor.fetchall()
@@ -215,7 +220,7 @@ class SqliteTransactionRepository(ITransactionRepository):
             if not getattr(self.db_connection, "is_transactional", False):
                 conn.close()
 
-    def update(self, transaction_id: int, transaction: TransactionEntity) -> bool:
+    def update(self, transaction_id: str, transaction: TransactionEntity) -> bool:
         """
         Update an existing transaction record.
 
@@ -247,7 +252,7 @@ class SqliteTransactionRepository(ITransactionRepository):
             )
             return cursor.rowcount > 0
 
-    def delete(self, transaction_id: int) -> bool:
+    def delete(self, transaction_id: str) -> bool:
         """
         Delete transaction by ID.
 
@@ -283,7 +288,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                 pass
 
         return TransactionEntity(
-            transaction_id=row["id"],  # Use transaction_id parameter
+            entity_id=row["id"],  # Use id parameter
             portfolio_id=row["portfolio_id"],
             stock_id=row["stock_id"],
             transaction_type=TransactionType(row["type"]),  # Wrap in TransactionType

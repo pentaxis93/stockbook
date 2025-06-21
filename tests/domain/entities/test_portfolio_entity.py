@@ -34,7 +34,8 @@ class TestPortfolioEntity:
         assert portfolio.description == description
         assert portfolio.created_date == created_date
         assert portfolio.is_active is True
-        assert portfolio.id is None  # Not yet persisted
+        assert portfolio.id is not None  # Generated nanoid
+        assert isinstance(portfolio.id, str)
 
     def test_create_portfolio_with_minimal_data(self):
         """Should create Portfolio with only required fields."""
@@ -46,7 +47,8 @@ class TestPortfolioEntity:
         assert portfolio.description.value == ""  # Description defaults to empty
         assert portfolio.created_date is None  # Optional
         assert portfolio.is_active is True  # Defaults to True
-        assert portfolio.id is None
+        assert portfolio.id is not None  # Generated nanoid
+        assert isinstance(portfolio.id, str)
 
     def test_portfolio_stores_value_objects(self):
         """Should store and return value objects directly."""
@@ -183,36 +185,38 @@ class TestPortfolioEntity:
 
         assert portfolio.description.value == "Updated description"
 
-    def test_set_id(self):
-        """Should allow setting ID (for persistence layer)."""
-        portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
+    def test_create_portfolio_with_id(self):
+        """Should create portfolio with provided ID."""
+        test_id = "portfolio-id-123"
+        portfolio = PortfolioEntity(
+            name=PortfolioName("Test Portfolio"), entity_id=test_id
+        )
 
-        assert portfolio.id is None
+        assert portfolio.id == test_id
 
-        portfolio.set_id(123)
-        assert portfolio.id == 123
+    def test_portfolio_id_immutability(self):
+        """Should not be able to change ID after creation."""
+        portfolio = PortfolioEntity(
+            name=PortfolioName("Test Portfolio"), entity_id="test-id-1"
+        )
 
-    def test_set_id_with_invalid_id_raises_error(self):
-        """Should raise error for invalid ID."""
-        portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
+        # ID property should not have a setter
+        with pytest.raises(AttributeError):
+            portfolio.id = "different-id"
 
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            portfolio.set_id(0)
+    def test_portfolio_from_persistence(self):
+        """Should create portfolio from persistence with existing ID."""
+        test_id = "persistence-id-456"
+        portfolio = PortfolioEntity.from_persistence(
+            test_id,
+            name=PortfolioName("Test Portfolio"),
+            description=Notes("From database"),
+            is_active=False,
+        )
 
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            portfolio.set_id(-1)
-
-        with pytest.raises(ValueError, match="ID must be a positive integer"):
-            portfolio.set_id("123")
-
-    def test_set_id_when_already_set_raises_error(self):
-        """Should raise error when trying to change existing ID."""
-        portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
-
-        portfolio.set_id(123)
-
-        with pytest.raises(ValueError, match="ID is already set and cannot be changed"):
-            portfolio.set_id(456)
+        assert portfolio.id == test_id
+        assert portfolio.name.value == "Test Portfolio"
+        assert portfolio.is_active is False
 
     def test_is_active_portfolio(self):
         """Should check if portfolio is active."""
