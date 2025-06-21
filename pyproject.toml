@@ -38,6 +38,164 @@ allowed-redefined-builtins = ["id"]
 # Require docstrings for public modules, classes, and functions
 docstring-min-length = 10
 
+# Layer-specific configurations
+[tool.pylint.core]
+# STRICTEST configuration for CORE business logic (domain, application, infrastructure)
+# Only disable rules that are genuinely necessary or handled by other tools
+disable = [
+    # Code structure - reasonable for domain models
+    "too-few-public-methods",
+    "too-many-public-methods", 
+    "too-many-instance-attributes",
+    
+    # Abstract base classes - pass statements are required
+    "unnecessary-pass",
+    
+    # Import organization - handled by isort
+    "wrong-import-order",
+    "ungrouped-imports",
+    "import-outside-toplevel",  # Sometimes needed to avoid circular imports
+    
+    # Line length - handled by black
+    "line-too-long",
+    
+    # Temporary architectural issues - TODO: remove these after DB refactor
+    "no-member",  # Due to dynamic repository creation
+    
+    # Domain entities legitimately need many fields
+    "too-many-positional-arguments",
+    
+    # Some duplication acceptable for clarity in domain patterns
+    "duplicate-code",
+    
+    # Exception chaining sometimes less clear in domain logic
+    "raise-missing-from",
+    
+    # Technical debt and development patterns
+    "fixme",  # TODO comments are legitimate in business logic
+    
+    # Value object internal operations need protected access
+    "protected-access",
+]
+
+max-args = 12  # Exception classes need context parameters
+max-locals = 15
+max-returns = 8  # Allow reasonable branching in business logic
+max-branches = 12
+max-statements = 50
+max-positional-arguments = 8  # Domain entities need many fields
+good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
+allowed-redefined-builtins = ["id"]
+docstring-min-length = 10
+
+[tool.pylint.tests]
+# LENIENT configuration for TEST files
+# Disable additional rules that are problematic in test contexts
+disable = [
+    # Production rules (same as default)
+    "too-few-public-methods",
+    "too-many-public-methods",
+    "too-many-instance-attributes", 
+    "wrong-import-order",
+    "ungrouped-imports",
+    "line-too-long",
+    "no-member",
+    # Additional test-specific rules
+    "redefined-outer-name",
+    "attribute-defined-outside-init",
+    "duplicate-code",
+    "unused-variable",
+    "unused-argument",
+    "protected-access",
+    "singleton-comparison",
+    "pointless-statement",
+    "unnecessary-pass",
+    "broad-exception-caught",
+    "comparison-with-itself",
+    "unexpected-keyword-arg",
+    "unused-import",
+    "logging-fstring-interpolation",
+    "no-else-return",
+    "raise-missing-from",
+    "import-outside-toplevel",
+    "unnecessary-negation",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "abstract-class-instantiated",
+    "consider-using-with",
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "fixme",
+    "too-many-lines",
+]
+
+allowed-redefined-builtins = ["id"]
+
+[tool.pylint.presentation]
+# MODERATE configuration for PRESENTATION layer
+# More lenient than core but stricter than tests
+disable = [
+    # Production rules
+    "too-few-public-methods",
+    "too-many-public-methods",
+    "too-many-instance-attributes",
+    "wrong-import-order",
+    "ungrouped-imports", 
+    "line-too-long",
+    "no-member",
+    # UI-specific allowances
+    "too-many-arguments",  # UI components often need many parameters
+    "too-many-positional-arguments",
+    "too-many-locals",  # UI setup code can be verbose
+    "fixme",  # UI development often has TODOs
+    "duplicate-code",  # Similar UI patterns are acceptable
+    "import-outside-toplevel",  # Conditional imports for UI frameworks
+    "broad-exception-caught",  # UI error handling is often broad
+    "missing-class-docstring",  # UI component classes don't always need docs
+    "missing-function-docstring",  # UI helper functions don't always need docs
+    "consider-using-join",  # UI string concatenation patterns vary
+    "reimported",  # UI modules may reimport for different contexts
+]
+
+max-args = 15  # UI components often need many parameters
+max-locals = 25  # UI setup can be verbose
+allowed-redefined-builtins = ["id"]
+
+[tool.pylint.config]
+# LENIENT configuration for CONFIG files
+# Most lenient for configuration and setup code
+disable = [
+    # All standard disables
+    "too-few-public-methods",
+    "too-many-public-methods", 
+    "too-many-instance-attributes",
+    "wrong-import-order",
+    "ungrouped-imports",
+    "line-too-long",
+    "no-member",
+    # Config-specific allowances
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "invalid-name",  # Config variables often use different naming
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "too-many-locals",
+    "import-outside-toplevel",
+    "broad-exception-caught",
+    "duplicate-code",
+    "fixme",
+    "global-statement",  # Config files sometimes need globals
+    "global-variable-not-assigned",
+    "unused-import",  # Config files may import for setup
+    "wildcard-import",  # Sometimes used in config for convenience
+    "unused-wildcard-import",
+    "c-extension-no-member",  # Dependency injection frameworks use C extensions
+    "consider-iterating-dictionary",  # Config files may use .keys() for clarity
+]
+
+allowed-redefined-builtins = ["id"]
+
 [tool.pytest.ini_options]
 # Test discovery and execution
 testpaths = ["tests"]

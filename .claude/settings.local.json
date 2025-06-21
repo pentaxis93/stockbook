@@ -157,7 +157,9 @@
       "Bash(pip install:*)",
       "mcp__serena__list_dir",
       "Bash(npx pyright:*)",
-      "mcp__serena__write_memory"
+      "mcp__serena__write_memory",
+      "Bash(PYTHONPATH=. pylint --rcfile=.pylintrc-core src/domain/entities/base.py)",
+      "Bash(./hooks/run-quality-checks.sh:*)"
     ],
     "deny": []
   }
