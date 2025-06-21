@@ -7,7 +7,7 @@ while fulfilling the domain repository contract.
 
 import sqlite3
 from datetime import date
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from src.domain.entities.journal_entry_entity import JournalEntryEntity
 from src.domain.repositories.interfaces import IJournalRepository
@@ -106,7 +106,7 @@ class SqliteJournalRepository(IJournalRepository):
                 ORDER BY entry_date DESC, created_at DESC
             """
 
-            params: list = []
+            params: List[Any] = []
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -141,7 +141,7 @@ class SqliteJournalRepository(IJournalRepository):
                 ORDER BY entry_date DESC, created_at DESC
             """
 
-            params: list = [portfolio_id]
+            params: List[Any] = [portfolio_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)
@@ -176,7 +176,7 @@ class SqliteJournalRepository(IJournalRepository):
                 ORDER BY entry_date DESC, created_at DESC
             """
 
-            params: list = [stock_id]
+            params: List[Any] = [stock_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)

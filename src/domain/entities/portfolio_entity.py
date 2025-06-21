@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import Notes, PortfolioName
@@ -88,7 +88,7 @@ class PortfolioEntity(BaseEntity):
         self._created_date = created_date
 
     # Equality and representation
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity (name)."""
         if not isinstance(other, PortfolioEntity):
             return False

@@ -192,16 +192,15 @@ class StockApplicationService:
         if stock_entity is None:
             raise ValueError(f"Stock with ID {command.stock_id} not found")
 
-        if stock_entity.id is None:
-            raise ValueError("Stock entity missing ID - cannot update")
-
         # Validate that there are fields to update
         if not command.has_updates():
             raise ValueError("No fields to update")
 
         return stock_entity
 
-    def _apply_updates_and_save(self, command: UpdateStockCommand, stock_entity):
+    def _apply_updates_and_save(
+        self, command: UpdateStockCommand, stock_entity: StockEntity
+    ):
         """Apply updates to stock entity and save to repository."""
         # Get the fields to update and apply them to the entity
         update_fields = command.get_update_fields()

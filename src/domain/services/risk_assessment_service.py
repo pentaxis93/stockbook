@@ -48,7 +48,7 @@ class RiskAssessmentService:
     def assess_stock_risk(self, stock: StockEntity) -> RiskAssessment:
         """Calculate overall risk level for individual stocks."""
         # TODO: Implement comprehensive risk assessment logic
-        risk_factors = []
+        risk_factors: List[str] = []
         if stock.grade and stock.grade.value in ["D", "F"]:
             risk_factors.append("Low quality grade")
 
@@ -71,7 +71,7 @@ class RiskAssessmentService:
             )
 
         # TODO: Implement comprehensive portfolio risk assessment logic
-        risk_factors = []
+        risk_factors: List[str] = []
 
         # Check concentration risk
         if len(portfolio) < 5:

@@ -272,5 +272,5 @@ exclude = [
     "src/presentation/coordinators/stock_page_coordinator.py"
 ]
 
-# Use standard type checking for better type safety
-typeCheckingMode = "standard"
+# Use strict type checking for maximum type safety
+typeCheckingMode = "strict"

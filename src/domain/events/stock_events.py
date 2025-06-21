@@ -44,7 +44,7 @@ class StockAddedEvent(DomainEvent):
         if not stock_name or not stock_name.strip():
             raise ValueError("Stock name cannot be empty")
 
-        if not isinstance(stock_id, int) or stock_id <= 0:
+        if stock_id <= 0:
             raise ValueError("Stock ID must be positive")
 
         self._stock_symbol = stock_symbol

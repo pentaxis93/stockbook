@@ -6,7 +6,7 @@ application layer and presentation layer.
 """
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
 
 @dataclass(frozen=True)
@@ -34,11 +34,11 @@ class StockDto:
         if not self.name:
             raise ValueError("Name cannot be empty")
 
-        if self.id is not None and not isinstance(self.id, str):
+        if self.id is not None and not self.id:
             raise ValueError("ID must be a string")
 
     @classmethod
-    def from_entity(cls, entity) -> "StockDto":
+    def from_entity(cls, entity: Any) -> "StockDto":
         """
         Create DTO from domain entity.
 

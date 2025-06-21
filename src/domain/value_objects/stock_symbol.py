@@ -6,6 +6,7 @@ used throughout the trading application.
 """
 
 import re
+from typing import Any
 
 
 class StockSymbol:
@@ -35,9 +36,6 @@ class StockSymbol:
         Raises:
             ValueError: If symbol is invalid format
         """
-        if not isinstance(symbol, str):
-            raise ValueError("Stock symbol must be a string")
-
         # Normalize the symbol
         normalized = self.normalize(symbol)
 
@@ -57,13 +55,13 @@ class StockSymbol:
         """Get the stock symbol value."""
         return self._value
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_value"):  # Object is already initialized
             raise AttributeError("Cannot modify immutable StockSymbol object")
         super().__setattr__(name, value)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality with another StockSymbol object."""
         if not isinstance(other, StockSymbol):
             return False
@@ -92,9 +90,6 @@ class StockSymbol:
         Returns:
             Normalized symbol (uppercase, stripped)
         """
-        if not isinstance(symbol, str):
-            return ""
-
         return symbol.strip().upper()
 
     @classmethod

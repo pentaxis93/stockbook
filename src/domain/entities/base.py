@@ -23,7 +23,7 @@ class BaseEntity(ABC):
         return self._id
 
     @classmethod
-    def from_persistence(cls, id: str, **kwargs):
+    def from_persistence(cls, id: str, **kwargs: Any) -> "BaseEntity":
         """Create entity from persistence layer with existing ID."""
         # This will call the subclass constructor with the id parameter
         return cls(id=id, **kwargs)

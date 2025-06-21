@@ -4,6 +4,8 @@ TargetStatus value object for the StockBook domain.
 Represents target status with validation rules and immutability.
 """
 
+from typing import Any
+
 
 class TargetStatus:
     """
@@ -27,9 +29,6 @@ class TargetStatus:
             TypeError: If value is not a string
             ValueError: If status is not valid
         """
-        if not isinstance(value, str):
-            raise TypeError("Target status must be a string")
-
         # Normalize to lowercase
         normalized_value = value.strip().lower()
 
@@ -53,7 +52,7 @@ class TargetStatus:
         """Developer representation of the target status."""
         return f"TargetStatus({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, TargetStatus):
             return False
@@ -63,7 +62,7 @@ class TargetStatus:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("TargetStatus is immutable")

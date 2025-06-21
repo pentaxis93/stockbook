@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional
+from typing import Any, Optional
 
 from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
@@ -33,9 +33,9 @@ class TransactionEntity(BaseEntity):
     ):
         """Initialize transaction with required value objects and validation."""
         # Validate foreign key IDs are not empty
-        if not portfolio_id or not isinstance(portfolio_id, str):
+        if not portfolio_id:
             raise ValueError("Portfolio ID must be a non-empty string")
-        if not stock_id or not isinstance(stock_id, str):
+        if not stock_id:
             raise ValueError("Stock ID must be a non-empty string")
 
         # Store validated attributes
@@ -102,7 +102,7 @@ class TransactionEntity(BaseEntity):
         return self._notes.has_content()
 
     # Equality and representation
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity."""
         if not isinstance(other, TransactionEntity):
             return False

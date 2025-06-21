@@ -5,7 +5,7 @@ Commands encapsulate user intentions to modify stock-related state
 and contain all necessary data for the operation.
 """
 
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from src.domain.value_objects.stock_symbol import StockSymbol
 
@@ -87,13 +87,13 @@ class CreateStockCommand:
         """Get the notes."""
         return self._notes
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_symbol"):  # Object is already initialized
             raise AttributeError("Cannot modify immutable CreateStockCommand")
         super().__setattr__(name, value)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on all properties."""
         if not isinstance(other, CreateStockCommand):
             return False
@@ -140,7 +140,7 @@ class CreateStockCommand:
         industry_group: Optional[str],
         grade: Optional[str],
         notes: str,
-    ) -> dict:
+    ) -> Dict[str, Any]:
         """Normalize and validate all inputs, returning normalized values."""
         # Normalize inputs
         symbol = self._normalize_symbol(symbol)
@@ -164,7 +164,7 @@ class CreateStockCommand:
             "notes": notes,
         }
 
-    def _set_attributes(self, normalized_inputs: dict) -> None:
+    def _set_attributes(self, normalized_inputs: Dict[str, Any]) -> None:
         """Set all attributes using normalized inputs."""
         object.__setattr__(self, "_symbol", normalized_inputs["symbol"])
         object.__setattr__(self, "_name", normalized_inputs["name"])
@@ -176,15 +176,13 @@ class CreateStockCommand:
     @staticmethod
     def _normalize_symbol(symbol: str) -> str:
         """Normalize symbol format."""
-        if not isinstance(symbol, str):
-            raise ValueError("Symbol must be a string")
+        # Type checking is handled by type annotations
         return symbol.strip().upper()
 
     @staticmethod
     def _normalize_name(name: str) -> str:
         """Normalize company name."""
-        if not isinstance(name, str):
-            raise ValueError("Name must be a string")
+        # Type checking is handled by type annotations
         return name.strip()
 
     @staticmethod
@@ -192,8 +190,7 @@ class CreateStockCommand:
         """Normalize sector."""
         if sector is None:
             return None
-        if not isinstance(sector, str):
-            raise ValueError("Sector must be a string or None")
+        # Type checking is handled by type annotations
         normalized = sector.strip()
         return normalized if normalized else None
 
@@ -202,16 +199,13 @@ class CreateStockCommand:
         """Normalize industry group."""
         if industry_group is None:
             return None
-        if not isinstance(industry_group, str):
-            raise ValueError("Industry group must be a string or None")
         normalized = industry_group.strip()
         return normalized if normalized else None
 
     @staticmethod
     def _normalize_notes(notes: str) -> str:
         """Normalize notes."""
-        if not isinstance(notes, str):
-            raise ValueError("Notes must be a string")
+        # Type checking is handled by type annotations
         return notes.strip()
 
     @staticmethod
@@ -355,14 +349,14 @@ class UpdateStockCommand:
             ]
         )
 
-    def get_update_fields(self) -> dict:
+    def get_update_fields(self) -> Dict[str, Any]:
         """
         Get dictionary of fields that are being updated.
 
         Returns:
             Dictionary with field names as keys and values as values
         """
-        fields = {}
+        fields: Dict[str, Any] = {}
         if self._name is not None:
             fields["name"] = self._name
         if self._sector is not None:
@@ -375,13 +369,13 @@ class UpdateStockCommand:
             fields["notes"] = self._notes
         return fields
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_stock_id"):  # Object is already initialized
             raise AttributeError("Cannot modify immutable UpdateStockCommand")
         super().__setattr__(name, value)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on all properties."""
         if not isinstance(other, UpdateStockCommand):
             return False
@@ -421,7 +415,7 @@ class UpdateStockCommand:
         industry_group: Optional[str],
         grade: Optional[str],
         notes: Optional[str],
-    ) -> dict:
+    ) -> Dict[str, Any]:
         """Validate and normalize all inputs, returning normalized values."""
         # Validate stock_id
         self._validate_stock_id(stock_id)
@@ -452,7 +446,7 @@ class UpdateStockCommand:
             "notes": notes,
         }
 
-    def _set_attributes(self, normalized_inputs: dict) -> None:
+    def _set_attributes(self, normalized_inputs: Dict[str, Any]) -> None:
         """Set all attributes using normalized inputs."""
         object.__setattr__(self, "_stock_id", normalized_inputs["stock_id"])
         object.__setattr__(self, "_name", normalized_inputs["name"])
@@ -464,14 +458,13 @@ class UpdateStockCommand:
     @staticmethod
     def _validate_stock_id(stock_id: str) -> None:
         """Validate stock ID."""
-        if not isinstance(stock_id, str) or not stock_id.strip():
+        if not stock_id.strip():
             raise ValueError("Stock ID must be a non-empty string")
 
     @staticmethod
     def _normalize_name(name: str) -> str:
         """Normalize company name."""
-        if not isinstance(name, str):
-            raise ValueError("Name must be a string")
+        # Type checking is handled by type annotations
         return name.strip()
 
     @staticmethod
@@ -479,24 +472,21 @@ class UpdateStockCommand:
         """Normalize sector."""
         if sector is None:
             return None
-        if not isinstance(sector, str):
-            raise ValueError("Sector must be a string or None")
+        # Type checking is handled by type annotations
         normalized = sector.strip()
         return normalized if normalized else None
 
     @staticmethod
     def _normalize_industry_group(industry_group: str) -> Optional[str]:
         """Normalize industry group."""
-        if not isinstance(industry_group, str):
-            raise ValueError("Industry group must be a string")
+        # Type checking is handled by type annotations
         normalized = industry_group.strip()
         return normalized if normalized else None
 
     @staticmethod
     def _normalize_notes(notes: str) -> str:
         """Normalize notes."""
-        if not isinstance(notes, str):
-            raise ValueError("Notes must be a string")
+        # Type checking is handled by type annotations
         return notes.strip()
 
     @staticmethod

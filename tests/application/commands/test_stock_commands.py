@@ -180,7 +180,7 @@ class TestUpdateStockCommand:
             UpdateStockCommand(stock_id="")
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            UpdateStockCommand(stock_id=-1)
+            UpdateStockCommand(stock_id="   ")  # whitespace-only string
 
     def test_update_stock_command_with_invalid_grade_raises_error(self):
         """Should raise error for invalid grade."""

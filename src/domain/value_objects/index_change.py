@@ -4,6 +4,8 @@ IndexChange value object for the StockBook domain.
 Represents percentage change in portfolio index with validation rules and immutability.
 """
 
+from typing import Any, Union
+
 
 class IndexChange:
     """
@@ -17,7 +19,7 @@ class IndexChange:
     MAX_CHANGE = 100.0
     _value: float
 
-    def __init__(self, value: float):
+    def __init__(self, value: Union[int, float]):
         """
         Initialize IndexChange with validation.
 
@@ -25,11 +27,9 @@ class IndexChange:
             value: The index change percentage as a float
 
         Raises:
-            TypeError: If value is not a number
             ValueError: If index change is outside valid range
         """
-        if not isinstance(value, (int, float)):
-            raise TypeError("Index change must be a number")
+        # Type checking is handled by type annotations
 
         # Convert to float and round to 2 decimal places
         normalized_value = round(float(value), 2)
@@ -67,7 +67,7 @@ class IndexChange:
         """Developer representation of the index change."""
         return f"IndexChange({self._value})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, IndexChange):
             return False
@@ -77,7 +77,7 @@ class IndexChange:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("IndexChange is immutable")

@@ -39,7 +39,10 @@ class IUIOperations(ABC):
 
     @abstractmethod
     def render_data_table(
-        self, data: List[Dict[str, Any]], columns: Optional[List[str]] = None, **kwargs
+        self,
+        data: List[Dict[str, Any]],
+        columns: Optional[List[str]] = None,
+        **kwargs: Any
     ) -> None:
         """Render a data table with the provided data."""
         pass

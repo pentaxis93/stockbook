@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import Money, Notes, TargetStatus
@@ -33,9 +33,9 @@ class TargetEntity(BaseEntity):
     ):
         """Initialize target with required value objects and validation."""
         # Validate foreign key IDs are not empty
-        if not portfolio_id or not isinstance(portfolio_id, str):
+        if not portfolio_id:
             raise ValueError("Portfolio ID must be a non-empty string")
-        if not stock_id or not isinstance(stock_id, str):
+        if not stock_id:
             raise ValueError("Stock ID must be a non-empty string")
 
         # Store validated attributes
@@ -129,7 +129,7 @@ class TargetEntity(BaseEntity):
             self._notes = notes
 
     # Equality and representation
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity (portfolio_id, stock_id)."""
         if not isinstance(other, TargetEntity):
             return False

@@ -6,7 +6,7 @@ operations and business rules consistently across all domains.
 """
 
 from decimal import Decimal
-from typing import Union
+from typing import Any, Union
 
 from .money import BaseNumericValueObject
 
@@ -32,7 +32,7 @@ class Quantity(BaseNumericValueObject):
         """
         super().__init__(value, allow_negative=False)
 
-    def __add__(self, other) -> "Quantity":
+    def __add__(self, other: Any) -> "Quantity":
         """Add two Quantity instances."""
         if isinstance(other, Quantity):
             return Quantity(self._value + other._value)
@@ -41,7 +41,7 @@ class Quantity(BaseNumericValueObject):
 
         raise TypeError("Can only add Quantity or numeric types to Quantity")
 
-    def __sub__(self, other) -> "Quantity":
+    def __sub__(self, other: Any) -> "Quantity":
         """Subtract Quantity from this Quantity."""
         if isinstance(other, Quantity):
             result_value = self._value - other._value
@@ -55,19 +55,15 @@ class Quantity(BaseNumericValueObject):
 
         return Quantity(result_value)
 
-    def __mul__(self, scalar) -> "Quantity":
+    def __mul__(self, scalar: Union[int, float, Decimal]) -> "Quantity":
         """Multiply Quantity by a scalar."""
-        if isinstance(scalar, (int, float, Decimal)):
-            return Quantity(self._value * Decimal(str(scalar)))
-        raise TypeError("Can only multiply Quantity by numeric types")
+        return Quantity(self._value * Decimal(str(scalar)))
 
-    def __truediv__(self, scalar) -> "Quantity":
+    def __truediv__(self, scalar: Union[int, float, Decimal]) -> "Quantity":
         """Divide Quantity by a scalar."""
-        if isinstance(scalar, (int, float, Decimal)):
-            if scalar == 0:
-                raise ZeroDivisionError("Cannot divide by zero")
-            return Quantity(self._value / Decimal(str(scalar)))
-        raise TypeError("Can only divide Quantity by numeric types")
+        if scalar == 0:
+            raise ZeroDivisionError("Cannot divide by zero")
+        return Quantity(self._value / Decimal(str(scalar)))
 
     def is_whole(self) -> bool:
         """Check if quantity is a whole number."""

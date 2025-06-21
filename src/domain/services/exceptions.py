@@ -6,7 +6,7 @@ domain service error scenarios. Designed to teach best practices
 for exception handling in domain-driven design.
 """
 
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 
 class DomainServiceError(Exception):
@@ -17,7 +17,7 @@ class DomainServiceError(Exception):
     All domain service exceptions should inherit from this class.
     """
 
-    def __init__(self, message: str, context: Optional[dict] = None):
+    def __init__(self, message: str, context: Optional[Dict[str, Any]] = None):
         self.message = message
         self.context = context or {}
         super().__init__(message)
@@ -31,8 +31,8 @@ class ValidationError(DomainServiceError):
     Includes optional field and value context for debugging.
     """
 
-    def __init__(self, message: str, field: Optional[str] = None, value=None):
-        context = {}
+    def __init__(self, message: str, field: Optional[str] = None, value: Any = None):
+        context: Dict[str, Any] = {}
         if field:
             context["field"] = field
         if value is not None:
@@ -49,7 +49,7 @@ class CalculationError(DomainServiceError):
     """
 
     def __init__(self, message: str, operation: Optional[str] = None):
-        context = {"operation": operation} if operation else {}
+        context: Dict[str, Any] = {"operation": operation} if operation else {}
         super().__init__(message, context)
 
 
@@ -61,6 +61,6 @@ class InsufficientDataError(DomainServiceError):
     due to missing required information.
     """
 
-    def __init__(self, message: str, required_fields: Optional[list] = None):
-        context = {"required_fields": required_fields or []}
+    def __init__(self, message: str, required_fields: Optional[List[str]] = None):
+        context: Dict[str, Any] = {"required_fields": required_fields or []}
         super().__init__(message, context)

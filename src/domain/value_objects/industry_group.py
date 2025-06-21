@@ -4,6 +4,8 @@ IndustryGroup value object for the StockBook domain.
 Represents an industry group classification with validation rules and immutability.
 """
 
+from typing import Any
+
 
 class IndustryGroup:
     """
@@ -50,7 +52,7 @@ class IndustryGroup:
         """Developer representation of the industry group."""
         return f"IndustryGroup({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, IndustryGroup):
             return False
@@ -60,7 +62,7 @@ class IndustryGroup:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("IndustryGroup is immutable")

@@ -4,6 +4,8 @@ PortfolioName value object for the StockBook domain.
 Represents portfolio names with validation rules and immutability.
 """
 
+from typing import Any
+
 
 class PortfolioName:
     """
@@ -27,9 +29,6 @@ class PortfolioName:
             TypeError: If value is not a string
             ValueError: If portfolio name is empty or exceeds maximum length
         """
-        if not isinstance(value, str):
-            raise TypeError("Portfolio name must be a string")
-
         # Strip whitespace
         normalized_value = value.strip()
 
@@ -57,7 +56,7 @@ class PortfolioName:
         """Developer representation of the portfolio name."""
         return f"PortfolioName({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, PortfolioName):
             return False
@@ -67,7 +66,7 @@ class PortfolioName:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("PortfolioName is immutable")

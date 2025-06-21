@@ -5,7 +5,7 @@ Represents notes/comments with validation rules and immutability.
 """
 
 from abc import ABC
-from typing import Optional
+from typing import Any, Optional
 
 
 class BaseTextValueObject(ABC):
@@ -33,9 +33,6 @@ class BaseTextValueObject(ABC):
             TypeError: If value is not a string
             ValueError: If validation fails
         """
-        if not isinstance(value, str):
-            raise TypeError(f"{self.__class__.__name__} must be a string")
-
         # Strip whitespace
         normalized_value = value.strip()
 
@@ -74,7 +71,7 @@ class BaseTextValueObject(ABC):
         """Developer representation of the value."""
         return f"{self.__class__.__name__}({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, self.__class__):
             return False
@@ -84,7 +81,7 @@ class BaseTextValueObject(ABC):
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError(f"{self.__class__.__name__} is immutable")

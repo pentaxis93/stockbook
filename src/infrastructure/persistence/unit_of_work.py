@@ -7,7 +7,7 @@ within a transactional context.
 
 import sqlite3
 from contextlib import contextmanager
-from typing import Generator, Optional
+from typing import Any, Generator, Optional, Type
 
 from src.domain.repositories.interfaces import (
     IJournalRepository,
@@ -139,7 +139,12 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
             self._connection = self.db_connection.get_connection()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_val: Optional[BaseException],
+        exc_tb: Optional[Any],
+    ) -> None:
         """
         Exit transaction context.
 
@@ -158,7 +163,9 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
             self._handle_transaction_completion(exc_type)
             self._cleanup_resources()
 
-    def _handle_transaction_completion(self, exc_type) -> None:
+    def _handle_transaction_completion(
+        self, exc_type: Optional[Type[BaseException]]
+    ) -> None:
         """Handle transaction commit or rollback based on exception status."""
         if self._connection:
             try:

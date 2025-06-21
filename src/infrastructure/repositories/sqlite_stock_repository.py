@@ -6,7 +6,7 @@ while fulfilling the domain repository contract.
 """
 
 import sqlite3
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from src.domain.entities.stock_entity import StockEntity
 from src.domain.repositories.interfaces import IStockRepository
@@ -325,10 +325,10 @@ class SqliteStockRepository(IStockRepository):
         sector_filter: Optional[str],
         industry_filter: Optional[str],
         grade_filter: Optional[str],
-    ) -> tuple[List[str], List[str]]:
+    ) -> Tuple[List[str], List[str]]:
         """Build WHERE clauses and parameters for search filters."""
-        where_clauses = []
-        parameters = []
+        where_clauses: List[str] = []
+        parameters: List[str] = []
 
         # Add all filter types using helper method
         self._add_like_filter(where_clauses, parameters, "UPPER(symbol)", symbol_filter)

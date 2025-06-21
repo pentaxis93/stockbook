@@ -34,7 +34,7 @@ class CreateStockRequest:
         Returns:
             Dictionary of field errors, empty if valid
         """
-        errors = {}
+        errors: Dict[str, str] = {}
 
         # Validate symbol
         if not self.symbol or not self.symbol.strip():
@@ -106,10 +106,10 @@ class UpdateStockRequest:
 
     def validate(self) -> Dict[str, str]:
         """Validate the update request data."""
-        errors = {}
+        errors: Dict[str, str] = {}
 
         # Validate stock_id
-        if not isinstance(self.stock_id, str) or not self.stock_id.strip():
+        if not self.stock_id.strip():
             errors["stock_id"] = "Stock ID must be a non-empty string"
 
         # Only validate name if it's being updated
@@ -442,7 +442,7 @@ class StockSearchRequest:
     @property
     def active_filters(self) -> Dict[str, str]:
         """Get dictionary of active filters."""
-        filters = {}
+        filters: Dict[str, str] = {}
 
         if self.symbol_filter:
             filters["symbol"] = self.symbol_filter
@@ -457,7 +457,7 @@ class StockSearchRequest:
 
     def validate(self) -> Dict[str, str]:
         """Validate search parameters."""
-        errors = {}
+        errors: Dict[str, str] = {}
 
         if self.grade_filter and self.grade_filter not in ["A", "B", "C"]:
             errors["grade_filter"] = "Grade must be A, B, or C"

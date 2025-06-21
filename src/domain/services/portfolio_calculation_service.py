@@ -83,7 +83,7 @@ class PortfolioCalculationService:
         if total_value.amount == 0:
             return []
 
-        allocations = []
+        allocations: List[PositionAllocation] = []
         for stock, quantity in portfolio:
             symbol_str = str(stock.symbol)
             current_price = prices[symbol_str]
@@ -125,7 +125,7 @@ class PortfolioCalculationService:
             industry_values[industry] += position_value.amount
 
         # Convert to percentages
-        industry_percentages = {}
+        industry_percentages: Dict[str, Decimal] = {}
         for industry, value in industry_values.items():
             percentage = (
                 (value / total_value.amount) * Decimal("100")

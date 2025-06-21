@@ -4,6 +4,8 @@ Grade value object for the StockBook domain.
 Represents a stock grade with validation rules and immutability.
 """
 
+from typing import Any
+
 
 class Grade:
     """
@@ -52,7 +54,7 @@ class Grade:
         """Developer representation of the grade."""
         return f"Grade({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, Grade):
             return False
@@ -62,7 +64,7 @@ class Grade:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("Grade is immutable")

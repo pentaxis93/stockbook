@@ -4,6 +4,8 @@ TransactionType value object for the StockBook domain.
 Represents transaction types (buy/sell) with validation rules and immutability.
 """
 
+from typing import Any
+
 
 class TransactionType:
     """
@@ -27,8 +29,7 @@ class TransactionType:
             TypeError: If value is not a string
             ValueError: If transaction type is not 'buy' or 'sell'
         """
-        if not isinstance(value, str):
-            raise TypeError("Transaction type must be a string")
+        # Type checking is handled by type annotations
 
         # Normalize to lowercase and strip whitespace
         normalized_value = value.strip().lower()
@@ -73,7 +74,7 @@ class TransactionType:
         """Developer representation of the transaction type."""
         return f"TransactionType({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, TransactionType):
             return False
@@ -83,7 +84,7 @@ class TransactionType:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("TransactionType is immutable")

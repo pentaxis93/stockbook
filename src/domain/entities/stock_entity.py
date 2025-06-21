@@ -5,7 +5,7 @@ Represents a stock/security in the trading system with business logic
 and validation rules encapsulated within the entity.
 """
 
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import (
@@ -15,9 +15,9 @@ from src.domain.value_objects import (
     Money,
     Notes,
     Quantity,
+    Sector,
+    StockSymbol,
 )
-from src.domain.value_objects.sector import Sector
-from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class StockEntity(BaseEntity):
@@ -27,6 +27,14 @@ class StockEntity(BaseEntity):
     Encapsulates business logic for stock operations including
     validation, calculations, and state management.
     """
+
+    # Type annotations for instance variables
+    _symbol: StockSymbol
+    _company_name: CompanyName
+    _sector_vo: Optional[Sector]
+    _industry_group_vo: Optional[IndustryGroup]
+    _grade_vo: Optional[Grade]
+    _notes_vo: Notes
 
     def __init__(
         self,
@@ -102,7 +110,7 @@ class StockEntity(BaseEntity):
         """Get the notes value object."""
         return self._notes_vo
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """
         Check equality based on business key (symbol).
 
@@ -150,7 +158,7 @@ class StockEntity(BaseEntity):
         """
         return self._notes_vo.has_content()
 
-    def update_fields(self, **kwargs) -> None:
+    def update_fields(self, **kwargs: Any) -> None:
         """
         Update multiple fields at once.
 
@@ -170,9 +178,9 @@ class StockEntity(BaseEntity):
         # All validation passed, now update the actual fields
         self._apply_field_updates(temp_values)
 
-    def _create_temp_value_objects(self, kwargs: dict) -> dict:
+    def _create_temp_value_objects(self, kwargs: Dict[str, Any]) -> Dict[str, Any]:
         """Create temporary value objects for validation."""
-        temp_values = {}
+        temp_values: Dict[str, Any] = {}
 
         if "name" in kwargs:
             temp_values["company_name"] = CompanyName(kwargs["name"])
@@ -195,7 +203,7 @@ class StockEntity(BaseEntity):
         return temp_values
 
     def _validate_and_adjust_sector_industry(
-        self, kwargs: dict, temp_values: dict
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
     ) -> None:
         """Validate sector-industry combination and adjust if needed."""
         new_sector = kwargs.get("sector", self.sector.value if self.sector else None)
@@ -212,7 +220,9 @@ class StockEntity(BaseEntity):
         # Validate the final sector-industry combination
         self._validate_sector_industry_combination(new_sector, new_industry_group)
 
-    def _should_clear_industry_group_for_new_sector(self, new_sector: str) -> bool:
+    def _should_clear_industry_group_for_new_sector(
+        self, new_sector: Optional[str]
+    ) -> bool:
         """Check if current industry group should be cleared for new sector."""
         return (
             self.industry_group is not None
@@ -222,7 +232,7 @@ class StockEntity(BaseEntity):
             )
         )
 
-    def _apply_field_updates(self, temp_values: dict) -> None:
+    def _apply_field_updates(self, temp_values: Dict[str, Any]) -> None:
         """Apply validated field updates to the entity."""
         if "company_name" in temp_values:
             self._company_name = temp_values["company_name"]

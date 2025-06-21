@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from src.domain.entities.base import BaseEntity
 from src.domain.value_objects import JournalContent
@@ -31,15 +31,11 @@ class JournalEntryEntity(BaseEntity):
     ):
         """Initialize journal entry with required value objects and validation."""
         # Validate optional foreign key IDs
-        if portfolio_id is not None and (
-            not isinstance(portfolio_id, str) or not portfolio_id
-        ):
+        if portfolio_id is not None and not portfolio_id:
             raise ValueError("Portfolio ID must be a non-empty string")
-        if stock_id is not None and (not isinstance(stock_id, str) or not stock_id):
+        if stock_id is not None and not stock_id:
             raise ValueError("Stock ID must be a non-empty string")
-        if transaction_id is not None and (
-            not isinstance(transaction_id, str) or not transaction_id
-        ):
+        if transaction_id is not None and not transaction_id:
             raise ValueError("Transaction ID must be a non-empty string")
 
         # Store validated attributes
@@ -101,7 +97,7 @@ class JournalEntryEntity(BaseEntity):
             self._content = content
 
     # Equality and representation
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity (entry_date, content)."""
         if not isinstance(other, JournalEntryEntity):
             return False

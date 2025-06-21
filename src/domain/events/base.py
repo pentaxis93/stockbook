@@ -7,7 +7,7 @@ loose coupling between aggregates and bounded contexts.
 
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 
 
 class DomainEvent:
@@ -38,7 +38,7 @@ class DomainEvent:
         """Get when the event occurred."""
         return self._occurred_at
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on event ID."""
         if not isinstance(other, DomainEvent):
             return False

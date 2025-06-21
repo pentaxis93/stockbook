@@ -150,7 +150,7 @@ class SectorIndustryService:
                 return sector
 
         # Collect all available industry groups for error message
-        all_industries = []
+        all_industries: List[str] = []
         for industries in self.SECTOR_INDUSTRY_MAPPING.values():
             all_industries.extend(industries)
 

@@ -8,7 +8,7 @@ while fulfilling the domain repository contract.
 import sqlite3
 from datetime import date
 from decimal import Decimal
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 from src.domain.repositories.interfaces import IPortfolioBalanceRepository
@@ -152,7 +152,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
                 ORDER BY balance_date DESC
             """
 
-            params: list = [portfolio_id]
+            params: List[Any] = [portfolio_id]
             if limit is not None:
                 query += " LIMIT ?"
                 params.append(limit)

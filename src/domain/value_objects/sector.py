@@ -4,6 +4,8 @@ Sector value object for the StockBook domain.
 Represents a sector classification with validation rules and immutability.
 """
 
+from typing import Any
+
 
 class Sector:
     """
@@ -52,7 +54,7 @@ class Sector:
         """Developer representation of the sector."""
         return f"Sector({self._value!r})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Check equality based on value."""
         if not isinstance(other, Sector):
             return False
@@ -62,7 +64,7 @@ class Sector:
         """Hash based on value for use in collections."""
         return hash(self._value)
 
-    def __setattr__(self, name, value):
+    def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
             raise AttributeError("Sector is immutable")

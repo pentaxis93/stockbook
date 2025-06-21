@@ -8,7 +8,7 @@ arithmetic operations, and business rules consistently across all domains.
 import decimal
 from abc import ABC
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Union
+from typing import Any, Union
 
 
 class BaseNumericValueObject(ABC):
@@ -56,7 +56,7 @@ class BaseNumericValueObject(ABC):
         """Developer representation."""
         return f"{self.__class__.__name__}({self._value})"
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         """Equality comparison."""
         if not isinstance(other, self.__class__):
             return False
@@ -66,7 +66,7 @@ class BaseNumericValueObject(ABC):
         """Hash for use in sets and as dict keys."""
         return hash(self._value)
 
-    def __lt__(self, other) -> bool:
+    def __lt__(self, other: Any) -> bool:
         """Less than comparison."""
         if not isinstance(other, self.__class__):
             raise TypeError(
@@ -74,7 +74,7 @@ class BaseNumericValueObject(ABC):
             )
         return self._value < other._value
 
-    def __le__(self, other) -> bool:
+    def __le__(self, other: Any) -> bool:
         """Less than or equal comparison."""
         if not isinstance(other, self.__class__):
             raise TypeError(
@@ -82,7 +82,7 @@ class BaseNumericValueObject(ABC):
             )
         return self._value <= other._value
 
-    def __gt__(self, other) -> bool:
+    def __gt__(self, other: Any) -> bool:
         """Greater than comparison."""
         if not isinstance(other, self.__class__):
             raise TypeError(
@@ -90,7 +90,7 @@ class BaseNumericValueObject(ABC):
             )
         return self._value > other._value
 
-    def __ge__(self, other) -> bool:
+    def __ge__(self, other: Any) -> bool:
         """Greater than or equal comparison."""
         if not isinstance(other, self.__class__):
             raise TypeError(
@@ -98,7 +98,7 @@ class BaseNumericValueObject(ABC):
             )
         return self._value >= other._value
 
-    def __add__(self, other):
+    def __add__(self, other: Any) -> "BaseNumericValueObject":
         """Add two instances of the same type."""
         if isinstance(other, self.__class__):
             return self.__class__(self._value + other._value)
@@ -108,7 +108,7 @@ class BaseNumericValueObject(ABC):
             f"Can only add {self.__class__.__name__} to {self.__class__.__name__} or numeric types"
         )
 
-    def __sub__(self, other):
+    def __sub__(self, other: Any) -> "BaseNumericValueObject":
         """Subtract instances or numeric values."""
         if isinstance(other, self.__class__):
             result_value = self._value - other._value
@@ -123,9 +123,7 @@ class BaseNumericValueObject(ABC):
 
     def __mul__(self, scalar: Union[int, float, Decimal]):
         """Multiply by a scalar."""
-        if isinstance(scalar, (int, float, Decimal)):
-            return self.__class__(self._value * Decimal(str(scalar)))
-        raise TypeError(f"Can only multiply {self.__class__.__name__} by numeric types")
+        return self.__class__(self._value * Decimal(str(scalar)))
 
     def __rmul__(self, scalar: Union[int, float, Decimal]):
         """Right multiplication (scalar * instance)."""
@@ -133,17 +131,15 @@ class BaseNumericValueObject(ABC):
 
     def __truediv__(self, scalar: Union[int, float, Decimal]):
         """Divide by a scalar."""
-        if isinstance(scalar, (int, float, Decimal)):
-            if scalar == 0:
-                raise ZeroDivisionError("Cannot divide by zero")
-            return self.__class__(self._value / Decimal(str(scalar)))
-        raise TypeError(f"Can only divide {self.__class__.__name__} by numeric types")
+        if scalar == 0:
+            raise ZeroDivisionError("Cannot divide by zero")
+        return self.__class__(self._value / Decimal(str(scalar)))
 
-    def __neg__(self):
+    def __neg__(self) -> "BaseNumericValueObject":
         """Negate the value."""
         return self.__class__(-self._value)
 
-    def __abs__(self):
+    def __abs__(self) -> "BaseNumericValueObject":
         """Absolute value."""
         return self.__class__(abs(self._value))
 
@@ -160,7 +156,7 @@ class BaseNumericValueObject(ABC):
         return self._value < Decimal("0")
 
     @classmethod
-    def zero(cls):
+    def zero(cls) -> "BaseNumericValueObject":
         """Create zero instance."""
         return cls(Decimal("0"))
 
@@ -202,13 +198,13 @@ class Money(BaseNumericValueObject):
         formatted_amount = self._value.quantize(Decimal("0.01"))
         return f"Money({formatted_amount})"
 
-    def __add__(self, other) -> "Money":
+    def __add__(self, other: Any) -> "Money":
         """Add two Money instances."""
         if not isinstance(other, Money):
             raise TypeError("Can only add Money to Money")
         return Money(self._value + other._value)
 
-    def __sub__(self, other) -> "Money":
+    def __sub__(self, other: Any) -> "Money":
         """Subtract two Money instances."""
         if not isinstance(other, Money):
             raise TypeError("Can only subtract Money from Money")
@@ -216,17 +212,13 @@ class Money(BaseNumericValueObject):
 
     def __mul__(self, scalar: Union[int, float, Decimal]) -> "Money":
         """Multiply Money by a scalar."""
-        if isinstance(scalar, (int, float, Decimal)):
-            return Money(self._value * Decimal(str(scalar)))
-        raise TypeError("Can only multiply Money by numeric types")
+        return Money(self._value * Decimal(str(scalar)))
 
     def __truediv__(self, scalar: Union[int, float, Decimal]) -> "Money":
         """Divide Money by a scalar."""
-        if isinstance(scalar, (int, float, Decimal)):
-            if scalar == 0:
-                raise ZeroDivisionError("Cannot divide by zero")
-            return Money(self._value / Decimal(str(scalar)))
-        raise TypeError("Can only divide Money by numeric types")
+        if scalar == 0:
+            raise ZeroDivisionError("Cannot divide by zero")
+        return Money(self._value / Decimal(str(scalar)))
 
     def __neg__(self) -> "Money":
         """Negate Money amount."""
