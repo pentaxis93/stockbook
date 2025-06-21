@@ -83,7 +83,7 @@ class DIContainer:
             raise InvalidRegistrationError(
                 service_type,
                 f"Failed to register singleton {service_type.__name__}: {str(e)}",
-            )
+            ) from e
 
     def register_transient(
         self, service_type: Type[T], implementation_type: Optional[Type[T]] = None
@@ -123,7 +123,7 @@ class DIContainer:
             raise InvalidRegistrationError(
                 service_type,
                 f"Failed to register transient {service_type.__name__}: {str(e)}",
-            )
+            ) from e
 
     def register_instance(self, service_type: Type[T], instance: T) -> None:
         """
@@ -162,7 +162,7 @@ class DIContainer:
             raise InvalidRegistrationError(
                 service_type,
                 f"Failed to register instance for {service_type.__name__}: {str(e)}",
-            )
+            ) from e
 
     def register_factory(self, service_type: Type[T], factory: Callable[[], T]) -> None:
         """
@@ -200,7 +200,7 @@ class DIContainer:
             raise InvalidRegistrationError(
                 service_type,
                 f"Failed to register factory for {service_type.__name__}: {str(e)}",
-            )
+            ) from e
 
     def resolve(self, service_type: Type[T]) -> T:
         """
@@ -247,7 +247,7 @@ class DIContainer:
                     service_type,
                     f"Failed to resolve {service_type.__name__}: {str(e)}",
                     self._resolution_chain.copy(),
-                )
+                ) from e
 
         finally:
             # Remove from resolution chain

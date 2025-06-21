@@ -162,6 +162,16 @@ class StockEntity(BaseEntity):
             ValueError: If any field is invalid
         """
         # Create temporary value objects for validation first (atomic operation)
+        temp_values = self._create_temp_value_objects(kwargs)
+
+        # Handle sector-industry domain logic and validation
+        self._validate_and_adjust_sector_industry(kwargs, temp_values)
+
+        # All validation passed, now update the actual fields
+        self._apply_field_updates(temp_values)
+
+    def _create_temp_value_objects(self, kwargs: dict) -> dict:
+        """Create temporary value objects for validation."""
         temp_values = {}
 
         if "name" in kwargs:
@@ -182,7 +192,12 @@ class StockEntity(BaseEntity):
         if "notes" in kwargs:
             temp_values["notes_vo"] = Notes(kwargs["notes"])
 
-        # Now handle sector-industry domain logic
+        return temp_values
+
+    def _validate_and_adjust_sector_industry(
+        self, kwargs: dict, temp_values: dict
+    ) -> None:
+        """Validate sector-industry combination and adjust if needed."""
         new_sector = kwargs.get("sector", self.sector.value if self.sector else None)
         new_industry_group = kwargs.get(
             "industry_group", self.industry_group.value if self.industry_group else None
@@ -190,22 +205,25 @@ class StockEntity(BaseEntity):
 
         # Special logic: if changing sector, check if current industry_group is compatible
         if "sector" in kwargs and "industry_group" not in kwargs:
-            # User is only changing sector, check if current industry_group is still valid
-            if (
-                self.industry_group is not None
-                and new_sector is not None
-                and not self._sector_industry_service.validate_sector_industry_combination(
-                    new_sector, self.industry_group.value
-                )
-            ):
-                # Current industry_group is not valid for new sector, clear it
+            if self._should_clear_industry_group_for_new_sector(new_sector):
                 new_industry_group = None
                 temp_values["industry_group_vo"] = None
 
         # Validate the final sector-industry combination
         self._validate_sector_industry_combination(new_sector, new_industry_group)
 
-        # All validation passed, now update the actual fields
+    def _should_clear_industry_group_for_new_sector(self, new_sector: str) -> bool:
+        """Check if current industry group should be cleared for new sector."""
+        return (
+            self.industry_group is not None
+            and new_sector is not None
+            and not self._sector_industry_service.validate_sector_industry_combination(
+                new_sector, self.industry_group.value
+            )
+        )
+
+    def _apply_field_updates(self, temp_values: dict) -> None:
+        """Apply validated field updates to the entity."""
         if "company_name" in temp_values:
             self._company_name = temp_values["company_name"]
         if "sector_vo" in temp_values:

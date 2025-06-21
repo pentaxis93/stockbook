@@ -17,7 +17,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Union
 
 
 class ConfigError(Exception):
@@ -205,8 +205,8 @@ class Config:
             return default
         try:
             return int(value)
-        except ValueError:
-            raise ConfigError(f"Invalid integer value for {key}: {value}")
+        except ValueError as exc:
+            raise ConfigError(f"Invalid integer value for {key}: {value}") from exc
 
     def _get_env_float(self, key: str, default: float) -> float:
         """Get float value from environment with default."""
@@ -215,8 +215,8 @@ class Config:
             return default
         try:
             return float(value)
-        except ValueError:
-            raise ConfigError(f"Invalid float value for {key}: {value}")
+        except ValueError as exc:
+            raise ConfigError(f"Invalid float value for {key}: {value}") from exc
 
     def _get_env_bool(self, key: str, default: bool) -> bool:
         """Get boolean value from environment with default."""
@@ -281,7 +281,9 @@ class Config:
         try:
             re.compile(self.stock_symbol_pattern)
         except re.error as e:
-            raise ValidationError(f"Invalid regex pattern for stock symbols: {e}")
+            raise ValidationError(
+                f"Invalid regex pattern for stock symbols: {e}"
+            ) from e
 
     def get_db_connection_string(self) -> str:
         """Get database connection string."""

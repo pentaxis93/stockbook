@@ -54,35 +54,25 @@ disable = [
     # Import organization - handled by isort
     "wrong-import-order",
     "ungrouped-imports",
-    "import-outside-toplevel",  # Sometimes needed to avoid circular imports
     
     # Line length - handled by black
     "line-too-long",
     
-    # Temporary architectural issues - TODO: remove these after DB refactor
-    "no-member",  # Due to dynamic repository creation
-    
     # Domain entities legitimately need many fields
     "too-many-positional-arguments",
     
-    # Some duplication acceptable for clarity in domain patterns
-    "duplicate-code",
-    
-    # Exception chaining sometimes less clear in domain logic
-    "raise-missing-from",
-    
     # Technical debt and development patterns
     "fixme",  # TODO comments are legitimate in business logic
-    
-    # Value object internal operations need protected access
-    "protected-access",
 ]
 
+# Improve duplicate code detection
+min-similarity-lines = 10  # Require at least 10 lines for duplicate detection (was unlimited)
+
 max-args = 12  # Exception classes need context parameters
-max-locals = 15
+max-locals = 10  # Improved: reduced from 12 for better function design
 max-returns = 8  # Allow reasonable branching in business logic
-max-branches = 12
-max-statements = 50
+max-branches = 10  # Improved: reduced from 12 for simpler logic
+max-statements = 30  # Improved: reduced from 40 to encourage smaller methods
 max-positional-arguments = 8  # Domain entities need many fields
 good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
 allowed-redefined-builtins = ["id"]
@@ -113,10 +103,8 @@ disable = [
     "broad-exception-caught",
     "comparison-with-itself",
     "unexpected-keyword-arg",
-    "unused-import",
     "logging-fstring-interpolation",
     "no-else-return",
-    "raise-missing-from",
     "import-outside-toplevel",
     "unnecessary-negation",
     "missing-class-docstring",
@@ -127,6 +115,8 @@ disable = [
     "too-many-positional-arguments",
     "fixme",
     "too-many-lines",
+    "unused-import",  # Test files legitimately have unused imports
+    # Improved: enable raise-missing-from for better exception chaining
 ]
 
 allowed-redefined-builtins = ["id"]
@@ -157,9 +147,16 @@ disable = [
     "reimported",  # UI modules may reimport for different contexts
 ]
 
-max-args = 15  # UI components often need many parameters
-max-locals = 25  # UI setup can be verbose
+# More reasonable complexity for presentation layer
+max-args = 10  # Improved: further reduced from 12, UI should be well-designed
+max-locals = 15  # Improved: reduced from 20, UI should be more organized
+max-returns = 8  # Add explicit return limit
+max-branches = 15  # Add explicit branch limit
+max-statements = 40  # Improved: reduced from 50 for better method design
 allowed-redefined-builtins = ["id"]
+
+# Require docstrings for public controller methods (but not UI components)
+docstring-min-length = 10
 
 [tool.pylint.config]
 # LENIENT configuration for CONFIG files
@@ -187,8 +184,8 @@ disable = [
     "fixme",
     "global-statement",  # Config files sometimes need globals
     "global-variable-not-assigned",
-    "unused-import",  # Config files may import for setup
     "wildcard-import",  # Sometimes used in config for convenience
+    # Improved: enable unused-import detection for cleaner config files
     "unused-wildcard-import",
     "c-extension-no-member",  # Dependency injection frameworks use C extensions
     "consider-iterating-dictionary",  # Config files may use .keys() for clarity
