@@ -113,7 +113,7 @@ stockbook/
 
 **Test Coverage**: Comprehensive test suite with high coverage
 **Architecture Compliance**: 100% clean architecture principles
-**Code Quality**: Type-safe with comprehensive error handling
+**Code Quality**: Strict linting (pylint 10/10), type-safe (pyright standard mode), comprehensive error handling
 
 ## Contributing
 

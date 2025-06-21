@@ -62,12 +62,12 @@ echo "Starting parallel pylint analysis..."
 
 # Core business logic - strictest rules
 CORE_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,unnecessary-pass,wrong-import-order,ungrouped-imports,line-too-long,too-many-positional-arguments,fixme"
-CORE_ARGS="--allowed-redefined-builtins=id --max-args=12 --max-locals=8 --max-returns=8 --max-branches=10 --max-statements=25 --max-positional-arguments=8 --min-similarity-lines=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10"
+CORE_ARGS="--allowed-redefined-builtins=id --max-args=12 --max-locals=6 --max-returns=8 --max-branches=8 --max-statements=20 --max-positional-arguments=8 --min-similarity-lines=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10"
 run_pylint_check "core" "$CORE_FILES" "$CORE_DISABLE" "$CORE_ARGS"
 
 # Presentation layer - moderate rules  
-PRES_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,too-many-arguments,too-many-positional-arguments,fixme,duplicate-code,import-outside-toplevel,broad-exception-caught,missing-class-docstring,consider-using-join,reimported"
-PRES_ARGS="--allowed-redefined-builtins=id --max-args=10 --max-locals=12 --max-returns=8 --max-branches=15 --max-statements=35 --docstring-min-length=10"
+PRES_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,too-many-arguments,too-many-positional-arguments,fixme,duplicate-code,import-outside-toplevel,broad-exception-caught,consider-using-join,reimported"
+PRES_ARGS="--allowed-redefined-builtins=id --max-args=8 --max-locals=10 --max-returns=8 --max-branches=15 --max-statements=35 --docstring-min-length=10"
 run_pylint_check "presentation" "$PRESENTATION_FILES" "$PRES_DISABLE" "$PRES_ARGS"
 
 # Configuration files - most lenient

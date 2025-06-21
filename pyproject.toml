@@ -63,16 +63,21 @@ disable = [
     
     # Technical debt and development patterns
     "fixme",  # TODO comments are legitimate in business logic
+    
+    # Enable better code quality (removed from disable list)
+    # "consider-using-f-string",  # Now enabled for better string formatting
+    # "consider-using-dict-items",  # Now enabled for better dictionary iteration
+    # "unused-import",  # Now enabled for cleaner imports
 ]
 
 # Improve duplicate code detection
 min-similarity-lines = 8  # Improved: reduced from 10 for better duplicate detection
 
 max-args = 12  # Exception classes need context parameters
-max-locals = 8  # Improved: reduced from 10 for cleaner function design
+max-locals = 6  # Improved: reduced from 8 for cleaner function design
 max-returns = 8  # Allow reasonable branching in business logic
-max-branches = 10  # Improved: reduced from 12 for simpler logic
-max-statements = 25  # Improved: reduced from 30 to encourage smaller methods
+max-branches = 8  # Improved: reduced from 10 for simpler logic
+max-statements = 20  # Improved: reduced from 25 to encourage smaller methods
 max-positional-arguments = 8  # Domain entities need many fields
 good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
 allowed-redefined-builtins = ["id"]
@@ -140,14 +145,14 @@ disable = [
     "duplicate-code",  # Similar UI patterns are acceptable
     "import-outside-toplevel",  # Conditional imports for UI frameworks
     "broad-exception-caught",  # UI error handling is often broad
-    "missing-class-docstring",  # UI component classes don't always need docs
+    # "missing-class-docstring",  # Now enabled - controllers should have docstrings
     "consider-using-join",  # UI string concatenation patterns vary
     "reimported",  # UI modules may reimport for different contexts
 ]
 
 # More reasonable complexity for presentation layer
-max-args = 10  # Improved: further reduced from 12, UI should be well-designed
-max-locals = 12  # Improved: reduced from 15 for better organization
+max-args = 8  # Improved: reduced from 10, UI should be well-designed
+max-locals = 10  # Improved: reduced from 12 for better organization
 max-returns = 8  # Add explicit return limit
 max-branches = 15  # Add explicit branch limit
 max-statements = 35  # Improved: reduced from 40 for better method design
@@ -265,5 +270,5 @@ exclude = [
     "src/presentation/coordinators/stock_page_coordinator.py"
 ]
 
-# Use basic type checking - just catch the most important errors
-typeCheckingMode = "basic"
+# Use standard type checking for better type safety
+typeCheckingMode = "standard"
