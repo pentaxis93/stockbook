@@ -6,6 +6,17 @@
 
 set -e
 
+# Performance timing
+SCRIPT_START_TIME=$(date +%s.%3N)
+
+# Python pre-warming to cache imports and reduce cold-start overhead
+echo "⚡ Pre-warming Python environment..."
+PREWARM_START=$(date +%s.%3N)
+python -c "import src; import tests" &>/dev/null || true
+PREWARM_END=$(date +%s.%3N)
+PREWARM_TIME=$(echo "$PREWARM_END - $PREWARM_START" | bc -l)
+echo "✅ Pre-warming completed in ${PREWARM_TIME}s"
+
 # Track background processes for parallel execution
 declare -a PYLINT_PIDS=()
 declare -a PYLINT_RESULTS=()
@@ -323,4 +334,10 @@ if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT
 fi
 
 echo "✅ All pre-commit checks passed!"
+
+# Performance reporting
+SCRIPT_END_TIME=$(date +%s.%3N)
+TOTAL_TIME=$(echo "$SCRIPT_END_TIME - $SCRIPT_START_TIME" | bc -l)
+echo "⏱️  Total execution time: ${TOTAL_TIME}s (including ${PREWARM_TIME}s pre-warming)"
+
 exit 0
