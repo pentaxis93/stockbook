@@ -7,6 +7,7 @@ within a transactional context.
 
 import sqlite3
 from contextlib import contextmanager
+from dataclasses import dataclass
 from typing import Any, Generator, Optional, Type
 
 from src.domain.repositories.interfaces import (
@@ -79,6 +80,18 @@ class TransactionalDatabaseConnection(IDatabaseConnection):
         self.original_db_connection.initialize_schema()
 
 
+@dataclass
+class RepositoryContainer:
+    """Container for repository instances in Unit of Work."""
+
+    stocks: Optional[IStockRepository] = None
+    portfolios: Optional[IPortfolioRepository] = None
+    transactions: Optional[ITransactionRepository] = None
+    targets: Optional[ITargetRepository] = None
+    balances: Optional[IPortfolioBalanceRepository] = None
+    journal: Optional[IJournalRepository] = None
+
+
 class SqliteUnitOfWork(IStockBookUnitOfWork):
     """
     SQLite-based implementation of the Unit of Work pattern.
@@ -96,12 +109,7 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
         """
         self.db_connection = db_connection
         self._connection: Optional[sqlite3.Connection] = None
-        self._stocks: Optional[IStockRepository] = None
-        self._portfolios: Optional[IPortfolioRepository] = None
-        self._transactions: Optional[ITransactionRepository] = None
-        self._targets: Optional[ITargetRepository] = None
-        self._balances: Optional[IPortfolioBalanceRepository] = None
-        self._journal: Optional[IJournalRepository] = None
+        self._repositories = RepositoryContainer()
         self._nesting_level: int = 0
 
     @property
@@ -112,17 +120,17 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
         Returns:
             Stock repository instance
         """
-        if self._stocks is None:
+        if self._repositories.stocks is None:
             if self._connection is None:
                 # Return a repository that can be accessed but will fail on operations
-                self._stocks = SqliteStockRepository(self.db_connection)
+                self._repositories.stocks = SqliteStockRepository(self.db_connection)
             else:
                 # Create a special connection wrapper for transactional context
                 connection_wrapper = TransactionalDatabaseConnection(
                     self._connection, self.db_connection
                 )
-                self._stocks = SqliteStockRepository(connection_wrapper)
-        return self._stocks
+                self._repositories.stocks = SqliteStockRepository(connection_wrapper)
+        return self._repositories.stocks
 
     def __enter__(self) -> "SqliteUnitOfWork":
         """
@@ -179,12 +187,7 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
     def _cleanup_resources(self) -> None:
         """Clean up all resources after transaction completion."""
         self._connection = None
-        self._stocks = None
-        self._portfolios = None
-        self._transactions = None
-        self._targets = None
-        self._balances = None
-        self._journal = None
+        self._repositories = RepositoryContainer()
 
     def commit(self) -> None:
         """
@@ -209,64 +212,76 @@ class SqliteUnitOfWork(IStockBookUnitOfWork):
     @property
     def portfolios(self) -> IPortfolioRepository:
         """Get portfolio repository instance."""
-        if self._portfolios is None:
+        if self._repositories.portfolios is None:
             if self._connection is None:
-                self._portfolios = SqlitePortfolioRepository(self.db_connection)
+                self._repositories.portfolios = SqlitePortfolioRepository(
+                    self.db_connection
+                )
             else:
                 connection_wrapper = TransactionalDatabaseConnection(
                     self._connection, self.db_connection
                 )
-                self._portfolios = SqlitePortfolioRepository(connection_wrapper)
-        return self._portfolios
+                self._repositories.portfolios = SqlitePortfolioRepository(
+                    connection_wrapper
+                )
+        return self._repositories.portfolios
 
     @property
     def transactions(self) -> ITransactionRepository:
         """Get transaction repository instance."""
-        if self._transactions is None:
+        if self._repositories.transactions is None:
             if self._connection is None:
-                self._transactions = SqliteTransactionRepository(self.db_connection)
+                self._repositories.transactions = SqliteTransactionRepository(
+                    self.db_connection
+                )
             else:
                 connection_wrapper = TransactionalDatabaseConnection(
                     self._connection, self.db_connection
                 )
-                self._transactions = SqliteTransactionRepository(connection_wrapper)
-        return self._transactions
+                self._repositories.transactions = SqliteTransactionRepository(
+                    connection_wrapper
+                )
+        return self._repositories.transactions
 
     @property
     def targets(self) -> ITargetRepository:
         """Get target repository instance."""
-        if self._targets is None:
+        if self._repositories.targets is None:
             if self._connection is None:
-                self._targets = SqliteTargetRepository(self.db_connection)
+                self._repositories.targets = SqliteTargetRepository(self.db_connection)
             else:
                 connection_wrapper = TransactionalDatabaseConnection(
                     self._connection, self.db_connection
                 )
-                self._targets = SqliteTargetRepository(connection_wrapper)
-        return self._targets
+                self._repositories.targets = SqliteTargetRepository(connection_wrapper)
+        return self._repositories.targets
 
     @property
     def balances(self) -> IPortfolioBalanceRepository:
-        """Get balance repository instance."""
-        if self._balances is None:
+        """Get portfolio balance repository instance."""
+        if self._repositories.balances is None:
             if self._connection is None:
-                self._balances = SqlitePortfolioBalanceRepository(self.db_connection)
+                self._repositories.balances = SqlitePortfolioBalanceRepository(
+                    self.db_connection
+                )
             else:
                 connection_wrapper = TransactionalDatabaseConnection(
                     self._connection, self.db_connection
                 )
-                self._balances = SqlitePortfolioBalanceRepository(connection_wrapper)
-        return self._balances
+                self._repositories.balances = SqlitePortfolioBalanceRepository(
+                    connection_wrapper
+                )
+        return self._repositories.balances
 
     @property
     def journal(self) -> IJournalRepository:
         """Get journal repository instance."""
-        if self._journal is None:
+        if self._repositories.journal is None:
             if self._connection is None:
-                self._journal = SqliteJournalRepository(self.db_connection)
+                self._repositories.journal = SqliteJournalRepository(self.db_connection)
             else:
                 connection_wrapper = TransactionalDatabaseConnection(
                     self._connection, self.db_connection
                 )
-                self._journal = SqliteJournalRepository(connection_wrapper)
-        return self._journal
+                self._repositories.journal = SqliteJournalRepository(connection_wrapper)
+        return self._repositories.journal

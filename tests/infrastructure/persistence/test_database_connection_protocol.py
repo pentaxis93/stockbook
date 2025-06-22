@@ -362,8 +362,8 @@ class TestUnitOfWorkProtocolIntegration:
         # Inside transaction - should use TransactionalDatabaseConnection
         with uow:
             # Clear cached repositories to force recreation with transactional connection
-            uow._stocks = None  # type: ignore[attr-defined] - Testing internal state
-            uow._portfolios = None  # type: ignore[attr-defined] - Testing internal state
+            uow._repositories.stocks = None  # type: ignore[attr-defined] - Testing internal state
+            uow._repositories.portfolios = None  # type: ignore[attr-defined] - Testing internal state
 
             stocks_repo_inside = uow.stocks
             assert isinstance(  # Testing internal connection type

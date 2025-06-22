@@ -238,31 +238,16 @@ class StockViewModel:
         return self.notes[:97] + "..."
 
 
+@dataclass
 class StockListResponse:
-    """Response model for stock list operations.
+    """Response model for stock list operations."""
 
-    NOTE: Temporarily implemented as regular class instead of @dataclass
-    due to complex field ordering requirements with Optional[List[StockViewModel]].
-    TODO: Convert back to @dataclass when Python dataclass field ordering
-    with complex generic types is resolved, or use dataclasses with explicit
-    field() ordering.
-    """
-
-    def __init__(
-        self,
-        success: bool,
-        stocks: List[StockViewModel],
-        total_count: int,
-        message: str,
-        errors: Optional[Dict[str, str]] = None,
-        filters_applied: Optional[Dict[str, Any]] = None,
-    ):
-        self.success = success
-        self.stocks = stocks
-        self.total_count = total_count
-        self.message = message
-        self.errors = errors
-        self.filters_applied = filters_applied
+    success: bool
+    stocks: List[StockViewModel]
+    total_count: int
+    message: str
+    errors: Optional[Dict[str, str]] = field(default=None)
+    filters_applied: Optional[Dict[str, Any]] = field(default=None)
 
     @classmethod
     def create_success(
@@ -291,25 +276,14 @@ class StockListResponse:
         return bool(self.filters_applied)
 
 
+@dataclass
 class StockDetailResponse:
-    """Response model for stock detail operations.
+    """Response model for stock detail operations."""
 
-    NOTE: Temporarily implemented as regular class instead of @dataclass
-    due to complex field ordering requirements with Optional fields.
-    TODO: Convert back to @dataclass with proper field() ordering.
-    """
-
-    def __init__(
-        self,
-        success: bool,
-        message: str,
-        stock: Optional[StockViewModel] = None,
-        errors: Optional[Dict[str, str]] = None,
-    ):
-        self.success = success
-        self.message = message
-        self.stock = stock
-        self.errors = errors
+    success: bool
+    message: str
+    stock: Optional[StockViewModel] = field(default=None)
+    errors: Optional[Dict[str, str]] = field(default=None)
 
     @classmethod
     def create_success(
@@ -324,27 +298,15 @@ class StockDetailResponse:
         return cls(success=False, stock=None, message=message)
 
 
+@dataclass
 class CreateStockResponse:
-    """Response model for stock creation operations.
+    """Response model for stock creation operations."""
 
-    NOTE: Temporarily implemented as regular class instead of @dataclass
-    due to complex field ordering requirements with Optional fields.
-    TODO: Convert back to @dataclass with proper field() ordering.
-    """
-
-    def __init__(
-        self,
-        success: bool,
-        message: str,
-        stock_id: Optional[str] = None,
-        symbol: Optional[str] = None,
-        errors: Optional[Dict[str, str]] = None,
-    ):
-        self.success = success
-        self.message = message
-        self.stock_id = stock_id
-        self.symbol = symbol
-        self.errors = errors
+    success: bool
+    message: str
+    stock_id: Optional[str] = field(default=None)
+    symbol: Optional[str] = field(default=None)
+    errors: Optional[Dict[str, str]] = field(default=None)
 
     @classmethod
     def create_success(
@@ -359,25 +321,14 @@ class CreateStockResponse:
         return cls(success=False, stock_id=None, symbol=None, message=message)
 
 
+@dataclass
 class UpdateStockResponse:
-    """Response model for stock update operations.
+    """Response model for stock update operations."""
 
-    NOTE: Temporarily implemented as regular class instead of @dataclass
-    due to complex field ordering requirements with Optional fields.
-    TODO: Convert back to @dataclass with proper field() ordering.
-    """
-
-    def __init__(
-        self,
-        success: bool,
-        message: str,
-        stock_id: Optional[str] = None,
-        errors: Optional[Dict[str, str]] = None,
-    ):
-        self.success = success
-        self.message = message
-        self.stock_id = stock_id
-        self.errors = errors
+    success: bool
+    message: str
+    stock_id: Optional[str] = field(default=None)
+    errors: Optional[Dict[str, str]] = field(default=None)
 
     @classmethod
     def create_success(cls, stock_id: str, message: str) -> "UpdateStockResponse":
@@ -390,17 +341,16 @@ class UpdateStockResponse:
         return cls(success=False, stock_id=None, message=message)
 
 
+@dataclass
 class ValidationErrorResponse:
-    """Response model for validation errors.
+    """Response model for validation errors."""
 
-    NOTE: Temporarily implemented as regular class instead of @dataclass
-    due to computed field requirements in __init__.
-    TODO: Convert back to @dataclass with __post_init__ when field ordering is resolved.
-    """
+    errors: Dict[str, str]
+    success: bool = field(default=False, init=False)
+    message: str = field(init=False)
 
-    def __init__(self, errors: Dict[str, str]):
-        self.errors = errors
-        self.success = False
+    def __post_init__(self):
+        """Set computed fields after initialization."""
         # Set message based on error count
         if len(self.errors) == 1:
             self.message = "Validation failed"
