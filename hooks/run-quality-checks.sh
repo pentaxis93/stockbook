@@ -160,6 +160,32 @@ FLAKE8_TEMP="/tmp/flake8_$$"
 } &
 FLAKE8_PID=$!
 
+echo "Running security checks..."
+BANDIT_TEMP="/tmp/bandit_$$"
+{
+    if bandit -r src/ -ll -i > "$BANDIT_TEMP" 2>&1; then
+        echo "✅ Bandit security scan passed" >> "$BANDIT_TEMP"
+        echo "0" > "${BANDIT_TEMP}.exit"
+    else
+        echo "❌ Bandit security scan found issues. Review security vulnerabilities." >> "$BANDIT_TEMP"
+        echo "1" > "${BANDIT_TEMP}.exit"
+    fi
+} &
+BANDIT_PID=$!
+
+
+PIPAUDIT_TEMP="/tmp/pipaudit_$$"  
+{
+    if pip-audit > "$PIPAUDIT_TEMP" 2>&1; then
+        echo "✅ pip-audit security scan passed" >> "$PIPAUDIT_TEMP"
+        echo "0" > "${PIPAUDIT_TEMP}.exit"
+    else
+        echo "❌ pip-audit found security issues. Review dependencies." >> "$PIPAUDIT_TEMP"
+        echo "1" > "${PIPAUDIT_TEMP}.exit"
+    fi
+} &
+PIPAUDIT_PID=$!
+
 # Wait for all pylint processes to complete with progress indication
 echo "⏳ Waiting for pylint analysis to complete..."
 HAS_PYLINT_ERRORS=0
@@ -216,8 +242,22 @@ cat "$FLAKE8_TEMP"
 FLAKE8_EXIT=$(cat "${FLAKE8_TEMP}.exit")
 rm -f "$FLAKE8_TEMP" "${FLAKE8_TEMP}.exit"
 
+# Wait for security tools and display results
+echo "Waiting for bandit security scan to complete..."
+wait $BANDIT_PID
+cat "$BANDIT_TEMP"
+BANDIT_EXIT=$(cat "${BANDIT_TEMP}.exit")
+rm -f "$BANDIT_TEMP" "${BANDIT_TEMP}.exit"
+
+
+echo "Waiting for pip-audit security scan to complete..."
+wait $PIPAUDIT_PID
+cat "$PIPAUDIT_TEMP"
+PIPAUDIT_EXIT=$(cat "${PIPAUDIT_TEMP}.exit")
+rm -f "$PIPAUDIT_TEMP" "${PIPAUDIT_TEMP}.exit"
+
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi
