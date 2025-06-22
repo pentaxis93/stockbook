@@ -248,9 +248,6 @@ class StreamlitStockAdapter:
                 apply_filter = st.button("Apply Filter", type="secondary")
 
             if apply_filter and selected_grade:
-                from src.presentation.view_models.stock_view_models import (  # type: ignore[misc]
-                    StockSearchRequest,
-                )
 
                 search_request = StockSearchRequest(grade_filter=selected_grade)  # type: ignore[misc]
                 response = self.controller.search_stocks(search_request)  # type: ignore[misc]
@@ -435,9 +432,11 @@ class StreamlitStockAdapter:
 
     def _display_validation_errors(self, response: ValidationErrorResponse) -> None:
         """Display validation errors to user."""
-        error_message = "⚠️ Please fix the following errors:\n\n"
-        for field_error in response.field_errors:
-            error_message += f"• {field_error}\n"
+        error_message = (
+            "⚠️ Please fix the following errors:\n\n"
+            + "\n".join(f"• {field_error}" for field_error in response.field_errors)
+            + "\n"
+        )
 
         st.error(error_message)
 

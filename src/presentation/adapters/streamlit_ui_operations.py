@@ -187,9 +187,11 @@ class StreamlitUIValidationOperations(IUIValidationOperations):
         if not field_errors:
             return
 
-        error_message = "⚠️ Please fix the following errors:\n\n"
-        for error in field_errors:
-            error_message += f"• {error}\n"
+        error_message = (
+            "⚠️ Please fix the following errors:\n\n"
+            + "\n".join(f"• {error}" for error in field_errors)
+            + "\n"
+        )
 
         st.error(error_message)
 

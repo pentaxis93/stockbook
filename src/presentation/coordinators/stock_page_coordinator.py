@@ -242,9 +242,11 @@ class StockPageCoordinator:
         self, response: ValidationErrorResponse
     ) -> ValidationErrorResponse:
         """Handle validation errors with detailed feedback."""
-        error_message = "⚠️ Please fix the following errors:\n\n"
-        for field_error in response.field_errors:
-            error_message += f"• {field_error}\n"
+        error_message = (
+            "⚠️ Please fix the following errors:\n\n"
+            + "\n".join(f"• {field_error}" for field_error in response.field_errors)
+            + "\n"
+        )
 
         st.warning(error_message)
         return response

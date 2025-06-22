@@ -158,9 +158,9 @@ disable = [
     "duplicate-code",  # Similar UI patterns are acceptable
     "import-outside-toplevel",  # Conditional imports for UI frameworks
     "broad-exception-caught",  # UI error handling is often broad
-    # "missing-class-docstring",  # Now enabled - controllers should have docstrings
-    "consider-using-join",  # UI string concatenation patterns vary
-    "reimported",  # UI modules may reimport for different contexts
+    # \"missing-class-docstring\",  # Now enabled - controllers should have docstrings
+    # \"consider-using-join\",  # FIXED: Replaced string concatenation with .join()
+    # \"reimported\",  # FIXED: Removed duplicate local imports
     # "raise-missing-from",  # Now enabled for better exception chaining
 ]
 

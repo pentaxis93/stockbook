@@ -250,9 +250,6 @@ class StockPresentationAdapter:
                 apply_filter = self.ui.create_button("Apply Filter", "secondary")  # type: ignore[misc]
 
             if apply_filter and selected_grade:
-                from src.presentation.view_models.stock_view_models import (  # type: ignore[misc]
-                    StockSearchRequest,
-                )
 
                 search_request = StockSearchRequest(grade_filter=selected_grade)  # type: ignore[misc]
                 response = self.controller.search_stocks(search_request)  # type: ignore[misc]
