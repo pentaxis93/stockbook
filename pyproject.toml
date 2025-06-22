@@ -43,8 +43,7 @@ docstring-min-length = 10
 # STRICTEST configuration for CORE business logic (domain, application, infrastructure)
 # Only disable rules that are genuinely necessary or handled by other tools
 disable = [
-    # Code structure - reasonable for domain models
-    "too-few-public-methods",
+    # Code structure - reasonable for domain models - FIXED: Converted config classes to dataclasses
     "too-many-public-methods", 
     "too-many-instance-attributes",
     
@@ -58,8 +57,7 @@ disable = [
     # Line length - handled by black
     "line-too-long",
     
-    # Domain entities legitimately need many fields
-    "too-many-positional-arguments",
+    # Domain entities legitimately need many fields - FIXED: Using keyword-only args
     
     # Technical debt and development patterns
     "fixme",  # TODO comments are legitimate in business logic

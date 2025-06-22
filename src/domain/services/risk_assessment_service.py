@@ -5,6 +5,7 @@ Provides comprehensive risk assessment for individual stocks and portfolios,
 including various risk metrics and risk management analysis.
 """
 
+from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
@@ -18,20 +19,18 @@ from .value_objects import (
 )
 
 
+@dataclass(frozen=True)
 class RiskAssessmentConfig:
     """Configuration for risk assessment parameters."""
 
-    def __init__(
-        self,
-        var_confidence_level: Decimal = Decimal("0.95"),
-        concentration_threshold: Decimal = Decimal("0.15"),  # 15% max per position
-        high_volatility_threshold: Decimal = Decimal("0.30"),  # 30% annual volatility
-        high_beta_threshold: Decimal = Decimal("1.5"),
-    ):
-        self.var_confidence_level = var_confidence_level
-        self.concentration_threshold = concentration_threshold
-        self.high_volatility_threshold = high_volatility_threshold
-        self.high_beta_threshold = high_beta_threshold
+    var_confidence_level: Decimal = field(default_factory=lambda: Decimal("0.95"))
+    concentration_threshold: Decimal = field(
+        default_factory=lambda: Decimal("0.15")
+    )  # 15% max per position
+    high_volatility_threshold: Decimal = field(
+        default_factory=lambda: Decimal("0.30")
+    )  # 30% annual volatility
+    high_beta_threshold: Decimal = field(default_factory=lambda: Decimal("1.5"))
 
 
 class RiskAssessmentService:

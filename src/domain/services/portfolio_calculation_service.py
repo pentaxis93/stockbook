@@ -5,6 +5,7 @@ Provides business logic for portfolio-level calculations that operate
 across multiple stocks and provide aggregated insights.
 """
 
+from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
@@ -18,18 +19,17 @@ from .value_objects import (
 )
 
 
+@dataclass(frozen=True)
 class PortfolioCalculationConfig:
     """Configuration for portfolio calculation rules."""
 
-    def __init__(
-        self,
-        concentration_threshold: Decimal = Decimal("0.15"),  # 15% max per position
-        minimum_diversification_score: Decimal = Decimal("0.6"),
-        default_currency: str = "USD",
-    ):
-        self.concentration_threshold = concentration_threshold
-        self.minimum_diversification_score = minimum_diversification_score
-        self.default_currency = default_currency
+    concentration_threshold: Decimal = field(
+        default_factory=lambda: Decimal("0.15")
+    )  # 15% max per position
+    minimum_diversification_score: Decimal = field(
+        default_factory=lambda: Decimal("0.6")
+    )
+    default_currency: str = "USD"
 
 
 class PortfolioCalculationService:

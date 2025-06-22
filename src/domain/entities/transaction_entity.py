@@ -28,6 +28,7 @@ class TransactionEntity(BaseEntity):
         quantity: Quantity,
         price: Money,
         transaction_date: date,
+        *,
         notes: Optional[Notes] = None,
         id: Optional[str] = None,
     ):

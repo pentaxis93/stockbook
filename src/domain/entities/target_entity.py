@@ -28,6 +28,7 @@ class TargetEntity(BaseEntity):
         failure_price: Money,
         status: TargetStatus,
         created_date: date,
+        *,
         notes: Optional[Notes] = None,
         id: Optional[str] = None,
     ):
