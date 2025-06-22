@@ -331,3 +331,21 @@ ignore_errors = true
 module = "nanoid"
 ignore_missing_imports = true
 
+[tool.importlinter]
+root_package = "src"
+
+[[tool.importlinter.contracts]]
+name = "Domain layer independence"
+type = "independence"
+modules = ["src.domain"]
+
+[[tool.importlinter.contracts]]
+name = "Layered architecture"
+type = "layers"
+layers = [
+    "src.presentation",
+    "src.application", 
+    "src.infrastructure",
+    "src.domain"
+]
+

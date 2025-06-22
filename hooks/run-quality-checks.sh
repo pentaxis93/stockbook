@@ -160,6 +160,19 @@ FLAKE8_TEMP="/tmp/flake8_$$"
 } &
 FLAKE8_PID=$!
 
+echo "Starting import-linter architectural constraint analysis..."
+IMPORTLINTER_TEMP="/tmp/importlinter_$$"
+{
+    if lint-imports > "$IMPORTLINTER_TEMP" 2>&1; then
+        echo "✅ Import-linter architectural constraints check passed" >> "$IMPORTLINTER_TEMP"
+        echo "0" > "${IMPORTLINTER_TEMP}.exit"
+    else
+        echo "❌ Import-linter found architectural violations. Refactor to improve layer separation." >> "$IMPORTLINTER_TEMP"
+        echo "1" > "${IMPORTLINTER_TEMP}.exit"
+    fi
+} &
+IMPORTLINTER_PID=$!
+
 echo "Running security checks..."
 BANDIT_TEMP="/tmp/bandit_$$"
 {
@@ -242,6 +255,13 @@ cat "$FLAKE8_TEMP"
 FLAKE8_EXIT=$(cat "${FLAKE8_TEMP}.exit")
 rm -f "$FLAKE8_TEMP" "${FLAKE8_TEMP}.exit"
 
+# Wait for import-linter and display results
+echo "Waiting for import-linter architectural analysis to complete..."
+wait $IMPORTLINTER_PID
+cat "$IMPORTLINTER_TEMP"
+IMPORTLINTER_EXIT=$(cat "${IMPORTLINTER_TEMP}.exit")
+rm -f "$IMPORTLINTER_TEMP" "${IMPORTLINTER_TEMP}.exit"
+
 # Wait for security tools and display results
 echo "Waiting for bandit security scan to complete..."
 wait $BANDIT_PID
@@ -257,7 +277,7 @@ PIPAUDIT_EXIT=$(cat "${PIPAUDIT_TEMP}.exit")
 rm -f "$PIPAUDIT_TEMP" "${PIPAUDIT_TEMP}.exit"
 
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi
