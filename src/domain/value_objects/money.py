@@ -121,15 +121,17 @@ class BaseNumericValueObject(ABC):
 
         return self.__class__(result_value)
 
-    def __mul__(self, scalar: Union[int, float, Decimal]):
+    def __mul__(self, scalar: Union[int, float, Decimal]) -> "BaseNumericValueObject":
         """Multiply by a scalar."""
         return self.__class__(self._value * Decimal(str(scalar)))
 
-    def __rmul__(self, scalar: Union[int, float, Decimal]):
+    def __rmul__(self, scalar: Union[int, float, Decimal]) -> "BaseNumericValueObject":
         """Right multiplication (scalar * instance)."""
         return self.__mul__(scalar)
 
-    def __truediv__(self, scalar: Union[int, float, Decimal]):
+    def __truediv__(
+        self, scalar: Union[int, float, Decimal]
+    ) -> "BaseNumericValueObject":
         """Divide by a scalar."""
         if scalar == 0:
             raise ZeroDivisionError("Cannot divide by zero")

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Pre-commit hook to run pytest, pylint, pyright, black, and isort
-# This hook ensures code quality before allowing commits
+# Pre-commit hook to run pytest, pylint, pyright, mypy, black, and isort
+# This hook ensures maximum code quality before allowing commits
 # Optimized for parallel execution and caching
 
 set -e
@@ -80,7 +80,7 @@ TEST_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-a
 TEST_ARGS="--allowed-redefined-builtins=id"
 run_pylint_check "tests" "$TEST_FILES" "$TEST_DISABLE" "$TEST_ARGS"
 
-# Start pyright and pytest in parallel with pylint
+# Start pyright, mypy, and pytest in parallel with pylint
 echo "Starting pyright type checker in parallel..."
 PYRIGHT_TEMP="/tmp/pyright_$$"
 {
@@ -93,6 +93,19 @@ PYRIGHT_TEMP="/tmp/pyright_$$"
     fi
 } &
 PYRIGHT_PID=$!
+
+echo "Starting mypy type checker in parallel..."
+MYPY_TEMP="/tmp/mypy_$$"
+{
+    if mypy src --explicit-package-bases > "$MYPY_TEMP" 2>&1; then
+        echo "✅ Mypy type check passed" >> "$MYPY_TEMP"
+        echo "0" > "${MYPY_TEMP}.exit"
+    else
+        echo "❌ Mypy type check failed. Fix the type issues before committing." >> "$MYPY_TEMP"
+        echo "1" > "${MYPY_TEMP}.exit"
+    fi
+} &
+MYPY_PID=$!
 
 echo "Starting pytest with parallel execution..."
 PYTEST_TEMP="/tmp/pytest_$$"
@@ -142,6 +155,13 @@ cat "$PYRIGHT_TEMP"
 PYRIGHT_EXIT=$(cat "${PYRIGHT_TEMP}.exit")
 rm -f "$PYRIGHT_TEMP" "${PYRIGHT_TEMP}.exit"
 
+# Wait for mypy and display results
+echo "Waiting for mypy to complete..."
+wait $MYPY_PID
+cat "$MYPY_TEMP"
+MYPY_EXIT=$(cat "${MYPY_TEMP}.exit")
+rm -f "$MYPY_TEMP" "${MYPY_TEMP}.exit"
+
 # Wait for pytest and display results
 echo "Waiting for pytest to complete..."
 wait $PYTEST_PID
@@ -150,7 +170,7 @@ PYTEST_EXIT=$(cat "${PYTEST_TEMP}.exit")
 rm -f "$PYTEST_TEMP" "${PYTEST_TEMP}.exit"
 
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi

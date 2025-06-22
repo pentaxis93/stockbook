@@ -148,6 +148,7 @@ class SqliteTransactionRepository(ITransactionRepository):
         """
         conn = self.db_connection.get_connection()
         try:
+            params: List[Any]
             if portfolio_id is not None:
                 query = """
                     SELECT id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes, created_at
@@ -155,7 +156,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE stock_id = ? AND portfolio_id = ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params: List[Any] = [stock_id, portfolio_id]
+                params = [stock_id, portfolio_id]
             else:
                 query = """
                     SELECT id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes, created_at
@@ -163,7 +164,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE stock_id = ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params: List[Any] = [stock_id]
+                params = [stock_id]
 
             cursor = conn.execute(query, params)
             rows = cursor.fetchall()
@@ -190,6 +191,7 @@ class SqliteTransactionRepository(ITransactionRepository):
         """
         conn = self.db_connection.get_connection()
         try:
+            params: List[Any]
             if portfolio_id is not None:
                 query = """
                     SELECT id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes, created_at
@@ -197,7 +199,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE transaction_date >= ? AND transaction_date <= ? AND portfolio_id = ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params: List[Any] = [
+                params = [
                     start_date.isoformat(),
                     end_date.isoformat(),
                     portfolio_id,
@@ -209,7 +211,7 @@ class SqliteTransactionRepository(ITransactionRepository):
                     WHERE transaction_date >= ? AND transaction_date <= ?
                     ORDER BY transaction_date DESC, created_at DESC
                 """
-                params: List[Any] = [start_date.isoformat(), end_date.isoformat()]
+                params = [start_date.isoformat(), end_date.isoformat()]
 
             cursor = conn.execute(query, params)
             rows = cursor.fetchall()

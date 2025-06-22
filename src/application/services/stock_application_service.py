@@ -184,7 +184,9 @@ class StockApplicationService:
             self._unit_of_work.rollback()
             raise
 
-    def _validate_update_command_and_get_stock(self, command: UpdateStockCommand):
+    def _validate_update_command_and_get_stock(
+        self, command: UpdateStockCommand
+    ) -> StockEntity:
         """Validate update command and retrieve stock entity."""
         # Check if stock exists
         stock_entity = self._unit_of_work.stocks.get_by_id(command.stock_id)
@@ -200,7 +202,7 @@ class StockApplicationService:
 
     def _apply_updates_and_save(
         self, command: UpdateStockCommand, stock_entity: StockEntity
-    ):
+    ) -> None:
         """Apply updates to stock entity and save to repository."""
         # Get the fields to update and apply them to the entity
         update_fields = command.get_update_fields()
