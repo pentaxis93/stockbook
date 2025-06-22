@@ -56,6 +56,12 @@ class TestDomainEvent:
         # Different events should not be equal
         assert event1 != event2
 
+        # Event should not equal non-DomainEvent objects
+        assert event1 != "not an event"
+        assert event1 != 42
+        assert event1 != None
+        assert event1
+
     def test_domain_event_hash(self) -> None:
         """Should be hashable by event_id."""
         event1 = DomainEvent()
@@ -72,6 +78,15 @@ class TestDomainEvent:
 
         assert "DomainEvent" in str_repr
         assert str(event.event_id) in str_repr
+
+    def test_domain_event_repr_representation(self) -> None:
+        """Should have meaningful repr representation."""
+        event = DomainEvent()
+        repr_str = repr(event)
+
+        assert "DomainEvent" in repr_str
+        assert event.event_id in repr_str
+        assert event.occurred_at.isoformat() in repr_str
 
 
 class TestStockAddedEvent:

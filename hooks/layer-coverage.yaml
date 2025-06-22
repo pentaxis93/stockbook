@@ -6,7 +6,7 @@ layers:
   # Domain layer - highest coverage requirement (business logic)
   domain:
     path: src/domain
-    threshold: 90
+    threshold: 92
     description: "Core business logic and domain entities - requires highest coverage"
     
   # Application layer - high coverage requirement (use cases)

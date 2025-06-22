@@ -276,3 +276,169 @@ class TestMoneyEdgeCases:
         assert result1.amount == Decimal("150.00")
         assert result2.amount == Decimal("200.00")
         assert result3.amount == Decimal("-100.00")
+
+
+class TestBaseNumericValueObjectEdgeCases:
+    """Test BaseNumericValueObject functionality through Money."""
+
+    def test_negative_value_validation_for_disallowed_types(self) -> None:
+        """Should test negative value validation when subclass disallows it."""
+        # Using Money which allows negatives, but testing validation path
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class PositiveOnly(BaseNumericValueObject):
+            def __init__(self, value: Decimal) -> None:
+                super().__init__(value, allow_negative=False)
+
+        with pytest.raises(ValueError, match="PositiveOnly cannot be negative"):
+            _ = PositiveOnly(Decimal("-1"))
+
+    def test_comparison_with_incompatible_types(self) -> None:
+        """Should raise TypeError when comparing with incompatible types."""
+        money = Money(100)
+
+        with pytest.raises(TypeError, match="Cannot compare Money with"):
+            _ = money < "invalid"
+
+        with pytest.raises(TypeError, match="Cannot compare Money with"):
+            _ = money <= 42
+
+        with pytest.raises(TypeError, match="Cannot compare Money with"):
+            _ = money > [1, 2, 3]
+
+        with pytest.raises(TypeError, match="Cannot compare Money with"):
+            _ = money >= {"key": "value"}
+
+    def test_equality_with_incompatible_types(self) -> None:
+        """Should return False when comparing with incompatible types."""
+        money = Money(100)
+
+        assert money != "100"
+        assert money != 100
+        assert money != Decimal("100")
+        assert money != None
+        assert money
+
+    def test_base_numeric_arithmetic_with_test_class(self) -> None:
+        """Should test BaseNumericValueObject arithmetic with numeric types."""
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class TestNumeric(BaseNumericValueObject):
+            pass
+
+        value = TestNumeric(100)
+
+        # Addition with numeric types
+        result1 = value + 50
+        assert result1.value == Decimal("150")
+
+        result2 = value + 25.5
+        assert result2.value == Decimal("125.5")
+
+        result3 = value + Decimal("75")
+        assert result3.value == Decimal("175")
+
+    def test_base_numeric_subtraction_with_test_class(self) -> None:
+        """Should test BaseNumericValueObject subtraction with numeric types."""
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class TestNumeric(BaseNumericValueObject):
+            pass
+
+        value = TestNumeric(100)
+
+        # Subtraction with numeric types
+        result1 = value - 30
+        assert result1.value == Decimal("70")
+
+        result2 = value - 25.5
+        assert result2.value == Decimal("74.5")
+
+        result3 = value - Decimal("50")
+        assert result3.value == Decimal("50")
+
+    def test_right_multiplication(self) -> None:
+        """Should support right multiplication (scalar * money)."""
+        money = Money(100)
+
+        # Test __rmul__ method
+        result = 2.5 * money
+        assert result.value == Decimal("250.00")
+
+    def test_zero_class_method_on_base(self) -> None:
+        """Should test zero class method from BaseNumericValueObject."""
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class TestValue(BaseNumericValueObject):
+            pass
+
+        zero_value = TestValue.zero()
+        assert zero_value.value == Decimal("0")
+        assert zero_value.is_zero()
+
+
+class TestMoneyArithmeticErrorCases:
+    """Test Money arithmetic error cases for full coverage."""
+
+    def test_add_incompatible_type_error(self) -> None:
+        """Should raise TypeError when adding incompatible types to Money."""
+        money = Money(100)
+
+        with pytest.raises(TypeError, match="Can only add Money to Money"):
+            _ = money + "invalid"
+
+        with pytest.raises(TypeError, match="Can only add Money to Money"):
+            _ = money + 100  # Money overrides base to only allow Money
+
+    def test_subtract_incompatible_type_error(self) -> None:
+        """Should raise TypeError when subtracting incompatible types from Money."""
+        money = Money(100)
+
+        with pytest.raises(TypeError, match="Can only subtract Money from Money"):
+            _ = money - "invalid"
+
+        with pytest.raises(TypeError, match="Can only subtract Money from Money"):
+            _ = money - 50  # Money overrides base to only allow Money
+
+    def test_base_numeric_property_and_string_methods(self) -> None:
+        """Should test BaseNumericValueObject property and string methods."""
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class TestNumeric(BaseNumericValueObject):
+            pass
+
+        value = TestNumeric(42.5)
+
+        # Test value property (line 47-49)
+        assert value.value == Decimal("42.5")
+
+        # Test __str__ method (line 51-53)
+        assert str(value) == "42.5"
+
+        # Test arithmetic error cases with invalid types
+        with pytest.raises(TypeError):
+            _ = value + "invalid"
+
+        with pytest.raises(TypeError):
+            _ = value - [1, 2, 3]
+
+    def test_base_numeric_division_and_unary_operations(self) -> None:
+        """Should test BaseNumericValueObject division and unary operations."""
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class TestNumeric(BaseNumericValueObject):
+            pass
+
+        value = TestNumeric(100)
+
+        # Test division by zero error (line 136-138)
+        with pytest.raises(ZeroDivisionError, match="Cannot divide by zero"):
+            _ = value / 0
+
+        # Test __neg__ method (line 140-142)
+        neg_value = -value
+        assert neg_value.value == Decimal("-100")
+
+        # Test __abs__ method (line 144-146)
+        abs_value = abs(TestNumeric(-50))
+        assert abs_value.value == Decimal("50")
