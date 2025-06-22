@@ -80,3 +80,4 @@ flake8-cognitive-complexity==0.1.0
 bandit==1.7.9
 pip-audit==2.9.0
 import-linter==1.12.1
+pydocstyle==6.3.0

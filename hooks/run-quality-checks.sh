@@ -173,6 +173,19 @@ IMPORTLINTER_TEMP="/tmp/importlinter_$$"
 } &
 IMPORTLINTER_PID=$!
 
+echo "Starting pydocstyle docstring quality analysis..."
+PYDOCSTYLE_TEMP="/tmp/pydocstyle_$$"
+{
+    if pydocstyle src/ > "$PYDOCSTYLE_TEMP" 2>&1; then
+        echo "✅ Pydocstyle docstring quality check passed" >> "$PYDOCSTYLE_TEMP"
+        echo "0" > "${PYDOCSTYLE_TEMP}.exit"
+    else
+        echo "❌ Pydocstyle found docstring quality issues. Improve docstring formatting and completeness." >> "$PYDOCSTYLE_TEMP"
+        echo "1" > "${PYDOCSTYLE_TEMP}.exit"
+    fi
+} &
+PYDOCSTYLE_PID=$!
+
 echo "Running security checks..."
 BANDIT_TEMP="/tmp/bandit_$$"
 {
@@ -262,6 +275,13 @@ cat "$IMPORTLINTER_TEMP"
 IMPORTLINTER_EXIT=$(cat "${IMPORTLINTER_TEMP}.exit")
 rm -f "$IMPORTLINTER_TEMP" "${IMPORTLINTER_TEMP}.exit"
 
+# Wait for pydocstyle and display results
+echo "Waiting for pydocstyle docstring quality analysis to complete..."
+wait $PYDOCSTYLE_PID
+cat "$PYDOCSTYLE_TEMP"
+PYDOCSTYLE_EXIT=$(cat "${PYDOCSTYLE_TEMP}.exit")
+rm -f "$PYDOCSTYLE_TEMP" "${PYDOCSTYLE_TEMP}.exit"
+
 # Wait for security tools and display results
 echo "Waiting for bandit security scan to complete..."
 wait $BANDIT_PID
@@ -277,7 +297,7 @@ PIPAUDIT_EXIT=$(cat "${PIPAUDIT_TEMP}.exit")
 rm -f "$PIPAUDIT_TEMP" "${PIPAUDIT_TEMP}.exit"
 
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$PYDOCSTYLE_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi

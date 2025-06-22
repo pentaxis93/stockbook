@@ -1,5 +1,4 @@
-"""
-StockBook Application - A comprehensive stock portfolio management system.
+"""StockBook Application - A comprehensive stock portfolio management system.
 
 This package implements a clean architecture with four distinct layers:
 - Domain: Core business logic and entities
