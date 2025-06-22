@@ -111,9 +111,37 @@ stockbook/
 
 ### Current Phase: Integration & Feature Development
 
-**Test Coverage**: Comprehensive test suite with high coverage
+**Test Coverage**: Comprehensive test suite with layer-specific coverage enforcement:
+- Domain Layer: 90% minimum (business logic)
+- Application Layer: 90% minimum (use cases) 
+- Infrastructure Layer: 85% minimum (data persistence)
+- Presentation Layer: 75% minimum (UI components)
+- Overall Project: 84% minimum
+
 **Architecture Compliance**: 100% clean architecture principles
 **Code Quality**: Strict linting (pylint 10/10), type-safe (pyright standard mode), comprehensive error handling
+
+## Development
+
+### Layer-Specific Test Coverage
+
+This project enforces different test coverage thresholds for each architectural layer:
+
+```bash
+# Run layer coverage analysis
+python hooks/check-layer-coverage.py
+
+# View layer coverage configuration
+cat hooks/layer-coverage.yaml
+```
+
+The coverage thresholds reflect the criticality of each layer:
+- **Domain layer (90%)**: Contains core business logic and rules
+- **Application layer (90%)**: Orchestrates use cases and workflows  
+- **Infrastructure layer (85%)**: Handles data persistence and external services
+- **Presentation layer (75%)**: UI components and user interactions
+
+Coverage analysis runs automatically during pre-commit hooks and provides detailed reporting on which files in each layer need additional tests.
 
 ## Contributing
 

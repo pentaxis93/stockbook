@@ -109,7 +109,7 @@ PRES_ARGS="--allowed-redefined-builtins=id --max-args=6 --max-locals=10 --max-re
 run_pylint_check "presentation" "$PRESENTATION_FILES" "$PRES_DISABLE" "$PRES_ARGS"
 
 # Configuration files - most lenient
-CONFIG_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,missing-class-docstring,missing-function-docstring,missing-module-docstring,invalid-name,too-many-arguments,too-many-positional-arguments,too-many-locals,import-outside-toplevel,broad-exception-caught,duplicate-code,fixme,global-statement,global-variable-not-assigned,wildcard-import,unused-wildcard-import,c-extension-no-member,consider-iterating-dictionary"
+CONFIG_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,missing-class-docstring,missing-function-docstring,missing-module-docstring,invalid-name,too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-statements,too-many-nested-blocks,import-outside-toplevel,broad-exception-caught,duplicate-code,fixme,global-statement,global-variable-not-assigned,wildcard-import,unused-wildcard-import,c-extension-no-member,consider-iterating-dictionary"
 CONFIG_ARGS="--allowed-redefined-builtins=id"
 run_pylint_check "config" "$CONFIG_FILES" "$CONFIG_DISABLE" "$CONFIG_ARGS"
 
@@ -285,6 +285,20 @@ cat "$PYTEST_TEMP"
 PYTEST_EXIT=$(cat "${PYTEST_TEMP}.exit")
 rm -f "$PYTEST_TEMP" "${PYTEST_TEMP}.exit"
 
+# Run layer-specific coverage analysis after pytest completes
+echo "Starting layer-specific coverage analysis..."
+LAYER_COVERAGE_TEMP="/tmp/layer_coverage_$$"
+{
+    if python hooks/check-layer-coverage.py > "$LAYER_COVERAGE_TEMP" 2>&1; then
+        echo "✅ Layer-specific coverage thresholds met" >> "$LAYER_COVERAGE_TEMP"
+        echo "0" > "${LAYER_COVERAGE_TEMP}.exit"
+    else
+        echo "❌ Layer-specific coverage analysis failed. Some layers below required thresholds." >> "$LAYER_COVERAGE_TEMP"
+        echo "1" > "${LAYER_COVERAGE_TEMP}.exit"
+    fi
+} &
+LAYER_COVERAGE_PID=$!
+
 # Wait for flake8 and display results
 echo "Waiting for flake8 cognitive complexity analysis to complete..."
 wait $FLAKE8_PID
@@ -327,8 +341,15 @@ cat "$PIPAUDIT_TEMP"
 PIPAUDIT_EXIT=$(cat "${PIPAUDIT_TEMP}.exit")
 rm -f "$PIPAUDIT_TEMP" "${PIPAUDIT_TEMP}.exit"
 
+# Wait for layer coverage analysis and display results
+echo "Waiting for layer-specific coverage analysis to complete..."
+wait $LAYER_COVERAGE_PID
+cat "$LAYER_COVERAGE_TEMP"
+LAYER_COVERAGE_EXIT=$(cat "${LAYER_COVERAGE_TEMP}.exit")
+rm -f "$LAYER_COVERAGE_TEMP" "${LAYER_COVERAGE_TEMP}.exit"
+
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$PYDOCSTYLE_EXIT" != "0" ] || [ "$DOCSTRCOVERAGE_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$LAYER_COVERAGE_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$PYDOCSTYLE_EXIT" != "0" ] || [ "$DOCSTRCOVERAGE_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi

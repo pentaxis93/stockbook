@@ -195,6 +195,8 @@ disable = [
     "too-many-arguments",
     "too-many-positional-arguments",
     "too-many-locals",
+    "too-many-statements",  # Utility scripts can be longer
+    "too-many-nested-blocks",  # Complex logic analysis needs nesting
     "import-outside-toplevel",
     "broad-exception-caught",
     "duplicate-code",
@@ -206,6 +208,43 @@ disable = [
     "unused-wildcard-import",
     "c-extension-no-member",  # Dependency injection frameworks use C extensions
     "consider-iterating-dictionary",  # Config files may use .keys() for clarity
+]
+
+allowed-redefined-builtins = ["id"]
+
+[tool.pylint.hooks]
+# LENIENT configuration for HOOK scripts
+# Utility scripts need more flexibility for complex analysis tasks
+disable = [
+    # All standard disables
+    "too-few-public-methods",
+    "too-many-public-methods", 
+    "too-many-instance-attributes",
+    "wrong-import-order",
+    "ungrouped-imports",
+    "line-too-long",
+    "no-member",
+    # Hook-specific allowances for utility scripts
+    "too-many-statements",  # Analysis scripts can be longer
+    "too-many-nested-blocks",  # Complex logic analysis needs nesting
+    "too-many-locals",  # Data processing scripts need many variables
+    "too-many-branches",  # Decision trees are common in analysis
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "invalid-name",
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "import-outside-toplevel",
+    "broad-exception-caught",
+    "duplicate-code",
+    "fixme",
+    "global-statement",
+    "global-variable-not-assigned",
+    "wildcard-import",
+    "unused-wildcard-import",
+    "c-extension-no-member",
+    "consider-iterating-dictionary",
 ]
 
 allowed-redefined-builtins = ["id"]

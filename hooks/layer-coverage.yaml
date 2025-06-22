@@ -1,0 +1,74 @@
+# Layer-specific test coverage configuration for StockBook
+# This file defines coverage thresholds for each architectural layer
+
+# Layer-specific configuration
+layers:
+  # Domain layer - highest coverage requirement (business logic)
+  domain:
+    path: src/domain
+    threshold: 90
+    description: "Core business logic and domain entities - requires highest coverage"
+    
+  # Application layer - high coverage requirement (use cases)
+  application:
+    path: src/application
+    threshold: 90
+    description: "Application services and use cases - requires high coverage"
+    
+  # Infrastructure layer - moderate coverage requirement
+  infrastructure:
+    path: src/infrastructure
+    threshold: 85
+    description: "Data persistence and external integrations - moderate coverage"
+    
+  # Presentation layer - lower coverage requirement (UI code)
+  presentation:
+    path: src/presentation
+    threshold: 75
+    description: "UI components and controllers - lower coverage acceptable"
+
+# Overall project coverage (maintained from current setup)
+overall:
+  threshold: 84
+  description: "Overall project coverage threshold"
+
+# Configuration options
+options:
+  # Whether to fail fast on first layer that doesn't meet threshold
+  fail_fast: false
+  
+  # Whether to show detailed file-by-file breakdown for failing layers
+  show_file_details: true
+  
+  # Maximum number of low-coverage files to show per layer
+  max_files_shown: 5
+  
+  # Whether to generate HTML reports per layer
+  generate_html_reports: false
+  
+  # Whether to save JSON report for CI/CD integration
+  save_json_report: true
+
+# Exclusion patterns (in addition to global coverage exclusions)
+exclusions:
+  # Patterns to exclude from layer coverage analysis
+  patterns:
+    - "*/migrations/*"
+    - "*/tests/*"
+    - "*/__pycache__/*"
+    - "*/conftest.py"
+    - "*/.pytest_cache/*"
+  
+  # Specific files to exclude
+  files: []
+
+# Reporting configuration
+reporting:
+  # Format for console output
+  console_format: "detailed"  # options: simple, detailed, minimal
+  
+  # Whether to use colored output
+  use_colors: true
+  
+  # Whether to show progress indicators
+  show_progress: true
