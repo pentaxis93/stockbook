@@ -17,7 +17,7 @@ from src.domain.value_objects.portfolio_name import PortfolioName
 class TestPortfolioEntity:
     """Test suite for Portfolio domain entity."""
 
-    def test_create_portfolio_with_value_objects(self):
+    def test_create_portfolio_with_value_objects(self) -> None:
         """Should create Portfolio entity with value objects only."""
         name = PortfolioName("Growth Portfolio")
         description = Notes("Long-term growth strategy portfolio")
@@ -37,7 +37,7 @@ class TestPortfolioEntity:
         assert portfolio.id is not None  # Generated nanoid
         assert isinstance(portfolio.id, str)
 
-    def test_create_portfolio_with_minimal_data(self):
+    def test_create_portfolio_with_minimal_data(self) -> None:
         """Should create Portfolio with only required fields."""
         name = PortfolioName("Simple Portfolio")
 
@@ -50,7 +50,7 @@ class TestPortfolioEntity:
         assert portfolio.id is not None  # Generated nanoid
         assert isinstance(portfolio.id, str)
 
-    def test_portfolio_stores_value_objects(self):
+    def test_portfolio_stores_value_objects(self) -> None:
         """Should store and return value objects directly."""
         name = PortfolioName("Test Portfolio")
         description = Notes("Test description")
@@ -68,7 +68,7 @@ class TestPortfolioEntity:
         assert portfolio.name.value == "Test Portfolio"
         assert portfolio.description.value == "Test description"
 
-    def test_create_portfolio_with_none_description_allowed(self):
+    def test_create_portfolio_with_none_description_allowed(self) -> None:
         """Should allow creating portfolio with None for description."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"),
@@ -79,12 +79,12 @@ class TestPortfolioEntity:
             portfolio.description.value == ""
         )  # Description defaults to empty when None
 
-    def test_create_portfolio_with_invalid_name_raises_error(self):
+    def test_create_portfolio_with_invalid_name_raises_error(self) -> None:
         """Should raise error for invalid portfolio name through PortfolioName value object."""
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
             PortfolioName("")  # Error happens at PortfolioName construction
 
-    def test_portfolio_equality(self):
+    def test_portfolio_equality(self) -> None:
         """Should compare portfolios based on business identity (name)."""
         name1 = PortfolioName("Growth Portfolio")
         name2 = PortfolioName("Growth Portfolio")
@@ -97,7 +97,7 @@ class TestPortfolioEntity:
         assert portfolio1 == portfolio2  # Same name
         assert portfolio1 != portfolio3  # Different name
 
-    def test_portfolio_hash(self):
+    def test_portfolio_hash(self) -> None:
         """Should be hashable based on name."""
         name1 = PortfolioName("Growth Portfolio")
         name2 = PortfolioName("Growth Portfolio")
@@ -114,14 +114,14 @@ class TestPortfolioEntity:
         portfolio_set = {portfolio1, portfolio2, portfolio3}
         assert len(portfolio_set) == 2  # Growth Portfolio appears only once
 
-    def test_portfolio_string_representation(self):
+    def test_portfolio_string_representation(self) -> None:
         """Should have meaningful string representation."""
         name = PortfolioName("Growth Portfolio")
         portfolio = PortfolioEntity(name=name)
 
         assert str(portfolio) == "Portfolio(Growth Portfolio)"
 
-    def test_portfolio_repr(self):
+    def test_portfolio_repr(self) -> None:
         """Should have detailed repr representation."""
         name = PortfolioName("Growth Portfolio")
         portfolio = PortfolioEntity(name=name, is_active=True)
@@ -131,7 +131,7 @@ class TestPortfolioEntity:
         )
         assert repr(portfolio) == expected
 
-    def test_portfolio_activate(self):
+    def test_portfolio_activate(self) -> None:
         """Should be able to activate portfolio."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"), is_active=False
@@ -140,7 +140,7 @@ class TestPortfolioEntity:
         portfolio.activate()
         assert portfolio.is_active is True
 
-    def test_portfolio_deactivate(self):
+    def test_portfolio_deactivate(self) -> None:
         """Should be able to deactivate portfolio."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"), is_active=True
@@ -149,7 +149,7 @@ class TestPortfolioEntity:
         portfolio.deactivate()
         assert portfolio.is_active is False
 
-    def test_has_description(self):
+    def test_has_description(self) -> None:
         """Should check if portfolio has description."""
         portfolio_with_description = PortfolioEntity(
             name=PortfolioName("Test Portfolio"),
@@ -163,7 +163,7 @@ class TestPortfolioEntity:
         assert portfolio_with_description.has_description() is True
         assert portfolio_without_description.has_description() is False
 
-    def test_update_description(self):
+    def test_update_description(self) -> None:
         """Should allow updating portfolio description."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"),
@@ -175,7 +175,7 @@ class TestPortfolioEntity:
         assert portfolio.description == new_description
         assert portfolio.description.value == "Updated description"
 
-    def test_update_description_with_string(self):
+    def test_update_description_with_string(self) -> None:
         """Should allow updating description with string (convenience method)."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"),
@@ -185,14 +185,14 @@ class TestPortfolioEntity:
 
         assert portfolio.description.value == "Updated description"
 
-    def test_create_portfolio_with_id(self):
+    def test_create_portfolio_with_id(self) -> None:
         """Should create portfolio with provided ID."""
         test_id = "portfolio-id-123"
         portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"), id=test_id)
 
         assert portfolio.id == test_id
 
-    def test_portfolio_id_immutability(self):
+    def test_portfolio_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"), id="test-id-1"
@@ -200,9 +200,9 @@ class TestPortfolioEntity:
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):
-            portfolio.id = "different-id"
+            portfolio.id = "different-id"  # type: ignore[misc]
 
-    def test_portfolio_from_persistence(self):
+    def test_portfolio_from_persistence(self) -> None:
         """Should create portfolio from persistence with existing ID."""
         test_id = "persistence-id-456"
         portfolio = PortfolioEntity.from_persistence(
@@ -216,7 +216,7 @@ class TestPortfolioEntity:
         assert portfolio.name.value == "Test Portfolio"
         assert portfolio.is_active is False
 
-    def test_is_active_portfolio(self):
+    def test_is_active_portfolio(self) -> None:
         """Should check if portfolio is active."""
         active_portfolio = PortfolioEntity(
             name=PortfolioName("Active Portfolio"), is_active=True
@@ -229,7 +229,7 @@ class TestPortfolioEntity:
         assert active_portfolio.is_active_portfolio() is True
         assert inactive_portfolio.is_active_portfolio() is False
 
-    def test_set_created_date(self):
+    def test_set_created_date(self) -> None:
         """Should allow setting created date."""
         portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
 
@@ -238,7 +238,7 @@ class TestPortfolioEntity:
 
         assert portfolio.created_date == creation_date
 
-    def test_set_created_date_when_already_set_raises_error(self):
+    def test_set_created_date_when_already_set_raises_error(self) -> None:
         """Should raise error when trying to change existing created date."""
         portfolio = PortfolioEntity(
             name=PortfolioName("Test Portfolio"), created_date=date(2024, 1, 1)
@@ -253,7 +253,7 @@ class TestPortfolioEntity:
 class TestPortfolioName:
     """Test PortfolioName value object validation."""
 
-    def test_valid_portfolio_names_accepted(self):
+    def test_valid_portfolio_names_accepted(self) -> None:
         """Test that valid portfolio names are accepted."""
         valid_names = [
             "Growth Portfolio",
@@ -265,19 +265,19 @@ class TestPortfolioName:
             portfolio_name = PortfolioName(name)
             assert portfolio_name.value == name
 
-    def test_portfolio_name_strips_whitespace(self):
+    def test_portfolio_name_strips_whitespace(self) -> None:
         """Test that portfolio names are stripped of leading/trailing whitespace."""
         name = PortfolioName("  Growth Portfolio  ")
         assert name.value == "Growth Portfolio"
 
-    def test_empty_portfolio_names_rejected(self):
+    def test_empty_portfolio_names_rejected(self) -> None:
         """Test that empty portfolio names are rejected."""
         empty_names = ["", "   ", "\t", "\n"]
         for empty_name in empty_names:
             with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
                 PortfolioName(empty_name)
 
-    def test_too_long_portfolio_names_rejected(self):
+    def test_too_long_portfolio_names_rejected(self) -> None:
         """Test that excessively long portfolio names are rejected."""
         long_name = "A" * 101  # Max is 100 characters
         with pytest.raises(
@@ -285,7 +285,7 @@ class TestPortfolioName:
         ):
             PortfolioName(long_name)
 
-    def test_max_length_portfolio_name_accepted(self):
+    def test_max_length_portfolio_name_accepted(self) -> None:
         """Test that portfolio name at max length is accepted."""
         max_length_name = "A" * 100  # Exactly 100 characters
         portfolio_name = PortfolioName(max_length_name)

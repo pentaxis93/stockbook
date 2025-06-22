@@ -16,11 +16,10 @@ import logging
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Iterator
 from unittest.mock import MagicMock, patch
 
 import pytest
-import streamlit as st
 
 # Import the error handling module (will fail initially - that's expected in TDD)
 try:
@@ -43,7 +42,7 @@ except ImportError:
 class TestCustomExceptionClasses:
     """Test custom exception class hierarchy and behavior."""
 
-    def test_stockbook_error_base_class(self):
+    def test_stockbook_error_base_class(self) -> None:
         """Test that StockBookError is the base exception class."""
         error = StockBookError("Base error message")
 
@@ -53,7 +52,7 @@ class TestCustomExceptionClasses:
         assert error.error_code is None
         assert error.context == {}
 
-    def test_stockbook_error_with_code_and_context(self):
+    def test_stockbook_error_with_code_and_context(self) -> None:
         """Test StockBookError with error code and context."""
         context = {"user_id": 123, "operation": "create_portfolio"}
         error = StockBookError("Operation failed", error_code="E001", context=context)
@@ -62,7 +61,7 @@ class TestCustomExceptionClasses:
         assert error.error_code == "E001"
         assert error.context == context
 
-    def test_validation_error_inheritance(self):
+    def test_validation_error_inheritance(self) -> None:
         """Test ValidationError inherits from StockBookError."""
         error = ValidationError("Invalid stock symbol", field="symbol")
 
@@ -71,7 +70,7 @@ class TestCustomExceptionClasses:
         assert error.field == "symbol"
         assert error.error_code == "VALIDATION_ERROR"
 
-    def test_validation_error_with_value(self):
+    def test_validation_error_with_value(self) -> None:
         """Test ValidationError stores invalid value."""
         error = ValidationError(
             "Symbol must be uppercase", field="symbol", value="aapl"
@@ -82,7 +81,7 @@ class TestCustomExceptionClasses:
         assert "symbol" in error.context
         assert error.context["symbol"] == "aapl"
 
-    def test_database_error_inheritance(self):
+    def test_database_error_inheritance(self) -> None:
         """Test DatabaseError inherits from StockBookError."""
         error = DatabaseError("Connection failed", operation="INSERT")
 
@@ -91,10 +90,10 @@ class TestCustomExceptionClasses:
         assert error.operation == "INSERT"
         assert error.error_code == "DATABASE_ERROR"
 
-    def test_database_error_with_query(self):
+    def test_database_error_with_query(self) -> None:
         """Test DatabaseError stores SQL query information."""
         query = "INSERT INTO stock (symbol, name) VALUES (?, ?)"
-        params = ("AAPL", "Apple Inc.")
+        params: tuple[str, str] = ("AAPL", "Apple Inc.")
 
         error = DatabaseError(
             "Duplicate entry", operation="INSERT", query=query, params=params
@@ -105,7 +104,7 @@ class TestCustomExceptionClasses:
         assert "query" in error.context
         assert "params" in error.context
 
-    def test_business_logic_error_inheritance(self):
+    def test_business_logic_error_inheritance(self) -> None:
         """Test BusinessLogicError inherits from StockBookError."""
         error = BusinessLogicError("Insufficient funds", rule="max_risk_check")
 
@@ -114,7 +113,7 @@ class TestCustomExceptionClasses:
         assert error.rule == "max_risk_check"
         assert error.error_code == "BUSINESS_LOGIC_ERROR"
 
-    def test_business_logic_error_with_details(self):
+    def test_business_logic_error_with_details(self) -> None:
         """Test BusinessLogicError stores business rule details."""
         error = BusinessLogicError(
             "Risk limit exceeded",
@@ -134,7 +133,7 @@ class TestErrorLogger:
     """Test error logging system functionality."""
 
     @pytest.fixture
-    def temp_log_file(self):
+    def temp_log_file(self) -> Iterator[Path]:
         """Create temporary log file for testing."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".log", delete=False) as f:
             log_path = Path(f.name)
@@ -142,7 +141,7 @@ class TestErrorLogger:
         if log_path.exists():
             log_path.unlink()
 
-    def test_error_logger_initialization(self, temp_log_file):
+    def test_error_logger_initialization(self, temp_log_file: Path) -> None:
         """Test ErrorLogger initializes correctly."""
         logger = ErrorLogger(log_file=temp_log_file)
 
@@ -150,7 +149,7 @@ class TestErrorLogger:
         assert isinstance(logger.logger, logging.Logger)
         assert logger.logger.name == "stockbook.errors"
 
-    def test_error_logger_logs_stockbook_error(self, temp_log_file):
+    def test_error_logger_logs_stockbook_error(self, temp_log_file: Path) -> None:
         """Test logging of StockBookError instances."""
         logger = ErrorLogger(log_file=temp_log_file)
         error = ValidationError("Invalid symbol", field="symbol", value="123")
@@ -166,7 +165,7 @@ class TestErrorLogger:
         assert "symbol: 123" in log_content
         assert "value: 123" in log_content
 
-    def test_error_logger_logs_generic_exception(self, temp_log_file):
+    def test_error_logger_logs_generic_exception(self, temp_log_file: Path) -> None:
         """Test logging of generic Exception instances."""
         logger = ErrorLogger(log_file=temp_log_file)
         error = ValueError("Generic error")
@@ -179,22 +178,22 @@ class TestErrorLogger:
         assert "ValueError" in log_content
         assert "Generic error" in log_content
 
-    def test_error_logger_includes_timestamp(self, temp_log_file):
+    def test_error_logger_includes_timestamp(self, temp_log_file: Path) -> None:
         """Test that log entries include timestamps."""
         logger = ErrorLogger(log_file=temp_log_file)
         error = StockBookError("Test error")
 
-        before_time = datetime.now()
+        _before_time = datetime.now()
         logger.log_error(error)
-        after_time = datetime.now()
+        _after_time = datetime.now()
 
         with open(temp_log_file, "r", encoding="utf-8") as f:
             log_content = f.read()
 
         # Check that timestamp is in reasonable range
-        assert str(before_time.year) in log_content
+        assert str(_before_time.year) in log_content
 
-    def test_error_logger_with_user_context(self, temp_log_file):
+    def test_error_logger_with_user_context(self, temp_log_file: Path) -> None:
         """Test logging with user context information."""
         logger = ErrorLogger(log_file=temp_log_file)
         error = DatabaseError("Connection failed", operation="SELECT")
@@ -212,7 +211,7 @@ class TestErrorLogger:
 class TestErrorMessageMapper:
     """Test user-friendly error message mapping system."""
 
-    def test_message_mapper_initialization(self):
+    def test_message_mapper_initialization(self) -> None:
         """Test ErrorMessageMapper initializes with default mappings."""
         mapper = ErrorMessageMapper()
 
@@ -221,7 +220,7 @@ class TestErrorMessageMapper:
         assert "VALIDATION_ERROR" in mapper.message_mappings
         assert "DATABASE_ERROR" in mapper.message_mappings
 
-    def test_map_validation_error_message(self):
+    def test_map_validation_error_message(self) -> None:
         """Test mapping validation errors to user-friendly messages."""
         mapper = ErrorMessageMapper()
         error = ValidationError("Symbol must match pattern", field="symbol")
@@ -238,7 +237,7 @@ class TestErrorMessageMapper:
             user_message != error.message
         )  # Should be different from technical message
 
-    def test_map_database_error_message(self):
+    def test_map_database_error_message(self) -> None:
         """Test mapping database errors to user-friendly messages."""
         mapper = ErrorMessageMapper()
         error = DatabaseError("UNIQUE constraint failed", operation="INSERT")
@@ -251,7 +250,7 @@ class TestErrorMessageMapper:
         )
         assert "UNIQUE constraint" not in user_message  # Should hide technical details
 
-    def test_map_business_logic_error_message(self):
+    def test_map_business_logic_error_message(self) -> None:
         """Test mapping business logic errors to user-friendly messages."""
         mapper = ErrorMessageMapper()
         error = BusinessLogicError("Risk limit exceeded", rule="portfolio_risk_limit")
@@ -261,7 +260,7 @@ class TestErrorMessageMapper:
         assert "risk" in user_message.lower()
         assert "limit" in user_message.lower()
 
-    def test_map_unknown_error_message(self):
+    def test_map_unknown_error_message(self) -> None:
         """Test mapping unknown errors to generic user-friendly message."""
         mapper = ErrorMessageMapper()
         error = RuntimeError("Unexpected error")
@@ -271,7 +270,7 @@ class TestErrorMessageMapper:
         assert "unexpected" in user_message.lower() or "error" in user_message.lower()
         assert len(user_message) > 0
 
-    def test_custom_message_mapping(self):
+    def test_custom_message_mapping(self) -> None:
         """Test adding custom error message mappings."""
         custom_mappings = {"CUSTOM_ERROR": "This is a custom error message"}
         mapper = ErrorMessageMapper(custom_mappings=custom_mappings)
@@ -281,7 +280,7 @@ class TestErrorMessageMapper:
 
         assert user_message == "This is a custom error message"
 
-    def test_message_with_context_substitution(self):
+    def test_message_with_context_substitution(self) -> None:
         """Test message mapping with context variable substitution."""
         mapper = ErrorMessageMapper()
         error = ValidationError("Symbol too long", field="symbol", value="TOOLONGSTOCK")
@@ -295,7 +294,7 @@ class TestErrorMessageMapper:
 class TestStreamlitErrorBoundary:
     """Test Streamlit error boundary functionality."""
 
-    def test_error_boundary_initialization(self):
+    def test_error_boundary_initialization(self) -> None:
         """Test StreamlitErrorBoundary initializes correctly."""
         boundary = StreamlitErrorBoundary()
 
@@ -303,7 +302,9 @@ class TestStreamlitErrorBoundary:
         assert isinstance(boundary.message_mapper, ErrorMessageMapper)
 
     @patch("streamlit.error")
-    def test_error_boundary_handles_stockbook_error(self, mock_st_error):
+    def test_error_boundary_handles_stockbook_error(
+        self, mock_st_error: MagicMock
+    ) -> None:
         """Test error boundary handles StockBookError gracefully."""
         boundary = StreamlitErrorBoundary()
         error = ValidationError("Invalid input", field="symbol")
@@ -320,7 +321,9 @@ class TestStreamlitErrorBoundary:
         )
 
     @patch("streamlit.error")
-    def test_error_boundary_handles_generic_exception(self, mock_st_error):
+    def test_error_boundary_handles_generic_exception(
+        self, mock_st_error: MagicMock
+    ) -> None:
         """Test error boundary handles generic exceptions."""
         boundary = StreamlitErrorBoundary()
         error = ValueError("Generic error")
@@ -330,7 +333,7 @@ class TestStreamlitErrorBoundary:
         mock_st_error.assert_called_once()
 
     @patch("streamlit.warning")
-    def test_error_boundary_shows_warnings(self, mock_st_warning):
+    def test_error_boundary_shows_warnings(self, mock_st_warning: MagicMock) -> None:
         """Test error boundary can show warnings instead of errors."""
         boundary = StreamlitErrorBoundary()
         error = ValidationError("Minor issue", field="notes")
@@ -339,7 +342,7 @@ class TestStreamlitErrorBoundary:
 
         mock_st_warning.assert_called_once()
 
-    def test_error_boundary_context_manager(self):
+    def test_error_boundary_context_manager(self) -> None:
         """Test error boundary works as context manager."""
         boundary = StreamlitErrorBoundary()
 
@@ -349,7 +352,7 @@ class TestStreamlitErrorBoundary:
 
             mock_error.assert_called_once()
 
-    def test_error_boundary_suppress_mode(self):
+    def test_error_boundary_suppress_mode(self) -> None:
         """Test error boundary can suppress errors in testing mode."""
         boundary = StreamlitErrorBoundary(suppress_errors=True)
 
@@ -365,7 +368,7 @@ class TestMessageSystem:
     """Test success/info message system."""
 
     @patch("streamlit.success")
-    def test_success_message_display(self, mock_st_success):
+    def test_success_message_display(self, mock_st_success: MagicMock) -> None:
         """Test displaying success messages."""
         message_system = MessageSystem()
 
@@ -374,7 +377,7 @@ class TestMessageSystem:
         mock_st_success.assert_called_once_with("Portfolio created successfully!")
 
     @patch("streamlit.info")
-    def test_info_message_display(self, mock_st_info):
+    def test_info_message_display(self, mock_st_info: MagicMock) -> None:
         """Test displaying info messages."""
         message_system = MessageSystem()
 
@@ -383,7 +386,7 @@ class TestMessageSystem:
         mock_st_info.assert_called_once_with("Loading portfolio data...")
 
     @patch("streamlit.warning")
-    def test_warning_message_display(self, mock_st_warning):
+    def test_warning_message_display(self, mock_st_warning: MagicMock) -> None:
         """Test displaying warning messages."""
         message_system = MessageSystem()
 
@@ -391,7 +394,7 @@ class TestMessageSystem:
 
         mock_st_warning.assert_called_once_with("Portfolio risk is approaching limit")
 
-    def test_message_with_auto_dismiss(self):
+    def test_message_with_auto_dismiss(self) -> None:
         """Test messages with auto-dismiss timer."""
         message_system = MessageSystem()
 
@@ -405,7 +408,7 @@ class TestMessageSystem:
                 mock_sleep.assert_called_with(2.0)
                 container.empty.assert_called_once()
 
-    def test_message_queue_functionality(self):
+    def test_message_queue_functionality(self) -> None:
         """Test message queueing and batch display."""
         message_system = MessageSystem()
 
@@ -430,7 +433,7 @@ class TestMessageSystem:
 class TestErrorRecovery:
     """Test error recovery suggestion system."""
 
-    def test_recovery_suggestions_for_validation_error(self):
+    def test_recovery_suggestions_for_validation_error(self) -> None:
         """Test recovery suggestions for validation errors."""
         recovery = ErrorRecovery()
         error = ValidationError("Invalid symbol format", field="symbol", value="aapl")
@@ -441,7 +444,7 @@ class TestErrorRecovery:
         assert len(suggestions) > 0
         assert any("uppercase" in suggestion.lower() for suggestion in suggestions)
 
-    def test_recovery_suggestions_for_database_error(self):
+    def test_recovery_suggestions_for_database_error(self) -> None:
         """Test recovery suggestions for database errors."""
         recovery = ErrorRecovery()
         error = DatabaseError("Connection timeout", operation="SELECT")
@@ -455,7 +458,7 @@ class TestErrorRecovery:
             for suggestion in suggestions
         )
 
-    def test_recovery_suggestions_for_business_logic_error(self):
+    def test_recovery_suggestions_for_business_logic_error(self) -> None:
         """Test recovery suggestions for business logic errors."""
         recovery = ErrorRecovery()
         error = BusinessLogicError(
@@ -474,7 +477,7 @@ class TestErrorRecovery:
             for suggestion in suggestions
         )
 
-    def test_no_suggestions_for_unknown_error(self):
+    def test_no_suggestions_for_unknown_error(self) -> None:
         """Test that unknown errors return generic suggestions."""
         recovery = ErrorRecovery()
         error = RuntimeError("Unknown error")
@@ -489,7 +492,7 @@ class TestErrorRecovery:
                 for suggestion in suggestions
             )
 
-    def test_contextual_suggestions(self):
+    def test_contextual_suggestions(self) -> None:
         """Test that suggestions are contextual to the error."""
         recovery = ErrorRecovery()
 
@@ -504,7 +507,7 @@ class TestErrorRecovery:
         # Suggestions should be different for different fields
         assert symbol_suggestions != price_suggestions
 
-    def test_actionable_suggestions(self):
+    def test_actionable_suggestions(self) -> None:
         """Test that suggestions are actionable and specific."""
         recovery = ErrorRecovery()
         error = ValidationError(
@@ -528,20 +531,20 @@ class TestErrorRecovery:
 class TestErrorHandlingIntegration:
     """Test integration between error handling components."""
 
-    def test_full_error_handling_workflow(self):
+    def test_full_error_handling_workflow(self) -> None:
         """Test complete error handling workflow from error to user message."""
         # Create error handling components
-        logger = ErrorLogger()
-        mapper = ErrorMessageMapper()
+        _logger = ErrorLogger()
+        _mapper = ErrorMessageMapper()
         boundary = StreamlitErrorBoundary()
-        recovery = ErrorRecovery()
+        _recovery = ErrorRecovery()
 
         # Create an error
         error = ValidationError("Invalid symbol format", field="symbol", value="123")
 
         # Test the full workflow
         with patch("streamlit.error") as mock_error:
-            with patch("streamlit.info") as mock_info:
+            with patch("streamlit.info") as _mock_info:
                 # Handle the error
                 boundary.handle_error(error)
 
@@ -549,12 +552,12 @@ class TestErrorHandlingIntegration:
                 mock_error.assert_called_once()
 
                 # Get recovery suggestions
-                suggestions = recovery.get_suggestions(error)
+                suggestions = _recovery.get_suggestions(error)
 
                 # Should have suggestions
                 assert len(suggestions) > 0
 
-    def test_error_context_preservation(self):
+    def test_error_context_preservation(self) -> None:
         """Test that error context is preserved through the handling pipeline."""
         error = BusinessLogicError(
             "Risk limit exceeded",
@@ -577,7 +580,7 @@ class TestErrorHandlingIntegration:
         # Context should influence suggestions
         assert isinstance(suggestions, list)
 
-    def test_error_logging_integration(self):
+    def test_error_logging_integration(self) -> None:
         """Test that all error types are properly logged."""
         with tempfile.NamedTemporaryFile(mode="w", suffix=".log", delete=False) as f:
             log_path = Path(f.name)

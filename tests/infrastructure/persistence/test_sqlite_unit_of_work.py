@@ -21,7 +21,7 @@ from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 class TestSqliteUnitOfWork:
     """Test suite for SqliteUnitOfWork."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test database."""
         # Create temporary database file
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
@@ -31,12 +31,12 @@ class TestSqliteUnitOfWork:
         self.db_connection = DatabaseConnection(self.temp_db.name)
         self.db_connection.initialize_schema()
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test database."""
         if os.path.exists(self.temp_db.name):
             os.unlink(self.temp_db.name)
 
-    def test_unit_of_work_provides_repository_access(self):
+    def test_unit_of_work_provides_repository_access(self) -> None:
         """Should provide access to repository instances."""
         # Act
         uow = SqliteUnitOfWork(self.db_connection)
@@ -51,7 +51,7 @@ class TestSqliteUnitOfWork:
         # assert hasattr(uow, 'balances')
         # assert hasattr(uow, 'journal')
 
-    def test_unit_of_work_context_manager_success(self):
+    def test_unit_of_work_context_manager_success(self) -> None:
         """Should support context manager protocol for transactions."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -70,7 +70,7 @@ class TestSqliteUnitOfWork:
             assert retrieved_stock is not None
             assert str(retrieved_stock.symbol) == "AAPL"
 
-    def test_unit_of_work_rollback_on_exception(self):
+    def test_unit_of_work_rollback_on_exception(self) -> None:
         """Should rollback transaction when exception occurs."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -81,7 +81,7 @@ class TestSqliteUnitOfWork:
         # Act & Assert
         with pytest.raises(RuntimeError):
             with uow:
-                stock_id = uow.stocks.create(stock)
+                uow.stocks.create(stock)
                 # Simulate an error before commit
                 raise RuntimeError("Simulated error")
 
@@ -91,7 +91,7 @@ class TestSqliteUnitOfWork:
             retrieved_stock = uow.stocks.get_by_symbol(StockSymbol("MSFT"))
             assert retrieved_stock is None
 
-    def test_unit_of_work_explicit_commit(self):
+    def test_unit_of_work_explicit_commit(self) -> None:
         """Should commit changes when explicitly called."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -118,7 +118,7 @@ class TestSqliteUnitOfWork:
             assert retrieved_stock is not None
             assert str(retrieved_stock.symbol) == "GOOGL"
 
-    def test_unit_of_work_explicit_rollback(self):
+    def test_unit_of_work_explicit_rollback(self) -> None:
         """Should rollback changes when explicitly called."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -128,7 +128,7 @@ class TestSqliteUnitOfWork:
 
         # Act
         with uow:
-            stock_id = uow.stocks.create(stock)
+            _stock_id = uow.stocks.create(stock)
             # Explicitly rollback
             uow.rollback()
 
@@ -137,7 +137,7 @@ class TestSqliteUnitOfWork:
             retrieved_stock = uow.stocks.get_by_symbol(StockSymbol("TSLA"))
             assert retrieved_stock is None
 
-    def test_unit_of_work_multiple_operations_in_transaction(self):
+    def test_unit_of_work_multiple_operations_in_transaction(self) -> None:
         """Should handle multiple operations in single transaction."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -155,7 +155,7 @@ class TestSqliteUnitOfWork:
 
         # Act
         with uow:
-            stock_ids = []
+            stock_ids: list[str] = []
             for stock in stocks:
                 stock_id = uow.stocks.create(stock)
                 stock_ids.append(stock_id)
@@ -171,7 +171,7 @@ class TestSqliteUnitOfWork:
                 retrieved_stock = uow.stocks.get_by_id(stock_id)
                 assert retrieved_stock is not None
 
-    def test_unit_of_work_nested_context_managers_not_supported(self):
+    def test_unit_of_work_nested_context_managers_not_supported(self) -> None:
         """Should handle nested context managers appropriately."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -195,7 +195,7 @@ class TestSqliteUnitOfWork:
             assert uow.stocks.exists_by_symbol(StockSymbol("AMZN"))
             assert uow.stocks.exists_by_symbol(StockSymbol("META"))
 
-    def test_unit_of_work_isolation_between_instances(self):
+    def test_unit_of_work_isolation_between_instances(self) -> None:
         """Should provide isolation between different UoW instances."""
         # Arrange
         stock = StockEntity(
@@ -207,7 +207,7 @@ class TestSqliteUnitOfWork:
         uow2 = SqliteUnitOfWork(self.db_connection)
 
         with uow1:
-            stock_id = uow1.stocks.create(stock)
+            _stock_id = uow1.stocks.create(stock)
             # Don't commit in uow1
 
             # uow2 should not see the uncommitted data
@@ -223,7 +223,7 @@ class TestSqliteUnitOfWork:
             retrieved_stock = uow2.stocks.get_by_symbol(StockSymbol("NVDA"))
             assert retrieved_stock is not None
 
-    def test_unit_of_work_repository_consistency(self):
+    def test_unit_of_work_repository_consistency(self) -> None:
         """Should maintain repository consistency within transaction."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -247,11 +247,13 @@ class TestSqliteUnitOfWork:
 
             # Verify update within same transaction
             updated_stock = uow.stocks.get_by_id(stock_id)
+            assert updated_stock is not None
+            assert updated_stock.grade is not None
             assert updated_stock.grade.value == "A"
 
             uow.commit()
 
-    def test_unit_of_work_error_handling(self):
+    def test_unit_of_work_error_handling(self) -> None:
         """Should handle database errors properly."""
         # Arrange - Create UoW with invalid database path
         invalid_db = DatabaseConnection("/invalid/path/database.db")
@@ -266,7 +268,7 @@ class TestSqliteUnitOfWork:
                 uow.stocks.create(stock)
                 uow.commit()
 
-    def test_unit_of_work_commit_without_context_manager(self):
+    def test_unit_of_work_commit_without_context_manager(self) -> None:
         """Should handle commit/rollback outside context manager."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -283,7 +285,7 @@ class TestSqliteUnitOfWork:
         assert retrieved_stock is not None
         assert str(retrieved_stock.symbol) == "SOLO"
 
-    def test_unit_of_work_double_commit_is_safe(self):
+    def test_unit_of_work_double_commit_is_safe(self) -> None:
         """Should handle multiple commit calls safely."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)
@@ -301,7 +303,7 @@ class TestSqliteUnitOfWork:
         retrieved_stock = uow.stocks.get_by_id(stock_id)
         assert retrieved_stock is not None
 
-    def test_unit_of_work_double_rollback_is_safe(self):
+    def test_unit_of_work_double_rollback_is_safe(self) -> None:
         """Should handle multiple rollback calls safely."""
         # Arrange
         uow = SqliteUnitOfWork(self.db_connection)

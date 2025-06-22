@@ -116,7 +116,7 @@ class Config:
 
         # Business day configuration
         self.business_days = {0, 1, 2, 3, 4}  # Monday through Friday
-        self.market_holidays = []  # Can be populated from external source
+        self.market_holidays: List[str] = []  # Can be populated from external source
 
         # Streamlit configuration
         self._setup_streamlit_config()

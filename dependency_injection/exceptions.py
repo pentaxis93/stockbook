@@ -5,7 +5,7 @@ Provides clear, helpful error messages for common DI configuration
 and usage mistakes.
 """
 
-from typing import List, Optional, Type
+from typing import Any, List, Optional, Type
 
 
 class DependencyInjectionError(Exception):
@@ -19,7 +19,7 @@ class DependencyResolutionError(DependencyInjectionError):
 
     def __init__(
         self,
-        service_type: Type,
+        service_type: Type[Any],
         message: str,
         resolution_chain: Optional[List[str]] = None,
     ):
@@ -48,7 +48,7 @@ class CircularDependencyError(DependencyInjectionError):
 class DuplicateRegistrationError(DependencyInjectionError):
     """Raised when attempting to register a service that's already registered."""
 
-    def __init__(self, service_type: Type, message: str):
+    def __init__(self, service_type: Type[Any], message: str):
         self.service_type = service_type
         super().__init__(message)
 
@@ -56,6 +56,6 @@ class DuplicateRegistrationError(DependencyInjectionError):
 class InvalidRegistrationError(DependencyInjectionError):
     """Raised when registration parameters are invalid."""
 
-    def __init__(self, service_type: Type, message: str):
+    def __init__(self, service_type: Type[Any], message: str):
         self.service_type = service_type
         super().__init__(message)

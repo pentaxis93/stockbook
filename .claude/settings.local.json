@@ -181,7 +181,8 @@
       "Bash(PYTHONPATH=. pylint -j 0 --persistent=yes --disable=\"too-few-public-methods,too-many-public-methods,too-many-instance-attributes,unnecessary-pass,wrong-import-order,ungrouped-imports,line-too-long,too-many-positional-arguments,fixme\" --allowed-redefined-builtins=id --max-args=12 --max-locals=8 --max-returns=8 --max-branches=10 --max-statements=25 --max-positional-arguments=8 --min-similarity-lines=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10 src/application/services/stock_application_service.py)",
       "Bash(PYTHONPATH=. pylint -j 0 --persistent=yes --disable=\"too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,too-many-arguments,too-many-positional-arguments,fixme,duplicate-code,import-outside-toplevel,broad-exception-caught,missing-class-docstring,consider-using-join,reimported\" --allowed-redefined-builtins=id --max-args=10 --max-locals=12 --max-returns=8 --max-branches=15 --max-statements=35 --docstring-min-length=10 src/presentation/controllers/stock_controller.py)",
       "Bash(PYTHONPATH=. pylint:*)",
-      "mcp__serena__insert_before_symbol"
+      "mcp__serena__insert_before_symbol",
+      "Bash(pre-commit run:*)"
     ],
     "deny": []
   }

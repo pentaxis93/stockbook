@@ -8,7 +8,7 @@ transaction support for the infrastructure layer.
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Generator, List, Optional, Union
 
 from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
@@ -194,7 +194,7 @@ class DatabaseConnection(IDatabaseConnection):
         return connection
 
     @contextmanager
-    def transaction(self):
+    def transaction(self) -> Generator[sqlite3.Connection, None, None]:
         """
         Context manager for database transactions.
 

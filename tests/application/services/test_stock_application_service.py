@@ -25,7 +25,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 class TestStockApplicationService:
     """Test suite for StockApplicationService."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test dependencies."""
         self.mock_stock_repository = Mock(spec=IStockRepository)
         self.mock_unit_of_work = Mock(spec=IStockBookUnitOfWork)
@@ -37,7 +37,7 @@ class TestStockApplicationService:
 
         self.service = StockApplicationService(self.mock_unit_of_work)
 
-    def test_create_stock_with_valid_command(self):
+    def test_create_stock_with_valid_command(self) -> None:
         """Should create stock successfully with valid command."""
         # Arrange
         command = CreateStockCommand(
@@ -78,7 +78,7 @@ class TestStockApplicationService:
         assert str(create_call.symbol) == "AAPL"
         assert create_call.company_name.value == "Apple Inc."
 
-    def test_create_stock_with_duplicate_symbol_raises_error(self):
+    def test_create_stock_with_duplicate_symbol_raises_error(self) -> None:
         """Should raise error when trying to create stock with existing symbol."""
         # Arrange
         command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
@@ -99,7 +99,7 @@ class TestStockApplicationService:
         self.mock_stock_repository.create.assert_not_called()
         self.mock_unit_of_work.commit.assert_not_called()
 
-    def test_create_stock_handles_repository_error(self):
+    def test_create_stock_handles_repository_error(self) -> None:
         """Should handle repository errors gracefully."""
         # Arrange
         command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
@@ -114,7 +114,7 @@ class TestStockApplicationService:
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
 
-    def test_get_stock_by_symbol_success(self):
+    def test_get_stock_by_symbol_success(self) -> None:
         """Should retrieve stock by symbol successfully."""
         # Arrange
         symbol = "AAPL"
@@ -147,7 +147,7 @@ class TestStockApplicationService:
             StockSymbol("AAPL")
         )
 
-    def test_get_stock_by_symbol_not_found(self):
+    def test_get_stock_by_symbol_not_found(self) -> None:
         """Should return None when stock not found."""
         # Arrange
         symbol = "NFND"  # Valid 4-character symbol
@@ -164,7 +164,7 @@ class TestStockApplicationService:
             StockSymbol("NFND")
         )
 
-    def test_get_all_stocks_success(self):
+    def test_get_all_stocks_success(self) -> None:
         """Should retrieve all stocks successfully."""
         # Arrange
         stock1 = StockEntity(
@@ -192,7 +192,7 @@ class TestStockApplicationService:
         # Verify repository interaction
         self.mock_stock_repository.get_all.assert_called_once()
 
-    def test_get_all_stocks_empty_list(self):
+    def test_get_all_stocks_empty_list(self) -> None:
         """Should handle empty stock list."""
         # Arrange
         self.mock_stock_repository.get_all.return_value = []
@@ -206,7 +206,7 @@ class TestStockApplicationService:
         # Verify repository interaction
         self.mock_stock_repository.get_all.assert_called_once()
 
-    def test_stock_exists_true(self):
+    def test_stock_exists_true(self) -> None:
         """Should return True when stock exists."""
         # Arrange
         symbol = "AAPL"
@@ -223,7 +223,7 @@ class TestStockApplicationService:
             StockSymbol("AAPL")
         )
 
-    def test_stock_exists_false(self):
+    def test_stock_exists_false(self) -> None:
         """Should return False when stock doesn't exist."""
         # Arrange
         symbol = "NFND"  # Valid 4-character symbol
@@ -240,7 +240,7 @@ class TestStockApplicationService:
             StockSymbol("NFND")
         )
 
-    def test_search_stocks_with_filters(self):
+    def test_search_stocks_with_filters(self) -> None:
         """Should search stocks with filter criteria."""
         # Arrange
         symbol_filter = "APP"
@@ -282,7 +282,7 @@ class TestStockApplicationService:
             grade_filter=grade_filter,
         )
 
-    def test_search_stocks_no_filters(self):
+    def test_search_stocks_no_filters(self) -> None:
         """Should search stocks without any filters."""
         # Arrange
         mock_entities = [
@@ -321,7 +321,7 @@ class TestStockApplicationService:
             grade_filter=None,
         )
 
-    def test_search_stocks_empty_results(self):
+    def test_search_stocks_empty_results(self) -> None:
         """Should handle empty search results gracefully."""
         # Arrange
         symbol_filter = "NOTFOUND"
@@ -341,7 +341,7 @@ class TestStockApplicationService:
             grade_filter=None,
         )
 
-    def test_update_stock_with_valid_command(self):
+    def test_update_stock_with_valid_command(self) -> None:
         """Should update stock successfully with valid command."""
         # Arrange
         command = UpdateStockCommand(
@@ -384,7 +384,7 @@ class TestStockApplicationService:
         self.mock_stock_repository.update.assert_called_once()
         self.mock_unit_of_work.commit.assert_called_once()
 
-    def test_update_stock_with_partial_command(self):
+    def test_update_stock_with_partial_command(self) -> None:
         """Should update only specified fields."""
         # Arrange
         command = UpdateStockCommand(
@@ -418,7 +418,7 @@ class TestStockApplicationService:
         assert result.industry_group == "Software"
         assert result.notes == "Existing notes"
 
-    def test_update_stock_with_nonexistent_stock_raises_error(self):
+    def test_update_stock_with_nonexistent_stock_raises_error(self) -> None:
         """Should raise error when stock doesn't exist."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-999", grade="A")
@@ -431,7 +431,7 @@ class TestStockApplicationService:
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
 
-    def test_update_stock_with_empty_command_raises_error(self):
+    def test_update_stock_with_empty_command_raises_error(self) -> None:
         """Should raise error when no fields to update."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1")  # No fields to update
@@ -440,7 +440,7 @@ class TestStockApplicationService:
         with pytest.raises(ValueError, match="No fields to update"):
             self.service.update_stock(command)
 
-    def test_update_stock_with_repository_failure_raises_error(self):
+    def test_update_stock_with_repository_failure_raises_error(self) -> None:
         """Should handle repository update failure."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
@@ -462,7 +462,7 @@ class TestStockApplicationService:
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
 
-    def test_update_stock_with_exception_rolls_back_transaction(self):
+    def test_update_stock_with_exception_rolls_back_transaction(self) -> None:
         """Should rollback transaction on any exception."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", grade="A")

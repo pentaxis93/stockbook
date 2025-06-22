@@ -13,35 +13,35 @@ from src.domain.value_objects.company_name import CompanyName
 class TestCompanyName:
     """Test suite for CompanyName value object."""
 
-    def test_create_company_name_with_valid_name(self):
+    def test_create_company_name_with_valid_name(self) -> None:
         """Should create CompanyName with valid name."""
         name = CompanyName("Apple Inc.")
 
         assert name.value == "Apple Inc."
         assert str(name) == "Apple Inc."
 
-    def test_create_company_name_with_empty_string(self):
+    def test_create_company_name_with_empty_string(self) -> None:
         """Should allow creating CompanyName with empty string."""
         name = CompanyName("")
 
         assert name.value == ""
         assert str(name) == ""
 
-    def test_create_company_name_with_whitespace_only(self):
+    def test_create_company_name_with_whitespace_only(self) -> None:
         """Should strip whitespace and allow empty result."""
         name = CompanyName("   ")
 
         assert name.value == ""
         assert str(name) == ""
 
-    def test_create_company_name_strips_whitespace(self):
+    def test_create_company_name_strips_whitespace(self) -> None:
         """Should strip leading and trailing whitespace."""
         name = CompanyName("  Apple Inc.  ")
 
         assert name.value == "Apple Inc."
         assert str(name) == "Apple Inc."
 
-    def test_create_company_name_with_maximum_length(self):
+    def test_create_company_name_with_maximum_length(self) -> None:
         """Should allow company name with maximum length (200 chars)."""
         long_name = "A" * 200
         name = CompanyName(long_name)
@@ -49,7 +49,7 @@ class TestCompanyName:
         assert name.value == long_name
         assert len(name.value) == 200
 
-    def test_create_company_name_exceeding_maximum_length_raises_error(self):
+    def test_create_company_name_exceeding_maximum_length_raises_error(self) -> None:
         """Should raise error for company name exceeding 200 characters."""
         too_long_name = "A" * 201
 
@@ -58,7 +58,7 @@ class TestCompanyName:
         ):
             CompanyName(too_long_name)
 
-    def test_company_name_equality(self):
+    def test_company_name_equality(self) -> None:
         """Should compare CompanyName objects by value."""
         name1 = CompanyName("Apple Inc.")
         name2 = CompanyName("Apple Inc.")
@@ -68,7 +68,7 @@ class TestCompanyName:
         assert name1 != name3
         assert name2 != name3
 
-    def test_company_name_hash(self):
+    def test_company_name_hash(self) -> None:
         """Should be hashable based on value."""
         name1 = CompanyName("Apple Inc.")
         name2 = CompanyName("Apple Inc.")
@@ -80,7 +80,7 @@ class TestCompanyName:
         name_set = {name1, name2, name3}
         assert len(name_set) == 2  # name1 and name2 are the same
 
-    def test_company_name_immutability(self):
+    def test_company_name_immutability(self) -> None:
         """Should be immutable."""
         name = CompanyName("Apple Inc.")
 
@@ -90,9 +90,9 @@ class TestCompanyName:
 
         # The value attribute should be read-only
         with pytest.raises(AttributeError):
-            name.value = "Microsoft Corp."
+            name.value = "Microsoft Corp."  # type: ignore[misc] - Testing immutability
 
-    def test_company_name_repr(self):
+    def test_company_name_repr(self) -> None:
         """Should have meaningful repr representation."""
         name = CompanyName("Apple Inc.")
 

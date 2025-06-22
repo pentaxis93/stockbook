@@ -16,7 +16,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Iterator
 from unittest.mock import patch
 
 import pytest
@@ -30,7 +30,7 @@ except ImportError:
 
 
 @pytest.fixture(autouse=True)
-def reset_config():
+def reset_config() -> Iterator[None]:
     """Reset config singleton before each test."""
     Config.reset()
     yield
@@ -40,7 +40,7 @@ def reset_config():
 class TestConfigInitialization:
     """Test configuration system initialization and validation."""
 
-    def test_config_loads_default_values(self):
+    def test_config_loads_default_values(self) -> None:
         """Test that Config loads with sensible defaults."""
         config = Config()
 
@@ -61,13 +61,13 @@ class TestConfigInitialization:
         assert config.currency_symbol == "$"
         assert config.decimal_places == 2
 
-    def test_config_validates_on_startup(self):
+    def test_config_validates_on_startup(self) -> None:
         """Test that configuration validation happens on initialization."""
         # This should not raise any exceptions with default config
         config = Config()
         config.validate()
 
-    def test_config_singleton_behavior(self):
+    def test_config_singleton_behavior(self) -> None:
         """Test that Config behaves as a singleton."""
         config1 = Config()
         config2 = Config()
@@ -75,7 +75,7 @@ class TestConfigInitialization:
         # Should be the same instance
         assert config1 is config2
 
-    def test_config_loads_from_environment(self):
+    def test_config_loads_from_environment(self) -> None:
         """Test that Config can load values from environment variables."""
         with patch.dict(
             os.environ,
@@ -95,7 +95,7 @@ class TestConfigInitialization:
 class TestDatabaseConfiguration:
     """Test database-related configuration."""
 
-    def test_database_connection_settings(self):
+    def test_database_connection_settings(self) -> None:
         """Test database connection configuration."""
         config = Config()
 
@@ -104,7 +104,7 @@ class TestDatabaseConfiguration:
         assert config.db_foreign_keys_enabled is True
         assert config.db_row_factory == "dict"
 
-    def test_database_paths_are_path_objects(self):
+    def test_database_paths_are_path_objects(self) -> None:
         """Test that database paths are Path objects."""
         config = Config()
 
@@ -112,7 +112,7 @@ class TestDatabaseConfiguration:
         assert isinstance(config.schema_path, Path)
         assert isinstance(config.test_db_path, Path)
 
-    def test_database_directory_creation(self):
+    def test_database_directory_creation(self) -> None:
         """Test that database directory gets created if it doesn't exist."""
         with tempfile.TemporaryDirectory() as temp_dir:
             custom_path = Path(temp_dir) / "custom_db" / "stockbook.db"
@@ -127,7 +127,7 @@ class TestDatabaseConfiguration:
 class TestValidationRules:
     """Test validation rule configuration."""
 
-    def test_stock_symbol_validation_rules(self):
+    def test_stock_symbol_validation_rules(self) -> None:
         """Test stock symbol validation configuration."""
         config = Config()
 
@@ -144,14 +144,14 @@ class TestValidationRules:
         assert pattern.match("BRK.B") is not None
         assert pattern.match("123invalid") is None
 
-    def test_grade_validation_rules(self):
+    def test_grade_validation_rules(self) -> None:
         """Test stock grade validation configuration."""
         config = Config()
 
         assert hasattr(config, "valid_grades")
         assert set(config.valid_grades) == {"A", "B", "C"}
 
-    def test_transaction_validation_rules(self):
+    def test_transaction_validation_rules(self) -> None:
         """Test transaction validation configuration."""
         config = Config()
 
@@ -167,7 +167,7 @@ class TestValidationRules:
         assert hasattr(config, "max_quantity")
         assert config.min_quantity > 0
 
-    def test_portfolio_validation_rules(self):
+    def test_portfolio_validation_rules(self) -> None:
         """Test portfolio validation configuration."""
         config = Config()
 
@@ -181,7 +181,7 @@ class TestValidationRules:
 class TestPortfolioDefaults:
     """Test portfolio default configuration."""
 
-    def test_portfolio_default_values(self):
+    def test_portfolio_default_values(self) -> None:
         """Test portfolio default configuration values."""
         config = Config()
 
@@ -192,22 +192,26 @@ class TestPortfolioDefaults:
         assert defaults["max_risk_per_trade"] == 2.0
         assert "name_prefix" in defaults
 
-    def test_portfolio_defaults_are_valid(self):
+    def test_portfolio_defaults_are_valid(self) -> None:
         """Test that portfolio defaults pass validation rules."""
         config = Config()
         defaults = config.portfolio_defaults
 
         # Max positions should be reasonable
-        assert 1 <= defaults["max_positions"] <= 100
+        max_positions = defaults["max_positions"]
+        assert isinstance(max_positions, int)
+        assert 1 <= max_positions <= 100
 
         # Risk per trade should be reasonable percentage
-        assert 0 < defaults["max_risk_per_trade"] <= config.max_risk_per_trade_limit
+        max_risk_per_trade = defaults["max_risk_per_trade"]
+        assert isinstance(max_risk_per_trade, (int, float))
+        assert 0 < max_risk_per_trade <= config.max_risk_per_trade_limit
 
 
 class TestFeatureFlags:
     """Test feature flag configuration."""
 
-    def test_feature_flags_exist(self):
+    def test_feature_flags_exist(self) -> None:
         """Test that feature flags are properly configured."""
         config = Config()
 
@@ -224,7 +228,7 @@ class TestFeatureFlags:
         assert "journal_system" in features
         assert "analytics" in features
 
-    def test_development_features_disabled_by_default(self):
+    def test_development_features_disabled_by_default(self) -> None:
         """Test that development features are disabled by default."""
         config = Config()
 
@@ -242,7 +246,7 @@ class TestFeatureFlags:
 class TestDateTimeConfiguration:
     """Test date and time format configuration."""
 
-    def test_date_format_configuration(self):
+    def test_date_format_configuration(self) -> None:
         """Test date format settings."""
         config = Config()
 
@@ -255,7 +259,7 @@ class TestDateTimeConfiguration:
         assert formatted_date == "2023-12-25"
         assert formatted_datetime == "2023-12-25 15:30:45"
 
-    def test_business_day_configuration(self):
+    def test_business_day_configuration(self) -> None:
         """Test business day calculation settings."""
         config = Config()
 
@@ -269,7 +273,7 @@ class TestDateTimeConfiguration:
 class TestDisplayConfiguration:
     """Test display and UI configuration."""
 
-    def test_currency_formatting(self):
+    def test_currency_formatting(self) -> None:
         """Test currency display configuration."""
         config = Config()
 
@@ -281,7 +285,7 @@ class TestDisplayConfiguration:
             assert config.format_currency(1234.567) == "$1,234.57"
             assert config.format_currency(0) == "$0.00"
 
-    def test_table_display_settings(self):
+    def test_table_display_settings(self) -> None:
         """Test table display configuration."""
         config = Config()
 
@@ -295,7 +299,7 @@ class TestDisplayConfiguration:
 class TestConfigValidation:
     """Test configuration validation and error handling."""
 
-    def test_validate_raises_on_invalid_paths(self):
+    def test_validate_raises_on_invalid_paths(self) -> None:
         """Test validation fails for invalid file paths."""
         config = Config()
 
@@ -305,7 +309,7 @@ class TestConfigValidation:
         with pytest.raises(ValidationError, match="Schema file does not exist"):
             config.validate()
 
-    def test_validate_raises_on_invalid_values(self):
+    def test_validate_raises_on_invalid_values(self) -> None:
         """Test validation fails for invalid configuration values."""
         config = Config()
 
@@ -322,7 +326,7 @@ class TestConfigValidation:
         with pytest.raises(ValidationError, match="max_positions must be positive"):
             config.validate(skip_file_checks=True)
 
-    def test_validate_raises_on_invalid_patterns(self):
+    def test_validate_raises_on_invalid_patterns(self) -> None:
         """Test validation fails for invalid regex patterns."""
         config = Config()
 
@@ -336,7 +340,7 @@ class TestConfigValidation:
 class TestConfigEnvironmentOverrides:
     """Test environment variable configuration overrides."""
 
-    def test_environment_variables_override_defaults(self):
+    def test_environment_variables_override_defaults(self) -> None:
         """Test that environment variables properly override defaults."""
         env_vars = {
             "STOCKBOOK_CURRENCY_SYMBOL": "€",
@@ -351,7 +355,7 @@ class TestConfigEnvironmentOverrides:
             assert config.decimal_places == 3
             assert config.table_page_size == 25
 
-    def test_invalid_environment_values_raise_errors(self):
+    def test_invalid_environment_values_raise_errors(self) -> None:
         """Test that invalid environment values raise appropriate errors."""
         with patch.dict(os.environ, {"STOCKBOOK_DECIMAL_PLACES": "invalid"}):
             with pytest.raises(ConfigError, match="Invalid integer value"):
@@ -361,14 +365,14 @@ class TestConfigEnvironmentOverrides:
 class TestConfigMethods:
     """Test configuration utility methods."""
 
-    def test_get_db_connection_string(self):
+    def test_get_db_connection_string(self) -> None:
         """Test database connection string generation."""
         config = Config()
 
         conn_str = config.get_db_connection_string()
         assert str(config.db_path) in conn_str
 
-    def test_ensure_directories_creates_paths(self):
+    def test_ensure_directories_creates_paths(self) -> None:
         """Test that ensure_directories creates necessary directories."""
         with tempfile.TemporaryDirectory() as temp_dir:
             config = Config()
@@ -384,14 +388,14 @@ class TestConfigMethods:
             assert config.backup_dir.exists()
             assert config.logs_dir.exists()
 
-    def test_is_feature_enabled(self):
+    def test_is_feature_enabled(self) -> None:
         """Test feature flag checking method."""
         config = Config()
 
         assert config.is_feature_enabled("stock_management") is True
         assert config.is_feature_enabled("nonexistent_feature") is False
 
-    def test_get_validation_rules(self):
+    def test_get_validation_rules(self) -> None:
         """Test validation rules retrieval."""
         config = Config()
 
@@ -407,7 +411,7 @@ class TestConfigMethods:
 class TestConfigIntegration:
     """Test configuration integration with other system components."""
 
-    def test_config_integrates_with_database_module(self):
+    def test_config_integrates_with_database_module(self) -> None:
         """Test that config works with database utilities."""
         # This test will be more meaningful once we refactor database.py
         config = Config()
@@ -416,7 +420,7 @@ class TestConfigIntegration:
         assert config.db_path.name == "stockbook.db"
         assert config.schema_path.name == "schema.sql"
 
-    def test_config_provides_streamlit_settings(self):
+    def test_config_provides_streamlit_settings(self) -> None:
         """Test that config provides Streamlit configuration."""
         config = Config()
 

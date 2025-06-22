@@ -5,17 +5,11 @@ Following TDD approach - these tests define the expected behavior
 of the stock controller that coordinates between UI and application services.
 """
 
-from datetime import datetime
-from decimal import Decimal
-from unittest.mock import Mock, patch
-
-import pytest
+from unittest.mock import Mock
 
 from src.application.commands.stock_commands import CreateStockCommand
 from src.application.dto.stock_dto import StockDto
 from src.application.services.stock_application_service import StockApplicationService
-from src.domain.entities.stock_entity import StockEntity
-from src.domain.value_objects.stock_symbol import StockSymbol
 from src.presentation.controllers.stock_controller import StockController
 from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
@@ -30,12 +24,12 @@ from src.presentation.view_models.stock_view_models import (
 class TestStockController:
     """Test suite for StockController presentation layer."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.mock_stock_service = Mock(spec=StockApplicationService)
         self.controller = StockController(self.mock_stock_service)
 
-    def test_controller_initialization(self):
+    def test_controller_initialization(self) -> None:
         """Should initialize controller with required dependencies."""
         # Act & Assert
         assert self.controller.stock_service == self.mock_stock_service
@@ -43,7 +37,7 @@ class TestStockController:
         assert hasattr(self.controller, "get_stock_list")
         assert hasattr(self.controller, "get_stock_by_symbol")
 
-    def test_create_stock_success(self):
+    def test_create_stock_success(self) -> None:
         """Should successfully create stock through application service."""
         # Arrange
         request = CreateStockRequest(
@@ -85,7 +79,7 @@ class TestStockController:
         assert call_args.symbol == "AAPL"
         assert call_args.name == "Apple Inc."
 
-    def test_create_stock_validation_error(self):
+    def test_create_stock_validation_error(self) -> None:
         """Should handle validation errors gracefully."""
         # Arrange
         request = CreateStockRequest(
@@ -110,7 +104,7 @@ class TestStockController:
         # Service should not be called
         self.mock_stock_service.create_stock.assert_not_called()
 
-    def test_create_stock_service_error(self):
+    def test_create_stock_service_error(self) -> None:
         """Should handle application service errors."""
         # Arrange
         request = CreateStockRequest(
@@ -136,7 +130,7 @@ class TestStockController:
         assert response.message == "Stock already exists"
         assert response.errors is None
 
-    def test_create_stock_invalid_symbol_format(self):
+    def test_create_stock_invalid_symbol_format(self) -> None:
         """Should validate stock symbol format."""
         # Arrange
         request = CreateStockRequest(
@@ -157,7 +151,7 @@ class TestStockController:
         assert "symbol" in response.errors
         assert "Invalid stock symbol format" in response.errors["symbol"]
 
-    def test_create_stock_invalid_grade(self):
+    def test_create_stock_invalid_grade(self) -> None:
         """Should validate stock grade values."""
         # Arrange
         request = CreateStockRequest(
@@ -178,7 +172,7 @@ class TestStockController:
         assert "grade" in response.errors
         assert "Grade must be A, B, C, or empty" in response.errors["grade"]
 
-    def test_get_stock_list_success(self):
+    def test_get_stock_list_success(self) -> None:
         """Should retrieve stock list successfully."""
         # Arrange
         mock_stocks = [
@@ -225,7 +219,7 @@ class TestStockController:
         assert response.total_count == 3
         assert response.message == "Retrieved 3 stocks"
 
-    def test_get_stock_list_empty(self):
+    def test_get_stock_list_empty(self) -> None:
         """Should handle empty stock list."""
         # Arrange
         self.mock_stock_service.get_all_stocks.return_value = []
@@ -240,7 +234,7 @@ class TestStockController:
         assert response.total_count == 0
         assert response.message == "No stocks found"
 
-    def test_get_stock_list_service_error(self):
+    def test_get_stock_list_service_error(self) -> None:
         """Should handle service errors in stock list retrieval."""
         # Arrange
         self.mock_stock_service.get_all_stocks.side_effect = Exception("Database error")
@@ -254,7 +248,7 @@ class TestStockController:
         assert response.stocks == []
         assert response.message == "Database error"
 
-    def test_get_stock_by_symbol_success(self):
+    def test_get_stock_by_symbol_success(self) -> None:
         """Should retrieve stock by symbol successfully."""
         # Arrange
         symbol = "AAPL"
@@ -276,6 +270,7 @@ class TestStockController:
         # Assert
         assert isinstance(response, StockDetailResponse)
         assert response.success is True
+        assert response.stock is not None
         assert response.stock.symbol == "AAPL"
         assert response.stock.name == "Apple Inc."
         assert response.message == "Stock retrieved successfully"
@@ -283,7 +278,7 @@ class TestStockController:
         # Verify service was called with correct symbol
         self.mock_stock_service.get_stock_by_symbol.assert_called_once_with(symbol)
 
-    def test_get_stock_by_symbol_not_found(self):
+    def test_get_stock_by_symbol_not_found(self) -> None:
         """Should handle stock not found scenario."""
         # Arrange
         symbol = "NOTFD"  # Valid format but doesn't exist
@@ -298,7 +293,7 @@ class TestStockController:
         assert response.stock is None
         assert response.message == f"Stock with symbol {symbol} not found"
 
-    def test_get_stock_by_symbol_invalid_format(self):
+    def test_get_stock_by_symbol_invalid_format(self) -> None:
         """Should validate symbol format before service call."""
         # Arrange
         invalid_symbol = "invalid123"
@@ -315,7 +310,7 @@ class TestStockController:
         # Service should not be called
         self.mock_stock_service.get_stock_by_symbol.assert_not_called()
 
-    def test_controller_error_handling_generic_exception(self):
+    def test_controller_error_handling_generic_exception(self) -> None:
         """Should handle unexpected exceptions gracefully."""
         # Arrange
         request = CreateStockRequest(
@@ -337,7 +332,7 @@ class TestStockController:
         assert response.success is False
         assert "Unexpected error" in response.message
 
-    def test_controller_input_sanitization(self):
+    def test_controller_input_sanitization(self) -> None:
         """Should sanitize input data before processing."""
         # Arrange
         request = CreateStockRequest(
@@ -376,7 +371,7 @@ class TestStockController:
         assert call_args.grade == "A"
         assert call_args.notes == "Some notes"
 
-    def test_controller_concurrent_requests_handling(self):
+    def test_controller_concurrent_requests_handling(self) -> None:
         """Should handle concurrent requests safely."""
         # Arrange
         request = CreateStockRequest(
@@ -411,7 +406,7 @@ class TestStockController:
         assert response2.success is False
         assert "Stock already exists" in response2.message
 
-    def test_search_stocks_success(self):
+    def test_search_stocks_success(self) -> None:
         """Should search stocks successfully with filters."""
         # Arrange
         from src.presentation.view_models.stock_view_models import StockSearchRequest
@@ -459,7 +454,7 @@ class TestStockController:
             grade_filter="A",
         )
 
-    def test_search_stocks_no_filters_fallback(self):
+    def test_search_stocks_no_filters_fallback(self) -> None:
         """Should fallback to get_stock_list when no filters are provided."""
         # Arrange
         from src.presentation.view_models.stock_view_models import StockSearchRequest
@@ -502,7 +497,7 @@ class TestStockController:
         self.mock_stock_service.get_all_stocks.assert_called_once()
         self.mock_stock_service.search_stocks.assert_not_called()
 
-    def test_search_stocks_validation_error(self):
+    def test_search_stocks_validation_error(self) -> None:
         """Should handle validation errors in search request."""
         # Arrange
         from src.presentation.view_models.stock_view_models import StockSearchRequest
@@ -523,7 +518,7 @@ class TestStockController:
         # Service should not be called
         self.mock_stock_service.search_stocks.assert_not_called()
 
-    def test_search_stocks_empty_results(self):
+    def test_search_stocks_empty_results(self) -> None:
         """Should handle empty search results gracefully."""
         # Arrange
         from src.presentation.view_models.stock_view_models import StockSearchRequest
@@ -542,7 +537,7 @@ class TestStockController:
         assert "Retrieved 0 stocks" in response.message
         assert response.filters_applied == {"symbol": "NOTFOUND"}
 
-    def test_search_stocks_service_error(self):
+    def test_search_stocks_service_error(self) -> None:
         """Should handle application service errors in search."""
         # Arrange
         from src.presentation.view_models.stock_view_models import StockSearchRequest
@@ -559,7 +554,7 @@ class TestStockController:
         assert response.success is False
         assert response.message == "Database error"
 
-    def test_search_stocks_filter_message_formatting(self):
+    def test_search_stocks_filter_message_formatting(self) -> None:
         """Should format filter messages correctly based on filter count."""
         # Arrange
         from src.presentation.view_models.stock_view_models import StockSearchRequest
@@ -582,7 +577,7 @@ class TestStockController:
         response_multi = self.controller.search_stocks(search_request_multi)
         assert "matching 2 filters" in response_multi.message
 
-    def test_update_stock_with_valid_request(self):
+    def test_update_stock_with_valid_request(self) -> None:
         """Should update stock successfully with valid request."""
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
@@ -615,7 +610,7 @@ class TestStockController:
         assert response.stock_id == "stock-id-1"
         assert "Stock updated successfully" in response.message
 
-    def test_update_stock_with_validation_errors(self):
+    def test_update_stock_with_validation_errors(self) -> None:
         """Should return validation errors for invalid update request."""
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
@@ -634,7 +629,7 @@ class TestStockController:
         assert "name" in response.errors
         assert "grade" in response.errors
 
-    def test_update_stock_with_nonexistent_stock(self):
+    def test_update_stock_with_nonexistent_stock(self) -> None:
         """Should handle update of nonexistent stock."""
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
@@ -653,7 +648,7 @@ class TestStockController:
         assert response.success is False
         assert "Stock with ID stock-id-999 not found" in response.message
 
-    def test_update_stock_with_no_fields_to_update(self):
+    def test_update_stock_with_no_fields_to_update(self) -> None:
         """Should handle update request with no fields to update."""
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest
@@ -667,7 +662,7 @@ class TestStockController:
         assert isinstance(response, ValidationErrorResponse)
         assert "No fields to update" in response.errors.get("general", "")
 
-    def test_update_stock_with_service_error(self):
+    def test_update_stock_with_service_error(self) -> None:
         """Should handle application service errors during update."""
         # Arrange
         from src.presentation.view_models.stock_view_models import UpdateStockRequest

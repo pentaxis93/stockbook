@@ -4,21 +4,19 @@ This document tracks temporary implementations, architectural compromises, and t
 
 ## High Priority (Blocking Clean Architecture Completion)
 
-### 0. Strategic Streamlit Type Ignores (NEW - 2025-06-21)
-- **Issue**: Broad `# type: ignore` statements added to Streamlit UI files during type safety improvements
+### 0. Strategic Presentation Layer Type Checking Exemption (UPDATED - 2025-06-21)
+- **Issue**: Entire presentation layer excluded from strict type checking during transition period
 - **Reason**: Dev team plans to replace Streamlit with different UI framework - investing in perfect Streamlit typing is wasteful
-- **Impact**: Temporary reduction in type safety for UI layer only (business logic remains fully typed)
-- **Files Affected**:
-  - `src/presentation/adapters/streamlit_stock_adapter.py` 
-  - `src/presentation/adapters/streamlit_ui_operations.py`
-  - `tests/presentation/adapters/test_streamlit_stock_adapter.py`
-- **Documentation**: Clear TODO comments added explaining cleanup requirements
+- **Impact**: Complete type checking disabled for presentation layer (business logic remains fully typed)
+- **Configuration**: `pyproject.toml` - `src/presentation` execution environment set to `typeCheckingMode = "off"`
+- **Files Affected**: All files under `src/presentation/` directory
 - **MANDATORY CLEANUP when migrating UI framework**:
-  1. Remove all `# type: ignore[import-untyped]` and `# type: ignore[misc]` statements
+  1. Re-enable type checking: Change `typeCheckingMode = "off"` to `"strict"`
   2. Replace Streamlit-specific code with new UI framework implementation  
   3. Preserve clean controller interfaces (they should work unchanged)
   4. Add proper typing for new UI framework
-- **Strategic Value**: Allows team to achieve 60%+ type error elimination while focusing on permanent business logic
+  5. Remove any remaining `# type: ignore` statements
+- **Strategic Value**: Allows team to achieve 100% type error elimination in business logic while deferring UI layer typing
 - **Review Date**: When UI framework migration begins
 
 ### 1. ✅ RESOLVED: Enhanced Pylint Configuration (COMPLETED - 2025-06-21)

@@ -6,28 +6,21 @@ across multiple stocks and provide aggregated insights.
 """
 
 from decimal import Decimal
-from typing import List
+from typing import Dict, List, Tuple
 
 import pytest
 
 from src.domain.entities.stock_entity import StockEntity
-from src.domain.services.exceptions import CalculationError, InsufficientDataError
 
 # These imports now exist after implementation
 from src.domain.services.portfolio_calculation_service import (
     PortfolioCalculationService,
-)
-from src.domain.services.value_objects import (
-    PortfolioAllocation,
-    PortfolioMetrics,
-    PositionAllocation,
 )
 from src.domain.value_objects import (
     CompanyName,
     Grade,
     IndustryGroup,
     Money,
-    Notes,
     Quantity,
 )
 from src.domain.value_objects.sector import Sector
@@ -35,7 +28,9 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 # Test data helpers
-def create_test_stock(symbol="AAPL", price=100.00, quantity=10, grade="B"):
+def create_test_stock(
+    symbol: str = "AAPL", price: float = 100.00, quantity: int = 10, grade: str = "B"
+) -> Tuple[StockEntity, Quantity, Money]:
     """Helper to create test stock with position."""
     stock = StockEntity(
         symbol=StockSymbol(symbol),
@@ -47,7 +42,9 @@ def create_test_stock(symbol="AAPL", price=100.00, quantity=10, grade="B"):
     return stock, Quantity(quantity), Money(Decimal(str(price)))
 
 
-def create_test_portfolio():
+def create_test_portfolio() -> (
+    Tuple[List[Tuple[StockEntity, Quantity]], Dict[str, Money]]
+):
     """Helper to create a test portfolio with multiple positions."""
     positions = [
         create_test_stock("AAPL", 150.00, 10, "A"),  # $1,500
@@ -56,8 +53,8 @@ def create_test_portfolio():
         create_test_stock("GME", 20.00, 50, "C"),  # $1,000
     ]
 
-    portfolio = []
-    prices = {}
+    portfolio: List[Tuple[StockEntity, Quantity]] = []
+    prices: Dict[str, Money] = {}
 
     for stock, quantity, price in positions:
         portfolio.append((stock, quantity))
@@ -69,7 +66,7 @@ def create_test_portfolio():
 class TestPortfolioValueCalculations:
     """Test portfolio value and worth calculations."""
 
-    def test_calculate_total_portfolio_value(self):
+    def test_calculate_total_portfolio_value(self) -> None:
         """Should calculate total portfolio market value."""
         service = PortfolioCalculationService()
         portfolio, prices = create_test_portfolio()
@@ -79,7 +76,7 @@ class TestPortfolioValueCalculations:
         expected = Money(Decimal("8500.00"))  # 1500 + 5000 + 1000 + 1000
         assert total_value == expected
 
-    def test_calculate_position_values(self):
+    def test_calculate_position_values(self) -> None:
         """Should calculate individual position values."""
         service = PortfolioCalculationService()
         stock, quantity, current_price = create_test_stock("AAPL", 150.00, 10)
@@ -91,7 +88,7 @@ class TestPortfolioValueCalculations:
         expected = Money(Decimal("1500.00"))
         assert position_value == expected
 
-    def test_calculate_portfolio_with_different_currencies(self):
+    def test_calculate_portfolio_with_different_currencies(self) -> None:
         """Should handle multi-currency portfolios."""
         # service = PortfolioCalculationService()
         #
@@ -114,7 +111,7 @@ class TestPortfolioValueCalculations:
         #     service.calculate_total_value(portfolio)
         pass
 
-    def test_calculate_portfolio_value_with_zero_positions(self):
+    def test_calculate_portfolio_value_with_zero_positions(self) -> None:
         """Should handle empty portfolio."""
         # service = PortfolioCalculationService()
         # empty_portfolio = []
@@ -128,7 +125,7 @@ class TestPortfolioValueCalculations:
 class TestPortfolioAllocationAnalysis:
     """Test portfolio allocation and distribution analysis."""
 
-    def test_calculate_allocation_by_position(self):
+    def test_calculate_allocation_by_position(self) -> None:
         """Should calculate allocation percentage for each position."""
         service = PortfolioCalculationService()
         portfolio, prices = create_test_portfolio()
@@ -139,7 +136,7 @@ class TestPortfolioAllocationAnalysis:
         googl_allocation = next(a for a in allocations if a.symbol.value == "GOOGL")
         assert abs(googl_allocation.percentage - Decimal("58.8")) < Decimal("0.1")
 
-    def test_calculate_allocation_by_industry(self):
+    def test_calculate_allocation_by_industry(self) -> None:
         """Should calculate allocation by industry sectors."""
         service = PortfolioCalculationService()
         portfolio, prices = create_test_portfolio()  # All Technology stocks
@@ -149,35 +146,35 @@ class TestPortfolioAllocationAnalysis:
         tech_allocation = industry_allocations.get_allocation_percentage("Software")
         assert tech_allocation == Decimal("100.0")  # All are Software
 
-    def test_calculate_grade_allocations_method_removed(self):
+    def test_calculate_grade_allocations_method_removed(self) -> None:
         """Grade allocation method should be removed from service."""
         service = PortfolioCalculationService()
 
         # Method should not exist
         assert not hasattr(service, "calculate_grade_allocations")
 
-    def test_calculate_diversity_score_method_removed(self):
+    def test_calculate_diversity_score_method_removed(self) -> None:
         """Diversity score method should be removed from service."""
         service = PortfolioCalculationService()
 
         # Method should not exist
         assert not hasattr(service, "calculate_diversity_score")
 
-    def test_calculate_weighted_average_grade_method_removed(self):
+    def test_calculate_weighted_average_grade_method_removed(self) -> None:
         """Weighted average grade method should be removed from service."""
         service = PortfolioCalculationService()
 
         # Method should not exist
         assert not hasattr(service, "calculate_weighted_average_grade")
 
-    def test_generate_portfolio_summary_method_removed(self):
+    def test_generate_portfolio_summary_method_removed(self) -> None:
         """Portfolio summary generation method should be removed from service."""
         service = PortfolioCalculationService()
 
         # Method should not exist
         assert not hasattr(service, "generate_portfolio_summary")
 
-    def test_identify_concentration_risks(self):
+    def test_identify_concentration_risks(self) -> None:
         """Should identify positions that are overly concentrated."""
         # service = PortfolioCalculationService()
         # concentrated_portfolio = [
@@ -197,7 +194,7 @@ class TestPortfolioAllocationAnalysis:
 class TestPortfolioPerformanceMetrics:
     """Test portfolio performance and risk metrics."""
 
-    def test_calculate_portfolio_risk_metrics(self):
+    def test_calculate_portfolio_risk_metrics(self) -> None:
         """Should calculate comprehensive risk metrics."""
         # service = PortfolioCalculationService()
         # portfolio = create_test_portfolio()
@@ -209,7 +206,7 @@ class TestPortfolioPerformanceMetrics:
         # assert len(risk_metrics.risk_factors) > 0
         pass
 
-    def test_calculate_growth_vs_value_allocation(self):
+    def test_calculate_growth_vs_value_allocation(self) -> None:
         """Should analyze growth vs value stock allocation."""
         # service = PortfolioCalculationService()
         # portfolio = [
@@ -229,7 +226,7 @@ class TestPortfolioPerformanceMetrics:
 class TestPortfolioRebalancingAnalysis:
     """Test portfolio rebalancing recommendations."""
 
-    def test_suggest_rebalancing_for_overweight_positions(self):
+    def test_suggest_rebalancing_for_overweight_positions(self) -> None:
         """Should suggest rebalancing when positions become overweight."""
         # service = PortfolioCalculationService()
         # target_allocation = {
@@ -249,7 +246,7 @@ class TestPortfolioRebalancingAnalysis:
         # assert googl_suggestion.target_percentage == 25.0
         pass
 
-    def test_calculate_rebalancing_trades(self):
+    def test_calculate_rebalancing_trades(self) -> None:
         """Should calculate specific trades needed for rebalancing."""
         # service = PortfolioCalculationService()
         # portfolio = create_test_portfolio()
@@ -265,7 +262,7 @@ class TestPortfolioRebalancingAnalysis:
         # assert len(buy_trades) > 0
         pass
 
-    def test_calculate_tax_efficient_rebalancing(self):
+    def test_calculate_tax_efficient_rebalancing(self) -> None:
         """Should consider tax implications in rebalancing suggestions."""
         # service = PortfolioCalculationService()
         # portfolio = create_portfolio_with_tax_implications()
@@ -283,7 +280,7 @@ class TestPortfolioRebalancingAnalysis:
 class TestPortfolioReporting:
     """Test portfolio reporting and summary generation."""
 
-    def test_generate_allocation_report(self):
+    def test_generate_allocation_report(self) -> None:
         """Should generate detailed allocation breakdown report."""
         # service = PortfolioCalculationService()
         # portfolio = create_test_portfolio()
@@ -296,7 +293,7 @@ class TestPortfolioReporting:
         # assert report.concentration_analysis is not None
         pass
 
-    def test_generate_performance_metrics_report(self):
+    def test_generate_performance_metrics_report(self) -> None:
         """Should generate performance and risk metrics report."""
         # service = PortfolioCalculationService()
         # portfolio = create_test_portfolio()
@@ -313,7 +310,7 @@ class TestPortfolioReporting:
 class TestPortfolioCalculationServiceConfiguration:
     """Test service configuration and error handling."""
 
-    def test_service_with_custom_calculation_rules(self):
+    def test_service_with_custom_calculation_rules(self) -> None:
         """Should allow custom calculation rule configuration."""
         # config = PortfolioCalculationConfig(
         #     concentration_threshold=0.3,  # 30% max per position
@@ -325,7 +322,7 @@ class TestPortfolioCalculationServiceConfiguration:
         # assert service.config.concentration_threshold == 0.3
         pass
 
-    def test_handle_calculation_errors_gracefully(self):
+    def test_handle_calculation_errors_gracefully(self) -> None:
         """Should handle edge cases and errors gracefully."""
         # service = PortfolioCalculationService()
         #
@@ -338,7 +335,7 @@ class TestPortfolioCalculationServiceConfiguration:
         #     service.calculate_total_value(invalid_portfolio)
         pass
 
-    def test_service_performance_with_large_portfolios(self):
+    def test_service_performance_with_large_portfolios(self) -> None:
         """Should handle large portfolios efficiently."""
         # service = PortfolioCalculationService()
         # large_portfolio = create_large_test_portfolio(1000)  # 1000 positions

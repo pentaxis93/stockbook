@@ -5,9 +5,11 @@ Provides common functionality for all domain entities following DDD principles.
 """
 
 from abc import ABC
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 
 import nanoid
+
+T = TypeVar("T", bound="BaseEntity")
 
 
 class BaseEntity(ABC):
@@ -23,7 +25,7 @@ class BaseEntity(ABC):
         return self._id
 
     @classmethod
-    def from_persistence(cls, id: str, **kwargs: Any) -> "BaseEntity":
+    def from_persistence(cls: type[T], id: str, **kwargs: Any) -> T:
         """Create entity from persistence layer with existing ID."""
         # This will call the subclass constructor with the id parameter
         return cls(id=id, **kwargs)

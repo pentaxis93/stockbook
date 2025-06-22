@@ -6,7 +6,7 @@ of our DI container before implementation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Type
+from typing import Optional
 
 import pytest
 
@@ -69,18 +69,18 @@ class MockSimpleService:
 class MockServiceWithOptionalDep:
     """Service with optional dependency (default parameter)."""
 
-    def __init__(self, repository: ITestRepository = None):
+    def __init__(self, repository: Optional[ITestRepository] = None):
         self.repository = repository
 
 
 class TestDIContainerBasics:
     """Test basic DI container functionality."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Create fresh container for each test."""
         self.container = DIContainer()
 
-    def test_register_and_resolve_singleton(self):
+    def test_register_and_resolve_singleton(self) -> None:
         """Should register singleton and return same instance."""
         # Arrange
         container = DIContainer()
@@ -94,7 +94,7 @@ class TestDIContainerBasics:
         assert instance1 is instance2
         assert isinstance(instance1, MockTestRepository)
 
-    def test_register_and_resolve_transient(self):
+    def test_register_and_resolve_transient(self) -> None:
         """Should create new instance each time for transient."""
         # Arrange
         container = DIContainer()
@@ -110,7 +110,7 @@ class TestDIContainerBasics:
         assert isinstance(instance1, MockTestService)
         assert isinstance(instance2, MockTestService)
 
-    def test_register_instance(self):
+    def test_register_instance(self) -> None:
         """Should register and resolve pre-created instances."""
         # Arrange
         container = DIContainer()
@@ -123,7 +123,7 @@ class TestDIContainerBasics:
         # Assert
         assert resolved is instance
 
-    def test_register_factory(self):
+    def test_register_factory(self) -> None:
         """Should register and use factory functions."""
         # Arrange
         container = DIContainer()
@@ -143,7 +143,7 @@ class TestDIContainerBasics:
 class TestDependencyInjection:
     """Test automatic dependency injection."""
 
-    def test_simple_dependency_injection(self):
+    def test_simple_dependency_injection(self) -> None:
         """Should automatically inject constructor dependencies."""
         # Arrange
         container = DIContainer()
@@ -157,7 +157,7 @@ class TestDependencyInjection:
         assert isinstance(service.repository, MockTestRepository)
         assert service.process() == "processed_test_data"
 
-    def test_nested_dependency_resolution(self):
+    def test_nested_dependency_resolution(self) -> None:
         """Should resolve complex dependency chains."""
         # Arrange - MockTestController -> MockTestService -> ITestRepository
         container = DIContainer()
@@ -173,7 +173,7 @@ class TestDependencyInjection:
         assert isinstance(controller.service.repository, MockTestRepository)
         assert controller.handle_request() == "handled_processed_test_data"
 
-    def test_no_dependencies_service(self):
+    def test_no_dependencies_service(self) -> None:
         """Should handle classes with no dependencies."""
         # Arrange
         container = DIContainer()
@@ -186,7 +186,7 @@ class TestDependencyInjection:
         assert isinstance(service, MockSimpleService)
         assert service.value == "simple"
 
-    def test_interface_to_implementation_resolution(self):
+    def test_interface_to_implementation_resolution(self) -> None:
         """Should resolve interface types to concrete implementations."""
         # Arrange
         container = DIContainer()
@@ -203,7 +203,7 @@ class TestDependencyInjection:
 class TestLifetimeManagement:
     """Test different dependency lifetime management."""
 
-    def test_singleton_lifecycle(self):
+    def test_singleton_lifecycle(self) -> None:
         """Should create and reuse singleton instances."""
         # Arrange
         container = DIContainer()
@@ -217,7 +217,7 @@ class TestLifetimeManagement:
         # Assert
         assert instance1 is instance2 is instance3
 
-    def test_transient_lifecycle(self):
+    def test_transient_lifecycle(self) -> None:
         """Should create new transient instances."""
         # Arrange
         container = DIContainer()
@@ -234,7 +234,7 @@ class TestLifetimeManagement:
         assert instance2 is not instance3
         assert instance1 is not instance3
 
-    def test_mixed_lifetimes(self):
+    def test_mixed_lifetimes(self) -> None:
         """Should handle mixed singleton and transient lifetimes correctly."""
         # Arrange
         container = DIContainer()
@@ -253,7 +253,7 @@ class TestLifetimeManagement:
 class TestErrorHandling:
     """Test error handling and edge cases."""
 
-    def test_unregistered_dependency_error(self):
+    def test_unregistered_dependency_error(self) -> None:
         """Should raise clear error for unregistered types."""
         # Arrange
         container = DIContainer()
@@ -264,7 +264,7 @@ class TestErrorHandling:
         assert "MockTestService" in str(exc_info.value)
         assert "not registered" in str(exc_info.value)
 
-    def test_circular_dependency_detection(self):
+    def test_circular_dependency_detection(self) -> None:
         """Should detect and prevent circular dependencies."""
         # Arrange
         container = DIContainer()
@@ -278,7 +278,7 @@ class TestErrorHandling:
         assert "MockServiceA" in str(exc_info.value)
         assert "MockServiceB" in str(exc_info.value)
 
-    def test_resolve_nonexistent_type(self):
+    def test_resolve_nonexistent_type(self) -> None:
         """Should raise clear error for completely unregistered type."""
         # Arrange
         container = DIContainer()
@@ -289,7 +289,7 @@ class TestErrorHandling:
         assert "MockTestRepository" in str(exc_info.value)
         assert "not registered" in str(exc_info.value)
 
-    def test_register_same_type_twice_error(self):
+    def test_register_same_type_twice_error(self) -> None:
         """Should handle re-registration attempts clearly."""
         # Arrange
         container = DIContainer()
@@ -303,7 +303,7 @@ class TestErrorHandling:
 class TestContainerIntrospection:
     """Test container introspection capabilities."""
 
-    def test_is_registered(self):
+    def test_is_registered(self) -> None:
         """Should check if type is registered."""
         container = DIContainer()
         assert not container.is_registered(ITestRepository)
@@ -311,7 +311,7 @@ class TestContainerIntrospection:
         container.register_singleton(ITestRepository, MockTestRepository)
         assert container.is_registered(ITestRepository)
 
-    def test_get_registrations(self):
+    def test_get_registrations(self) -> None:
         """Should list all registered types."""
         container = DIContainer()
         container.register_singleton(ITestRepository, MockTestRepository)
@@ -322,12 +322,13 @@ class TestContainerIntrospection:
         assert ITestRepository in registrations
         assert MockTestService in registrations
 
-    def test_registration_info(self):
+    def test_registration_info(self) -> None:
         """Should provide registration details."""
         container = DIContainer()
         container.register_singleton(ITestRepository, MockTestRepository)
 
         info = container.get_registration_info(ITestRepository)
+        assert info is not None
         assert info.service_type == ITestRepository
         assert info.implementation_type == MockTestRepository
         assert info.lifetime == Lifetime.SINGLETON

@@ -9,11 +9,13 @@ import tempfile
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
 from src.domain.entities.transaction_entity import TransactionEntity
-from src.domain.repositories.interfaces import ITransactionRepository
+
+# ITransactionRepository import removed - unused
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.repositories.sqlite_transaction_repository import (
@@ -22,7 +24,7 @@ from src.infrastructure.repositories.sqlite_transaction_repository import (
 
 
 @pytest.fixture
-def db_connection():
+def db_connection() -> Iterator[DatabaseConnection]:
     """Create temporary database for testing."""
     # Create temporary database file
     temp_fd, temp_path = tempfile.mkstemp(suffix=".db")
@@ -57,13 +59,15 @@ def db_connection():
 
 
 @pytest.fixture
-def transaction_repository(db_connection):
+def transaction_repository(
+    db_connection: DatabaseConnection,
+) -> SqliteTransactionRepository:
     """Create transaction repository with test database."""
     return SqliteTransactionRepository(db_connection)
 
 
 @pytest.fixture
-def sample_transaction():
+def sample_transaction() -> TransactionEntity:
     """Create sample transaction entity for testing."""
     return TransactionEntity(
         portfolio_id="portfolio-id-1",
@@ -80,8 +84,10 @@ class TestTransactionRepositoryCreate:
     """Test transaction creation operations."""
 
     def test_create_transaction_returns_id(
-        self, transaction_repository, sample_transaction
-    ):
+        self,
+        transaction_repository: SqliteTransactionRepository,
+        sample_transaction: TransactionEntity,
+    ) -> None:
         """Should create transaction and return database ID."""
         # Act
         transaction_id = transaction_repository.create(sample_transaction)
@@ -90,7 +96,9 @@ class TestTransactionRepositoryCreate:
         assert isinstance(transaction_id, str)
         assert transaction_id
 
-    def test_create_buy_transaction(self, transaction_repository):
+    def test_create_buy_transaction(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should create buy transaction with all fields."""
         # Arrange
         buy_transaction = TransactionEntity(
@@ -108,12 +116,15 @@ class TestTransactionRepositoryCreate:
 
         # Assert
         created_transaction = transaction_repository.get_by_id(transaction_id)
+        assert created_transaction is not None
         assert created_transaction.transaction_type.value == "buy"
         assert created_transaction.quantity.value == 50
         assert created_transaction.price.amount == Decimal("100.25")
         assert created_transaction.notes.value == "Buy order"
 
-    def test_create_sell_transaction(self, transaction_repository):
+    def test_create_sell_transaction(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should create sell transaction."""
         # Arrange
         sell_transaction = TransactionEntity(
@@ -131,11 +142,14 @@ class TestTransactionRepositoryCreate:
 
         # Assert
         created_transaction = transaction_repository.get_by_id(transaction_id)
+        assert created_transaction is not None
         assert created_transaction.transaction_type.value == "sell"
         assert created_transaction.quantity.value == 25
         assert created_transaction.price.amount == Decimal("105.75")
 
-    def test_create_transaction_minimal_data(self, transaction_repository):
+    def test_create_transaction_minimal_data(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should create transaction with minimal required data."""
         # Arrange
         minimal_transaction = TransactionEntity(
@@ -153,6 +167,7 @@ class TestTransactionRepositoryCreate:
         # Assert
         assert transaction_id is not None
         created = transaction_repository.get_by_id(transaction_id)
+        assert created is not None
         assert created.notes.value == ""
 
 
@@ -160,8 +175,10 @@ class TestTransactionRepositoryRead:
     """Test transaction read operations."""
 
     def test_get_by_id_existing_transaction(
-        self, transaction_repository, sample_transaction
-    ):
+        self,
+        transaction_repository: SqliteTransactionRepository,
+        sample_transaction: TransactionEntity,
+    ) -> None:
         """Should retrieve transaction by ID."""
         # Arrange
         transaction_id = transaction_repository.create(sample_transaction)
@@ -179,7 +196,9 @@ class TestTransactionRepositoryRead:
             == sample_transaction.transaction_type
         )
 
-    def test_get_by_id_nonexistent_transaction(self, transaction_repository):
+    def test_get_by_id_nonexistent_transaction(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return None for non-existent transaction."""
         # Act
         result = transaction_repository.get_by_id("nonexistent-id")
@@ -187,7 +206,9 @@ class TestTransactionRepositoryRead:
         # Assert
         assert result is None
 
-    def test_get_by_portfolio_empty(self, transaction_repository):
+    def test_get_by_portfolio_empty(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return empty list when no transactions exist for portfolio."""
         # Act
         transactions = transaction_repository.get_by_portfolio("portfolio-id-1")
@@ -195,7 +216,9 @@ class TestTransactionRepositoryRead:
         # Assert
         assert transactions == []
 
-    def test_get_by_portfolio_with_transactions(self, transaction_repository):
+    def test_get_by_portfolio_with_transactions(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return transactions for specific portfolio."""
         # Arrange
         transaction1 = TransactionEntity(
@@ -229,7 +252,9 @@ class TestTransactionRepositoryRead:
         assert id1 in transaction_ids
         assert id2 in transaction_ids
 
-    def test_get_by_portfolio_with_limit(self, transaction_repository):
+    def test_get_by_portfolio_with_limit(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should respect limit parameter for portfolio transactions."""
         # Arrange - create 5 transactions
         for i in range(5):
@@ -251,7 +276,9 @@ class TestTransactionRepositoryRead:
         # Assert
         assert len(limited_transactions) == 3
 
-    def test_get_by_stock(self, transaction_repository):
+    def test_get_by_stock(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return transactions for specific stock."""
         # Arrange
         transaction = TransactionEntity(
@@ -271,7 +298,9 @@ class TestTransactionRepositoryRead:
         assert len(stock_transactions) == 1
         assert stock_transactions[0].id == transaction_id
 
-    def test_get_by_stock_with_portfolio_filter(self, transaction_repository):
+    def test_get_by_stock_with_portfolio_filter(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should filter stock transactions by portfolio."""
         # Arrange - create transaction for stock 1 in portfolio 1
         transaction = TransactionEntity(
@@ -297,7 +326,9 @@ class TestTransactionRepositoryRead:
         assert filtered_transactions[0].id == transaction_id
         assert len(unfiltered_transactions) == 0
 
-    def test_get_by_date_range(self, transaction_repository):
+    def test_get_by_date_range(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return transactions within date range."""
         # Arrange
         early_transaction = TransactionEntity(
@@ -346,8 +377,10 @@ class TestTransactionRepositoryUpdate:
     """Test transaction update operations."""
 
     def test_update_existing_transaction(
-        self, transaction_repository, sample_transaction
-    ):
+        self,
+        transaction_repository: SqliteTransactionRepository,
+        sample_transaction: TransactionEntity,
+    ) -> None:
         """Should update existing transaction successfully."""
         # Arrange
         transaction_id = transaction_repository.create(sample_transaction)
@@ -369,12 +402,15 @@ class TestTransactionRepositoryUpdate:
 
         # Verify changes
         retrieved = transaction_repository.get_by_id(transaction_id)
+        assert retrieved is not None
         assert retrieved.transaction_type.value == "sell"
         assert retrieved.quantity.value == 75
         assert retrieved.price.amount == Decimal("155.25")
         assert retrieved.notes.value == "Updated transaction"
 
-    def test_update_nonexistent_transaction(self, transaction_repository):
+    def test_update_nonexistent_transaction(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return False when updating non-existent transaction."""
         # Arrange
         transaction = TransactionEntity(
@@ -397,8 +433,10 @@ class TestTransactionRepositoryDelete:
     """Test transaction deletion operations."""
 
     def test_delete_existing_transaction(
-        self, transaction_repository, sample_transaction
-    ):
+        self,
+        transaction_repository: SqliteTransactionRepository,
+        sample_transaction: TransactionEntity,
+    ) -> None:
         """Should delete existing transaction."""
         # Arrange
         transaction_id = transaction_repository.create(sample_transaction)
@@ -413,10 +451,12 @@ class TestTransactionRepositoryDelete:
         retrieved = transaction_repository.get_by_id(transaction_id)
         assert retrieved is None
 
-    def test_delete_nonexistent_transaction(self, transaction_repository):
+    def test_delete_nonexistent_transaction(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should return False when deleting non-existent transaction."""
         # Act
-        result = transaction_repository.delete(999)
+        result = transaction_repository.delete("999")
 
         # Assert
         assert result is False
@@ -425,7 +465,9 @@ class TestTransactionRepositoryDelete:
 class TestTransactionRepositoryIntegration:
     """Integration tests for transaction repository operations."""
 
-    def test_full_transaction_lifecycle(self, transaction_repository):
+    def test_full_transaction_lifecycle(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Test complete CRUD operations in sequence."""
         # Create
         transaction = TransactionEntity(
@@ -442,6 +484,7 @@ class TestTransactionRepositoryIntegration:
 
         # Read
         retrieved = transaction_repository.get_by_id(transaction_id)
+        assert retrieved is not None
         assert retrieved.notes.value == "Lifecycle test"
 
         # Update
@@ -461,6 +504,7 @@ class TestTransactionRepositoryIntegration:
 
         # Verify update
         updated_retrieved = transaction_repository.get_by_id(transaction_id)
+        assert updated_retrieved is not None
         assert updated_retrieved.transaction_type.value == "sell"
         assert updated_retrieved.notes.value == "Updated lifecycle test"
 
@@ -476,11 +520,13 @@ class TestTransactionRepositoryIntegration:
 class TestTransactionRepositoryErrorHandling:
     """Test error handling and edge cases."""
 
-    def test_create_transaction_with_invalid_entity(self, transaction_repository):
+    def test_create_transaction_with_invalid_entity(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should raise validation error for invalid transaction entity."""
         with pytest.raises(ValueError):
             invalid_transaction = TransactionEntity(
-                portfolio_id=0,  # Invalid portfolio ID
+                portfolio_id="",  # Invalid portfolio ID
                 stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
                 quantity=Quantity(10),
@@ -489,7 +535,9 @@ class TestTransactionRepositoryErrorHandling:
             )
             transaction_repository.create(invalid_transaction)
 
-    def test_create_transaction_with_invalid_type(self, transaction_repository):
+    def test_create_transaction_with_invalid_type(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
         """Should raise validation error for invalid transaction type."""
         # Error now happens at TransactionType value object construction
         with pytest.raises(

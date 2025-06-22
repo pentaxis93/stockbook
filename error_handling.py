@@ -107,7 +107,7 @@ class DatabaseError(StockBookError):
         message: str,
         operation: Optional[str] = None,
         query: Optional[str] = None,
-        params: Optional[tuple] = None,
+        params: Optional[tuple[Any, ...]] = None,
         **kwargs,
     ):
         """

@@ -8,11 +8,13 @@ import os
 import tempfile
 from datetime import date
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
 from src.domain.entities.journal_entry_entity import JournalEntryEntity
-from src.domain.repositories.interfaces import IJournalRepository
+
+# IJournalRepository import removed - unused
 from src.domain.value_objects import JournalContent
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.repositories.sqlite_journal_repository import (
@@ -21,7 +23,7 @@ from src.infrastructure.repositories.sqlite_journal_repository import (
 
 
 @pytest.fixture
-def db_connection():
+def db_connection() -> Iterator[DatabaseConnection]:
     """Create temporary database for testing."""
     # Create temporary database file
     temp_fd, temp_path = tempfile.mkstemp(suffix=".db")
@@ -53,13 +55,13 @@ def db_connection():
 
 
 @pytest.fixture
-def journal_repository(db_connection):
+def journal_repository(db_connection: DatabaseConnection) -> SqliteJournalRepository:
     """Create journal repository with test database."""
     return SqliteJournalRepository(db_connection)
 
 
 @pytest.fixture
-def sample_entry():
+def sample_entry() -> JournalEntryEntity:
     """Create sample journal entry for testing."""
     return JournalEntryEntity(
         portfolio_id="portfolio-id-1",
@@ -74,7 +76,11 @@ def sample_entry():
 class TestJournalRepositoryBasic:
     """Test basic journal repository operations."""
 
-    def test_create_entry_returns_id(self, journal_repository, sample_entry):
+    def test_create_entry_returns_id(
+        self,
+        journal_repository: SqliteJournalRepository,
+        sample_entry: JournalEntryEntity,
+    ) -> None:
         """Should create journal entry and return database ID."""
         # Act
         entry_id = journal_repository.create(sample_entry)
@@ -83,7 +89,11 @@ class TestJournalRepositoryBasic:
         assert isinstance(entry_id, str)
         assert entry_id
 
-    def test_get_by_id(self, journal_repository, sample_entry):
+    def test_get_by_id(
+        self,
+        journal_repository: SqliteJournalRepository,
+        sample_entry: JournalEntryEntity,
+    ) -> None:
         """Should retrieve journal entry by ID."""
         # Arrange
         entry_id = journal_repository.create(sample_entry)
@@ -97,7 +107,7 @@ class TestJournalRepositoryBasic:
         assert retrieved.content.value == sample_entry.content.value
         assert retrieved.portfolio_id == sample_entry.portfolio_id
 
-    def test_get_recent(self, journal_repository):
+    def test_get_recent(self, journal_repository: SqliteJournalRepository) -> None:
         """Should retrieve recent entries ordered by date."""
         # Arrange
         entries = [
@@ -125,7 +135,11 @@ class TestJournalRepositoryBasic:
         assert recent[0].entry_date > recent[1].entry_date
         assert recent[0].content.value == "Latest entry"
 
-    def test_get_by_portfolio(self, journal_repository, sample_entry):
+    def test_get_by_portfolio(
+        self,
+        journal_repository: SqliteJournalRepository,
+        sample_entry: JournalEntryEntity,
+    ) -> None:
         """Should retrieve entries for specific portfolio."""
         # Arrange
         entry_id = journal_repository.create(sample_entry)
@@ -137,7 +151,11 @@ class TestJournalRepositoryBasic:
         assert len(portfolio_entries) == 1
         assert portfolio_entries[0].id == entry_id
 
-    def test_update_entry(self, journal_repository, sample_entry):
+    def test_update_entry(
+        self,
+        journal_repository: SqliteJournalRepository,
+        sample_entry: JournalEntryEntity,
+    ) -> None:
         """Should update existing journal entry."""
         # Arrange
         entry_id = journal_repository.create(sample_entry)
@@ -156,9 +174,14 @@ class TestJournalRepositoryBasic:
 
         # Verify update
         retrieved = journal_repository.get_by_id(entry_id)
+        assert retrieved is not None
         assert retrieved.content.value == "Updated journal entry content."
 
-    def test_delete_entry(self, journal_repository, sample_entry):
+    def test_delete_entry(
+        self,
+        journal_repository: SqliteJournalRepository,
+        sample_entry: JournalEntryEntity,
+    ) -> None:
         """Should delete journal entry."""
         # Arrange
         entry_id = journal_repository.create(sample_entry)

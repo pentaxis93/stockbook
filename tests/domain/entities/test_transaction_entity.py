@@ -18,7 +18,7 @@ from src.domain.value_objects.transaction_type import TransactionType
 class TestTransactionEntity:
     """Test suite for Transaction domain entity."""
 
-    def test_create_transaction_with_value_objects(self):
+    def test_create_transaction_with_value_objects(self) -> None:
         """Should create Transaction entity with value objects only."""
         portfolio_id = "portfolio-1"
         stock_id = "stock-2"
@@ -48,7 +48,7 @@ class TestTransactionEntity:
         assert transaction.id is not None  # Generated nanoid
         assert isinstance(transaction.id, str)
 
-    def test_create_transaction_with_minimal_data(self):
+    def test_create_transaction_with_minimal_data(self) -> None:
         """Should create Transaction with only required fields."""
         portfolio_id = "portfolio-1"
         stock_id = "stock-2"
@@ -74,7 +74,7 @@ class TestTransactionEntity:
         assert transaction.transaction_date == transaction_date
         assert transaction.notes.value == ""  # Notes defaults to empty
 
-    def test_transaction_stores_value_objects(self):
+    def test_transaction_stores_value_objects(self) -> None:
         """Should store and return value objects directly."""
         transaction_type = TransactionType("buy")
         quantity = Quantity(75)
@@ -103,7 +103,7 @@ class TestTransactionEntity:
         assert transaction.price.amount == Decimal("200.00")
         assert transaction.notes.value == "Test transaction"
 
-    def test_create_transaction_with_none_notes_allowed(self):
+    def test_create_transaction_with_none_notes_allowed(self) -> None:
         """Should allow creating transaction with None for notes."""
         transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -117,14 +117,16 @@ class TestTransactionEntity:
 
         assert transaction.notes.value == ""  # Notes defaults to empty when None
 
-    def test_create_transaction_with_invalid_transaction_type_raises_error(self):
+    def test_create_transaction_with_invalid_transaction_type_raises_error(
+        self,
+    ) -> None:
         """Should raise error for invalid transaction type through TransactionType value object."""
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
         ):
             TransactionType("transfer")  # Error happens at TransactionType construction
 
-    def test_create_transaction_with_invalid_portfolio_id_raises_error(self):
+    def test_create_transaction_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             TransactionEntity(
@@ -136,7 +138,7 @@ class TestTransactionEntity:
                 transaction_date=date.today(),
             )
 
-    def test_create_transaction_with_invalid_stock_id_raises_error(self):
+    def test_create_transaction_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             TransactionEntity(
@@ -148,7 +150,7 @@ class TestTransactionEntity:
                 transaction_date=date.today(),
             )
 
-    def test_transaction_equality(self):
+    def test_transaction_equality(self) -> None:
         """Should compare transactions based on business identity."""
         transaction1 = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -181,7 +183,7 @@ class TestTransactionEntity:
         assert transaction1 == transaction2
         assert transaction1 != transaction3
 
-    def test_transaction_string_representation(self):
+    def test_transaction_string_representation(self) -> None:
         """Should have meaningful string representation."""
         transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -195,7 +197,7 @@ class TestTransactionEntity:
         expected = "buy 100 @ $150.50 on 2024-01-15"
         assert str(transaction) == expected
 
-    def test_transaction_repr(self):
+    def test_transaction_repr(self) -> None:
         """Should have detailed repr representation."""
         transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -209,7 +211,7 @@ class TestTransactionEntity:
         expected = "TransactionEntity(portfolio_id=portfolio-id-1, stock_id=stock-id-2, type='sell', quantity=50, price=$200.00)"
         assert repr(transaction) == expected
 
-    def test_calculate_total_value(self):
+    def test_calculate_total_value(self) -> None:
         """Should calculate total transaction value."""
         transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -225,7 +227,7 @@ class TestTransactionEntity:
         assert total_value == Money(Decimal("15050.00"))
         assert isinstance(total_value, Money)
 
-    def test_is_buy_transaction(self):
+    def test_is_buy_transaction(self) -> None:
         """Should check if transaction is a buy."""
         buy_transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -248,7 +250,7 @@ class TestTransactionEntity:
         assert buy_transaction.is_buy() is True
         assert sell_transaction.is_buy() is False
 
-    def test_is_sell_transaction(self):
+    def test_is_sell_transaction(self) -> None:
         """Should check if transaction is a sell."""
         buy_transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -271,7 +273,7 @@ class TestTransactionEntity:
         assert buy_transaction.is_sell() is False
         assert sell_transaction.is_sell() is True
 
-    def test_has_notes(self):
+    def test_has_notes(self) -> None:
         """Should check if transaction has notes."""
         transaction_with_notes = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -295,7 +297,7 @@ class TestTransactionEntity:
         assert transaction_with_notes.has_notes() is True
         assert transaction_without_notes.has_notes() is False
 
-    def test_transaction_create_with_id(self):
+    def test_transaction_create_with_id(self) -> None:
         """Should create transaction with provided ID."""
         test_id = "transaction-id-123"
         transaction = TransactionEntity(
@@ -310,7 +312,7 @@ class TestTransactionEntity:
 
         assert transaction.id == test_id
 
-    def test_transaction_id_immutability(self):
+    def test_transaction_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
         transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
@@ -324,9 +326,9 @@ class TestTransactionEntity:
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):
-            transaction.id = "different-id"
+            transaction.id = "different-id"  # type: ignore[misc]
 
-    def test_transaction_from_persistence(self):
+    def test_transaction_from_persistence(self) -> None:
         """Should create transaction from persistence with existing ID."""
         test_id = "persistence-id-456"
         transaction = TransactionEntity.from_persistence(
@@ -347,14 +349,14 @@ class TestTransactionEntity:
 class TestTransactionType:
     """Test TransactionType value object validation."""
 
-    def test_valid_transaction_types_accepted(self):
+    def test_valid_transaction_types_accepted(self) -> None:
         """Test that valid transaction types are accepted."""
         valid_types = ["buy", "sell"]
         for transaction_type in valid_types:
             trans_type = TransactionType(transaction_type)
             assert trans_type.value == transaction_type
 
-    def test_case_insensitive_transaction_types(self):
+    def test_case_insensitive_transaction_types(self) -> None:
         """Test that transaction types are case insensitive."""
         trans_type1 = TransactionType("BUY")
         trans_type2 = TransactionType("Buy")
@@ -364,7 +366,7 @@ class TestTransactionType:
         assert trans_type2.value == "buy"
         assert trans_type3.value == "buy"
 
-    def test_invalid_transaction_types_rejected(self):
+    def test_invalid_transaction_types_rejected(self) -> None:
         """Test that invalid transaction types are rejected."""
         invalid_types = ["transfer", "dividend", "split", "", "INVALID"]
         for invalid_type in invalid_types:

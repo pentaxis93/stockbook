@@ -5,10 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the decoupled presentation adapter that doesn't depend on specific UI frameworks.
 """
 
-from typing import Any, Dict, List, Optional
 from unittest.mock import Mock
-
-import pytest
 
 from src.presentation.adapters.stock_presentation_adapter import (
     StockPresentationAdapter,
@@ -20,7 +17,6 @@ from src.presentation.interfaces.ui_operations import (
     IUIValidationOperations,
 )
 from src.presentation.view_models.stock_view_models import (
-    CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,
     StockListResponse,
@@ -32,7 +28,7 @@ from src.presentation.view_models.stock_view_models import (
 class TestStockPresentationAdapter:
     """Test suite for StockPresentationAdapter."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.mock_controller = Mock(spec=StockController)
         self.mock_ui_operations = Mock(spec=IUIOperations)
@@ -46,7 +42,7 @@ class TestStockPresentationAdapter:
             validation_operations=self.mock_validation_operations,
         )
 
-    def test_adapter_initialization(self):
+    def test_adapter_initialization(self) -> None:
         """Should initialize adapter with required dependencies."""
         # Act & Assert
         assert self.adapter.controller == self.mock_controller
@@ -54,7 +50,7 @@ class TestStockPresentationAdapter:
         assert self.adapter.layout == self.mock_layout_operations
         assert self.adapter.validation == self.mock_validation_operations
 
-    def test_render_create_stock_form_display(self):
+    def test_render_create_stock_form_display(self) -> None:
         """Should render create stock form with proper UI operations."""
         # Arrange
         self.mock_ui_operations.create_form.return_value.__enter__ = Mock()
@@ -85,7 +81,7 @@ class TestStockPresentationAdapter:
         self.mock_ui_operations.create_text_area.assert_called_once()
         self.mock_ui_operations.create_form_submit_button.assert_called_once()
 
-    def test_render_create_stock_form_successful_submission(self):
+    def test_render_create_stock_form_successful_submission(self) -> None:
         """Should handle successful form submission using UI operations."""
         # Arrange
         self.mock_ui_operations.create_form.return_value.__enter__ = Mock()
@@ -117,7 +113,7 @@ class TestStockPresentationAdapter:
             "Stock created successfully"
         )
 
-    def test_render_create_stock_form_validation_error(self):
+    def test_render_create_stock_form_validation_error(self) -> None:
         """Should handle validation errors using validation operations."""
         # Arrange
         self.mock_ui_operations.create_form.return_value.__enter__ = Mock()
@@ -148,7 +144,7 @@ class TestStockPresentationAdapter:
             {"symbol": "Stock symbol cannot be empty"}
         )
 
-    def test_render_stock_list_success(self):
+    def test_render_stock_list_success(self) -> None:
         """Should render stock list successfully using UI operations."""
         # Arrange
         stocks = [
@@ -177,7 +173,7 @@ class TestStockPresentationAdapter:
         self.mock_controller.get_stock_list.assert_called_once()
         self.mock_ui_operations.render_data_table.assert_called_once()
 
-    def test_render_stock_list_empty(self):
+    def test_render_stock_list_empty(self) -> None:
         """Should handle empty stock list using UI operations."""
         # Arrange
         response = StockListResponse.create_success([], "No stocks found")
@@ -190,7 +186,7 @@ class TestStockPresentationAdapter:
         assert result == response
         self.mock_ui_operations.show_info.assert_called_once_with("No stocks found")
 
-    def test_render_stock_list_error(self):
+    def test_render_stock_list_error(self) -> None:
         """Should handle error in stock list retrieval using UI operations."""
         # Arrange
         response = StockListResponse.create_error("Database connection failed")
@@ -205,7 +201,7 @@ class TestStockPresentationAdapter:
             "Database connection failed"
         )
 
-    def test_render_stock_detail_success(self):
+    def test_render_stock_detail_success(self) -> None:
         """Should render stock detail view successfully using UI operations."""
         # Arrange
         stock = StockViewModel(
@@ -241,7 +237,7 @@ class TestStockPresentationAdapter:
         )
         assert self.mock_ui_operations.render_metric.call_count >= 2
 
-    def test_render_stock_detail_empty_symbol(self):
+    def test_render_stock_detail_empty_symbol(self) -> None:
         """Should handle empty symbol input using UI operations."""
         # Act
         result = self.adapter.render_stock_detail("")
@@ -253,7 +249,7 @@ class TestStockPresentationAdapter:
         )
         self.mock_controller.get_stock_by_symbol.assert_not_called()
 
-    def test_render_stock_detail_not_found(self):
+    def test_render_stock_detail_not_found(self) -> None:
         """Should handle stock not found scenario using UI operations."""
         # Arrange
         response = StockDetailResponse.create_error("Stock not found")
@@ -266,7 +262,7 @@ class TestStockPresentationAdapter:
         assert result == response
         self.mock_ui_operations.show_warning.assert_called_once_with("Stock not found")
 
-    def test_render_grade_filter_widget(self):
+    def test_render_grade_filter_widget(self) -> None:
         """Should render grade filtering widget using UI operations."""
         # Arrange
         columns = [Mock(), Mock()]
@@ -298,7 +294,7 @@ class TestStockPresentationAdapter:
         self.mock_ui_operations.create_selectbox.assert_called_once()
         self.mock_ui_operations.create_button.assert_called_once()
 
-    def test_render_stock_filters(self):
+    def test_render_stock_filters(self) -> None:
         """Should render stock filtering controls using UI operations."""
         # Arrange
         columns = [Mock(), Mock()]
@@ -322,7 +318,7 @@ class TestStockPresentationAdapter:
         assert filters.grade_filter == "A"
         assert filters.industry_filter == "Technology"
 
-    def test_render_sidebar_navigation(self):
+    def test_render_sidebar_navigation(self) -> None:
         """Should render navigation sidebar using layout operations."""
         # Arrange
         sidebar_mock = Mock()
@@ -344,7 +340,7 @@ class TestStockPresentationAdapter:
             "📈 Stock Management"
         )
 
-    def test_render_advanced_search_form(self):
+    def test_render_advanced_search_form(self) -> None:
         """Should render advanced search form using layout operations."""
         # Arrange
         expander_mock = Mock()
@@ -363,7 +359,7 @@ class TestStockPresentationAdapter:
         )
         assert search_filters is not None
 
-    def test_adapter_error_handling(self):
+    def test_adapter_error_handling(self) -> None:
         """Should handle controller errors gracefully using UI operations."""
         # Arrange
         self.mock_controller.get_stock_list.side_effect = Exception("Unexpected error")
@@ -377,7 +373,7 @@ class TestStockPresentationAdapter:
         error_call_args = self.mock_ui_operations.show_error.call_args[0][0]
         assert "An unexpected error occurred" in error_call_args
 
-    def test_prepare_display_data_formatting(self):
+    def test_prepare_display_data_formatting(self) -> None:
         """Should format stock data properly for display."""
         # Arrange
         stocks = [
@@ -400,7 +396,7 @@ class TestStockPresentationAdapter:
         ]
 
         # Act
-        display_data = self.adapter._prepare_display_data(stocks)
+        display_data = self.adapter.prepare_display_data(stocks)
 
         # Assert
         assert len(display_data) == 2
@@ -413,7 +409,7 @@ class TestStockPresentationAdapter:
         assert display_data[1]["Industry"] == "Not specified"
         assert display_data[1]["Notes"] == "No"
 
-    def test_framework_independence(self):
+    def test_framework_independence(self) -> None:
         """Should operate without direct framework dependencies."""
         # This test verifies that the adapter only depends on the abstractions
         # and doesn't import or use framework-specific modules directly

@@ -4,9 +4,8 @@ Test the complete Unit of Work implementation with all repositories.
 
 import os
 import tempfile
-from datetime import date
-from decimal import Decimal
 from pathlib import Path
+from typing import Generator
 
 import pytest
 
@@ -16,7 +15,6 @@ from src.domain.value_objects import (
     CompanyName,
     Grade,
     IndustryGroup,
-    Money,
     Notes,
     PortfolioName,
 )
@@ -27,7 +25,7 @@ from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
 
 @pytest.fixture
-def db_connection():
+def db_connection() -> Generator[DatabaseConnection, None, None]:
     """Create temporary database for testing."""
     temp_fd, temp_path = tempfile.mkstemp(suffix=".db")
     os.close(temp_fd)
@@ -42,12 +40,14 @@ def db_connection():
 
 
 @pytest.fixture
-def unit_of_work(db_connection):
+def unit_of_work(db_connection: DatabaseConnection) -> SqliteUnitOfWork:
     """Create unit of work with test database."""
     return SqliteUnitOfWork(db_connection)
 
 
-def test_unit_of_work_all_repositories_accessible(unit_of_work):
+def test_unit_of_work_all_repositories_accessible(
+    unit_of_work: SqliteUnitOfWork,
+) -> None:
     """Should provide access to all repository types."""
     # Test that all repositories are accessible
     assert unit_of_work.stocks is not None
@@ -58,7 +58,7 @@ def test_unit_of_work_all_repositories_accessible(unit_of_work):
     assert unit_of_work.journal is not None
 
 
-def test_unit_of_work_transactional_context(unit_of_work):
+def test_unit_of_work_transactional_context(unit_of_work: SqliteUnitOfWork) -> None:
     """Should maintain transaction across multiple repositories."""
 
     # Create test data in a transaction
@@ -90,7 +90,7 @@ def test_unit_of_work_transactional_context(unit_of_work):
         assert retrieved_portfolio.name.value == "Test Portfolio"
 
 
-def test_unit_of_work_rollback_on_exception(unit_of_work):
+def test_unit_of_work_rollback_on_exception(unit_of_work: SqliteUnitOfWork) -> None:
     """Should rollback transaction on exception."""
 
     try:

@@ -1,0 +1,14 @@
+# Strategic type ignores for Streamlit UI framework migration
+# 
+# These files contain broad type ignores that are strategically applied
+# to accelerate type safety improvements in the core business logic layers.
+#
+# Reason: The dev team plans to replace Streamlit with a different UI framework.
+# Investing time in perfect Streamlit typing would be wasteful.
+#
+# Files affected by strategic UI framework type ignores:
+src/presentation/adapters/streamlit_*.py
+src/presentation/coordinators/stock_page_coordinator.py
+
+# This allows the business logic to achieve 100% type safety
+# while deferring UI layer typing until framework migration

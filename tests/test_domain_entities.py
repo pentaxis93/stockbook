@@ -23,7 +23,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 class TestStockEntity:
     """Test StockEntity domain entity with symbol validation and business logic"""
 
-    def test_valid_stock_creation(self):
+    def test_valid_stock_creation(self) -> None:
         """Test creating a valid stock with all fields"""
         from src.domain.value_objects import IndustryGroup, Notes
         from src.domain.value_objects.sector import Sector
@@ -38,12 +38,15 @@ class TestStockEntity:
         )
         assert stock.symbol.value == "AAPL"
         assert stock.company_name.value == "Apple Inc."
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
+        assert stock.grade is not None
         assert stock.grade.value == "A"
         assert stock.notes.value == "Great company"
 
-    def test_minimal_stock_creation(self):
+    def test_minimal_stock_creation(self) -> None:
         """Test creating stock with only required fields"""
         stock = StockEntity(
             symbol=StockSymbol("MSFT"),
@@ -55,12 +58,12 @@ class TestStockEntity:
         assert stock.grade is None
         assert stock.notes.value == ""
 
-    def test_invalid_grade_rejected(self):
+    def test_invalid_grade_rejected(self) -> None:
         """Test that invalid grades are rejected"""
         with pytest.raises(ValueError, match="Grade must be one of"):
             Grade("X")  # Invalid grade, now tested at value object level
 
-    def test_valid_grades_accepted(self):
+    def test_valid_grades_accepted(self) -> None:
         """Test that valid grades A, B, C, D, F are accepted"""
         for grade_str in ["A", "B", "C", "D", "F"]:
             grade = Grade(grade_str)
@@ -70,15 +73,16 @@ class TestStockEntity:
                 grade=grade,
             )
             assert stock.grade == grade
+            assert stock.grade is not None
             assert stock.grade.value == grade_str
 
-    def test_empty_name_allowed(self):
+    def test_empty_name_allowed(self) -> None:
         """Test that empty name is now allowed (users can create stock with only symbol)"""
         stock = StockEntity(symbol=StockSymbol("TEST"), company_name=CompanyName(""))
         assert stock.company_name.value == ""
         assert stock.symbol.value == "TEST"
 
-    def test_invalid_symbol_rejected(self):
+    def test_invalid_symbol_rejected(self) -> None:
         """Test that invalid symbols are rejected by StockSymbol value object"""
         # Invalid symbols should be rejected by StockSymbol
         invalid_symbols = ["123", "AA-PL", "TOOLONG", ""]
@@ -90,7 +94,7 @@ class TestStockEntity:
 class TestPortfolioEntity:
     """Test PortfolioEntity domain entity with business validation"""
 
-    def test_valid_portfolio_creation(self):
+    def test_valid_portfolio_creation(self) -> None:
         """Test creating a valid portfolio"""
         from src.domain.value_objects import Notes, PortfolioName
 
@@ -103,7 +107,7 @@ class TestPortfolioEntity:
         assert portfolio.description.value == "Test portfolio"
         assert portfolio.is_active is True
 
-    def test_minimal_portfolio_creation(self):
+    def test_minimal_portfolio_creation(self) -> None:
         """Test creating portfolio with only required fields"""
         from src.domain.value_objects import PortfolioName
 
@@ -111,14 +115,14 @@ class TestPortfolioEntity:
         assert portfolio.name.value == "Test Portfolio"
         assert portfolio.is_active is True
 
-    def test_empty_name_rejected(self):
+    def test_empty_name_rejected(self) -> None:
         """Test that empty name is rejected"""
         from src.domain.value_objects import PortfolioName
 
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
             PortfolioName("")  # Error happens at value object level
 
-    def test_long_name_rejected(self):
+    def test_long_name_rejected(self) -> None:
         """Test that excessively long names are rejected"""
         from src.domain.value_objects import PortfolioName
 
@@ -132,7 +136,7 @@ class TestPortfolioEntity:
 class TestTransactionEntity:
     """Test TransactionEntity domain entity with business validation"""
 
-    def test_valid_buy_transaction(self):
+    def test_valid_buy_transaction(self) -> None:
         """Test creating a valid buy transaction"""
         from src.domain.value_objects import Notes, TransactionType
 
@@ -150,7 +154,7 @@ class TestTransactionEntity:
         assert transaction.price.amount == Decimal("150.25")
         assert transaction.transaction_date == date(2024, 1, 15)
 
-    def test_valid_sell_transaction(self):
+    def test_valid_sell_transaction(self) -> None:
         """Test creating a valid sell transaction"""
         from src.domain.value_objects import TransactionType
 
@@ -166,7 +170,7 @@ class TestTransactionEntity:
         assert transaction.quantity.value == 50
         assert transaction.price.amount == Decimal("175.00")
 
-    def test_invalid_transaction_type_rejected(self):
+    def test_invalid_transaction_type_rejected(self) -> None:
         """Test that invalid transaction types are rejected"""
         from src.domain.value_objects import TransactionType
 
@@ -175,7 +179,7 @@ class TestTransactionEntity:
         ):
             TransactionType("transfer")  # Error happens at value object level
 
-    def test_invalid_portfolio_id_rejected(self):
+    def test_invalid_portfolio_id_rejected(self) -> None:
         """Test that invalid portfolio ID is rejected"""
         from src.domain.value_objects import TransactionType
 
@@ -189,7 +193,7 @@ class TestTransactionEntity:
                 transaction_date=date.today(),
             )
 
-    def test_invalid_stock_id_rejected(self):
+    def test_invalid_stock_id_rejected(self) -> None:
         """Test that invalid stock ID is rejected"""
         from src.domain.value_objects import TransactionType
 
@@ -207,7 +211,7 @@ class TestTransactionEntity:
 class TestTargetEntity:
     """Test TargetEntity domain entity with value objects"""
 
-    def test_target_entity_creation_with_value_objects(self):
+    def test_target_entity_creation_with_value_objects(self) -> None:
         """Test that TargetEntity can be instantiated with value objects"""
         from src.domain.value_objects import TargetStatus
 
@@ -229,7 +233,7 @@ class TestTargetEntity:
 class TestPortfolioBalanceEntity:
     """Test PortfolioBalanceEntity domain entity with value objects"""
 
-    def test_portfolio_balance_entity_creation_with_value_objects(self):
+    def test_portfolio_balance_entity_creation_with_value_objects(self) -> None:
         """Test that PortfolioBalanceEntity can be instantiated with value objects"""
         from src.domain.value_objects import IndexChange
 
@@ -245,13 +249,14 @@ class TestPortfolioBalanceEntity:
         assert balance.final_balance.amount == Decimal("10000.00")
         assert balance.deposits.amount == Decimal("1000.00")
         assert balance.withdrawals.amount == Decimal("500.00")
+        assert balance.index_change is not None
         assert balance.index_change.value == 5.25
 
 
 class TestJournalEntryEntity:
     """Test JournalEntryEntity domain entity with value objects"""
 
-    def test_journal_entry_entity_creation_with_value_objects(self):
+    def test_journal_entry_entity_creation_with_value_objects(self) -> None:
         """Test that JournalEntryEntity can be instantiated with value objects"""
         from src.domain.value_objects import JournalContent
 
@@ -277,19 +282,19 @@ class TestJournalEntryEntity:
 class TestStockSymbol:
     """Test StockSymbol value object validation"""
 
-    def test_valid_symbols_accepted(self):
+    def test_valid_symbols_accepted(self) -> None:
         """Test that valid symbols are accepted"""
         valid_symbols = ["AAPL", "MSFT", "BRK", "ABC", "A"]
         for symbol in valid_symbols:
             stock_symbol = StockSymbol(symbol)
             assert stock_symbol.value == symbol
 
-    def test_lowercase_symbols_normalized(self):
+    def test_lowercase_symbols_normalized(self) -> None:
         """Test that lowercase symbols are normalized to uppercase"""
         symbol = StockSymbol("aapl")
         assert symbol.value == "AAPL"
 
-    def test_invalid_symbols_rejected(self):
+    def test_invalid_symbols_rejected(self) -> None:
         """Test that invalid symbols are rejected"""
         invalid_symbols = ["123", "AA-PL", "TOOLONG", "", "AA PL"]
         for symbol in invalid_symbols:
@@ -300,22 +305,22 @@ class TestStockSymbol:
 class TestSharedKernelValueObjects:
     """Test shared kernel value objects used by domain entities"""
 
-    def test_money_creation(self):
+    def test_money_creation(self) -> None:
         """Test Money value object creation"""
         money = Money(Decimal("150.25"))
         assert money.amount == Decimal("150.25")
 
-    def test_quantity_creation(self):
+    def test_quantity_creation(self) -> None:
         """Test Quantity value object creation"""
         quantity = Quantity(100)
         assert quantity.value == 100
 
-    def test_negative_quantity_rejected(self):
+    def test_negative_quantity_rejected(self) -> None:
         """Test that negative quantities are rejected"""
         with pytest.raises(ValueError):
             Quantity(-100)
 
-    def test_zero_quantity_rejected(self):
+    def test_zero_quantity_rejected(self) -> None:
         """Test that zero quantities are rejected"""
         # Note: Based on actual implementation, zero quantities might be allowed
         # This test may need adjustment based on business rules
@@ -327,7 +332,7 @@ class TestSharedKernelValueObjects:
             # If exception, zero is not allowed
             pass
 
-    def test_negative_money_rejected(self):
+    def test_negative_money_rejected(self) -> None:
         """Test that negative money amounts are rejected"""
         # Note: Based on actual implementation, negative money might be allowed
         # This test may need adjustment based on business rules
@@ -339,7 +344,7 @@ class TestSharedKernelValueObjects:
             # If exception, negative is not allowed
             pass
 
-    def test_zero_money_rejected(self):
+    def test_zero_money_rejected(self) -> None:
         """Test that zero money amounts are rejected"""
         # Note: Based on actual implementation, zero money might be allowed
         # This test may need adjustment based on business rules

@@ -18,17 +18,17 @@ from src.infrastructure.persistence.database_connection import DatabaseConnectio
 class TestDatabaseConnection:
     """Test suite for DatabaseConnection."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test database file."""
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
         self.temp_db.close()
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test database."""
         if os.path.exists(self.temp_db.name):
             os.unlink(self.temp_db.name)
 
-    def test_database_connection_initialization(self):
+    def test_database_connection_initialization(self) -> None:
         """Should initialize database connection with file path."""
         # Act
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -37,7 +37,7 @@ class TestDatabaseConnection:
         assert db_conn.database_path == self.temp_db.name
         assert isinstance(db_conn.database_path, str)
 
-    def test_database_connection_with_pathlib_path(self):
+    def test_database_connection_with_pathlib_path(self) -> None:
         """Should accept pathlib.Path objects."""
         # Arrange
         path_obj = Path(self.temp_db.name)
@@ -48,7 +48,7 @@ class TestDatabaseConnection:
         # Assert
         assert str(db_conn.database_path) == str(path_obj)
 
-    def test_initialize_schema_creates_tables(self):
+    def test_initialize_schema_creates_tables(self) -> None:
         """Should initialize database schema with all required tables."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -85,7 +85,7 @@ class TestDatabaseConnection:
             for col in expected_columns:
                 assert col in column_names
 
-    def test_initialize_schema_idempotent(self):
+    def test_initialize_schema_idempotent(self) -> None:
         """Should be safe to call initialize_schema multiple times."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -101,7 +101,7 @@ class TestDatabaseConnection:
             result = cursor.fetchone()
             assert result[0] == 0  # Empty table
 
-    def test_get_connection_returns_sqlite_connection(self):
+    def test_get_connection_returns_sqlite_connection(self) -> None:
         """Should return SQLite connection object."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -121,7 +121,7 @@ class TestDatabaseConnection:
 
         connection.close()
 
-    def test_get_connection_enables_foreign_keys(self):
+    def test_get_connection_enables_foreign_keys(self) -> None:
         """Should enable foreign key constraints."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -138,7 +138,7 @@ class TestDatabaseConnection:
 
         connection.close()
 
-    def test_get_connection_sets_row_factory(self):
+    def test_get_connection_sets_row_factory(self) -> None:
         """Should set row factory for column access by name."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -166,7 +166,7 @@ class TestDatabaseConnection:
 
         connection.close()
 
-    def test_context_manager_support(self):
+    def test_context_manager_support(self) -> None:
         """Should support context manager protocol."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -190,7 +190,7 @@ class TestDatabaseConnection:
 
         # Connection should be closed automatically
 
-    def test_transaction_support(self):
+    def test_transaction_support(self) -> None:
         """Should support database transactions."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -216,7 +216,7 @@ class TestDatabaseConnection:
             result = cursor.fetchone()
             assert result[0] == 2
 
-    def test_transaction_rollback_on_error(self):
+    def test_transaction_rollback_on_error(self) -> None:
         """Should rollback transaction on error."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -250,7 +250,7 @@ class TestDatabaseConnection:
             result = cursor.fetchone()
             assert result[0] == 1  # Only one record
 
-    def test_close_connection(self):
+    def test_close_connection(self) -> None:
         """Should close database connection properly."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -268,7 +268,7 @@ class TestDatabaseConnection:
         with pytest.raises(sqlite3.ProgrammingError):
             connection.execute("SELECT 1")
 
-    def test_connection_timeout_configuration(self):
+    def test_connection_timeout_configuration(self) -> None:
         """Should configure connection timeout."""
         # Arrange & Act
         db_conn = DatabaseConnection(self.temp_db.name, timeout=30.0)
@@ -281,7 +281,7 @@ class TestDatabaseConnection:
             result = cursor.fetchone()
             assert result[0] == 1
 
-    def test_invalid_database_path_raises_error(self):
+    def test_invalid_database_path_raises_error(self) -> None:
         """Should raise error for invalid database path."""
         # Arrange - path to non-existent directory
         invalid_path = "/nonexistent/directory/database.db"
@@ -291,7 +291,7 @@ class TestDatabaseConnection:
             db_conn = DatabaseConnection(invalid_path)
             db_conn.initialize_schema()
 
-    def test_database_connection_string_representation(self):
+    def test_database_connection_string_representation(self) -> None:
         """Should have meaningful string representation."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)
@@ -303,7 +303,7 @@ class TestDatabaseConnection:
         assert "DatabaseConnection" in str_repr
         assert self.temp_db.name in str_repr
 
-    def test_concurrent_connections(self):
+    def test_concurrent_connections(self) -> None:
         """Should support multiple concurrent connections."""
         # Arrange
         db_conn = DatabaseConnection(self.temp_db.name)

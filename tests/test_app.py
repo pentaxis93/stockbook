@@ -4,9 +4,7 @@ Tests for the main application entry point.
 Basic tests to provide coverage for the app.py module.
 """
 
-from unittest.mock import MagicMock, patch
-
-import pytest
+from unittest.mock import MagicMock, Mock, patch
 
 # Import the app module
 import app
@@ -15,13 +13,13 @@ import app
 class TestStockBookApp:
     """Tests for the StockBookApp class."""
 
-    def test_app_class_exists(self):
+    def test_app_class_exists(self) -> None:
         """Should be able to instantiate StockBookApp."""
         # Test that the class exists and can be imported
         assert hasattr(app, "StockBookApp")
         assert callable(app.StockBookApp)
 
-    def test_app_has_required_attributes(self):
+    def test_app_has_required_attributes(self) -> None:
         """Should have required class attributes."""
         # Test that the class has the expected structure
         assert hasattr(app.StockBookApp, "__init__")
@@ -33,8 +31,8 @@ class TestStockBookApp:
     @patch("app.DIContainer")
     @patch("app.CompositionRoot")
     def test_app_run_method_exists(
-        self, mock_composition_root, mock_di_container, mock_st
-    ):
+        self, mock_composition_root: Mock, mock_di_container: Mock, mock_st: Mock
+    ) -> None:
         """Should have a run method."""
         # Mock the dependencies
         mock_container = MagicMock()
@@ -54,7 +52,7 @@ class TestStockBookApp:
 class TestAppModule:
     """Tests for module-level functionality."""
 
-    def test_imports_available(self):
+    def test_imports_available(self) -> None:
         """Should import required modules successfully."""
         # Test that all required imports are available
         assert hasattr(app, "st")
@@ -64,12 +62,12 @@ class TestAppModule:
         assert hasattr(app, "StockPageCoordinator")
 
     @patch("app.st")
-    def test_config_access(self, mock_st):
+    def test_config_access(self, mock_st: Mock) -> None:
         """Should be able to access configuration."""
         # Test that config is accessible
         assert hasattr(app, "config")
 
-    def test_module_docstring(self):
+    def test_module_docstring(self) -> None:
         """Should have proper module documentation."""
         # Test that module has docstring
         assert app.__doc__ is not None
@@ -82,7 +80,7 @@ class TestMainExecution:
 
     @patch("app.st")
     @patch("app.StockBookApp")
-    def test_main_execution_path(self, mock_app_class, mock_st):
+    def test_main_execution_path(self, mock_app_class: Mock, mock_st: Mock) -> None:
         """Should handle main execution properly."""
         # Mock the app instance
         mock_app_instance = MagicMock()

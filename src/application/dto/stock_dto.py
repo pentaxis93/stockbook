@@ -26,7 +26,7 @@ class StockDto:
     grade: Optional[str] = None
     notes: str = ""
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Validate DTO data after initialization."""
         if not self.symbol:
             raise ValueError("Symbol cannot be empty")

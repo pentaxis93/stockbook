@@ -7,12 +7,8 @@ expected behavior, then implementations are created to make tests pass.
 
 import sqlite3
 import tempfile
-from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, List, Optional, Union
 from unittest.mock import Mock, patch
-
-import pytest
 
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.persistence.unit_of_work import TransactionalDatabaseConnection
@@ -26,7 +22,7 @@ class TestIDatabaseConnectionProtocol:
     database connection implementations must provide.
     """
 
-    def test_protocol_interface_requirements(self):
+    def test_protocol_interface_requirements(self) -> None:
         """Test that protocol defines required interface methods."""
         # Protocol should now exist and be importable
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
@@ -34,19 +30,19 @@ class TestIDatabaseConnectionProtocol:
         # Protocol should be runtime checkable
         assert hasattr(IDatabaseConnection, "__protocol_attrs__")
 
-    def test_get_connection_method_required(self):
+    def test_get_connection_method_required(self) -> None:
         """Test that protocol requires get_connection method."""
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         # Mock implementation to test protocol contract
         class MockConnection:
-            def get_connection(self):
+            def get_connection(self) -> None:
                 pass
 
-            def transaction(self):
+            def transaction(self) -> None:
                 pass
 
-            def initialize_schema(self):
+            def initialize_schema(self) -> None:
                 pass
 
         # Should have get_connection method
@@ -54,18 +50,18 @@ class TestIDatabaseConnectionProtocol:
         # Should be compatible with protocol
         assert isinstance(MockConnection(), IDatabaseConnection)
 
-    def test_transaction_method_required(self):
+    def test_transaction_method_required(self) -> None:
         """Test that protocol requires transaction context manager method."""
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         class MockConnection:
-            def get_connection(self):
+            def get_connection(self) -> None:
                 pass
 
-            def transaction(self):
+            def transaction(self) -> None:
                 pass
 
-            def initialize_schema(self):
+            def initialize_schema(self) -> None:
                 pass
 
         # Should have transaction method
@@ -73,18 +69,18 @@ class TestIDatabaseConnectionProtocol:
         # Should be compatible with protocol
         assert isinstance(MockConnection(), IDatabaseConnection)
 
-    def test_initialize_schema_method_required(self):
+    def test_initialize_schema_method_required(self) -> None:
         """Test that protocol requires initialize_schema method."""
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         class MockConnection:
-            def get_connection(self):
+            def get_connection(self) -> None:
                 pass
 
-            def transaction(self):
+            def transaction(self) -> None:
                 pass
 
-            def initialize_schema(self):
+            def initialize_schema(self) -> None:
                 pass
 
         # Should have initialize_schema method
@@ -100,25 +96,25 @@ class TestDatabaseConnectionProtocolImplementation:
     These tests ensure DatabaseConnection properly implements the protocol interface.
     """
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
         self.temp_db.close()
         self.db_path = Path(self.temp_db.name)
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test fixtures."""
         if self.db_path.exists():
             self.db_path.unlink()
 
-    def test_database_connection_implements_protocol(self):
+    def test_database_connection_implements_protocol(self) -> None:
         """Test that DatabaseConnection implements IDatabaseConnection protocol."""
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         db_conn = DatabaseConnection(self.db_path)
         assert isinstance(db_conn, IDatabaseConnection)
 
-    def test_database_connection_get_connection_method(self):
+    def test_database_connection_get_connection_method(self) -> None:
         """Test DatabaseConnection provides get_connection method."""
         db_conn = DatabaseConnection(self.db_path)
 
@@ -128,7 +124,7 @@ class TestDatabaseConnectionProtocolImplementation:
         connection = db_conn.get_connection()
         assert isinstance(connection, sqlite3.Connection)
 
-    def test_database_connection_transaction_method(self):
+    def test_database_connection_transaction_method(self) -> None:
         """Test DatabaseConnection provides transaction context manager."""
         db_conn = DatabaseConnection(self.db_path)
 
@@ -138,7 +134,7 @@ class TestDatabaseConnectionProtocolImplementation:
         with db_conn.transaction() as conn:
             assert isinstance(conn, sqlite3.Connection)
 
-    def test_database_connection_initialize_schema_method(self):
+    def test_database_connection_initialize_schema_method(self) -> None:
         """Test DatabaseConnection provides initialize_schema method."""
         db_conn = DatabaseConnection(self.db_path)
 
@@ -157,7 +153,7 @@ class TestTransactionalDatabaseConnectionProtocolImplementation:
     These tests ensure TransactionalDatabaseConnection properly implements the protocol interface.
     """
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
         self.temp_db.close()
@@ -167,12 +163,12 @@ class TestTransactionalDatabaseConnectionProtocolImplementation:
         # Create a mock connection for testing
         self.mock_connection = Mock(spec=sqlite3.Connection)
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test fixtures."""
         if self.db_path.exists():
             self.db_path.unlink()
 
-    def test_transactional_connection_implements_protocol(self):
+    def test_transactional_connection_implements_protocol(self) -> None:
         """Test that TransactionalDatabaseConnection implements IDatabaseConnection protocol."""
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
@@ -181,7 +177,7 @@ class TestTransactionalDatabaseConnectionProtocolImplementation:
         )
         assert isinstance(trans_conn, IDatabaseConnection)
 
-    def test_transactional_connection_get_connection_method(self):
+    def test_transactional_connection_get_connection_method(self) -> None:
         """Test TransactionalDatabaseConnection provides get_connection method."""
         trans_conn = TransactionalDatabaseConnection(
             self.mock_connection, self.original_db_conn
@@ -193,7 +189,7 @@ class TestTransactionalDatabaseConnectionProtocolImplementation:
         connection = trans_conn.get_connection()
         assert connection is self.mock_connection
 
-    def test_transactional_connection_transaction_method(self):
+    def test_transactional_connection_transaction_method(self) -> None:
         """Test TransactionalDatabaseConnection provides transaction context manager."""
         trans_conn = TransactionalDatabaseConnection(
             self.mock_connection, self.original_db_conn
@@ -205,7 +201,7 @@ class TestTransactionalDatabaseConnectionProtocolImplementation:
         with trans_conn.transaction() as conn:
             assert conn is self.mock_connection
 
-    def test_transactional_connection_initialize_schema_method(self):
+    def test_transactional_connection_initialize_schema_method(self) -> None:
         """Test TransactionalDatabaseConnection provides initialize_schema method."""
         trans_conn = TransactionalDatabaseConnection(
             self.mock_connection, self.original_db_conn
@@ -228,18 +224,18 @@ class TestRepositoryProtocolCompatibility:
     These tests ensure repositories can work with any IDatabaseConnection implementation.
     """
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
         self.temp_db.close()
         self.db_path = Path(self.temp_db.name)
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test fixtures."""
         if self.db_path.exists():
             self.db_path.unlink()
 
-    def test_stock_repository_accepts_protocol_interface(self):
+    def test_stock_repository_accepts_protocol_interface(self) -> None:
         """Test that SqliteStockRepository accepts IDatabaseConnection protocol."""
         # This will fail until we update repository type hints
         from src.infrastructure.repositories.sqlite_stock_repository import (
@@ -258,7 +254,7 @@ class TestRepositoryProtocolCompatibility:
         assert repo1 is not None
         assert repo2 is not None
 
-    def test_all_repositories_accept_protocol_interface(self):
+    def test_all_repositories_accept_protocol_interface(self) -> None:
         """Test that all repositories accept IDatabaseConnection protocol."""
         from src.infrastructure.repositories.sqlite_balance_repository import (
             SqlitePortfolioBalanceRepository,
@@ -308,19 +304,19 @@ class TestUnitOfWorkProtocolIntegration:
     These tests ensure the Unit of Work pattern works correctly with the protocol.
     """
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
         self.temp_db.close()
         self.db_path = Path(self.temp_db.name)
         self.db_conn = DatabaseConnection(self.db_path)
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test fixtures."""
         if self.db_path.exists():
             self.db_path.unlink()
 
-    def test_unit_of_work_creates_protocol_compatible_repositories(self):
+    def test_unit_of_work_creates_protocol_compatible_repositories(self) -> None:
         """Test that UoW creates repositories compatible with protocol."""
         from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
@@ -335,7 +331,7 @@ class TestUnitOfWorkProtocolIntegration:
             assert uow.balances is not None
             assert uow.journal is not None
 
-    def test_unit_of_work_provides_consistent_connection_interface(self):
+    def test_unit_of_work_provides_consistent_connection_interface(self) -> None:
         """Test that UoW provides consistent connection interface to all repositories."""
         from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
@@ -344,16 +340,16 @@ class TestUnitOfWorkProtocolIntegration:
         with uow:
             # All repositories should be using the same connection interface type
             # This tests the protocol consistency
-            stocks_conn_type = type(uow.stocks.db_connection)
-            portfolios_conn_type = type(uow.portfolios.db_connection)
+            stocks_conn_type = type(uow.stocks.db_connection)  # type: ignore[attr-defined]
+            portfolios_conn_type = type(uow.portfolios.db_connection)  # type: ignore[attr-defined]
 
             # Within transaction, should use TransactionalDatabaseConnection
             assert stocks_conn_type == portfolios_conn_type
-            assert hasattr(uow.stocks.db_connection, "get_connection")
-            assert hasattr(uow.stocks.db_connection, "transaction")
-            assert hasattr(uow.stocks.db_connection, "initialize_schema")
+            assert hasattr(uow.stocks.db_connection, "get_connection")  # type: ignore[attr-defined]
+            assert hasattr(uow.stocks.db_connection, "transaction")  # type: ignore[attr-defined]
+            assert hasattr(uow.stocks.db_connection, "initialize_schema")  # type: ignore[attr-defined]
 
-    def test_unit_of_work_transaction_isolation(self):
+    def test_unit_of_work_transaction_isolation(self) -> None:
         """Test that UoW maintains transaction isolation through protocol."""
         from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
 
@@ -361,24 +357,24 @@ class TestUnitOfWorkProtocolIntegration:
 
         # Outside transaction - should use regular DatabaseConnection
         stocks_repo_outside = uow.stocks
-        assert isinstance(stocks_repo_outside.db_connection, DatabaseConnection)
+        assert isinstance(stocks_repo_outside.db_connection, DatabaseConnection)  # type: ignore[attr-defined]
 
         # Inside transaction - should use TransactionalDatabaseConnection
         with uow:
             # Clear cached repositories to force recreation with transactional connection
-            uow._stocks = None
-            uow._portfolios = None
+            uow._stocks = None  # type: ignore[attr-defined] - Testing internal state
+            uow._portfolios = None  # type: ignore[attr-defined] - Testing internal state
 
             stocks_repo_inside = uow.stocks
-            assert isinstance(
-                stocks_repo_inside.db_connection, TransactionalDatabaseConnection
+            assert isinstance(  # type: ignore[attr-defined,reportPrivateUsage] - Testing internal connection type
+                stocks_repo_inside.db_connection, TransactionalDatabaseConnection  # type: ignore[attr-defined]
             )
 
             # Should be same connection instance across all repositories
             portfolios_repo_inside = uow.portfolios
-            assert (
-                stocks_repo_inside.db_connection.connection
-                is portfolios_repo_inside.db_connection.connection
+            assert (  # type: ignore[attr-defined] - Testing connection sharing
+                stocks_repo_inside.db_connection.connection  # type: ignore[attr-defined]
+                is portfolios_repo_inside.db_connection.connection  # type: ignore[attr-defined]
             )
 
 
@@ -389,7 +385,7 @@ class TestProtocolTypeCompatibility:
     These tests ensure the protocol solution resolves the original type errors.
     """
 
-    def test_protocol_resolves_type_errors(self):
+    def test_protocol_resolves_type_errors(self) -> None:
         """Test that protocol implementation resolves pyright type errors."""
         # This test verifies the main issue is resolved
         # Will fail until protocol is implemented and type hints updated
@@ -409,7 +405,7 @@ class TestProtocolTypeCompatibility:
             assert stocks_repo is not None
             assert portfolios_repo is not None
 
-    def test_repository_constructor_type_safety(self):
+    def test_repository_constructor_type_safety(self) -> None:
         """Test that repository constructors are type-safe with protocol."""
         # This will fail until we update repository type hints
         from src.infrastructure.repositories.sqlite_stock_repository import (

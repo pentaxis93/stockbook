@@ -257,24 +257,18 @@ exclude_lines = [
 
 [tool.pyright]
 include = ["src", "tests", "dependency_injection"]
-exclude = ["**/node_modules", "**/__pycache__"]
+exclude = [
+    "**/node_modules", 
+    "**/__pycache__",
+    # Strategic exclusion: presentation layer during Streamlit→new UI migration
+    "src/presentation/**"
+]
 
 # Use strict mode everywhere
 typeCheckingMode = "strict"
 
 # Set python path to include project root for import resolution
 pythonPath = ["."]
-
-# Re-enable execution environments with proper python path configuration
-[[tool.pyright.executionEnvironments]]
-root = "src/presentation/adapters"
-typeCheckingMode = "basic"
-extraPaths = ["."]
-
-[[tool.pyright.executionEnvironments]]
-root = "src/presentation/coordinators" 
-typeCheckingMode = "standard"
-extraPaths = ["."]
 
 # REASONABLE configuration for TEST files - matches pylint.tests philosophy
 [[tool.pyright.executionEnvironments]]

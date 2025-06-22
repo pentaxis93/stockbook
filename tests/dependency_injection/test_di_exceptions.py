@@ -20,7 +20,7 @@ import pytest
 class TestDependencyResolutionError:
     """Test dependency resolution error messages."""
 
-    def test_unregistered_type_error_message(self):
+    def test_unregistered_type_error_message(self) -> None:
         """Should provide helpful message for unregistered types."""
         # Arrange
         # error = DependencyResolutionError("TestService", "TestService is not registered in the container")
@@ -31,7 +31,7 @@ class TestDependencyResolutionError:
         # assert error.service_type == "TestService"
         pass
 
-    def test_missing_dependency_error_message(self):
+    def test_missing_dependency_error_message(self) -> None:
         """Should provide helpful message for missing dependencies."""
         # Arrange - when TestService needs IRepository but IRepository not registered
         # error = DependencyResolutionError(
@@ -45,7 +45,7 @@ class TestDependencyResolutionError:
         # assert "dependency" in str(error)
         pass
 
-    def test_resolution_chain_in_error(self):
+    def test_resolution_chain_in_error(self) -> None:
         """Should show resolution chain in error messages."""
         # When A -> B -> C and C fails, should show the chain
         # error = DependencyResolutionError(
@@ -61,7 +61,7 @@ class TestDependencyResolutionError:
 class TestCircularDependencyError:
     """Test circular dependency detection and error messages."""
 
-    def test_simple_circular_dependency_error(self):
+    def test_simple_circular_dependency_error(self) -> None:
         """Should detect A -> B -> A circular dependency."""
         # error = CircularDependencyError(["ServiceA", "ServiceB", "ServiceA"])
 
@@ -71,7 +71,7 @@ class TestCircularDependencyError:
         # assert error.dependency_chain == ["ServiceA", "ServiceB", "ServiceA"]
         pass
 
-    def test_complex_circular_dependency_error(self):
+    def test_complex_circular_dependency_error(self) -> None:
         """Should detect longer circular dependency chains."""
         # A -> B -> C -> D -> B (circular)
         # error = CircularDependencyError(["ServiceA", "ServiceB", "ServiceC", "ServiceD", "ServiceB"])
@@ -79,7 +79,7 @@ class TestCircularDependencyError:
         # assert "ServiceA -> ServiceB -> ServiceC -> ServiceD -> ServiceB" in str(error)
         pass
 
-    def test_self_circular_dependency_error(self):
+    def test_self_circular_dependency_error(self) -> None:
         """Should detect self-referencing circular dependencies."""
         # Service that depends on itself
         # error = CircularDependencyError(["SelfService", "SelfService"])
@@ -93,7 +93,7 @@ class TestCircularDependencyError:
 class TestDuplicateRegistrationError:
     """Test duplicate registration handling."""
 
-    def test_duplicate_registration_error_message(self):
+    def test_duplicate_registration_error_message(self) -> None:
         """Should provide clear message for duplicate registrations."""
         # error = DuplicateRegistrationError(
         #     "ITestService",
@@ -105,7 +105,7 @@ class TestDuplicateRegistrationError:
         # assert "replace=True" in str(error)
         pass
 
-    def test_duplicate_with_different_implementation_error(self):
+    def test_duplicate_with_different_implementation_error(self) -> None:
         """Should show what was previously registered."""
         # error = DuplicateRegistrationError(
         #     "ITestService",
@@ -121,7 +121,7 @@ class TestDuplicateRegistrationError:
 class TestInvalidRegistrationError:
     """Test invalid registration scenarios."""
 
-    def test_invalid_implementation_type_error(self):
+    def test_invalid_implementation_type_error(self) -> None:
         """Should validate implementation type matches interface."""
         # error = InvalidRegistrationError(
         #     "ITestService",
@@ -133,7 +133,7 @@ class TestInvalidRegistrationError:
         # assert "TestRepository" in str(error)
         pass
 
-    def test_abstract_implementation_error(self):
+    def test_abstract_implementation_error(self) -> None:
         """Should reject abstract classes as implementations."""
         # error = InvalidRegistrationError(
         #     "ITestService",
@@ -144,7 +144,7 @@ class TestInvalidRegistrationError:
         # assert "AbstractService" in str(error)
         pass
 
-    def test_none_implementation_error(self):
+    def test_none_implementation_error(self) -> None:
         """Should reject None as implementation."""
         # error = InvalidRegistrationError(
         #     "ITestService",
@@ -159,7 +159,7 @@ class TestInvalidRegistrationError:
 class TestErrorHelpfulness:
     """Test that errors provide helpful guidance."""
 
-    def test_suggests_correct_registration(self):
+    def test_suggests_correct_registration(self) -> None:
         """Should suggest how to fix registration issues."""
         # Error message should guide user toward solution
         # error = DependencyResolutionError(
@@ -170,7 +170,7 @@ class TestErrorHelpfulness:
         # assert "container.register_transient" in str(error)
         pass
 
-    def test_suggests_dependency_registration(self):
+    def test_suggests_dependency_registration(self) -> None:
         """Should suggest registering missing dependencies."""
         # error = DependencyResolutionError(
         #     "TestService",
@@ -181,7 +181,7 @@ class TestErrorHelpfulness:
         # assert "Register IRepository" in str(error)
         pass
 
-    def test_provides_resolution_context(self):
+    def test_provides_resolution_context(self) -> None:
         """Should provide context about where resolution failed."""
         # When resolving complex chain, should show where it failed
         # error = DependencyResolutionError(

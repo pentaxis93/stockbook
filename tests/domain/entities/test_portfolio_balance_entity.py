@@ -17,7 +17,7 @@ from src.domain.value_objects import Money
 class TestPortfolioBalanceEntity:
     """Test PortfolioBalanceEntity domain entity with value objects and business logic."""
 
-    def test_create_portfolio_balance_with_value_objects(self):
+    def test_create_portfolio_balance_with_value_objects(self) -> None:
         """Test creating a portfolio balance with all value objects."""
         from src.domain.value_objects import IndexChange
 
@@ -35,9 +35,10 @@ class TestPortfolioBalanceEntity:
         assert balance.withdrawals.amount == Decimal("500.00")
         assert balance.deposits.amount == Decimal("1000.00")
         assert balance.final_balance.amount == Decimal("10500.00")
+        assert balance.index_change is not None
         assert balance.index_change.value == 5.25
 
-    def test_create_portfolio_balance_with_minimal_data(self):
+    def test_create_portfolio_balance_with_minimal_data(self) -> None:
         """Test creating portfolio balance with only required fields."""
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -52,7 +53,7 @@ class TestPortfolioBalanceEntity:
         assert balance.deposits.amount == Decimal("0.00")  # Defaults to zero
         assert balance.index_change is None  # Defaults to None
 
-    def test_create_portfolio_balance_with_none_optionals_allowed(self):
+    def test_create_portfolio_balance_with_none_optionals_allowed(self) -> None:
         """Should allow creating portfolio balance with None for optional fields."""
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -69,7 +70,9 @@ class TestPortfolioBalanceEntity:
         assert balance.deposits.amount == Decimal("0.00")  # Defaults to zero when None
         assert balance.index_change is None  # Remains None
 
-    def test_create_portfolio_balance_with_invalid_portfolio_id_raises_error(self):
+    def test_create_portfolio_balance_with_invalid_portfolio_id_raises_error(
+        self,
+    ) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             PortfolioBalanceEntity(
@@ -78,14 +81,16 @@ class TestPortfolioBalanceEntity:
                 final_balance=Money(Decimal("10000.00")),
             )
 
-    def test_create_portfolio_balance_with_invalid_index_change_raises_error(self):
+    def test_create_portfolio_balance_with_invalid_index_change_raises_error(
+        self,
+    ) -> None:
         """Should raise error for invalid index change through IndexChange value object."""
         from src.domain.value_objects import IndexChange
 
         with pytest.raises(ValueError, match="Index change cannot exceed"):
             IndexChange(150.0)  # Error happens at IndexChange construction (over 100%)
 
-    def test_portfolio_balance_equality(self):
+    def test_portfolio_balance_equality(self) -> None:
         """Should compare portfolio balances based on business identity (portfolio_id, date)."""
         balance1 = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -108,7 +113,7 @@ class TestPortfolioBalanceEntity:
         assert balance1 == balance2  # Same portfolio and date
         assert balance1 != balance3  # Different portfolio
 
-    def test_portfolio_balance_hash(self):
+    def test_portfolio_balance_hash(self) -> None:
         """Should hash consistently based on business identity."""
         balance1 = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -124,7 +129,7 @@ class TestPortfolioBalanceEntity:
 
         assert hash(balance1) == hash(balance2)  # Same portfolio and date
 
-    def test_portfolio_balance_string_representation(self):
+    def test_portfolio_balance_string_representation(self) -> None:
         """Should have informative string representation."""
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -135,7 +140,7 @@ class TestPortfolioBalanceEntity:
         assert "2024-01-15" in str(balance)
         assert "10500.00" in str(balance)
 
-    def test_portfolio_balance_repr(self):
+    def test_portfolio_balance_repr(self) -> None:
         """Should have detailed repr representation."""
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -149,7 +154,7 @@ class TestPortfolioBalanceEntity:
         assert repr(balance) == expected
 
     # Business behavior tests
-    def test_portfolio_balance_calculate_net_flow(self):
+    def test_portfolio_balance_calculate_net_flow(self) -> None:
         """Should calculate net cash flow (deposits - withdrawals)."""
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -162,7 +167,7 @@ class TestPortfolioBalanceEntity:
         net_flow = balance.calculate_net_flow()
         assert net_flow.amount == Decimal("500.00")  # 1000 - 500
 
-    def test_portfolio_balance_has_positive_change(self):
+    def test_portfolio_balance_has_positive_change(self) -> None:
         """Should check if portfolio has positive index change."""
         from src.domain.value_objects import IndexChange
 
@@ -190,7 +195,7 @@ class TestPortfolioBalanceEntity:
         assert negative_balance.has_positive_change() is False
         assert no_change_balance.has_positive_change() is False
 
-    def test_portfolio_balance_has_negative_change(self):
+    def test_portfolio_balance_has_negative_change(self) -> None:
         """Should check if portfolio has negative index change."""
         from src.domain.value_objects import IndexChange
 
@@ -211,7 +216,7 @@ class TestPortfolioBalanceEntity:
         assert negative_balance.has_negative_change() is True
         assert positive_balance.has_negative_change() is False
 
-    def test_portfolio_balance_had_deposits(self):
+    def test_portfolio_balance_had_deposits(self) -> None:
         """Should check if portfolio had deposits."""
         balance_with_deposits = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -229,7 +234,7 @@ class TestPortfolioBalanceEntity:
         assert balance_with_deposits.had_deposits() is True
         assert balance_without_deposits.had_deposits() is False
 
-    def test_portfolio_balance_had_withdrawals(self):
+    def test_portfolio_balance_had_withdrawals(self) -> None:
         """Should check if portfolio had withdrawals."""
         balance_with_withdrawals = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -247,7 +252,7 @@ class TestPortfolioBalanceEntity:
         assert balance_with_withdrawals.had_withdrawals() is True
         assert balance_without_withdrawals.had_withdrawals() is False
 
-    def test_portfolio_balance_create_with_id(self):
+    def test_portfolio_balance_create_with_id(self) -> None:
         """Should create portfolio balance with provided ID."""
         test_id = "balance-id-123"
         balance = PortfolioBalanceEntity(
@@ -259,7 +264,7 @@ class TestPortfolioBalanceEntity:
 
         assert balance.id == test_id
 
-    def test_portfolio_balance_id_immutability(self):
+    def test_portfolio_balance_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
@@ -270,9 +275,9 @@ class TestPortfolioBalanceEntity:
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):
-            balance.id = "different-id"
+            balance.id = "different-id"  # type: ignore[misc]
 
-    def test_portfolio_balance_from_persistence(self):
+    def test_portfolio_balance_from_persistence(self) -> None:
         """Should create portfolio balance from persistence with existing ID."""
         test_id = "persistence-id-456"
         balance = PortfolioBalanceEntity.from_persistence(
@@ -284,7 +289,7 @@ class TestPortfolioBalanceEntity:
 
         assert balance.id == test_id
 
-    def test_portfolio_balance_update_index_change(self):
+    def test_portfolio_balance_update_index_change(self) -> None:
         """Should be able to update index change."""
         from src.domain.value_objects import IndexChange
 
@@ -296,10 +301,12 @@ class TestPortfolioBalanceEntity:
 
         # Update with IndexChange value object
         balance.update_index_change(IndexChange(7.5))
+        assert balance.index_change is not None
         assert balance.index_change.value == 7.5
 
         # Update with float (should be converted to IndexChange)
         balance.update_index_change(3.25)
+        assert balance.index_change is not None
         assert balance.index_change.value == 3.25
 
         # Update with None
@@ -310,7 +317,7 @@ class TestPortfolioBalanceEntity:
 class TestIndexChange:
     """Test IndexChange value object validation."""
 
-    def test_valid_index_changes_accepted(self):
+    def test_valid_index_changes_accepted(self) -> None:
         """Test that valid index changes are accepted."""
         from src.domain.value_objects import IndexChange
 
@@ -319,7 +326,7 @@ class TestIndexChange:
             index_change = IndexChange(change)
             assert index_change.value == change
 
-    def test_extreme_index_changes_rejected(self):
+    def test_extreme_index_changes_rejected(self) -> None:
         """Test that extreme index changes are rejected."""
         from src.domain.value_objects import IndexChange
 
@@ -328,7 +335,7 @@ class TestIndexChange:
             with pytest.raises(ValueError):
                 IndexChange(change)
 
-    def test_index_change_precision(self):
+    def test_index_change_precision(self) -> None:
         """Test that index change values are properly rounded."""
         from src.domain.value_objects import IndexChange
 

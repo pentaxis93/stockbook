@@ -10,24 +10,16 @@ import pytest
 # These imports now exist after implementation
 from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
-from src.application.services.stock_application_service import StockApplicationService
 
-# Application imports - these exist
-from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
-from src.infrastructure.persistence.database_connection import DatabaseConnection
-from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from src.infrastructure.repositories.sqlite_stock_repository import (
-    SqliteStockRepository,
-)
-from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from src.presentation.controllers.stock_controller import StockController
-from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
+# Unused import removed
+
+# Unused imports removed - tests are stubs
 
 
 class TestCompositionRoot:
     """Test application dependency composition."""
 
-    def test_configure_returns_container(self):
+    def test_configure_returns_container(self) -> None:
         """Should return configured DI container."""
         # Act
         container = CompositionRoot.configure()
@@ -36,7 +28,7 @@ class TestCompositionRoot:
         assert container is not None
         assert isinstance(container, DIContainer)
 
-    def test_configure_database_layer(self):
+    def test_configure_database_layer(self) -> None:
         """Should configure database and infrastructure layer correctly."""
         # Arrange
         # container = CompositionRoot.configure()
@@ -52,7 +44,7 @@ class TestCompositionRoot:
         # assert isinstance(stock_repo, SqliteStockRepository)
         pass
 
-    def test_configure_application_layer(self):
+    def test_configure_application_layer(self) -> None:
         """Should configure application services correctly."""
         # Arrange
         # container = CompositionRoot.configure()
@@ -65,7 +57,7 @@ class TestCompositionRoot:
         # assert isinstance(stock_service._unit_of_work, SqliteUnitOfWork)
         pass
 
-    def test_configure_presentation_layer(self):
+    def test_configure_presentation_layer(self) -> None:
         """Should configure presentation layer components correctly."""
         # Arrange
         # container = CompositionRoot.configure()
@@ -85,7 +77,7 @@ class TestCompositionRoot:
         # assert coordinator.adapter is adapter
         pass
 
-    def test_complete_object_graph_wiring(self):
+    def test_complete_object_graph_wiring(self) -> None:
         """Should wire complete dependency chain correctly."""
         # Arrange
         # container = CompositionRoot.configure()
@@ -99,7 +91,7 @@ class TestCompositionRoot:
         # assert isinstance(coordinator.adapter.controller, StockController)
         pass
 
-    def test_singleton_configuration(self):
+    def test_singleton_configuration(self) -> None:
         """Should configure singleton lifetimes correctly."""
         # Arrange
         # container = CompositionRoot.configure()
@@ -115,7 +107,7 @@ class TestCompositionRoot:
         # assert uow1 is uow2
         pass
 
-    def test_transient_configuration(self):
+    def test_transient_configuration(self) -> None:
         """Should configure transient lifetimes correctly."""
         # Arrange
         # container = CompositionRoot.configure()
@@ -138,7 +130,7 @@ class TestCompositionRoot:
 class TestCompositionRootConfiguration:
     """Test configuration options and customization."""
 
-    def test_configure_with_test_database(self):
+    def test_configure_with_test_database(self) -> None:
         """Should allow configuration with test database."""
         # Act
         # container = CompositionRoot.configure(database_path=":memory:")
@@ -148,7 +140,7 @@ class TestCompositionRootConfiguration:
         # assert db_connection.database_path == ":memory:"
         pass
 
-    def test_configure_with_custom_config(self):
+    def test_configure_with_custom_config(self) -> None:
         """Should allow custom configuration overrides."""
         # Arrange
         # config = {
@@ -164,7 +156,7 @@ class TestCompositionRootConfiguration:
         # assert "/custom/test.db" in str(db_connection.database_path)
         pass
 
-    def test_register_additional_services(self):
+    def test_register_additional_services(self) -> None:
         """Should allow registering additional services."""
         # Arrange
         # def configure_extras(container: DIContainer):
@@ -183,7 +175,7 @@ class TestCompositionRootConfiguration:
 class TestBootstrapIntegration:
     """Test integration with application bootstrap."""
 
-    def test_bootstrap_app_with_di(self):
+    def test_bootstrap_app_with_di(self) -> None:
         """Should bootstrap complete application with DI."""
         # This tests the main app.py integration point
         # from main import bootstrap_app
@@ -194,7 +186,7 @@ class TestBootstrapIntegration:
         # assert isinstance(app_components['coordinator'], StockPageCoordinator)
         pass
 
-    def test_streamlit_integration_ready(self):
+    def test_streamlit_integration_ready(self) -> None:
         """Should provide components ready for Streamlit integration."""
         # container = CompositionRoot.configure()
         # coordinator = container.resolve(StockPageCoordinator)
@@ -210,18 +202,18 @@ class TestBootstrapIntegration:
 class TestCompositionRootErrorHandling:
     """Test error handling in composition root."""
 
-    def test_missing_database_file_handling(self):
+    def test_missing_database_file_handling(self) -> None:
         """Should handle missing database file gracefully."""
         # Test what happens when database file doesn't exist
         # Should either create it or give clear error
         pass
 
-    def test_invalid_configuration_handling(self):
+    def test_invalid_configuration_handling(self) -> None:
         """Should validate configuration and give clear errors."""
         # Test invalid database paths, missing permissions, etc.
         pass
 
-    def test_partial_registration_failure(self):
+    def test_partial_registration_failure(self) -> None:
         """Should handle partial registration failures clearly."""
         # Test what happens if some registrations fail
         pass

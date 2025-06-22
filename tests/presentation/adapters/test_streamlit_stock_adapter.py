@@ -5,16 +5,13 @@ Following TDD approach - these tests define the expected behavior
 of the Streamlit adapter that bridges controllers with Streamlit UI.
 """
 
-from typing import Any, Dict, List, Optional
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-import streamlit as st
 
 from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
 from src.presentation.controllers.stock_controller import StockController
 from src.presentation.view_models.stock_view_models import (
-    CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,
     StockListResponse,
@@ -26,12 +23,12 @@ from src.presentation.view_models.stock_view_models import (
 class TestStreamlitStockAdapter:
     """Test suite for StreamlitStockAdapter."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         self.mock_controller = Mock(spec=StockController)
         self.adapter = StreamlitStockAdapter(self.mock_controller)
 
-    def test_adapter_initialization(self):
+    def test_adapter_initialization(self) -> None:
         """Should initialize adapter with required dependencies."""
         # Act & Assert
         assert self.adapter.controller == self.mock_controller
@@ -45,8 +42,13 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.text_area")
     @patch("streamlit.form_submit_button")
     def test_render_create_stock_form_display(
-        self, mock_submit, mock_text_area, mock_selectbox, mock_text_input, mock_form
-    ):
+        self,
+        mock_submit: MagicMock,
+        mock_text_area: MagicMock,
+        mock_selectbox: MagicMock,
+        mock_text_input: MagicMock,
+        mock_form: MagicMock,
+    ) -> None:
         """Should render create stock form with proper inputs."""
         # Arrange
         mock_form_context = MagicMock()
@@ -76,13 +78,13 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.success")
     def test_render_create_stock_form_successful_submission(
         self,
-        mock_success,
-        mock_submit,
-        mock_text_area,
-        mock_selectbox,
-        mock_text_input,
-        mock_form,
-    ):
+        mock_success: MagicMock,
+        mock_submit: MagicMock,
+        mock_text_area: MagicMock,
+        mock_selectbox: MagicMock,
+        mock_text_input: MagicMock,
+        mock_form: MagicMock,
+    ) -> None:
         """Should handle successful form submission."""
         # Arrange
         mock_form_context = MagicMock()
@@ -114,13 +116,13 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.error")
     def test_render_create_stock_form_validation_error(
         self,
-        mock_error,
-        mock_submit,
-        mock_text_area,
-        mock_selectbox,
-        mock_text_input,
-        mock_form,
-    ):
+        mock_error: MagicMock,
+        mock_submit: MagicMock,
+        mock_text_area: MagicMock,
+        mock_selectbox: MagicMock,
+        mock_text_input: MagicMock,
+        mock_form: MagicMock,
+    ) -> None:
         """Should handle validation errors in form submission."""
         # Arrange
         mock_form_context = MagicMock()
@@ -152,7 +154,9 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.dataframe")
     @patch("streamlit.metric")
     @patch("streamlit.columns")
-    def test_render_stock_list_success(self, mock_columns, mock_metric, mock_dataframe):
+    def test_render_stock_list_success(
+        self, mock_columns: MagicMock, mock_metric: MagicMock, mock_dataframe: MagicMock
+    ) -> None:
         """Should render stock list successfully."""
         # Arrange
         stocks = [
@@ -182,7 +186,7 @@ class TestStreamlitStockAdapter:
         mock_metric.assert_called()  # Should show metrics
 
     @patch("streamlit.info")
-    def test_render_stock_list_empty(self, mock_info):
+    def test_render_stock_list_empty(self, mock_info: MagicMock) -> None:
         """Should handle empty stock list."""
         # Arrange
         response = StockListResponse.create_success([], "No stocks found")
@@ -196,7 +200,7 @@ class TestStreamlitStockAdapter:
         mock_info.assert_called_once_with("No stocks found")
 
     @patch("streamlit.error")
-    def test_render_stock_list_error(self, mock_error):
+    def test_render_stock_list_error(self, mock_error: MagicMock) -> None:
         """Should handle error in stock list retrieval."""
         # Arrange
         response = StockListResponse.create_error("Database connection failed")
@@ -212,7 +216,12 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.selectbox")
     @patch("streamlit.text_input")
     @patch("streamlit.button")
-    def test_render_stock_filters(self, mock_button, mock_text_input, mock_selectbox):
+    def test_render_stock_filters(
+        self,
+        mock_button: MagicMock,
+        mock_text_input: MagicMock,
+        mock_selectbox: MagicMock,
+    ) -> None:
         """Should render stock filtering controls."""
         # Arrange
         mock_selectbox.side_effect = ["A", "Technology"]  # Grade and industry filters
@@ -234,8 +243,12 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.metric")
     @patch("streamlit.write")
     def test_render_stock_detail_success(
-        self, mock_write, mock_metric, mock_columns, mock_header
-    ):
+        self,
+        mock_write: MagicMock,
+        mock_metric: MagicMock,
+        mock_columns: MagicMock,
+        mock_header: MagicMock,
+    ) -> None:
         """Should render stock detail view successfully."""
         # Arrange
         stock = StockViewModel(
@@ -264,7 +277,7 @@ class TestStreamlitStockAdapter:
         mock_metric.assert_called()  # Should show stock metrics
 
     @patch("streamlit.warning")
-    def test_render_stock_detail_not_found(self, mock_warning):
+    def test_render_stock_detail_not_found(self, mock_warning: MagicMock) -> None:
         """Should handle stock not found scenario."""
         # Arrange
         response = StockDetailResponse.create_error("Stock not found")
@@ -281,8 +294,8 @@ class TestStreamlitStockAdapter:
     @patch("streamlit.selectbox")
     @patch("streamlit.button")
     def test_render_grade_filter_widget(
-        self, mock_button, mock_selectbox, mock_columns
-    ):
+        self, mock_button: MagicMock, mock_selectbox: MagicMock, mock_columns: MagicMock
+    ) -> None:
         """Should render grade filtering widget."""
         # Arrange
         mock_columns.return_value = [MagicMock(), MagicMock()]
@@ -307,7 +320,7 @@ class TestStreamlitStockAdapter:
         self.mock_controller.search_stocks.assert_called_once()
 
     @patch("streamlit.dataframe")
-    def test_render_stock_dataframe_formatting(self, mock_dataframe):
+    def test_render_stock_dataframe_formatting(self, mock_dataframe: MagicMock) -> None:
         """Should format stock data properly for display."""
         # Arrange
         stocks = [
@@ -328,7 +341,7 @@ class TestStreamlitStockAdapter:
         ]
 
         # Act
-        self.adapter._render_stock_dataframe(stocks)
+        self.adapter.render_stock_dataframe_with_data(stocks)
 
         # Assert
         mock_dataframe.assert_called_once()
@@ -342,7 +355,7 @@ class TestStreamlitStockAdapter:
         reason="Streamlit context manager mocking complexity - st.sidebar context calls not captured properly by mocks. Functionality verified in integration tests."
     )
     @patch("streamlit.sidebar")
-    def test_render_sidebar_navigation(self, mock_sidebar):
+    def test_render_sidebar_navigation(self, mock_sidebar: MagicMock) -> None:
         """Should render navigation sidebar."""
         # Arrange
         mock_sidebar_context = MagicMock()
@@ -357,7 +370,7 @@ class TestStreamlitStockAdapter:
         assert selected_action is not None
 
     @patch("streamlit.expander")
-    def test_render_advanced_search_form(self, mock_expander):
+    def test_render_advanced_search_form(self, mock_expander: MagicMock) -> None:
         """Should render advanced search form in expander."""
         # Arrange
         mock_expander_context = MagicMock()
@@ -371,14 +384,14 @@ class TestStreamlitStockAdapter:
         mock_expander.assert_called_once_with("Advanced Search")
         assert search_filters is not None
 
-    def test_adapter_error_handling(self):
+    def test_adapter_error_handling(self) -> None:
         """Should handle controller errors gracefully."""
         # Arrange
         self.mock_controller.get_stock_list.side_effect = Exception("Unexpected error")
 
         # Act & Assert - Should not raise exception
         with patch("streamlit.error") as mock_error:
-            result = self.adapter.render_stock_list()
+            _result = self.adapter.render_stock_list()
             mock_error.assert_called_once()
             assert "An unexpected error occurred" in mock_error.call_args[0][0]
 
@@ -386,7 +399,9 @@ class TestStreamlitStockAdapter:
         reason="Streamlit session state mocking complexity - session_state dictionary-like operations not captured by mock. Functionality verified in integration tests."
     )
     @patch("streamlit.session_state")
-    def test_adapter_session_state_management(self, mock_session_state):
+    def test_adapter_session_state_management(
+        self, mock_session_state: MagicMock
+    ) -> None:
         """Should manage Streamlit session state properly."""
         # Arrange
         mock_session_state.__contains__.return_value = False
@@ -394,18 +409,18 @@ class TestStreamlitStockAdapter:
         mock_session_state.__setitem__ = MagicMock()
 
         # Act
-        self.adapter._initialize_session_state()
+        self.adapter.initialize_session_state()
 
         # Assert
         # Verify session state is initialized
         assert mock_session_state.__setitem__.called
 
-    def test_adapter_input_validation_before_controller_call(self):
+    def test_adapter_input_validation_before_controller_call(self) -> None:
         """Should validate input before calling controller."""
         # Arrange
         with patch("streamlit.error") as mock_error:
             # Act
-            result = self.adapter.render_stock_detail("")  # Empty symbol
+            _result = self.adapter.render_stock_detail("")  # Empty symbol
 
             # Assert
             mock_error.assert_called_once()
@@ -413,11 +428,13 @@ class TestStreamlitStockAdapter:
             self.mock_controller.get_stock_by_symbol.assert_not_called()
 
     @patch("streamlit.rerun")
-    def test_adapter_page_refresh_after_successful_create(self, mock_rerun):
+    def test_adapter_page_refresh_after_successful_create(
+        self, mock_rerun: MagicMock
+    ) -> None:
         """Should refresh page after successful stock creation."""
         # Arrange
         success_response = CreateStockResponse.create_success(
-            1, "AAPL", "Created successfully"
+            "1", "AAPL", "Created successfully"  # type: ignore[misc] - temporary for UI migration
         )
 
         with patch.multiple(
@@ -437,7 +454,7 @@ class TestStreamlitStockAdapter:
             # Assert
             mock_rerun.assert_called_once()
 
-    def test_adapter_data_type_conversion(self):
+    def test_adapter_data_type_conversion(self) -> None:
         """Should handle data type conversions for Streamlit display."""
         # Arrange
         stocks = [
@@ -450,7 +467,7 @@ class TestStreamlitStockAdapter:
         ]
 
         # Act
-        display_data = self.adapter._prepare_display_data(stocks)
+        display_data = self.adapter.prepare_display_data(stocks)
 
         # Assert
         assert display_data[0]["Grade"] == "No Grade"  # None converted to display text

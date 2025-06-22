@@ -17,7 +17,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 class TestDomainEvent:
     """Test suite for base DomainEvent."""
 
-    def test_domain_event_has_timestamp(self):
+    def test_domain_event_has_timestamp(self) -> None:
         """Should automatically set timestamp when created."""
         event = DomainEvent()
 
@@ -28,14 +28,14 @@ class TestDomainEvent:
         now = datetime.now(timezone.utc)
         assert (now - event.occurred_at).total_seconds() < 1
 
-    def test_domain_event_with_custom_timestamp(self):
+    def test_domain_event_with_custom_timestamp(self) -> None:
         """Should allow setting custom timestamp."""
         custom_time = datetime(2024, 1, 15, 10, 30, 0)
         event = DomainEvent(occurred_at=custom_time)
 
         assert event.occurred_at == custom_time
 
-    def test_domain_event_has_event_id(self):
+    def test_domain_event_has_event_id(self) -> None:
         """Should have unique event ID."""
         event1 = DomainEvent()
         event2 = DomainEvent()
@@ -44,7 +44,7 @@ class TestDomainEvent:
         assert event2.event_id is not None
         assert event1.event_id != event2.event_id
 
-    def test_domain_event_equality(self):
+    def test_domain_event_equality(self) -> None:
         """Should compare events by event_id."""
         event1 = DomainEvent()
         event2 = DomainEvent()
@@ -55,7 +55,7 @@ class TestDomainEvent:
         # Different events should not be equal
         assert event1 != event2
 
-    def test_domain_event_hash(self):
+    def test_domain_event_hash(self) -> None:
         """Should be hashable by event_id."""
         event1 = DomainEvent()
         event2 = DomainEvent()
@@ -64,7 +64,7 @@ class TestDomainEvent:
         event_set = {event1, event2}
         assert len(event_set) == 2
 
-    def test_domain_event_string_representation(self):
+    def test_domain_event_string_representation(self) -> None:
         """Should have meaningful string representation."""
         event = DomainEvent()
         str_repr = str(event)
@@ -76,7 +76,7 @@ class TestDomainEvent:
 class TestStockAddedEvent:
     """Test suite for StockAddedEvent."""
 
-    def test_create_stock_added_event(self):
+    def test_create_stock_added_event(self) -> None:
         """Should create StockAddedEvent with stock information."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
@@ -89,7 +89,7 @@ class TestStockAddedEvent:
         assert event.occurred_at is not None
         assert event.event_id is not None
 
-    def test_stock_added_event_validation(self):
+    def test_stock_added_event_validation(self) -> None:
         """Should validate required fields."""
         symbol = StockSymbol("AAPL")
 
@@ -99,7 +99,7 @@ class TestStockAddedEvent:
         with pytest.raises(ValueError, match="Stock ID must be positive"):
             StockAddedEvent(stock_symbol=symbol, stock_name="Apple Inc.", stock_id=0)
 
-    def test_stock_added_event_string_representation(self):
+    def test_stock_added_event_string_representation(self) -> None:
         """Should have meaningful string representation."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
@@ -111,7 +111,7 @@ class TestStockAddedEvent:
         assert "AAPL" in str_repr
         assert "Apple Inc." in str_repr
 
-    def test_stock_added_event_repr(self):
+    def test_stock_added_event_repr(self) -> None:
         """Should have detailed repr representation."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(

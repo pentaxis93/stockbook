@@ -16,7 +16,7 @@ from src.application.commands.stock_commands import (
 class TestCreateStockCommand:
     """Test suite for CreateStockCommand."""
 
-    def test_create_stock_command_with_valid_data(self):
+    def test_create_stock_command_with_valid_data(self) -> None:
         """Should create command with valid stock data."""
         command = CreateStockCommand(
             symbol="AAPL",
@@ -34,7 +34,7 @@ class TestCreateStockCommand:
         assert command.grade == "A"
         assert command.notes == "Excellent company"
 
-    def test_create_stock_command_with_minimal_data(self):
+    def test_create_stock_command_with_minimal_data(self) -> None:
         """Should create command with only required fields."""
         command = CreateStockCommand(symbol="MSFT", name="Microsoft Corp.")
 
@@ -44,13 +44,13 @@ class TestCreateStockCommand:
         assert command.grade is None
         assert command.notes == ""
 
-    def test_create_stock_command_normalizes_symbol(self):
+    def test_create_stock_command_normalizes_symbol(self) -> None:
         """Should normalize symbol to uppercase."""
         command = CreateStockCommand(symbol="aapl", name="Apple Inc.")
 
         assert command.symbol == "AAPL"
 
-    def test_create_stock_command_strips_whitespace(self):
+    def test_create_stock_command_strips_whitespace(self) -> None:
         """Should strip whitespace from fields."""
         command = CreateStockCommand(
             symbol="  AAPL  ",
@@ -66,27 +66,27 @@ class TestCreateStockCommand:
         assert command.industry_group == "Software"
         assert command.notes == "Great company"
 
-    def test_create_stock_command_with_empty_symbol_raises_error(self):
+    def test_create_stock_command_with_empty_symbol_raises_error(self) -> None:
         """Should raise error for empty symbol."""
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
             CreateStockCommand(symbol="", name="Apple Inc.")
 
-    def test_create_stock_command_with_empty_name_raises_error(self):
+    def test_create_stock_command_with_empty_name_raises_error(self) -> None:
         """Should raise error for empty name."""
         with pytest.raises(ValueError, match="Name cannot be empty"):
             CreateStockCommand(symbol="AAPL", name="")
 
-    def test_create_stock_command_with_invalid_symbol_raises_error(self):
+    def test_create_stock_command_with_invalid_symbol_raises_error(self) -> None:
         """Should raise error for invalid symbol format."""
         with pytest.raises(ValueError, match="Invalid symbol format"):
             CreateStockCommand(symbol="AAPL123", name="Apple Inc.")
 
-    def test_create_stock_command_with_invalid_grade_raises_error(self):
+    def test_create_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
         with pytest.raises(ValueError, match="Invalid grade"):
             CreateStockCommand(symbol="AAPL", name="Apple Inc.", grade="Z")
 
-    def test_create_stock_command_equality(self):
+    def test_create_stock_command_equality(self) -> None:
         """Should compare commands for equality."""
         command1 = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
         command2 = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
@@ -95,7 +95,7 @@ class TestCreateStockCommand:
         assert command1 == command2
         assert command1 != command3
 
-    def test_create_stock_command_string_representation(self):
+    def test_create_stock_command_string_representation(self) -> None:
         """Should have meaningful string representation."""
         command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
 
@@ -104,21 +104,21 @@ class TestCreateStockCommand:
         assert "AAPL" in str_repr
         assert "Apple Inc." in str_repr
 
-    def test_create_stock_command_is_immutable(self):
+    def test_create_stock_command_is_immutable(self) -> None:
         """Command should be immutable after creation."""
         command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
 
         with pytest.raises(AttributeError):
-            command.symbol = "MSFT"
+            command.symbol = "MSFT"  # type: ignore[misc]
 
         with pytest.raises(AttributeError):
-            command.name = "Microsoft"
+            command.name = "Microsoft"  # type: ignore[misc]
 
 
 class TestUpdateStockCommand:
     """Test suite for UpdateStockCommand."""
 
-    def test_update_stock_command_with_valid_data(self):
+    def test_update_stock_command_with_valid_data(self) -> None:
         """Should create command with valid update data."""
         command = UpdateStockCommand(
             stock_id="test-stock-1",
@@ -134,7 +134,7 @@ class TestUpdateStockCommand:
         assert command.grade == "A"
         assert command.notes == "Updated notes"
 
-    def test_update_stock_command_with_partial_data(self):
+    def test_update_stock_command_with_partial_data(self) -> None:
         """Should create command with only some fields to update."""
         command = UpdateStockCommand(
             stock_id="test-stock-1",
@@ -148,7 +148,7 @@ class TestUpdateStockCommand:
         assert command.grade == "B"
         assert command.notes == "Updated notes only"
 
-    def test_update_stock_command_strips_whitespace(self):
+    def test_update_stock_command_strips_whitespace(self) -> None:
         """Should strip whitespace from fields."""
         command = UpdateStockCommand(
             stock_id="test-stock-1",
@@ -161,7 +161,7 @@ class TestUpdateStockCommand:
         assert command.industry_group == "Technology"
         assert command.notes == "Updated notes"
 
-    def test_update_stock_command_with_empty_string_sets_none(self):
+    def test_update_stock_command_with_empty_string_sets_none(self) -> None:
         """Should convert empty strings to None for optional fields."""
         command = UpdateStockCommand(
             stock_id="test-stock-1",
@@ -174,7 +174,7 @@ class TestUpdateStockCommand:
         assert command.industry_group is None
         assert command.notes == ""  # Notes should be empty string, not None
 
-    def test_update_stock_command_with_invalid_stock_id_raises_error(self):
+    def test_update_stock_command_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             UpdateStockCommand(stock_id="")
@@ -182,12 +182,12 @@ class TestUpdateStockCommand:
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             UpdateStockCommand(stock_id="   ")  # whitespace-only string
 
-    def test_update_stock_command_with_invalid_grade_raises_error(self):
+    def test_update_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
         with pytest.raises(ValueError, match="Invalid grade"):
             UpdateStockCommand(stock_id="test-stock-1", grade="Z")
 
-    def test_update_stock_command_with_empty_name_raises_error(self):
+    def test_update_stock_command_with_empty_name_raises_error(self) -> None:
         """Should raise error for empty name."""
         with pytest.raises(ValueError, match="Name cannot be empty"):
             UpdateStockCommand(stock_id="test-stock-1", name="")
@@ -195,7 +195,7 @@ class TestUpdateStockCommand:
         with pytest.raises(ValueError, match="Name cannot be empty"):
             UpdateStockCommand(stock_id="test-stock-1", name="   ")
 
-    def test_update_stock_command_equality(self):
+    def test_update_stock_command_equality(self) -> None:
         """Should compare commands for equality."""
         command1 = UpdateStockCommand(stock_id="test-stock-1", grade="A")
         command2 = UpdateStockCommand(stock_id="test-stock-1", grade="A")
@@ -204,7 +204,7 @@ class TestUpdateStockCommand:
         assert command1 == command2
         assert command1 != command3
 
-    def test_update_stock_command_string_representation(self):
+    def test_update_stock_command_string_representation(self) -> None:
         """Should have meaningful string representation."""
         command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
 
@@ -212,29 +212,29 @@ class TestUpdateStockCommand:
         assert "UpdateStockCommand" in str_repr
         assert "stock_id=test-stock-1" in str_repr
 
-    def test_update_stock_command_is_immutable(self):
+    def test_update_stock_command_is_immutable(self) -> None:
         """Command should be immutable after creation."""
         command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
 
         with pytest.raises(AttributeError):
-            command.stock_id = "different-id"
+            command.stock_id = "different-id"  # type: ignore[misc]
 
         with pytest.raises(AttributeError):
-            command.grade = "B"
+            command.grade = "B"  # type: ignore[misc]
 
-    def test_update_stock_command_has_no_updates_when_all_fields_none(self):
+    def test_update_stock_command_has_no_updates_when_all_fields_none(self) -> None:
         """Should detect when no fields are being updated."""
         command = UpdateStockCommand(stock_id="test-stock-1")
 
         assert not command.has_updates()
 
-    def test_update_stock_command_has_updates_when_fields_provided(self):
+    def test_update_stock_command_has_updates_when_fields_provided(self) -> None:
         """Should detect when fields are being updated."""
         command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
 
         assert command.has_updates()
 
-    def test_update_stock_command_get_update_fields(self):
+    def test_update_stock_command_get_update_fields(self) -> None:
         """Should return only fields that are being updated."""
         command = UpdateStockCommand(
             stock_id="test-stock-1",

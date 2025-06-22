@@ -10,16 +10,15 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Dict, Generator
 
 import pytest
 
 from config import config
 from src.domain.entities import PortfolioEntity
+from src.domain.value_objects import Notes, PortfolioName
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from src.infrastructure.repositories.sqlite_portfolio_repository import (
-    SqlitePortfolioRepository,
-)
 
 # Add the project root to Python path so we can import our modules
 # This allows tests to import from project packages
@@ -27,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 @pytest.fixture
-def test_db():
+def test_db() -> Generator[Path, None, None]:
     """
     Create a temporary test database for each test.
 
@@ -63,7 +62,7 @@ def test_db():
 
 
 @pytest.fixture
-def sample_stock_data():
+def sample_stock_data() -> Dict[str, Dict[str, str]]:
     """
     Provide sample stock data for testing.
 
@@ -96,7 +95,7 @@ def sample_stock_data():
 
 
 @pytest.fixture
-def sample_portfolio(test_db):
+def sample_portfolio(test_db: Path) -> Dict[str, Any]:
     """
     Create a sample portfolio with some test data.
 
@@ -112,28 +111,31 @@ def sample_portfolio(test_db):
     """
     # Create portfolio using clean architecture
     db_conn = DatabaseConnection(str(test_db))
-    portfolio_repo = SqlitePortfolioRepository(db_conn)
     uow = SqliteUnitOfWork(db_conn)
 
     portfolio = PortfolioEntity(
-        name="Test Portfolio", description="Test portfolio for testing", is_active=True
+        name=PortfolioName("Test Portfolio"),
+        description=Notes("Test portfolio for testing"),
+        is_active=True,
     )
 
     with uow:
-        uow.portfolio_repository = portfolio_repo
-        saved_portfolio = uow.portfolio_repository.add(portfolio)
+        portfolio_id = uow.portfolios.create(portfolio)
         uow.commit()
+        # Get the created portfolio for return
+        saved_portfolio = uow.portfolios.get_by_id(portfolio_id)
+        assert saved_portfolio is not None
 
     return {
         "id": saved_portfolio.id,
-        "name": saved_portfolio.name,
-        "description": saved_portfolio.description,
+        "name": saved_portfolio.name.value,
+        "description": saved_portfolio.description.value,
         "is_active": saved_portfolio.is_active,
     }
 
 
 # Test helper functions that can be imported by test files
-def assert_datetime_recent(dt, seconds=5):
+def assert_datetime_recent(dt: datetime | str, seconds: int = 5) -> None:
     """
     Assert that a datetime is recent (within the specified seconds).
 
@@ -157,7 +159,7 @@ def assert_datetime_recent(dt, seconds=5):
     ), f"Datetime {dt} is not recent (difference: {time_diff} seconds, limit: {seconds})"
 
 
-def count_db_rows(table_name, test_db_path):
+def count_db_rows(table_name: str, test_db_path: Path) -> int:
     """
     Count rows in a database table.
 

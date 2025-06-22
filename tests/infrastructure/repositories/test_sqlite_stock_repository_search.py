@@ -7,19 +7,19 @@ of the search functionality in the stock repository.
 
 from unittest.mock import Mock
 
-import pytest
-
 from src.domain.entities.stock_entity import StockEntity
 from src.domain.value_objects.stock_symbol import StockSymbol
 from src.infrastructure.repositories.sqlite_stock_repository import (
     SqliteStockRepository,
 )
 
+# pytest import removed - unused
+
 
 class TestSqliteStockRepositorySearch:
     """Test suite for SqliteStockRepository search functionality."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test fixtures."""
         # Mock database connection that simulates the SQLite behavior
         self.mock_db_connection = Mock()
@@ -32,7 +32,7 @@ class TestSqliteStockRepositorySearch:
         # Set up the repository
         self.repository = SqliteStockRepository(self.mock_db_connection)
 
-    def test_search_stocks_with_symbol_filter(self):
+    def test_search_stocks_with_symbol_filter(self) -> None:
         """Should search stocks by symbol filter."""
         # Arrange
         symbol_filter = "APP"
@@ -64,7 +64,7 @@ class TestSqliteStockRepositorySearch:
         assert results[0].symbol.value == "AAPL"
         assert results[0].company_name.value == "Apple Inc."
 
-    def test_search_stocks_with_name_filter(self):
+    def test_search_stocks_with_name_filter(self) -> None:
         """Should search stocks by name filter."""
         # Arrange
         name_filter = "Apple"
@@ -95,7 +95,7 @@ class TestSqliteStockRepositorySearch:
         assert len(results) == 1
         assert results[0].company_name.value == "Apple Inc."
 
-    def test_search_stocks_with_industry_filter(self):
+    def test_search_stocks_with_industry_filter(self) -> None:
         """Should search stocks by industry filter."""
         # Arrange
         industry_filter = "Tech"
@@ -134,7 +134,7 @@ class TestSqliteStockRepositorySearch:
         )
         assert len(results) == 2
 
-    def test_search_stocks_with_grade_filter(self):
+    def test_search_stocks_with_grade_filter(self) -> None:
         """Should search stocks by grade filter."""
         # Arrange
         grade_filter = "A"
@@ -172,9 +172,11 @@ class TestSqliteStockRepositorySearch:
             expected_query, expected_params
         )
         assert len(results) == 2
-        assert all(stock.grade.value == "A" for stock in results)
+        assert all(
+            stock.grade is not None and stock.grade.value == "A" for stock in results
+        )
 
-    def test_search_stocks_with_multiple_filters(self):
+    def test_search_stocks_with_multiple_filters(self) -> None:
         """Should search stocks with multiple filter criteria."""
         # Arrange
         symbol_filter = "G"
@@ -207,9 +209,10 @@ class TestSqliteStockRepositorySearch:
         )
         assert len(results) == 1
         assert results[0].symbol.value == "GOOGL"
+        assert results[0].grade is not None
         assert results[0].grade.value == "A"
 
-    def test_search_stocks_with_all_filters(self):
+    def test_search_stocks_with_all_filters(self) -> None:
         """Should search stocks with all filter criteria."""
         # Arrange
         symbol_filter = "APP"
@@ -252,7 +255,7 @@ class TestSqliteStockRepositorySearch:
         assert len(results) == 1
         assert results[0].symbol.value == "AAPL"
 
-    def test_search_stocks_with_no_filters(self):
+    def test_search_stocks_with_no_filters(self) -> None:
         """Should return all stocks when no filters are provided."""
         # Arrange
         expected_query = "SELECT id, symbol, name, sector, industry_group, grade, notes FROM stock ORDER BY symbol"
@@ -299,7 +302,7 @@ class TestSqliteStockRepositorySearch:
         )
         assert len(results) == 3
 
-    def test_search_stocks_empty_results(self):
+    def test_search_stocks_empty_results(self) -> None:
         """Should handle empty search results gracefully."""
         # Arrange
         symbol_filter = "NOTFOUND"
@@ -318,7 +321,7 @@ class TestSqliteStockRepositorySearch:
         )
         assert len(results) == 0
 
-    def test_search_stocks_case_insensitive(self):
+    def test_search_stocks_case_insensitive(self) -> None:
         """Should perform case-insensitive searches."""
         # Arrange
         symbol_filter = "app"  # lowercase
@@ -349,7 +352,7 @@ class TestSqliteStockRepositorySearch:
         assert len(results) == 1
         assert results[0].symbol.value == "AAPL"
 
-    def test_search_stocks_connection_cleanup(self):
+    def test_search_stocks_connection_cleanup(self) -> None:
         """Should properly handle database connection cleanup."""
         # Arrange
         symbol_filter = "AAPL"
@@ -376,7 +379,7 @@ class TestSqliteStockRepositorySearch:
         assert len(results) == 1
         self.mock_connection.close.assert_called_once()
 
-    def test_search_stocks_entity_mapping(self):
+    def test_search_stocks_entity_mapping(self) -> None:
         """Should properly map database rows to domain entities."""
         # Arrange
         symbol_filter = "AAPL"
@@ -404,7 +407,10 @@ class TestSqliteStockRepositorySearch:
         assert stock.id == "stock-id-1"
         assert stock.symbol.value == "AAPL"
         assert stock.company_name.value == "Apple Inc."
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
+        assert stock.grade is not None
         assert stock.grade.value == "A"
         assert stock.notes.value == "High quality stock"

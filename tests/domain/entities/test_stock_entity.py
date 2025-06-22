@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the rich Stock entity with business logic.
 """
 
-from decimal import Decimal
+# from decimal import Decimal  # Unused import
 
 import pytest
 
@@ -25,7 +25,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 class TestStockEntity:
     """Test suite for Stock domain entity."""
 
-    def test_create_stock_with_value_objects(self):
+    def test_create_stock_with_value_objects(self) -> None:
         """Should create Stock entity with value objects only."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -52,7 +52,7 @@ class TestStockEntity:
         assert stock.id is not None  # Generated nanoid
         assert isinstance(stock.id, str)
 
-    def test_create_stock_with_minimal_data(self):
+    def test_create_stock_with_minimal_data(self) -> None:
         """Should create Stock with only required fields."""
         symbol = StockSymbol("MSFT")
         company_name = CompanyName("Microsoft Corp.")
@@ -65,7 +65,7 @@ class TestStockEntity:
         assert stock.grade is None
         assert stock.notes.value == ""  # Notes defaults to empty
 
-    def test_stock_stores_value_objects(self):
+    def test_stock_stores_value_objects(self) -> None:
         """Should store and return value objects directly."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -89,11 +89,14 @@ class TestStockEntity:
 
         # String access through value property
         assert stock.company_name.value == "Apple Inc."
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
         assert stock.notes.value == "Great company"
 
-    def test_create_stock_with_empty_name_allowed(self):
+    def test_create_stock_with_empty_name_allowed(self) -> None:
         """Should allow creating stock with empty company name."""
         symbol = StockSymbol("AAPL")
         empty_name = CompanyName("")
@@ -107,7 +110,7 @@ class TestStockEntity:
         assert stock_whitespace_name.symbol == symbol
         assert stock_whitespace_name.company_name.value == ""  # Whitespace is stripped
 
-    def test_create_stock_with_optional_none_values(self):
+    def test_create_stock_with_optional_none_values(self) -> None:
         """Should allow creating stock with None for optional value objects."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -127,15 +130,12 @@ class TestStockEntity:
         assert stock.grade is None
         assert stock.notes.value == ""  # Notes defaults to empty when None
 
-    def test_create_stock_with_invalid_grade_raises_error(self):
+    def test_create_stock_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade through Grade value object."""
-        symbol = StockSymbol("AAPL")
-        company_name = CompanyName("Apple Inc.")
-
         with pytest.raises(ValueError, match="Grade must be one of"):
             Grade("Z")  # Error happens at Grade construction
 
-    def test_create_stock_with_too_long_name_raises_error(self):
+    def test_create_stock_with_too_long_name_raises_error(self) -> None:
         """Should raise error for company name that's too long (delegated to value object)."""
         long_name = "A" * 201  # Max is 200 characters
 
@@ -144,7 +144,7 @@ class TestStockEntity:
         ):
             CompanyName(long_name)  # Error happens at CompanyName construction
 
-    def test_create_stock_with_too_long_industry_raises_error(self):
+    def test_create_stock_with_too_long_industry_raises_error(self) -> None:
         """Should raise error for industry group that's too long (delegated to value object)."""
         long_industry = "A" * 101  # Max is 100 characters
 
@@ -153,14 +153,14 @@ class TestStockEntity:
         ):
             IndustryGroup(long_industry)  # Error happens at IndustryGroup construction
 
-    def test_create_stock_with_too_long_notes_raises_error(self):
+    def test_create_stock_with_too_long_notes_raises_error(self) -> None:
         """Should raise error for notes that are too long (delegated to value object)."""
         long_notes = "A" * 1001  # Max is 1000 characters
 
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
             Notes(long_notes)  # Error happens at Notes construction
 
-    def test_stock_equality(self):
+    def test_stock_equality(self) -> None:
         """Should compare stocks based on symbol (business key)."""
         symbol1 = StockSymbol("AAPL")
         symbol2 = StockSymbol("AAPL")
@@ -177,7 +177,7 @@ class TestStockEntity:
         assert stock1 == stock2  # Same symbol
         assert stock1 != stock3  # Different symbol
 
-    def test_stock_hash(self):
+    def test_stock_hash(self) -> None:
         """Should be hashable based on symbol."""
         symbol1 = StockSymbol("AAPL")
         symbol2 = StockSymbol("AAPL")
@@ -198,7 +198,7 @@ class TestStockEntity:
         stock_set = {stock1, stock2, stock3}
         assert len(stock_set) == 2  # AAPL appears only once
 
-    def test_stock_string_representation(self):
+    def test_stock_string_representation(self) -> None:
         """Should have meaningful string representation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -206,7 +206,7 @@ class TestStockEntity:
 
         assert str(stock) == "AAPL - Apple Inc."
 
-    def test_stock_repr(self):
+    def test_stock_repr(self) -> None:
         """Should have detailed repr representation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -216,7 +216,7 @@ class TestStockEntity:
         expected = "StockEntity(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), grade=Grade('A'))"
         assert repr(stock) == expected
 
-    def test_calculate_position_value(self):
+    def test_calculate_position_value(self) -> None:
         """Should calculate total position value."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -230,7 +230,7 @@ class TestStockEntity:
         assert total_value == Money("15050.00")
         assert isinstance(total_value, Money)
 
-    def test_calculate_position_value_with_zero_quantity(self):
+    def test_calculate_position_value_with_zero_quantity(self) -> None:
         """Should handle zero quantity gracefully."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -243,7 +243,7 @@ class TestStockEntity:
         total_value = stock.calculate_position_value(quantity, price)
         assert total_value == Money("0.00")
 
-    def test_has_notes(self):
+    def test_has_notes(self) -> None:
         """Should check if stock has notes."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -262,7 +262,7 @@ class TestStockEntity:
         assert stock_without_notes.has_notes() is False
         assert stock_empty_notes.has_notes() is False
 
-    def test_update_fields_single_field(self):
+    def test_update_fields_single_field(self) -> None:
         """Should update individual fields using update_fields method."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -271,6 +271,7 @@ class TestStockEntity:
 
         # Update grade
         stock.update_fields(grade="A")
+        assert stock.grade is not None
         assert stock.grade.value == "A"
 
         # Update name
@@ -279,14 +280,17 @@ class TestStockEntity:
 
         # Update sector and industry_group
         stock.update_fields(sector="Technology", industry_group="Software")
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
 
         # Update notes
         stock.update_fields(notes="Great company")
         assert stock.notes.value == "Great company"
 
-    def test_update_fields_multiple_fields_atomic(self):
+    def test_update_fields_multiple_fields_atomic(self) -> None:
         """Should update multiple fields atomically."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -302,12 +306,16 @@ class TestStockEntity:
         )
 
         assert stock.company_name.value == "Apple Inc. Updated"
+        assert stock.grade is not None
         assert stock.grade.value == "A"
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
         assert stock.notes.value == "Excellent company"
 
-    def test_update_fields_validation_failure_rollback(self):
+    def test_update_fields_validation_failure_rollback(self) -> None:
         """Should rollback all changes if any validation fails."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -322,10 +330,11 @@ class TestStockEntity:
 
         # Original values should be unchanged
         assert stock.company_name.value == "Apple Inc."
+        assert stock.grade is not None
         assert stock.grade.value == "B"
         assert stock.notes.value == ""
 
-    def test_update_fields_with_too_long_values_raises_error(self):
+    def test_update_fields_with_too_long_values_raises_error(self) -> None:
         """Should raise error for values that are too long."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -350,7 +359,7 @@ class TestStockEntity:
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
             stock.update_fields(notes=long_notes)
 
-    def test_create_stock_with_id(self):
+    def test_create_stock_with_id(self) -> None:
         """Should create stock with provided ID."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -359,7 +368,7 @@ class TestStockEntity:
 
         assert stock.id == test_id
 
-    def test_stock_id_immutability(self):
+    def test_stock_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -367,9 +376,9 @@ class TestStockEntity:
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):
-            stock.id = "different-id"
+            stock.id = "different-id"  # type: ignore[misc]
 
-    def test_stock_from_persistence(self):
+    def test_stock_from_persistence(self) -> None:
         """Should create stock from persistence with existing ID."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -385,10 +394,11 @@ class TestStockEntity:
 
         assert stock.id == test_id
         assert stock.symbol.value == "AAPL"
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
 
     # New tests for sector functionality
-    def test_create_stock_with_sector_and_industry_group(self):
+    def test_create_stock_with_sector_and_industry_group(self) -> None:
         """Should create Stock entity with sector and industry_group."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -406,13 +416,17 @@ class TestStockEntity:
 
         assert stock.symbol == symbol
         assert stock.company_name.value == "Apple Inc."
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
+        assert stock.grade is not None
         assert stock.grade.value == "A"
         assert isinstance(stock.sector, Sector)
         assert isinstance(stock.industry_group, IndustryGroup)
 
-    def test_create_stock_with_sector_only(self):
+    def test_create_stock_with_sector_only(self) -> None:
         """Should create Stock with sector but no industry_group."""
         symbol = StockSymbol("MSFT")
         company_name = CompanyName("Microsoft Corp.")
@@ -422,12 +436,15 @@ class TestStockEntity:
 
         assert stock.symbol == symbol
         assert stock.company_name.value == "Microsoft Corp."
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
         assert stock.industry_group is None
         assert isinstance(stock.sector, Sector)
         assert stock.industry_group is None
 
-    def test_create_stock_with_invalid_sector_industry_combination_raises_error(self):
+    def test_create_stock_with_invalid_sector_industry_combination_raises_error(
+        self,
+    ) -> None:
         """Should raise error when industry_group doesn't belong to sector."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -447,7 +464,7 @@ class TestStockEntity:
                 industry_group=industry_group,
             )
 
-    def test_create_stock_with_industry_group_but_no_sector_raises_error(self):
+    def test_create_stock_with_industry_group_but_no_sector_raises_error(self) -> None:
         """Should raise error when industry_group is provided without sector."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -462,39 +479,43 @@ class TestStockEntity:
                 industry_group=industry_group,
             )
 
-    def test_create_stock_with_empty_sector_raises_error(self):
+    def test_create_stock_with_empty_sector_raises_error(self) -> None:
         """Should raise error for empty sector string."""
         with pytest.raises(ValueError, match="Sector cannot be empty"):
             Sector("")  # Error happens at Sector construction
 
-    def test_create_stock_with_too_long_sector_raises_error(self):
+    def test_create_stock_with_too_long_sector_raises_error(self) -> None:
         """Should raise error for sector that's too long."""
         long_sector = "A" * 101  # Max is 100 characters
 
         with pytest.raises(ValueError, match="Sector cannot exceed 100 characters"):
             Sector(long_sector)  # Error happens at Sector construction
 
-    def test_update_fields_sector_only(self):
+    def test_update_fields_sector_only(self) -> None:
         """Should update sector without industry_group."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         stock = StockEntity(symbol=symbol, company_name=company_name)
 
         stock.update_fields(sector="Technology")
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
         assert stock.industry_group is None
 
-    def test_update_fields_sector_and_industry_group(self):
+    def test_update_fields_sector_and_industry_group(self) -> None:
         """Should update both sector and industry_group when valid combination."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         stock = StockEntity(symbol=symbol, company_name=company_name)
 
         stock.update_fields(sector="Technology", industry_group="Software")
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
 
-    def test_update_fields_invalid_sector_industry_combination_rollback(self):
+    def test_update_fields_invalid_sector_industry_combination_rollback(self) -> None:
         """Should rollback all changes if sector-industry combination is invalid."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -521,11 +542,14 @@ class TestStockEntity:
 
         # Original values should be unchanged
         assert stock.company_name.value == "Apple Inc."
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
         assert stock.notes.value == ""
 
-    def test_update_fields_add_industry_group_to_existing_sector(self):
+    def test_update_fields_add_industry_group_to_existing_sector(self) -> None:
         """Should allow adding industry_group to stock with existing sector."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -535,10 +559,15 @@ class TestStockEntity:
         assert stock.industry_group is None
 
         stock.update_fields(industry_group="Software")
+        assert stock.sector is not None
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
 
-    def test_update_fields_change_sector_clears_incompatible_industry_group(self):
+    def test_update_fields_change_sector_clears_incompatible_industry_group(
+        self,
+    ) -> None:
         """Should clear industry_group when changing to incompatible sector."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
@@ -554,10 +583,11 @@ class TestStockEntity:
 
         # Change to Healthcare sector - Software is not valid for Healthcare
         stock.update_fields(sector="Healthcare")
+        assert stock.sector is not None
         assert stock.sector.value == "Healthcare"
         assert stock.industry_group is None  # Should be cleared
 
-    def test_update_fields_industry_group_without_sector_raises_error(self):
+    def test_update_fields_industry_group_without_sector_raises_error(self) -> None:
         """Should raise error when trying to set industry_group without sector."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")

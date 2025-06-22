@@ -5,22 +5,13 @@ Following TDD approach - these tests define the expected behavior
 of view models for data transfer between UI and controllers.
 """
 
-from datetime import datetime
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
-
-import pytest
-
 from src.application.dto.stock_dto import StockDto
 from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
-    StockDetailResponse,
     StockListResponse,
     StockSearchRequest,
     StockViewModel,
-    UpdateStockRequest,
-    UpdateStockResponse,
     ValidationErrorResponse,
 )
 
@@ -28,7 +19,7 @@ from src.presentation.view_models.stock_view_models import (
 class TestCreateStockRequest:
     """Test suite for CreateStockRequest view model."""
 
-    def test_create_stock_request_initialization(self):
+    def test_create_stock_request_initialization(self) -> None:
         """Should initialize with all required fields."""
         # Act
         request = CreateStockRequest(
@@ -48,7 +39,7 @@ class TestCreateStockRequest:
         assert request.grade == "A"
         assert request.notes == "High quality stock"
 
-    def test_create_stock_request_minimal_fields(self):
+    def test_create_stock_request_minimal_fields(self) -> None:
         """Should initialize with minimal required fields."""
         # Act
         request = CreateStockRequest(symbol="AAPL", name="Apple Inc.")
@@ -60,7 +51,7 @@ class TestCreateStockRequest:
         assert request.grade is None
         assert request.notes == ""
 
-    def test_create_stock_request_validation_rules(self):
+    def test_create_stock_request_validation_rules(self) -> None:
         """Should define validation rules for fields."""
         # Act
         request = CreateStockRequest(symbol="AAPL", name="Apple Inc.")
@@ -69,7 +60,7 @@ class TestCreateStockRequest:
         assert hasattr(request, "validate")
         assert hasattr(request, "to_command")
 
-    def test_create_stock_request_to_command_conversion(self):
+    def test_create_stock_request_to_command_conversion(self) -> None:
         """Should convert to application command correctly."""
         # Arrange
         request = CreateStockRequest(
@@ -92,7 +83,7 @@ class TestCreateStockRequest:
         assert command.grade == "A"
         assert command.notes == "Test notes"
 
-    def test_create_stock_request_validation_success(self):
+    def test_create_stock_request_validation_success(self) -> None:
         """Should validate successfully with valid data."""
         # Arrange
         request = CreateStockRequest(
@@ -109,7 +100,7 @@ class TestCreateStockRequest:
         # Assert
         assert not errors
 
-    def test_create_stock_request_validation_empty_symbol(self):
+    def test_create_stock_request_validation_empty_symbol(self) -> None:
         """Should validate symbol is not empty."""
         # Arrange
         request = CreateStockRequest(symbol="", name="Apple Inc.")
@@ -121,7 +112,7 @@ class TestCreateStockRequest:
         assert "symbol" in errors
         assert "Stock symbol cannot be empty" in errors["symbol"]
 
-    def test_create_stock_request_validation_empty_name(self):
+    def test_create_stock_request_validation_empty_name(self) -> None:
         """Should validate name is not empty."""
         # Arrange
         request = CreateStockRequest(symbol="AAPL", name="")
@@ -133,7 +124,7 @@ class TestCreateStockRequest:
         assert "name" in errors
         assert "Stock name cannot be empty" in errors["name"]
 
-    def test_create_stock_request_validation_invalid_symbol_format(self):
+    def test_create_stock_request_validation_invalid_symbol_format(self) -> None:
         """Should validate symbol format."""
         # Arrange
         request = CreateStockRequest(symbol="invalid123", name="Test Company")
@@ -145,7 +136,7 @@ class TestCreateStockRequest:
         assert "symbol" in errors
         assert "Invalid stock symbol format" in errors["symbol"]
 
-    def test_create_stock_request_validation_invalid_grade(self):
+    def test_create_stock_request_validation_invalid_grade(self) -> None:
         """Should validate grade values."""
         # Arrange
         request = CreateStockRequest(symbol="AAPL", name="Apple Inc.", grade="Z")
@@ -157,7 +148,7 @@ class TestCreateStockRequest:
         assert "grade" in errors
         assert "Grade must be A, B, C, or empty" in errors["grade"]
 
-    def test_create_stock_request_validation_name_too_long(self):
+    def test_create_stock_request_validation_name_too_long(self) -> None:
         """Should validate name length."""
         # Arrange
         long_name = "A" * 201  # Exceeds max length
@@ -170,7 +161,7 @@ class TestCreateStockRequest:
         assert "name" in errors
         assert "Name cannot exceed 200 characters" in errors["name"]
 
-    def test_create_stock_request_sanitization(self):
+    def test_create_stock_request_sanitization(self) -> None:
         """Should sanitize input data."""
         # Arrange
         request = CreateStockRequest(
@@ -195,7 +186,7 @@ class TestCreateStockRequest:
 class TestStockViewModel:
     """Test suite for StockViewModel."""
 
-    def test_stock_view_model_from_dto(self):
+    def test_stock_view_model_from_dto(self) -> None:
         """Should create view model from DTO."""
         # Arrange
         dto = StockDto(
@@ -219,7 +210,7 @@ class TestStockViewModel:
         assert view_model.notes == "High quality stock"
         assert view_model.display_name == "AAPL - Apple Inc."
 
-    def test_stock_view_model_display_properties(self):
+    def test_stock_view_model_display_properties(self) -> None:
         """Should provide computed display properties."""
         # Arrange
         dto = StockDto(
@@ -240,7 +231,7 @@ class TestStockViewModel:
         assert view_model.has_notes is False
         assert view_model.is_high_grade is True
 
-    def test_stock_view_model_grade_display_formatting(self):
+    def test_stock_view_model_grade_display_formatting(self) -> None:
         """Should format grade display correctly."""
         # Test Grade A
         dto_a = StockDto(id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A")
@@ -262,7 +253,7 @@ class TestStockViewModel:
         assert view_model_none.grade_display == "No Grade"
         assert view_model_none.is_high_grade is False
 
-    def test_stock_view_model_notes_handling(self):
+    def test_stock_view_model_notes_handling(self) -> None:
         """Should handle notes properly."""
         # With notes
         dto_with_notes = StockDto(
@@ -280,7 +271,7 @@ class TestStockViewModel:
         assert view_model_without.has_notes is False
         assert view_model_without.notes_preview == "No notes"
 
-    def test_stock_view_model_long_notes_preview(self):
+    def test_stock_view_model_long_notes_preview(self) -> None:
         """Should truncate long notes for preview."""
         # Arrange
         long_notes = "This is a very long note that exceeds the preview limit " * 5
@@ -299,7 +290,7 @@ class TestStockViewModel:
 class TestStockListResponse:
     """Test suite for StockListResponse."""
 
-    def test_stock_list_response_success(self):
+    def test_stock_list_response_success(self) -> None:
         """Should create successful response with stock list."""
         # Arrange
         stocks = [
@@ -321,7 +312,7 @@ class TestStockListResponse:
         assert response.message == "Retrieved successfully"
         assert response.errors is None
 
-    def test_stock_list_response_empty(self):
+    def test_stock_list_response_empty(self) -> None:
         """Should handle empty stock list."""
         # Act
         response = StockListResponse.create_success([], "No stocks found")
@@ -332,7 +323,7 @@ class TestStockListResponse:
         assert response.total_count == 0
         assert response.message == "No stocks found"
 
-    def test_stock_list_response_error(self):
+    def test_stock_list_response_error(self) -> None:
         """Should create error response."""
         # Act
         response = StockListResponse.create_error("Database error")
@@ -343,7 +334,7 @@ class TestStockListResponse:
         assert response.total_count == 0
         assert response.message == "Database error"
 
-    def test_stock_list_response_filtering_info(self):
+    def test_stock_list_response_filtering_info(self) -> None:
         """Should include filtering information."""
         # Arrange
         stocks = [
@@ -363,7 +354,7 @@ class TestStockListResponse:
 class TestCreateStockResponse:
     """Test suite for CreateStockResponse."""
 
-    def test_create_stock_response_success(self):
+    def test_create_stock_response_success(self) -> None:
         """Should create successful response."""
         # Act
         response = CreateStockResponse.create_success(
@@ -377,7 +368,7 @@ class TestCreateStockResponse:
         assert response.message == "Stock created successfully"
         assert response.errors is None
 
-    def test_create_stock_response_error(self):
+    def test_create_stock_response_error(self) -> None:
         """Should create error response."""
         # Act
         response = CreateStockResponse.create_error("Stock already exists")
@@ -393,7 +384,7 @@ class TestCreateStockResponse:
 class TestValidationErrorResponse:
     """Test suite for ValidationErrorResponse."""
 
-    def test_validation_error_response_single_error(self):
+    def test_validation_error_response_single_error(self) -> None:
         """Should handle single validation error."""
         # Arrange
         errors = {"symbol": "Invalid symbol format"}
@@ -407,7 +398,7 @@ class TestValidationErrorResponse:
         assert response.message == "Validation failed"
         assert response.error_count == 1
 
-    def test_validation_error_response_multiple_errors(self):
+    def test_validation_error_response_multiple_errors(self) -> None:
         """Should handle multiple validation errors."""
         # Arrange
         errors = {
@@ -425,7 +416,7 @@ class TestValidationErrorResponse:
         assert response.error_count == 3
         assert "3 validation errors" in response.message
 
-    def test_validation_error_response_field_errors_list(self):
+    def test_validation_error_response_field_errors_list(self) -> None:
         """Should provide list of field errors."""
         # Arrange
         errors = {"symbol": "Invalid symbol format", "name": "Name cannot be empty"}
@@ -443,7 +434,7 @@ class TestValidationErrorResponse:
 class TestStockSearchRequest:
     """Test suite for StockSearchRequest."""
 
-    def test_stock_search_request_initialization(self):
+    def test_stock_search_request_initialization(self) -> None:
         """Should initialize search request with filters."""
         # Act
         request = StockSearchRequest(
@@ -459,7 +450,7 @@ class TestStockSearchRequest:
         assert request.grade_filter == "A"
         assert request.industry_filter == "Technology"
 
-    def test_stock_search_request_has_filters(self):
+    def test_stock_search_request_has_filters(self) -> None:
         """Should detect if any filters are applied."""
         # With filters
         request_with_filters = StockSearchRequest(symbol_filter="AAPL")
@@ -469,7 +460,7 @@ class TestStockSearchRequest:
         request_no_filters = StockSearchRequest()
         assert request_no_filters.has_filters is False
 
-    def test_stock_search_request_active_filters(self):
+    def test_stock_search_request_active_filters(self) -> None:
         """Should return dictionary of active filters."""
         # Arrange
         request = StockSearchRequest(
@@ -485,7 +476,7 @@ class TestStockSearchRequest:
         # Assert
         assert active_filters == {"symbol": "AAPL", "grade": "A"}
 
-    def test_stock_search_request_validation(self):
+    def test_stock_search_request_validation(self) -> None:
         """Should validate search parameters."""
         # Valid request
         valid_request = StockSearchRequest(grade_filter="A")

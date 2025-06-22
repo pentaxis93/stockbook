@@ -9,11 +9,13 @@ import tempfile
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
 from src.domain.entities.target_entity import TargetEntity
-from src.domain.repositories.interfaces import ITargetRepository
+
+# ITargetRepository import removed - unused
 from src.domain.value_objects import Money, Notes, TargetStatus
 from src.infrastructure.persistence.database_connection import DatabaseConnection
 from src.infrastructure.repositories.sqlite_target_repository import (
@@ -22,7 +24,7 @@ from src.infrastructure.repositories.sqlite_target_repository import (
 
 
 @pytest.fixture
-def db_connection():
+def db_connection() -> Iterator[DatabaseConnection]:
     """Create temporary database for testing."""
     # Create temporary database file
     temp_fd, temp_path = tempfile.mkstemp(suffix=".db")
@@ -57,13 +59,13 @@ def db_connection():
 
 
 @pytest.fixture
-def target_repository(db_connection):
+def target_repository(db_connection: DatabaseConnection) -> SqliteTargetRepository:
     """Create target repository with test database."""
     return SqliteTargetRepository(db_connection)
 
 
 @pytest.fixture
-def sample_target():
+def sample_target() -> TargetEntity:
     """Create sample target entity for testing."""
     return TargetEntity(
         portfolio_id="portfolio-id-1",
@@ -79,7 +81,9 @@ def sample_target():
 class TestTargetRepositoryCreate:
     """Test target creation operations."""
 
-    def test_create_target_returns_id(self, target_repository, sample_target):
+    def test_create_target_returns_id(
+        self, target_repository: SqliteTargetRepository, sample_target: TargetEntity
+    ) -> None:
         """Should create target and return database ID."""
         # Act
         target_id = target_repository.create(sample_target)
@@ -88,7 +92,9 @@ class TestTargetRepositoryCreate:
         assert isinstance(target_id, str)
         assert target_id
 
-    def test_create_active_target(self, target_repository):
+    def test_create_active_target(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should create active target with all fields."""
         # Arrange
         active_target = TargetEntity(
@@ -106,12 +112,15 @@ class TestTargetRepositoryCreate:
 
         # Assert
         created_target = target_repository.get_by_id(target_id)
+        assert created_target is not None
         assert created_target.status.value == "active"
         assert created_target.pivot_price.amount == Decimal("100.00")
         assert created_target.failure_price.amount == Decimal("95.00")
         assert created_target.notes.value == "Active target test"
 
-    def test_create_target_minimal_data(self, target_repository):
+    def test_create_target_minimal_data(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should create target with minimal required data."""
         # Arrange
         minimal_target = TargetEntity(
@@ -129,13 +138,16 @@ class TestTargetRepositoryCreate:
         # Assert
         assert target_id is not None
         created = target_repository.get_by_id(target_id)
+        assert created is not None
         assert created.notes.value == ""
 
 
 class TestTargetRepositoryRead:
     """Test target read operations."""
 
-    def test_get_by_id_existing_target(self, target_repository, sample_target):
+    def test_get_by_id_existing_target(
+        self, target_repository: SqliteTargetRepository, sample_target: TargetEntity
+    ) -> None:
         """Should retrieve target by ID."""
         # Arrange
         target_id = target_repository.create(sample_target)
@@ -150,7 +162,9 @@ class TestTargetRepositoryRead:
         assert retrieved_target.stock_id == sample_target.stock_id
         assert retrieved_target.status.value == sample_target.status.value
 
-    def test_get_by_id_nonexistent_target(self, target_repository):
+    def test_get_by_id_nonexistent_target(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should return None for non-existent target."""
         # Act
         result = target_repository.get_by_id("nonexistent-id")
@@ -158,7 +172,9 @@ class TestTargetRepositoryRead:
         # Assert
         assert result is None
 
-    def test_get_active_by_portfolio_empty(self, target_repository):
+    def test_get_active_by_portfolio_empty(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should return empty list when no active targets exist for portfolio."""
         # Act
         targets = target_repository.get_active_by_portfolio("portfolio-id-1")
@@ -166,7 +182,9 @@ class TestTargetRepositoryRead:
         # Assert
         assert targets == []
 
-    def test_get_active_by_portfolio_with_targets(self, target_repository):
+    def test_get_active_by_portfolio_with_targets(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should return only active targets for specific portfolio."""
         # Arrange
         active_target = TargetEntity(
@@ -197,7 +215,9 @@ class TestTargetRepositoryRead:
         assert active_targets[0].id == active_id
         assert active_targets[0].status.value == "active"
 
-    def test_get_active_by_stock(self, target_repository):
+    def test_get_active_by_stock(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should return active targets for specific stock."""
         # Arrange
         target = TargetEntity(
@@ -217,7 +237,7 @@ class TestTargetRepositoryRead:
         assert len(stock_targets) == 1
         assert stock_targets[0].id == target_id
 
-    def test_get_all_active(self, target_repository):
+    def test_get_all_active(self, target_repository: SqliteTargetRepository) -> None:
         """Should return all active targets across portfolios."""
         # Arrange
         target1 = TargetEntity(
@@ -251,7 +271,9 @@ class TestTargetRepositoryRead:
 class TestTargetRepositoryUpdate:
     """Test target update operations."""
 
-    def test_update_existing_target(self, target_repository, sample_target):
+    def test_update_existing_target(
+        self, target_repository: SqliteTargetRepository, sample_target: TargetEntity
+    ) -> None:
         """Should update existing target successfully."""
         # Arrange
         target_id = target_repository.create(sample_target)
@@ -273,12 +295,15 @@ class TestTargetRepositoryUpdate:
 
         # Verify changes
         retrieved = target_repository.get_by_id(target_id)
+        assert retrieved is not None
         assert retrieved.pivot_price.amount == Decimal("160.00")
         assert retrieved.failure_price.amount == Decimal("145.00")
         assert retrieved.status.value == "hit"
         assert retrieved.notes.value == "Updated target"
 
-    def test_update_nonexistent_target(self, target_repository):
+    def test_update_nonexistent_target(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should return False when updating non-existent target."""
         # Arrange
         target = TargetEntity(
@@ -296,7 +321,9 @@ class TestTargetRepositoryUpdate:
         # Assert
         assert result is False
 
-    def test_update_status(self, target_repository, sample_target):
+    def test_update_status(
+        self, target_repository: SqliteTargetRepository, sample_target: TargetEntity
+    ) -> None:
         """Should update target status."""
         # Arrange
         target_id = target_repository.create(sample_target)
@@ -309,9 +336,12 @@ class TestTargetRepositoryUpdate:
 
         # Verify status change
         retrieved = target_repository.get_by_id(target_id)
+        assert retrieved is not None
         assert retrieved.status.value == "hit"
 
-    def test_update_status_nonexistent_target(self, target_repository):
+    def test_update_status_nonexistent_target(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should return False when updating status of non-existent target."""
         # Act
         result = target_repository.update_status("nonexistent-id", "hit")
@@ -323,7 +353,9 @@ class TestTargetRepositoryUpdate:
 class TestTargetRepositoryIntegration:
     """Integration tests for target repository operations."""
 
-    def test_full_target_lifecycle(self, target_repository):
+    def test_full_target_lifecycle(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Test complete CRUD operations in sequence."""
         # Create
         target = TargetEntity(
@@ -340,6 +372,7 @@ class TestTargetRepositoryIntegration:
 
         # Read
         retrieved = target_repository.get_by_id(target_id)
+        assert retrieved is not None
         assert retrieved.notes.value == "Lifecycle test"
 
         # Update
@@ -357,6 +390,7 @@ class TestTargetRepositoryIntegration:
 
         # Verify update
         updated_retrieved = target_repository.get_by_id(target_id)
+        assert updated_retrieved is not None
         assert updated_retrieved.status.value == "hit"
         assert updated_retrieved.notes.value == "Updated lifecycle test"
 
@@ -366,9 +400,12 @@ class TestTargetRepositoryIntegration:
 
         # Verify status update
         final_retrieved = target_repository.get_by_id(target_id)
+        assert final_retrieved is not None
         assert final_retrieved.status.value == "cancelled"
 
-    def test_multiple_targets_filtering(self, target_repository):
+    def test_multiple_targets_filtering(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Test filtering behavior with multiple targets."""
         # Create targets with different statuses
         targets = [
@@ -413,7 +450,9 @@ class TestTargetRepositoryIntegration:
 class TestTargetRepositoryErrorHandling:
     """Test error handling and edge cases."""
 
-    def test_create_target_with_invalid_entity(self, target_repository):
+    def test_create_target_with_invalid_entity(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should raise validation error for invalid target entity."""
         with pytest.raises(ValueError):
             invalid_target = TargetEntity(
@@ -426,7 +465,9 @@ class TestTargetRepositoryErrorHandling:
             )
             target_repository.create(invalid_target)
 
-    def test_create_target_with_invalid_status(self, target_repository):
+    def test_create_target_with_invalid_status(
+        self, target_repository: SqliteTargetRepository
+    ) -> None:
         """Should raise validation error for invalid status."""
         with pytest.raises(ValueError):
             invalid_target = TargetEntity(

@@ -6,7 +6,7 @@ and portfolios, including various risk metrics and risk management strategies.
 """
 
 from decimal import Decimal
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from src.domain.entities.stock_entity import StockEntity
 from src.domain.services.risk_assessment_service import (
@@ -17,6 +17,7 @@ from src.domain.services.value_objects import (
     RiskAssessment,
     RiskLevel,
 )
+from src.domain.value_objects import Money, Quantity
 from src.domain.value_objects.company_name import CompanyName
 from src.domain.value_objects.grade import Grade
 from src.domain.value_objects.industry_group import IndustryGroup
@@ -59,7 +60,7 @@ def create_test_stock(
     return stock
 
 
-def create_conservative_portfolio():
+def create_conservative_portfolio() -> list[tuple[StockEntity, Quantity]]:
     """Helper to create a conservative risk portfolio."""
     return [
         (
@@ -78,7 +79,7 @@ def create_conservative_portfolio():
     ]
 
 
-def create_aggressive_portfolio():
+def create_aggressive_portfolio() -> list[tuple[StockEntity, Quantity]]:
     """Helper to create a high-risk aggressive portfolio."""
     return [
         (create_test_stock("TSLA", 200.00, "B", "Technology", 0.65, 2.1), Quantity(10)),
@@ -91,7 +92,7 @@ def create_aggressive_portfolio():
     ]
 
 
-def create_concentrated_portfolio():
+def create_concentrated_portfolio() -> list[tuple[StockEntity, Quantity]]:
     """Helper to create a portfolio with concentration risk."""
     return [
         (
@@ -109,9 +110,11 @@ def create_concentrated_portfolio():
     ]
 
 
-def create_test_prices(portfolio: List) -> Dict[str, Money]:
+def create_test_prices(
+    portfolio: List[Tuple[StockEntity, Quantity]],
+) -> Dict[str, Money]:
     """Helper to create price dictionary from portfolio."""
-    prices = {}
+    prices: Dict[str, Money] = {}
     for stock, _ in portfolio:
         # Use a default price since we don't need actual prices for stub tests
         prices[str(stock.symbol)] = Money(Decimal("100.00"))
@@ -121,7 +124,7 @@ def create_test_prices(portfolio: List) -> Dict[str, Money]:
 class TestRiskAssessmentStubs:
     """Test stubbed risk assessment methods."""
 
-    def test_assess_stock_risk_returns_assessment(self):
+    def test_assess_stock_risk_returns_assessment(self) -> None:
         """Should return RiskAssessment with basic risk information."""
         service = RiskAssessmentService()
         stock = create_test_stock("TEST", 100.00, "A", "Technology")
@@ -134,7 +137,7 @@ class TestRiskAssessmentStubs:
         assert risk_assessment.risk_score == Decimal("50.0")
         assert isinstance(risk_assessment.risk_factors, list)
 
-    def test_assess_portfolio_risk_returns_assessment(self):
+    def test_assess_portfolio_risk_returns_assessment(self) -> None:
         """Should return portfolio RiskAssessment based on simple diversification rules."""
         service = RiskAssessmentService()
         portfolio = create_conservative_portfolio()
@@ -150,7 +153,7 @@ class TestRiskAssessmentStubs:
         assert portfolio_risk.risk_score == Decimal("50.0")
         assert isinstance(portfolio_risk.risk_factors, list)
 
-    def test_assess_portfolio_risk_high_risk_small_portfolio(self):
+    def test_assess_portfolio_risk_high_risk_small_portfolio(self) -> None:
         """Should assess small portfolios as high risk."""
         service = RiskAssessmentService()
         # Create a small portfolio with only 2 positions
@@ -163,7 +166,7 @@ class TestRiskAssessmentStubs:
         assert portfolio_risk.risk_score == Decimal("80.0")
         assert "Insufficient diversification" in " ".join(portfolio_risk.risk_factors)
 
-    def test_private_methods_removed(self):
+    def test_private_methods_removed(self) -> None:
         """All private risk assessment methods should be removed."""
         service = RiskAssessmentService()
 
@@ -192,7 +195,7 @@ class TestRiskAssessmentStubs:
 class TestRiskAssessmentConfig:
     """Test risk assessment configuration."""
 
-    def test_default_config_creation(self):
+    def test_default_config_creation(self) -> None:
         """Should create config with default values."""
         config = RiskAssessmentConfig()
 
@@ -201,7 +204,7 @@ class TestRiskAssessmentConfig:
         assert config.high_volatility_threshold == Decimal("0.30")
         assert config.high_beta_threshold == Decimal("1.5")
 
-    def test_custom_config_creation(self):
+    def test_custom_config_creation(self) -> None:
         """Should create config with custom values."""
         config = RiskAssessmentConfig(
             var_confidence_level=Decimal("0.99"),

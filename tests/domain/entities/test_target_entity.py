@@ -17,7 +17,7 @@ from src.domain.value_objects import Money, Notes
 class TestTargetEntity:
     """Test TargetEntity domain entity with value objects and business logic."""
 
-    def test_create_target_with_value_objects(self):
+    def test_create_target_with_value_objects(self) -> None:
         """Test creating a target with all value objects."""
         from src.domain.value_objects import TargetStatus
 
@@ -39,7 +39,7 @@ class TestTargetEntity:
         assert target.created_date == date(2024, 1, 15)
         assert target.notes.value == "Important target level"
 
-    def test_create_target_with_minimal_data(self):
+    def test_create_target_with_minimal_data(self) -> None:
         """Test creating target with only required fields."""
         from src.domain.value_objects import TargetStatus
 
@@ -59,7 +59,7 @@ class TestTargetEntity:
         assert target.status.value == "active"
         assert target.notes.value == ""  # Defaults to empty when not provided
 
-    def test_create_target_with_none_notes_allowed(self):
+    def test_create_target_with_none_notes_allowed(self) -> None:
         """Should allow creating target with None for notes."""
         from src.domain.value_objects import TargetStatus
 
@@ -75,7 +75,7 @@ class TestTargetEntity:
 
         assert target.notes.value == ""  # Notes defaults to empty when None
 
-    def test_create_target_with_invalid_portfolio_id_raises_error(self):
+    def test_create_target_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         from src.domain.value_objects import TargetStatus
 
@@ -89,7 +89,7 @@ class TestTargetEntity:
                 created_date=date.today(),
             )
 
-    def test_create_target_with_invalid_stock_id_raises_error(self):
+    def test_create_target_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         from src.domain.value_objects import TargetStatus
 
@@ -103,14 +103,14 @@ class TestTargetEntity:
                 created_date=date.today(),
             )
 
-    def test_create_target_with_invalid_status_raises_error(self):
+    def test_create_target_with_invalid_status_raises_error(self) -> None:
         """Should raise error for invalid target status through TargetStatus value object."""
         from src.domain.value_objects import TargetStatus
 
         with pytest.raises(ValueError, match="Target status must be one of"):
             TargetStatus("invalid_status")  # Error happens at TargetStatus construction
 
-    def test_target_equality(self):
+    def test_target_equality(self) -> None:
         """Should compare targets based on business identity (portfolio_id, stock_id)."""
         from src.domain.value_objects import TargetStatus
 
@@ -144,7 +144,7 @@ class TestTargetEntity:
         assert target1 == target2  # Same portfolio and stock
         assert target1 != target3  # Different portfolio
 
-    def test_target_hash(self):
+    def test_target_hash(self) -> None:
         """Should hash consistently based on business identity."""
         from src.domain.value_objects import TargetStatus
 
@@ -168,7 +168,7 @@ class TestTargetEntity:
 
         assert hash(target1) == hash(target2)  # Same portfolio and stock
 
-    def test_target_string_representation(self):
+    def test_target_string_representation(self) -> None:
         """Should have informative string representation."""
         from src.domain.value_objects import TargetStatus
 
@@ -185,7 +185,7 @@ class TestTargetEntity:
         assert "80.00" in str(target)
         assert "active" in str(target)
 
-    def test_target_repr(self):
+    def test_target_repr(self) -> None:
         """Should have detailed repr representation."""
         from src.domain.value_objects import TargetStatus
 
@@ -202,7 +202,7 @@ class TestTargetEntity:
         assert repr(target) == expected
 
     # Business behavior tests
-    def test_target_activate(self):
+    def test_target_activate(self) -> None:
         """Should be able to activate target."""
         from src.domain.value_objects import TargetStatus
 
@@ -218,7 +218,7 @@ class TestTargetEntity:
         target.activate()
         assert target.status.value == "active"
 
-    def test_target_mark_as_hit(self):
+    def test_target_mark_as_hit(self) -> None:
         """Should be able to mark target as hit."""
         from src.domain.value_objects import TargetStatus
 
@@ -234,7 +234,7 @@ class TestTargetEntity:
         target.mark_as_hit()
         assert target.status.value == "hit"
 
-    def test_target_mark_as_failed(self):
+    def test_target_mark_as_failed(self) -> None:
         """Should be able to mark target as failed."""
         from src.domain.value_objects import TargetStatus
 
@@ -250,7 +250,7 @@ class TestTargetEntity:
         target.mark_as_failed()
         assert target.status.value == "failed"
 
-    def test_target_cancel(self):
+    def test_target_cancel(self) -> None:
         """Should be able to cancel target."""
         from src.domain.value_objects import TargetStatus
 
@@ -266,7 +266,7 @@ class TestTargetEntity:
         target.cancel()
         assert target.status.value == "cancelled"
 
-    def test_target_is_active(self):
+    def test_target_is_active(self) -> None:
         """Should check if target is active."""
         from src.domain.value_objects import TargetStatus
 
@@ -291,7 +291,7 @@ class TestTargetEntity:
         assert active_target.is_active() is True
         assert hit_target.is_active() is False
 
-    def test_target_is_hit(self):
+    def test_target_is_hit(self) -> None:
         """Should check if target is hit."""
         from src.domain.value_objects import TargetStatus
 
@@ -316,7 +316,7 @@ class TestTargetEntity:
         assert hit_target.is_hit() is True
         assert active_target.is_hit() is False
 
-    def test_target_has_notes(self):
+    def test_target_has_notes(self) -> None:
         """Should check if target has notes."""
         from src.domain.value_objects import TargetStatus
 
@@ -342,7 +342,7 @@ class TestTargetEntity:
         assert target_with_notes.has_notes() is True
         assert target_without_notes.has_notes() is False
 
-    def test_target_update_notes(self):
+    def test_target_update_notes(self) -> None:
         """Should be able to update target notes."""
         from src.domain.value_objects import TargetStatus
 
@@ -363,7 +363,7 @@ class TestTargetEntity:
         target.update_notes("String notes")
         assert target.notes.value == "String notes"
 
-    def test_target_create_with_id(self):
+    def test_target_create_with_id(self) -> None:
         """Should create target with provided ID."""
         from src.domain.value_objects import TargetStatus
 
@@ -380,7 +380,7 @@ class TestTargetEntity:
 
         assert target.id == test_id
 
-    def test_target_id_immutability(self):
+    def test_target_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
         from src.domain.value_objects import TargetStatus
 
@@ -396,9 +396,9 @@ class TestTargetEntity:
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):
-            target.id = "different-id"
+            target.id = "different-id"  # type: ignore[misc]
 
-    def test_target_from_persistence(self):
+    def test_target_from_persistence(self) -> None:
         """Should create target from persistence with existing ID."""
         from src.domain.value_objects import TargetStatus
 
@@ -421,7 +421,7 @@ class TestTargetEntity:
 class TestTargetStatus:
     """Test TargetStatus value object validation."""
 
-    def test_valid_target_statuses_accepted(self):
+    def test_valid_target_statuses_accepted(self) -> None:
         """Test that valid target statuses are accepted."""
         from src.domain.value_objects import TargetStatus
 
@@ -430,7 +430,7 @@ class TestTargetStatus:
             target_status = TargetStatus(status)
             assert target_status.value == status
 
-    def test_target_status_case_insensitive(self):
+    def test_target_status_case_insensitive(self) -> None:
         """Test that target statuses are case insensitive."""
         from src.domain.value_objects import TargetStatus
 
@@ -442,7 +442,7 @@ class TestTargetStatus:
         assert status2.value == "active"
         assert status3.value == "active"
 
-    def test_invalid_target_statuses_rejected(self):
+    def test_invalid_target_statuses_rejected(self) -> None:
         """Test that invalid target statuses are rejected."""
         from src.domain.value_objects import TargetStatus
 

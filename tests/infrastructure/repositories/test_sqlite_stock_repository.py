@@ -7,7 +7,6 @@ of the concrete repository implementation.
 
 import os
 import tempfile
-from pathlib import Path
 
 import pytest
 
@@ -20,11 +19,13 @@ from src.infrastructure.repositories.sqlite_stock_repository import (
     SqliteStockRepository,
 )
 
+# Path import removed - unused
+
 
 class TestSqliteStockRepository:
     """Test suite for SqliteStockRepository."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Set up test database and repository."""
         # Create temporary database file
         self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
@@ -36,12 +37,12 @@ class TestSqliteStockRepository:
 
         self.repository = SqliteStockRepository(self.db_connection)
 
-    def teardown_method(self):
+    def teardown_method(self) -> None:
         """Clean up test database."""
         if os.path.exists(self.temp_db.name):
             os.unlink(self.temp_db.name)
 
-    def test_create_stock_success(self):
+    def test_create_stock_success(self) -> None:
         """Should create stock successfully and return ID."""
         # Arrange
         stock = StockEntity(
@@ -65,13 +66,16 @@ class TestSqliteStockRepository:
         assert retrieved_stock is not None
         assert str(retrieved_stock.symbol) == "AAPL"
         assert retrieved_stock.company_name.value == "Apple Inc."
+        assert retrieved_stock.sector is not None
         assert retrieved_stock.sector.value == "Technology"
+        assert retrieved_stock.industry_group is not None
         assert retrieved_stock.industry_group.value == "Software"
+        assert retrieved_stock.grade is not None
         assert retrieved_stock.grade.value == "A"
         assert retrieved_stock.notes.value == "Great company"
         assert retrieved_stock.id == stock_id
 
-    def test_create_stock_with_minimal_data(self):
+    def test_create_stock_with_minimal_data(self) -> None:
         """Should create stock with only required fields."""
         # Arrange
         stock = StockEntity(
@@ -90,7 +94,7 @@ class TestSqliteStockRepository:
         assert retrieved_stock.grade is None
         assert retrieved_stock.notes.value == ""
 
-    def test_create_duplicate_symbol_raises_error(self):
+    def test_create_duplicate_symbol_raises_error(self) -> None:
         """Should raise error when creating stock with duplicate symbol."""
         # Arrange
         stock1 = StockEntity(
@@ -106,7 +110,7 @@ class TestSqliteStockRepository:
         with pytest.raises(ValueError, match="Stock with symbol AAPL already exists"):
             self.repository.create(stock2)
 
-    def test_get_by_id_success(self):
+    def test_get_by_id_success(self) -> None:
         """Should retrieve stock by ID successfully."""
         # Arrange
         stock = StockEntity(
@@ -123,7 +127,7 @@ class TestSqliteStockRepository:
         assert str(retrieved_stock.symbol) == "GOOGL"
         assert retrieved_stock.company_name.value == "Alphabet Inc."
 
-    def test_get_by_id_not_found(self):
+    def test_get_by_id_not_found(self) -> None:
         """Should return None when stock ID not found."""
         # Act
         result = self.repository.get_by_id("nonexistent-id")
@@ -131,7 +135,7 @@ class TestSqliteStockRepository:
         # Assert
         assert result is None
 
-    def test_get_by_symbol_success(self):
+    def test_get_by_symbol_success(self) -> None:
         """Should retrieve stock by symbol successfully."""
         # Arrange
         stock = StockEntity(
@@ -148,7 +152,7 @@ class TestSqliteStockRepository:
         assert str(retrieved_stock.symbol) == "TSLA"
         assert retrieved_stock.company_name.value == "Tesla Inc."
 
-    def test_get_by_symbol_not_found(self):
+    def test_get_by_symbol_not_found(self) -> None:
         """Should return None when symbol not found."""
         # Act
         result = self.repository.get_by_symbol(StockSymbol("NFND"))
@@ -156,7 +160,7 @@ class TestSqliteStockRepository:
         # Assert
         assert result is None
 
-    def test_get_by_symbol_case_insensitive(self):
+    def test_get_by_symbol_case_insensitive(self) -> None:
         """Should retrieve stock by symbol case-insensitively."""
         # Arrange
         stock = StockEntity(
@@ -171,7 +175,7 @@ class TestSqliteStockRepository:
         assert result is not None
         assert str(result.symbol) == "AAPL"
 
-    def test_get_all_empty(self):
+    def test_get_all_empty(self) -> None:
         """Should return empty list when no stocks exist."""
         # Act
         result = self.repository.get_all()
@@ -179,7 +183,7 @@ class TestSqliteStockRepository:
         # Assert
         assert result == []
 
-    def test_get_all_multiple_stocks(self):
+    def test_get_all_multiple_stocks(self) -> None:
         """Should retrieve all stocks in alphabetical order."""
         # Arrange
         stocks = [
@@ -211,7 +215,7 @@ class TestSqliteStockRepository:
             assert stock.symbol is not None
             assert stock.company_name.value is not None
 
-    def test_update_stock_success(self):
+    def test_update_stock_success(self) -> None:
         """Should update stock successfully."""
         # Arrange
         stock = StockEntity(
@@ -239,11 +243,12 @@ class TestSqliteStockRepository:
         # Verify changes were persisted
         updated_stock = self.repository.get_by_id(stock_id)
         assert updated_stock is not None
+        assert updated_stock.grade is not None
         assert updated_stock.grade.value == "A"
         assert updated_stock.notes.value == "Excellent company"
         assert updated_stock.company_name.value == "Amazon.com Inc."  # Unchanged
 
-    def test_update_nonexistent_stock_returns_false(self):
+    def test_update_nonexistent_stock_returns_false(self) -> None:
         """Should return False when trying to update non-existent stock."""
         # Arrange
         stock = StockEntity(
@@ -256,7 +261,7 @@ class TestSqliteStockRepository:
         # Assert
         assert success is False
 
-    def test_delete_stock_success(self):
+    def test_delete_stock_success(self) -> None:
         """Should delete stock successfully."""
         # Arrange
         stock = StockEntity(
@@ -276,7 +281,7 @@ class TestSqliteStockRepository:
         # Verify stock was deleted
         assert self.repository.get_by_id(stock_id) is None
 
-    def test_delete_nonexistent_stock_returns_false(self):
+    def test_delete_nonexistent_stock_returns_false(self) -> None:
         """Should return False when trying to delete non-existent stock."""
         # Act
         success = self.repository.delete("nonexistent-id")
@@ -284,7 +289,7 @@ class TestSqliteStockRepository:
         # Assert
         assert success is False
 
-    def test_exists_by_symbol_true(self):
+    def test_exists_by_symbol_true(self) -> None:
         """Should return True when stock exists."""
         # Arrange
         stock = StockEntity(
@@ -298,7 +303,7 @@ class TestSqliteStockRepository:
         # Assert
         assert result is True
 
-    def test_exists_by_symbol_false(self):
+    def test_exists_by_symbol_false(self) -> None:
         """Should return False when stock doesn't exist."""
         # Act
         result = self.repository.exists_by_symbol(StockSymbol("NFND"))
@@ -306,7 +311,7 @@ class TestSqliteStockRepository:
         # Assert
         assert result is False
 
-    def test_exists_by_symbol_case_insensitive(self):
+    def test_exists_by_symbol_case_insensitive(self) -> None:
         """Should check existence case-insensitively."""
         # Arrange
         stock = StockEntity(
@@ -320,7 +325,7 @@ class TestSqliteStockRepository:
         # Assert
         assert result is True
 
-    def test_repository_handles_database_errors(self):
+    def test_repository_handles_database_errors(self) -> None:
         """Should handle database connection errors gracefully."""
         # Arrange - create repository with invalid database path
         invalid_db = DatabaseConnection("/invalid/path/database.db")
@@ -333,7 +338,7 @@ class TestSqliteStockRepository:
         with pytest.raises(Exception):  # Should raise some database-related error
             invalid_repository.create(stock)
 
-    def test_repository_preserves_identity(self):
+    def test_repository_preserves_identity(self) -> None:
         """Should preserve entity identity and value object types."""
         # Arrange
         original_symbol = StockSymbol("JNJ")
@@ -355,7 +360,7 @@ class TestSqliteStockRepository:
         assert str(retrieved_stock.symbol) == str(original_symbol)
         assert retrieved_stock == stock  # Business equality based on symbol
 
-    def test_concurrent_access_safety(self):
+    def test_concurrent_access_safety(self) -> None:
         """Should handle concurrent access safely."""
         # This is a basic test - in real implementation you'd test with threading
         # Arrange

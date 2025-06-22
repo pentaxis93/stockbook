@@ -26,7 +26,10 @@ class RegistrationInfo:
     """Information about a registered service."""
 
     def __init__(
-        self, service_type: Type, implementation_type: Type, lifetime: Lifetime
+        self,
+        service_type: Type[Any],
+        implementation_type: Type[Any],
+        lifetime: Lifetime,
     ):
         self.service_type = service_type
         self.implementation_type = implementation_type
@@ -42,7 +45,7 @@ class DIContainer:
     def __init__(self):
         """Initialize the DI container."""
         self._container = containers.DeclarativeContainer()
-        self._registrations: Dict[Type, RegistrationInfo] = {}
+        self._registrations: Dict[Type[Any], RegistrationInfo] = {}
         self._resolution_chain: List[str] = []
 
     def register_singleton(
@@ -254,7 +257,7 @@ class DIContainer:
             if type_name in self._resolution_chain:
                 self._resolution_chain.remove(type_name)
 
-    def is_registered(self, service_type: Type) -> bool:
+    def is_registered(self, service_type: Type[Any]) -> bool:
         """
         Check if a service type is registered.
 
@@ -266,7 +269,7 @@ class DIContainer:
         """
         return service_type in self._registrations
 
-    def get_registrations(self) -> List[Type]:
+    def get_registrations(self) -> List[Type[Any]]:
         """
         Get list of all registered service types.
 
@@ -275,7 +278,9 @@ class DIContainer:
         """
         return list(self._registrations.keys())
 
-    def get_registration_info(self, service_type: Type) -> Optional[RegistrationInfo]:
+    def get_registration_info(
+        self, service_type: Type[Any]
+    ) -> Optional[RegistrationInfo]:
         """
         Get registration information for a service type.
 
@@ -288,7 +293,7 @@ class DIContainer:
         return self._registrations.get(service_type)
 
     def _validate_registration(
-        self, service_type: Type, implementation_type: Type
+        self, service_type: Type[Any], implementation_type: Type[Any]
     ) -> None:
         """Validate that implementation_type can be used for service_type."""
         if not inspect.isclass(implementation_type):
@@ -309,14 +314,14 @@ class DIContainer:
                     f"Implementation {implementation_type.__name__} does not implement interface {service_type.__name__}",
                 )
 
-    def _get_provider_name(self, service_type: Type) -> str:
+    def _get_provider_name(self, service_type: Type[Any]) -> str:
         """Generate a unique provider name for the service type."""
         return f"provider_{service_type.__name__}_{id(service_type)}"
 
-    def _get_constructor_args(self, implementation_type: Type) -> List[Any]:
+    def _get_constructor_args(self, implementation_type: Type[Any]) -> List[Any]:
         """Get the constructor arguments for auto-wiring."""
         sig = inspect.signature(implementation_type.__init__)
-        args = []
+        args: List[Any] = []
 
         for param_name, param in sig.parameters.items():
             if param_name == "self":
@@ -331,8 +336,8 @@ class DIContainer:
             if isinstance(param_type, str):
                 # For string type annotations, we need to look them up by name
                 # in the registered types at resolution time
-                def create_string_resolver(type_name):
-                    def resolver():
+                def create_string_resolver(type_name: str) -> Callable[[], Any]:
+                    def resolver() -> Any:
                         # Find the registered type that matches this name
                         for registered_type in self._registrations.keys():
                             if registered_type.__name__ == type_name:
@@ -350,9 +355,13 @@ class DIContainer:
                 )
             else:
                 # Normal type annotation
-                dependency_provider = providers.Callable(
-                    lambda dep_type=param_type: self.resolve(dep_type)
-                )
+                def create_resolver(resolved_type: Type[Any]) -> Callable[[], Any]:
+                    def resolver() -> Any:
+                        return self.resolve(resolved_type)
+
+                    return resolver
+
+                dependency_provider = providers.Callable(create_resolver(param_type))
 
             args.append(dependency_provider)
 

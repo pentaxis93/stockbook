@@ -9,20 +9,23 @@ import tempfile
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
 from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
-from src.domain.repositories.interfaces import IPortfolioBalanceRepository
+
+# IPortfolioBalanceRepository import removed - unused
 from src.domain.value_objects import IndexChange, Money
 from src.infrastructure.persistence.database_connection import DatabaseConnection
+from src.infrastructure.persistence.interfaces import IDatabaseConnection
 from src.infrastructure.repositories.sqlite_balance_repository import (
     SqlitePortfolioBalanceRepository,
 )
 
 
 @pytest.fixture
-def db_connection():
+def db_connection() -> Iterator[IDatabaseConnection]:
     """Create temporary database for testing."""
     # Create temporary database file
     temp_fd, temp_path = tempfile.mkstemp(suffix=".db")
@@ -48,13 +51,15 @@ def db_connection():
 
 
 @pytest.fixture
-def balance_repository(db_connection):
+def balance_repository(
+    db_connection: DatabaseConnection,
+) -> SqlitePortfolioBalanceRepository:
     """Create balance repository with test database."""
     return SqlitePortfolioBalanceRepository(db_connection)
 
 
 @pytest.fixture
-def sample_balance():
+def sample_balance() -> PortfolioBalanceEntity:
     """Create sample balance entity for testing."""
     return PortfolioBalanceEntity(
         portfolio_id="portfolio-id-1",
@@ -69,7 +74,11 @@ def sample_balance():
 class TestPortfolioBalanceRepositoryCreate:
     """Test balance creation operations."""
 
-    def test_create_balance_returns_id(self, balance_repository, sample_balance):
+    def test_create_balance_returns_id(
+        self,
+        balance_repository: SqlitePortfolioBalanceRepository,
+        sample_balance: PortfolioBalanceEntity,
+    ) -> None:
         """Should create balance and return database ID."""
         # Act
         balance_id = balance_repository.create(sample_balance)
@@ -78,7 +87,11 @@ class TestPortfolioBalanceRepositoryCreate:
         assert isinstance(balance_id, str)
         assert balance_id
 
-    def test_create_and_retrieve_balance(self, balance_repository, sample_balance):
+    def test_create_and_retrieve_balance(
+        self,
+        balance_repository: SqlitePortfolioBalanceRepository,
+        sample_balance: PortfolioBalanceEntity,
+    ) -> None:
         """Should create and retrieve balance correctly."""
         # Act
         balance_id = balance_repository.create(sample_balance)
@@ -94,7 +107,11 @@ class TestPortfolioBalanceRepositoryCreate:
 class TestPortfolioBalanceRepositoryRead:
     """Test balance read operations."""
 
-    def test_get_by_portfolio_and_date(self, balance_repository, sample_balance):
+    def test_get_by_portfolio_and_date(
+        self,
+        balance_repository: SqlitePortfolioBalanceRepository,
+        sample_balance: PortfolioBalanceEntity,
+    ) -> None:
         """Should retrieve balance by portfolio and date."""
         # Arrange
         balance_repository.create(sample_balance)
@@ -109,7 +126,9 @@ class TestPortfolioBalanceRepositoryRead:
         assert retrieved.portfolio_id == "portfolio-id-1"
         assert retrieved.balance_date == date(2024, 1, 15)
 
-    def test_get_history(self, balance_repository):
+    def test_get_history(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
         """Should retrieve balance history for portfolio."""
         # Arrange
         balances = [
@@ -140,7 +159,9 @@ class TestPortfolioBalanceRepositoryRead:
         # Should be ordered by date (newest first)
         assert history[0].balance_date > history[1].balance_date
 
-    def test_get_latest_balance(self, balance_repository):
+    def test_get_latest_balance(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
         """Should retrieve latest balance for portfolio."""
         # Arrange
         old_balance = PortfolioBalanceEntity(
@@ -173,7 +194,9 @@ class TestPortfolioBalanceRepositoryRead:
 class TestPortfolioBalanceRepositoryIntegration:
     """Integration tests for balance repository operations."""
 
-    def test_full_balance_lifecycle(self, balance_repository):
+    def test_full_balance_lifecycle(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
         """Test complete balance operations."""
         # Create
         balance = PortfolioBalanceEntity(
@@ -189,6 +212,8 @@ class TestPortfolioBalanceRepositoryIntegration:
 
         # Read
         retrieved = balance_repository.get_by_id(balance_id)
+        assert retrieved is not None
+        assert retrieved.index_change is not None
         assert retrieved.index_change.value == 1.5
 
         # Test portfolio queries

@@ -9,12 +9,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.application.commands.stock_commands import CreateStockCommand
-from src.application.dto.stock_dto import StockDto
-
-# Clean architecture imports - these exist
-from src.domain.entities.stock_entity import StockEntity
-from src.domain.value_objects.stock_symbol import StockSymbol
+# Unused imports removed - tests are stubs
 
 # These imports will exist after implementation
 # from dependency_injection.composition_root import CompositionRoot
@@ -24,7 +19,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 class TestCleanArchitectureWiring:
     """Test that DI system respects clean architecture boundaries."""
 
-    def test_dependency_direction_compliance(self):
+    def test_dependency_direction_compliance(self) -> None:
         """Should enforce correct dependency directions."""
         # Domain should have no dependencies on outer layers
         # Application should only depend on domain
@@ -39,7 +34,7 @@ class TestCleanArchitectureWiring:
         # assert hasattr(coordinator.controller.stock_service, '_unit_of_work')
         pass
 
-    def test_interface_segregation(self):
+    def test_interface_segregation(self) -> None:
         """Should wire interfaces correctly, not concrete types."""
         # container = CompositionRoot.configure()
         # stock_service = container.resolve(StockApplicationService)
@@ -50,7 +45,7 @@ class TestCleanArchitectureWiring:
         # assert isinstance(stock_service._unit_of_work, IUnitOfWork)
         pass
 
-    def test_domain_isolation(self):
+    def test_domain_isolation(self) -> None:
         """Should ensure domain layer has no external dependencies."""
         # Domain entities should be created without DI container
         # They should not depend on infrastructure or presentation
@@ -69,7 +64,7 @@ class TestEndToEndWorkflow:
     """Test complete workflows through DI-wired components."""
 
     @patch("infrastructure.persistence.database_connection.DatabaseConnection")
-    def test_create_stock_workflow(self, mock_db):
+    def test_create_stock_workflow(self, mock_db: Mock) -> None:
         """Should execute complete stock creation workflow."""
         # Arrange
         # mock_db.return_value.get_connection.return_value = Mock()
@@ -92,7 +87,7 @@ class TestEndToEndWorkflow:
         pass
 
     @patch("infrastructure.persistence.database_connection.DatabaseConnection")
-    def test_stock_list_workflow(self, mock_db):
+    def test_stock_list_workflow(self, mock_db: Mock) -> None:
         """Should execute complete stock listing workflow."""
         # Arrange
         # mock_db.return_value.get_connection.return_value = Mock()
@@ -107,7 +102,7 @@ class TestEndToEndWorkflow:
         # assert hasattr(response, 'stocks')
         pass
 
-    def test_error_propagation_through_layers(self):
+    def test_error_propagation_through_layers(self) -> None:
         """Should properly propagate errors through all layers."""
         # Test that domain validation errors bubble up correctly
         # Test that infrastructure errors are handled appropriately
@@ -119,7 +114,7 @@ class TestEndToEndWorkflow:
 class TestLayerIsolationTesting:
     """Test that DI enables proper layer isolation for testing."""
 
-    def test_mock_infrastructure_layer(self):
+    def test_mock_infrastructure_layer(self) -> None:
         """Should allow mocking infrastructure layer for testing."""
         # from dependency_injection.di_container import DIContainer
         # from src.domain.repositories.interfaces import IUnitOfWork
@@ -135,7 +130,7 @@ class TestLayerIsolationTesting:
         # assert service._unit_of_work is mock_uow
         pass
 
-    def test_mock_application_layer(self):
+    def test_mock_application_layer(self) -> None:
         """Should allow mocking application layer for presentation testing."""
         # from dependency_injection.di_container import DIContainer
 
@@ -150,7 +145,7 @@ class TestLayerIsolationTesting:
         # assert controller.stock_service is mock_stock_service
         pass
 
-    def test_integration_test_configuration(self):
+    def test_integration_test_configuration(self) -> None:
         """Should support integration test configuration."""
         # Should be able to configure container for integration tests
         # with real database but isolated from production data
@@ -167,7 +162,7 @@ class TestLayerIsolationTesting:
 class TestPerformanceWithDI:
     """Test that DI doesn't impact performance significantly."""
 
-    def test_resolution_performance(self):
+    def test_resolution_performance(self) -> None:
         """Should resolve dependencies quickly."""
         # container = CompositionRoot.configure()
 
@@ -181,14 +176,14 @@ class TestPerformanceWithDI:
         # assert (end - start) < 0.1  # 100 resolutions in < 100ms
         pass
 
-    def test_memory_usage(self):
+    def test_memory_usage(self) -> None:
         """Should not cause memory leaks."""
         # Test that repeated resolutions don't accumulate memory
         # Test that singletons are properly reused
         # Test that transients are garbage collected
         pass
 
-    def test_singleton_creation_overhead(self):
+    def test_singleton_creation_overhead(self) -> None:
         """Should create singletons only once."""
         # container = CompositionRoot.configure()
 
