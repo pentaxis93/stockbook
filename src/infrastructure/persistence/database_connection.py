@@ -6,7 +6,7 @@ transaction support for the infrastructure layer.
 """
 
 import sqlite3
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from pathlib import Path
 from typing import Generator, List, Optional, Union
 
@@ -224,11 +224,8 @@ class DatabaseConnection(IDatabaseConnection):
 
         # Close all tracked connections
         for conn in self._active_connections:
-            try:
+            with suppress(sqlite3.ProgrammingError):
                 conn.close()
-            except sqlite3.ProgrammingError:
-                # Connection already closed
-                pass
 
         self._active_connections.clear()
 

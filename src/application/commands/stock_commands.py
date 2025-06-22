@@ -122,14 +122,14 @@ class CreateStockCommand:
 
     def __str__(self) -> str:
         """String representation for display."""
-        return f"CreateStockCommand(symbol='{self.symbol}', name='{self.name}')"
+        return f"CreateStockCommand(symbol={self.symbol!r}, name={self.name!r})"
 
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"CreateStockCommand(symbol='{self.symbol}', name='{self.name}', "
+            f"CreateStockCommand(symbol={self.symbol!r}, name={self.name!r}, "
             f"sector={self.sector!r}, industry_group={self.industry_group!r}, grade={self.grade!r}, "
-            f"notes='{self.notes}')"
+            f"notes={self.notes!r})"
         )
 
     def _normalize_and_validate_inputs(

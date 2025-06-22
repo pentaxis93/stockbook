@@ -243,10 +243,13 @@ class StockEntity(BaseEntity):
         )
 
         # Special logic: if changing sector, check if current industry_group is compatible
-        if "sector" in kwargs and "industry_group" not in kwargs:
-            if self._should_clear_industry_group_for_new_sector(new_sector):
-                new_industry_group = None
-                temp_values["industry_group_vo"] = None
+        if (
+            "sector" in kwargs
+            and "industry_group" not in kwargs
+            and self._should_clear_industry_group_for_new_sector(new_sector)
+        ):
+            new_industry_group = None
+            temp_values["industry_group_vo"] = None
 
         # Validate the final sector-industry combination
         self._validate_sector_industry_combination(new_sector, new_industry_group)

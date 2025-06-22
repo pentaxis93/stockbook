@@ -4,7 +4,6 @@ Base entity class for domain entities.
 Provides common functionality for all domain entities following DDD principles.
 """
 
-from abc import ABC
 from typing import Any, Optional, TypeVar
 
 import nanoid
@@ -12,7 +11,7 @@ import nanoid
 T = TypeVar("T", bound="BaseEntity")
 
 
-class BaseEntity(ABC):
+class BaseEntity:
     """Base class for all domain entities with immutable string IDs."""
 
     def __init__(self, id: Optional[str] = None) -> None:

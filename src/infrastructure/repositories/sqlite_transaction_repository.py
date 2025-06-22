@@ -6,6 +6,7 @@ while fulfilling the domain repository contract.
 """
 
 import sqlite3
+from contextlib import suppress
 from datetime import date
 from decimal import Decimal
 from typing import Any, List, Optional
@@ -283,11 +284,8 @@ class SqliteTransactionRepository(ITransactionRepository):
         # Parse transaction date - must be valid for TransactionEntity
         transaction_date = date.today()  # Default fallback
         if row["transaction_date"]:
-            try:
+            with suppress(ValueError):
                 transaction_date = date.fromisoformat(row["transaction_date"])
-            except ValueError:
-                # Keep default fallback if parsing fails
-                pass
 
         return TransactionEntity(
             id=row["id"],  # Use id parameter

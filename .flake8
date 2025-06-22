@@ -6,6 +6,10 @@ max-cognitive-complexity = 10
 ignore = 
     # Line length - handled by black
     E501,
+    # Bugbear line length - conflicts with black
+    B950,
+    # String formatting - can be addressed in future commits
+    B907,
     # Line break before binary operator - black prefers this style
     W503,
     # Whitespace before ':' - conflicts with black formatting  
@@ -35,16 +39,30 @@ exclude =
 
 # Enable specific checks we want alongside cognitive complexity
 select = 
-    # PyFlakes errors (undefined names, unused imports, etc.)
-    F,
+    # Bugbear: likely bugs and design problems
+    B,
+    # Comprehensions: list/dict/set comprehension improvements
+    C,
     # PEP 8 errors (except those we ignore above)
     E,
+    # PyFlakes errors (undefined names, unused imports, etc.)
+    F,
     # PEP 8 warnings (except those we ignore above) 
     W,
+    # Print statement usage
+    T4,
+    # Bugbear opinionated warnings
+    B9,
     # McCabe complexity (complement to cognitive complexity)
-    C,
+    C90,
+    # Security issues (bandit)
+    S,
     # Cognitive complexity violations
     CCR001
 
 # McCabe complexity limit (lower than cognitive complexity)
 max-complexity = 8
+
+# Per-file ignores
+per-file-ignores = 
+    tests/*:S101
