@@ -14,13 +14,24 @@ ignore =
     E701,
     # Blank line at end of file - handled by black
     W391,
+    # Trailing whitespace - handled by black
+    W291, W293,
     # Import related - handled by isort
     I001, I002, I003, I004, I005,
     # Blank line formatting - handled by black
     E302, E305
 
-# Focus on domain and application layers for cognitive complexity
-include = src/domain/*, src/application/*
+# Exclude virtual environment and other non-source directories
+exclude = 
+    .venv,
+    venv,
+    __pycache__,
+    .git,
+    .pytest_cache,
+    .mypy_cache,
+    htmlcov,
+    dist,
+    build
 
 # Enable specific checks we want alongside cognitive complexity
 select = 
