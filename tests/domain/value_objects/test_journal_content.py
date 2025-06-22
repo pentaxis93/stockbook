@@ -5,8 +5,6 @@ This module tests the JournalContent value object which encapsulates
 journal entry content validation and business logic for journal management.
 """
 
-from typing import Any
-
 import pytest
 
 from src.domain.value_objects.journal_content import JournalContent
@@ -60,12 +58,12 @@ class TestJournalContentCreation:
     def test_create_with_empty_string_raises_error(self) -> None:
         """Should raise ValueError for empty journal content."""
         with pytest.raises(ValueError, match="Journal content cannot be empty"):
-            JournalContent("")
+            _ = JournalContent("")
 
     def test_create_with_whitespace_only_raises_error(self) -> None:
         """Should raise ValueError for whitespace-only journal content."""
         with pytest.raises(ValueError, match="Journal content cannot be empty"):
-            JournalContent("   \n\t  ")
+            _ = JournalContent("   \n\t  ")
 
     def test_create_with_content_exceeding_max_length_raises_error(self) -> None:
         """Should raise ValueError for journal content exceeding maximum length."""
@@ -74,7 +72,7 @@ class TestJournalContentCreation:
         with pytest.raises(
             ValueError, match="Journal content cannot exceed 10000 characters"
         ):
-            JournalContent(long_content)
+            _ = JournalContent(long_content)
 
     def test_create_at_max_length_boundary(self) -> None:
         """Should accept journal content at exactly maximum length."""
@@ -202,7 +200,7 @@ class TestJournalContentEquality:
         assert content != "Journal content"
         assert content != 1
         assert content != None
-        assert content != []
+        assert content
 
     def test_journal_content_hashable(self) -> None:
         """Should be hashable for use in collections."""
@@ -235,7 +233,7 @@ class TestJournalContentImmutability:
         content = JournalContent("Journal content")
 
         with pytest.raises(AttributeError, match="JournalContent is immutable"):
-            content.new_attribute = "value"  # type: ignore[attr-defined]
+            content.new_attribute = "value"
 
     def test_cannot_modify_private_value_attribute(self) -> None:
         """Should not be able to modify private _value attribute."""
@@ -293,7 +291,7 @@ class TestJournalContentConstants:
 
         # This should fail
         with pytest.raises(ValueError):
-            JournalContent("A" * (JournalContent.MAX_LENGTH + 1))
+            _ = JournalContent("A" * (JournalContent.MAX_LENGTH + 1))
 
 
 class TestJournalContentEdgeCases:

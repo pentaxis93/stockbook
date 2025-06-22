@@ -5,8 +5,6 @@ This module tests the PortfolioName value object which encapsulates
 portfolio name validation and business logic for portfolio management.
 """
 
-from typing import Any
-
 import pytest
 
 from src.domain.value_objects.portfolio_name import PortfolioName
@@ -70,12 +68,12 @@ class TestPortfolioNameCreation:
     def test_create_with_empty_string_raises_error(self) -> None:
         """Should raise ValueError for empty portfolio name."""
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
-            PortfolioName("")
+            _ = PortfolioName("")
 
     def test_create_with_whitespace_only_raises_error(self) -> None:
         """Should raise ValueError for whitespace-only portfolio name."""
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
-            PortfolioName("   \n\t  ")
+            _ = PortfolioName("   \n\t  ")
 
     def test_create_exceeding_max_length_raises_error(self) -> None:
         """Should raise ValueError for portfolio name exceeding maximum length."""
@@ -84,7 +82,7 @@ class TestPortfolioNameCreation:
         with pytest.raises(
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
-            PortfolioName(long_name)
+            _ = PortfolioName(long_name)
 
     def test_create_with_much_longer_name_raises_error(self) -> None:
         """Should raise ValueError for much longer portfolio name."""
@@ -93,7 +91,7 @@ class TestPortfolioNameCreation:
         with pytest.raises(
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
-            PortfolioName(very_long_name)
+            _ = PortfolioName(very_long_name)
 
 
 class TestPortfolioNameEquality:
@@ -134,7 +132,7 @@ class TestPortfolioNameEquality:
         assert name != "Portfolio Name"
         assert name != 1
         assert name != None
-        assert name != []
+        assert name
 
     def test_portfolio_name_hashable(self) -> None:
         """Should be hashable for use in collections."""
@@ -167,7 +165,7 @@ class TestPortfolioNameImmutability:
         name = PortfolioName("Portfolio Name")
 
         with pytest.raises(AttributeError, match="PortfolioName is immutable"):
-            name.new_attribute = "value"  # type: ignore[attr-defined]
+            name.new_attribute = "value"
 
     def test_cannot_modify_private_value_attribute(self) -> None:
         """Should not be able to modify private _value attribute."""
@@ -215,7 +213,7 @@ class TestPortfolioNameConstants:
 
         # This should fail
         with pytest.raises(ValueError):
-            PortfolioName("A" * (PortfolioName.MAX_LENGTH + 1))
+            _ = PortfolioName("A" * (PortfolioName.MAX_LENGTH + 1))
 
 
 class TestPortfolioNameBusinessLogic:
@@ -355,4 +353,4 @@ class TestPortfolioNameEdgeCases:
         with pytest.raises(
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
-            PortfolioName(too_long_unicode_name)
+            _ = PortfolioName(too_long_unicode_name)

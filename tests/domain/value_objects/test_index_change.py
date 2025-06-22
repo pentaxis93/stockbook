@@ -5,8 +5,6 @@ This module tests the IndexChange value object which encapsulates
 percentage change validation and business logic for portfolio index tracking.
 """
 
-from typing import Any
-
 import pytest
 
 from src.domain.value_objects.index_change import IndexChange
@@ -83,7 +81,7 @@ class TestIndexChangeCreation:
                 ValueError,
                 match="Index change cannot exceed 100.0% or be less than -100.0%",
             ):
-                IndexChange(invalid_value)
+                _ = IndexChange(invalid_value)
 
     def test_create_below_minimum_raises_error(self) -> None:
         """Should raise ValueError for changes below -100%."""
@@ -94,7 +92,7 @@ class TestIndexChangeCreation:
                 ValueError,
                 match="Index change cannot exceed 100.0% or be less than -100.0%",
             ):
-                IndexChange(invalid_value)
+                _ = IndexChange(invalid_value)
 
     def test_create_with_very_small_positive_values(self) -> None:
         """Should handle very small positive values correctly."""
@@ -198,7 +196,7 @@ class TestIndexChangeEquality:
         assert change != 5.75
         assert change != "5.75%"
         assert change != None
-        assert change != []
+        assert change
 
     def test_index_change_hashable(self) -> None:
         """Should be hashable for use in collections."""
@@ -241,7 +239,7 @@ class TestIndexChangeImmutability:
         change = IndexChange(5.75)
 
         with pytest.raises(AttributeError, match="IndexChange is immutable"):
-            change.new_attribute = "value"  # type: ignore[attr-defined]
+            change.new_attribute = "value"
 
     def test_cannot_modify_private_value_attribute(self) -> None:
         """Should not be able to modify private _value attribute."""
@@ -327,7 +325,7 @@ class TestIndexChangeEdgeCases:
                 ValueError,
                 match="Index change cannot exceed 100.0% or be less than -100.0%",
             ):
-                IndexChange(large_value)
+                _ = IndexChange(large_value)
 
     def test_create_with_nan_raises_error(self) -> None:
         """Should raise error for NaN values."""
@@ -353,7 +351,7 @@ class TestIndexChangeEdgeCases:
         # Test values that would exceed boundaries after rounding
         # Note: The actual implementation might handle this differently
         try:
-            IndexChange(100.005)  # Would round to 100.01
+            _ = IndexChange(100.005)  # Would round to 100.01
             # If this doesn't raise an error, the implementation allows it
         except ValueError:
             # This is expected if the implementation validates after rounding

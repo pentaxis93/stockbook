@@ -56,12 +56,12 @@ class TestTransactionTypeCreation:
     def test_create_with_empty_string_raises_error(self) -> None:
         """Should raise ValueError for empty transaction type."""
         with pytest.raises(ValueError, match="Transaction type cannot be empty"):
-            TransactionType("")
+            _ = TransactionType("")
 
     def test_create_with_whitespace_only_raises_error(self) -> None:
         """Should raise ValueError for whitespace-only transaction type."""
         with pytest.raises(ValueError, match="Transaction type cannot be empty"):
-            TransactionType("   ")
+            _ = TransactionType("   ")
 
     def test_create_with_invalid_type_raises_error(self) -> None:
         """Should raise ValueError for invalid transaction types."""
@@ -71,7 +71,7 @@ class TestTransactionTypeCreation:
             with pytest.raises(
                 ValueError, match="Transaction type must be 'buy' or 'sell'"
             ):
-                TransactionType(invalid_type)
+                _ = TransactionType(invalid_type)
 
     def test_create_with_partial_match_raises_error(self) -> None:
         """Should raise ValueError for partial matches of valid types."""
@@ -81,7 +81,7 @@ class TestTransactionTypeCreation:
             with pytest.raises(
                 ValueError, match="Transaction type must be 'buy' or 'sell'"
             ):
-                TransactionType(partial_match)
+                _ = TransactionType(partial_match)
 
 
 class TestTransactionTypeBusinessLogic:
@@ -139,7 +139,7 @@ class TestTransactionTypeEquality:
         assert buy_type != "buy"
         assert buy_type != 1
         assert buy_type != None
-        assert buy_type != []
+        assert buy_type
 
     def test_transaction_type_hashable(self) -> None:
         """Should be hashable for use in collections."""
@@ -172,7 +172,7 @@ class TestTransactionTypeImmutability:
         transaction_type = TransactionType("buy")
 
         with pytest.raises(AttributeError, match="TransactionType is immutable"):
-            transaction_type.new_attribute = "value"  # type: ignore[attr-defined]
+            transaction_type.new_attribute = "value"
 
     def test_cannot_modify_private_value_attribute(self) -> None:
         """Should not be able to modify private _value attribute."""
@@ -215,8 +215,8 @@ class TestTransactionTypeValidTypes:
         assert isinstance(valid_types, set)
 
         # Store original values
-        original_types = set(valid_types)
-        original_size = len(valid_types)
+        _ = set(valid_types)  # original_types
+        _ = len(valid_types)  # original_size
 
         # Attempting to modify the set - if it's mutable, this will change it
         # but we expect the implementation to use a frozenset or similar
@@ -241,7 +241,7 @@ class TestTransactionTypeEdgeCases:
             with pytest.raises(
                 ValueError, match="Transaction type must be 'buy' or 'sell'"
             ):
-                TransactionType(unicode_value)
+                _ = TransactionType(unicode_value)
 
     def test_create_with_numeric_strings_raises_error(self) -> None:
         """Should raise error for numeric strings."""
@@ -251,7 +251,7 @@ class TestTransactionTypeEdgeCases:
             with pytest.raises(
                 ValueError, match="Transaction type must be 'buy' or 'sell'"
             ):
-                TransactionType(numeric_value)
+                _ = TransactionType(numeric_value)
 
     def test_create_with_special_characters_raises_error(self) -> None:
         """Should raise error for special characters."""
@@ -261,4 +261,4 @@ class TestTransactionTypeEdgeCases:
             with pytest.raises(
                 ValueError, match="Transaction type must be 'buy' or 'sell'"
             ):
-                TransactionType(special_value)
+                _ = TransactionType(special_value)

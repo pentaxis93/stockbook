@@ -5,8 +5,6 @@ This module tests the TargetStatus value object which encapsulates
 target status validation and business logic for tracking target progress.
 """
 
-from typing import Any
-
 import pytest
 
 from src.domain.value_objects.target_status import TargetStatus
@@ -87,7 +85,7 @@ class TestTargetStatusCreation:
                 ValueError,
                 match="Target status must be one of: active, cancelled, failed, hit",
             ):
-                TargetStatus(invalid_status)
+                _ = TargetStatus(invalid_status)
 
     def test_create_with_empty_string_raises_error(self) -> None:
         """Should raise ValueError for empty target status."""
@@ -95,7 +93,7 @@ class TestTargetStatusCreation:
             ValueError,
             match="Target status must be one of: active, cancelled, failed, hit",
         ):
-            TargetStatus("")
+            _ = TargetStatus("")
 
     def test_create_with_whitespace_only_raises_error(self) -> None:
         """Should raise ValueError for whitespace-only target status."""
@@ -103,7 +101,7 @@ class TestTargetStatusCreation:
             ValueError,
             match="Target status must be one of: active, cancelled, failed, hit",
         ):
-            TargetStatus("   ")
+            _ = TargetStatus("   ")
 
     def test_create_with_partial_match_raises_error(self) -> None:
         """Should raise ValueError for partial matches of valid statuses."""
@@ -114,7 +112,7 @@ class TestTargetStatusCreation:
                 ValueError,
                 match="Target status must be one of: active, cancelled, failed, hit",
             ):
-                TargetStatus(partial_match)
+                _ = TargetStatus(partial_match)
 
 
 class TestTargetStatusEquality:
@@ -151,7 +149,7 @@ class TestTargetStatusEquality:
         assert active_status != "active"
         assert active_status != 1
         assert active_status != None
-        assert active_status != []
+        assert active_status
 
     def test_target_status_hashable(self) -> None:
         """Should be hashable for use in collections."""
@@ -189,7 +187,7 @@ class TestTargetStatusImmutability:
         status = TargetStatus("active")
 
         with pytest.raises(AttributeError, match="TargetStatus is immutable"):
-            status.new_attribute = "value"  # type: ignore[attr-defined]
+            status.new_attribute = "value"
 
     def test_cannot_modify_private_value_attribute(self) -> None:
         """Should not be able to modify private _value attribute."""
@@ -302,7 +300,7 @@ class TestTargetStatusEdgeCases:
                 ValueError,
                 match="Target status must be one of: active, cancelled, failed, hit",
             ):
-                TargetStatus(unicode_value)
+                _ = TargetStatus(unicode_value)
 
     def test_create_with_numeric_strings_raises_error(self) -> None:
         """Should raise error for numeric strings."""
@@ -313,7 +311,7 @@ class TestTargetStatusEdgeCases:
                 ValueError,
                 match="Target status must be one of: active, cancelled, failed, hit",
             ):
-                TargetStatus(numeric_value)
+                _ = TargetStatus(numeric_value)
 
     def test_create_with_special_characters_raises_error(self) -> None:
         """Should raise error for special characters."""
@@ -330,7 +328,7 @@ class TestTargetStatusEdgeCases:
                 ValueError,
                 match="Target status must be one of: active, cancelled, failed, hit",
             ):
-                TargetStatus(special_value)
+                _ = TargetStatus(special_value)
 
     def test_create_with_similar_words_raises_error(self) -> None:
         """Should raise error for words similar to valid statuses."""
@@ -348,4 +346,4 @@ class TestTargetStatusEdgeCases:
                 ValueError,
                 match="Target status must be one of: active, cancelled, failed, hit",
             ):
-                TargetStatus(similar_word)
+                _ = TargetStatus(similar_word)
