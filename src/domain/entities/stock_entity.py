@@ -182,25 +182,56 @@ class StockEntity(BaseEntity):
         """Create temporary value objects for validation."""
         temp_values: Dict[str, Any] = {}
 
+        # Create value objects in separate methods to reduce complexity
+        self._create_company_name_vo(kwargs, temp_values)
+        self._create_sector_vo(kwargs, temp_values)
+        self._create_industry_group_vo(kwargs, temp_values)
+        self._create_grade_vo(kwargs, temp_values)
+        self._create_notes_vo(kwargs, temp_values)
+
+        return temp_values
+
+    def _create_company_name_vo(
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+    ) -> None:
+        """Create company name value object if present."""
         if "name" in kwargs:
             temp_values["company_name"] = CompanyName(kwargs["name"])
+
+    def _create_sector_vo(
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+    ) -> None:
+        """Create sector value object if present."""
         if "sector" in kwargs:
             sector = kwargs["sector"]
             temp_values["sector_vo"] = Sector(sector) if sector is not None else None
+
+    def _create_industry_group_vo(
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+    ) -> None:
+        """Create industry group value object if present."""
         if "industry_group" in kwargs:
             industry_group = kwargs["industry_group"]
             temp_values["industry_group_vo"] = (
                 IndustryGroup(industry_group) if industry_group else None
             )
+
+    def _create_grade_vo(
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+    ) -> None:
+        """Create grade value object if present."""
         if "grade" in kwargs:
             grade_value = kwargs["grade"]
             temp_values["grade_vo"] = (
                 Grade(grade_value) if grade_value is not None else None
             )
+
+    def _create_notes_vo(
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+    ) -> None:
+        """Create notes value object if present."""
         if "notes" in kwargs:
             temp_values["notes_vo"] = Notes(kwargs["notes"])
-
-        return temp_values
 
     def _validate_and_adjust_sector_industry(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]

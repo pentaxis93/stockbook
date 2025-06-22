@@ -147,6 +147,19 @@ PYTEST_TEMP="/tmp/pytest_$$"
 } &
 PYTEST_PID=$!
 
+echo "Starting flake8 cognitive complexity analysis..."
+FLAKE8_TEMP="/tmp/flake8_$$"
+{
+    if flake8 --max-cognitive-complexity=10 --select=CCR001 src/domain/ src/application/ > "$FLAKE8_TEMP" 2>&1; then
+        echo "✅ Flake8 cognitive complexity check passed" >> "$FLAKE8_TEMP"
+        echo "0" > "${FLAKE8_TEMP}.exit"
+    else
+        echo "❌ Flake8 cognitive complexity check failed. Consider refactoring complex functions." >> "$FLAKE8_TEMP"
+        echo "1" > "${FLAKE8_TEMP}.exit"
+    fi
+} &
+FLAKE8_PID=$!
+
 # Wait for all pylint processes to complete with progress indication
 echo "⏳ Waiting for pylint analysis to complete..."
 HAS_PYLINT_ERRORS=0
@@ -196,8 +209,15 @@ cat "$PYTEST_TEMP"
 PYTEST_EXIT=$(cat "${PYTEST_TEMP}.exit")
 rm -f "$PYTEST_TEMP" "${PYTEST_TEMP}.exit"
 
+# Wait for flake8 and display results
+echo "Waiting for flake8 cognitive complexity analysis to complete..."
+wait $FLAKE8_PID
+cat "$FLAKE8_TEMP"
+FLAKE8_EXIT=$(cat "${FLAKE8_TEMP}.exit")
+rm -f "$FLAKE8_TEMP" "${FLAKE8_TEMP}.exit"
+
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi
