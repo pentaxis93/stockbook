@@ -202,7 +202,10 @@
       "Bash(PYTHONPATH=. pytest tests/presentation/view_models/ -v)",
       "Bash(PYTHONPATH=. pytest tests/presentation/view_models/ tests/infrastructure/persistence/test_sqlite_unit_of_work.py -v)",
       "Bash(PYTHONPATH=. pytest tests/infrastructure/persistence/test_database_connection_protocol.py::TestUnitOfWorkProtocolIntegration::test_unit_of_work_transaction_isolation -v)",
-      "mcp__serena__find_referencing_symbols"
+      "mcp__serena__find_referencing_symbols",
+      "mcp__serena__think_about_task_adherence",
+      "mcp__serena__insert_after_symbol",
+      "mcp__serena__execute_shell_command"
     ],
     "deny": []
   }

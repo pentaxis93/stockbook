@@ -110,6 +110,17 @@ class PortfolioCalculationService:
             return PortfolioAllocation({}, Money.zero())
 
         total_value = self.calculate_total_value(portfolio, prices)
+        industry_values = self._calculate_industry_values(portfolio, prices)
+        industry_percentages = self._convert_to_percentages(
+            industry_values, total_value
+        )
+
+        return PortfolioAllocation(industry_percentages, total_value)
+
+    def _calculate_industry_values(
+        self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]
+    ) -> Dict[str, Decimal]:
+        """Calculate total values by industry."""
         industry_values: Dict[str, Decimal] = {}
 
         for stock, quantity in portfolio:
@@ -124,7 +135,12 @@ class PortfolioCalculationService:
                 industry_values[industry] = Decimal("0")
             industry_values[industry] += position_value.amount
 
-        # Convert to percentages
+        return industry_values
+
+    def _convert_to_percentages(
+        self, industry_values: Dict[str, Decimal], total_value: Money
+    ) -> Dict[str, Decimal]:
+        """Convert industry values to percentages."""
         industry_percentages: Dict[str, Decimal] = {}
         for industry, value in industry_values.items():
             percentage = (
@@ -134,4 +150,4 @@ class PortfolioCalculationService:
             )
             industry_percentages[industry] = percentage
 
-        return PortfolioAllocation(industry_percentages, total_value)
+        return industry_percentages

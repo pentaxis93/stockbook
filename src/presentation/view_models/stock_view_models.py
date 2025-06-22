@@ -108,30 +108,41 @@ class UpdateStockRequest:
         """Validate the update request data."""
         errors: Dict[str, str] = {}
 
-        # Validate stock_id
+        self._validate_stock_id(errors)
+        self._validate_name(errors)
+        self._validate_grade(errors)
+        self._validate_industry_group(errors)
+        self._validate_notes(errors)
+
+        return errors
+
+    def _validate_stock_id(self, errors: Dict[str, str]) -> None:
+        """Validate stock ID field."""
         if not self.stock_id.strip():
             errors["stock_id"] = "Stock ID must be a non-empty string"
 
-        # Only validate name if it's being updated
+    def _validate_name(self, errors: Dict[str, str]) -> None:
+        """Validate name field if being updated."""
         if self.name is not None:
             if not self.name or not self.name.strip():
                 errors["name"] = "Stock name cannot be empty"
             elif len(self.name.strip()) > 200:
                 errors["name"] = "Name cannot exceed 200 characters"
 
-        # Only validate grade if it's being updated
+    def _validate_grade(self, errors: Dict[str, str]) -> None:
+        """Validate grade field if being updated."""
         if self.grade is not None and self.grade.upper() not in ["A", "B", "C"]:
             errors["grade"] = "Grade must be A, B, or C"
 
-        # Validate industry group length if being updated
+    def _validate_industry_group(self, errors: Dict[str, str]) -> None:
+        """Validate industry group field if being updated."""
         if self.industry_group is not None and len(self.industry_group) > 100:
             errors["industry_group"] = "Industry group cannot exceed 100 characters"
 
-        # Validate notes length if being updated
+    def _validate_notes(self, errors: Dict[str, str]) -> None:
+        """Validate notes field if being updated."""
         if self.notes is not None and len(self.notes) > 1000:
             errors["notes"] = "Notes cannot exceed 1000 characters"
-
-        return errors
 
     def sanitize(self) -> "UpdateStockRequest":
         """Sanitize input data."""

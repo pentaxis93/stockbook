@@ -72,58 +72,11 @@ class StockPresentationAdapter:
             with self.ui.create_form("create_stock_form"):
                 self.ui.render_subheader("📝 Add New Stock")  # type: ignore[misc]
 
-                # Form inputs
-                symbol = self.ui.create_text_input(
-                    "Stock Symbol *",
-                    placeholder="e.g., AAPL",
-                    help_text="1-5 uppercase letters",
-                )  # type: ignore[misc]
-
-                name = self.ui.create_text_input(
-                    "Company Name *", placeholder="e.g., Apple Inc."
-                )  # type: ignore[misc]
-
-                industry_group = self.ui.create_text_input(
-                    "Industry Group", placeholder="e.g., Technology"
-                )  # type: ignore[misc]
-
-                grade = self.ui.create_selectbox(
-                    "Grade",
-                    options=["", "A", "B", "C"],
-                    index=0,
-                    help_text="Investment grade: A (High), B (Medium), C (Low)",
-                )  # type: ignore[misc]
-
-                notes = self.ui.create_text_area(
-                    "Notes", placeholder="Additional notes about this stock..."
-                )  # type: ignore[misc]
-
+                form_inputs = self._render_stock_form_inputs()
                 submitted = self.ui.create_form_submit_button("Create Stock")  # type: ignore[misc]
 
                 if submitted:
-                    # Create request
-                    request = CreateStockRequest(
-                        symbol=symbol,
-                        name=name,
-                        industry_group=industry_group if industry_group else None,
-                        grade=grade if grade else None,
-                        notes=notes,
-                    )  # type: ignore[misc]
-
-                    # Call controller
-                    response = self.controller.create_stock(request)  # type: ignore[misc]
-
-                    # Handle response
-                    if isinstance(response, ValidationErrorResponse):
-                        self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
-                    elif response.success:
-                        self.ui.show_success(response.message)  # type: ignore[misc]
-                        if refresh_on_success:
-                            self.ui.trigger_rerun()  # type: ignore[misc]
-                    else:
-                        self.ui.show_error(response.message)  # type: ignore[misc]
-
-                    return response
+                    return self._process_stock_creation(form_inputs, refresh_on_success)
 
             return None
 
@@ -131,6 +84,74 @@ class StockPresentationAdapter:
             logger.error(f"Error rendering create stock form: {e}")  # type: ignore[misc]
             self.ui.show_error("An unexpected error occurred while rendering the form")  # type: ignore[misc]
             return None
+
+    def _render_stock_form_inputs(self) -> Dict[str, str]:
+        """Render and collect stock form input values."""
+        symbol = self.ui.create_text_input(
+            "Stock Symbol *",
+            placeholder="e.g., AAPL",
+            help_text="1-5 uppercase letters",
+        )  # type: ignore[misc]
+
+        name = self.ui.create_text_input(
+            "Company Name *", placeholder="e.g., Apple Inc."
+        )  # type: ignore[misc]
+
+        industry_group = self.ui.create_text_input(
+            "Industry Group", placeholder="e.g., Technology"
+        )  # type: ignore[misc]
+
+        grade = self.ui.create_selectbox(
+            "Grade",
+            options=["", "A", "B", "C"],
+            index=0,
+            help_text="Investment grade: A (High), B (Medium), C (Low)",
+        )  # type: ignore[misc]
+
+        notes = self.ui.create_text_area(
+            "Notes", placeholder="Additional notes about this stock..."
+        )  # type: ignore[misc]
+
+        return {
+            "symbol": symbol,
+            "name": name,
+            "industry_group": industry_group,
+            "grade": grade,
+            "notes": notes,
+        }
+
+    def _process_stock_creation(
+        self, form_inputs: Dict[str, str], refresh_on_success: bool
+    ) -> Union[CreateStockResponse, ValidationErrorResponse]:
+        """Process stock creation request and handle response."""
+        request = CreateStockRequest(
+            symbol=form_inputs["symbol"],
+            name=form_inputs["name"],
+            industry_group=(
+                form_inputs["industry_group"] if form_inputs["industry_group"] else None
+            ),
+            grade=form_inputs["grade"] if form_inputs["grade"] else None,
+            notes=form_inputs["notes"],
+        )  # type: ignore[misc]
+
+        response = self.controller.create_stock(request)  # type: ignore[misc]
+        self._handle_stock_creation_response(response, refresh_on_success)
+        return response
+
+    def _handle_stock_creation_response(
+        self,
+        response: Union[CreateStockResponse, ValidationErrorResponse],
+        refresh_on_success: bool,
+    ) -> None:
+        """Handle the response from stock creation."""
+        if isinstance(response, ValidationErrorResponse):
+            self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
+        elif response.success:
+            self.ui.show_success(response.message)  # type: ignore[misc]
+            if refresh_on_success:
+                self.ui.trigger_rerun()  # type: ignore[misc]
+        else:
+            self.ui.show_error(response.message)  # type: ignore[misc]
 
     def render_stock_list(
         self, show_metrics: bool = True
@@ -241,35 +262,10 @@ class StockPresentationAdapter:
         """
         try:
             columns = self.ui.create_columns(2)  # type: ignore[misc]
-
-            with self.layout.within_container(columns[0]):
-                selected_grade = self.ui.create_selectbox(
-                    "Filter by Grade", options=["A", "B", "C"], index=0
-                )  # type: ignore[misc]
-
-                apply_filter = self.ui.create_button("Apply Filter", "secondary")  # type: ignore[misc]
+            selected_grade, apply_filter = self._render_grade_filter_inputs(columns[0])
 
             if apply_filter and selected_grade:
-
-                search_request = StockSearchRequest(grade_filter=selected_grade)  # type: ignore[misc]
-                response = self.controller.search_stocks(search_request)  # type: ignore[misc]
-
-                with self.layout.within_container(columns[1]):
-                    if isinstance(response, ValidationErrorResponse):
-                        self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
-                    elif response.success:
-                        # TODO: Add bold text formatting to UI operations
-                        self.ui.show_info(f"**{response.message}**")  # type: ignore[misc]
-                        if response.stocks:
-                            self._render_stock_dataframe(response.stocks)  # type: ignore[misc]
-                        else:
-                            self.ui.show_info(
-                                f"No stocks found with grade {selected_grade}"
-                            )  # type: ignore[misc]
-                    else:
-                        self.ui.show_error(response.message)  # type: ignore[misc]
-
-                return response
+                return self._process_grade_filter(selected_grade, columns[1])
 
             return None
 
@@ -277,6 +273,49 @@ class StockPresentationAdapter:
             logger.error(f"Error rendering grade filter: {e}")  # type: ignore[misc]
             self.ui.show_error("An unexpected error occurred with the grade filter")  # type: ignore[misc]
             return None
+
+    def _render_grade_filter_inputs(self, column_container) -> tuple[str, bool]:
+        """Render grade filter input controls."""
+        with self.layout.within_container(column_container):
+            selected_grade = self.ui.create_selectbox(
+                "Filter by Grade", options=["A", "B", "C"], index=0
+            )  # type: ignore[misc]
+
+            apply_filter = self.ui.create_button("Apply Filter", "secondary")  # type: ignore[misc]
+
+        return selected_grade, apply_filter
+
+    def _process_grade_filter(
+        self, selected_grade: str, result_column_container
+    ) -> Union[StockListResponse, ValidationErrorResponse]:
+        """Process the grade filter request and display results."""
+        search_request = StockSearchRequest(grade_filter=selected_grade)  # type: ignore[misc]
+        response = self.controller.search_stocks(search_request)  # type: ignore[misc]
+
+        with self.layout.within_container(result_column_container):
+            self._display_grade_filter_results(response, selected_grade)
+
+        return response
+
+    def _display_grade_filter_results(
+        self,
+        response: Union[StockListResponse, ValidationErrorResponse],
+        selected_grade: str,
+    ) -> None:
+        """Display the results of grade filtering."""
+        if isinstance(response, ValidationErrorResponse):
+            self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
+        elif response.success:
+            # TODO: Add bold text formatting to UI operations
+            self.ui.show_info(f"**{response.message}**")  # type: ignore[misc]
+            if response.stocks:
+                self._render_stock_dataframe(response.stocks)  # type: ignore[misc]
+            else:
+                self.ui.show_info(
+                    f"No stocks found with grade {selected_grade}"
+                )  # type: ignore[misc]
+        else:
+            self.ui.show_error(response.message)  # type: ignore[misc]
 
     def render_stock_filters(self) -> Optional[StockSearchRequest]:
         """
@@ -288,34 +327,11 @@ class StockPresentationAdapter:
         try:
             self.ui.render_subheader("🔍 Stock Filters")  # type: ignore[misc]
 
-            columns = self.ui.create_columns(2)  # type: ignore[misc]
-
-            with self.layout.within_container(columns[0]):
-                symbol_filter = self.ui.create_text_input(
-                    "Symbol contains", placeholder="e.g., APP"
-                )  # type: ignore[misc]
-                grade_filter = self.ui.create_selectbox(
-                    "Grade", options=["", "A", "B", "C"]
-                )  # type: ignore[misc]
-
-            with self.layout.within_container(columns[1]):
-                name_filter = self.ui.create_text_input(
-                    "Name contains", placeholder="e.g., Apple"
-                )  # type: ignore[misc]
-                industry_filter = self.ui.create_selectbox(
-                    "Industry",
-                    options=["", "Technology", "Healthcare", "Finance", "Energy"],
-                )  # type: ignore[misc]
-
+            filter_values = self._render_filter_inputs()
             apply_filters = self.ui.create_button("Apply Filters", "primary")  # type: ignore[misc]
 
             if apply_filters:
-                return StockSearchRequest(
-                    symbol_filter=symbol_filter if symbol_filter else None,
-                    name_filter=name_filter if name_filter else None,
-                    grade_filter=grade_filter if grade_filter else None,
-                    industry_filter=industry_filter if industry_filter else None,
-                )  # type: ignore[misc]
+                return self._create_search_request(filter_values)
 
             return None
 
@@ -323,6 +339,57 @@ class StockPresentationAdapter:
             logger.error(f"Error rendering stock filters: {e}")  # type: ignore[misc]
             self.ui.show_error("An unexpected error occurred with the filters")  # type: ignore[misc]
             return None
+
+    def _render_filter_inputs(self) -> Dict[str, str]:
+        """Render filter input controls and return values."""
+        columns = self.ui.create_columns(2)  # type: ignore[misc]
+
+        with self.layout.within_container(columns[0]):
+            symbol_filter = self.ui.create_text_input(
+                "Symbol contains", placeholder="e.g., APP"
+            )  # type: ignore[misc]
+            grade_filter = self.ui.create_selectbox(
+                "Grade", options=["", "A", "B", "C"]
+            )  # type: ignore[misc]
+
+        with self.layout.within_container(columns[1]):
+            name_filter = self.ui.create_text_input(
+                "Name contains", placeholder="e.g., Apple"
+            )  # type: ignore[misc]
+            industry_filter = self.ui.create_selectbox(
+                "Industry",
+                options=["", "Technology", "Healthcare", "Finance", "Energy"],
+            )  # type: ignore[misc]
+
+        return {
+            "symbol_filter": symbol_filter,
+            "name_filter": name_filter,
+            "grade_filter": grade_filter,
+            "industry_filter": industry_filter,
+        }
+
+    def _create_search_request(
+        self, filter_values: Dict[str, str]
+    ) -> StockSearchRequest:
+        """Create search request from filter values."""
+        return StockSearchRequest(
+            symbol_filter=(
+                filter_values["symbol_filter"]
+                if filter_values["symbol_filter"]
+                else None
+            ),
+            name_filter=(
+                filter_values["name_filter"] if filter_values["name_filter"] else None
+            ),
+            grade_filter=(
+                filter_values["grade_filter"] if filter_values["grade_filter"] else None
+            ),
+            industry_filter=(
+                filter_values["industry_filter"]
+                if filter_values["industry_filter"]
+                else None
+            ),
+        )  # type: ignore[misc]
 
     def render_sidebar_navigation(self) -> str:
         """

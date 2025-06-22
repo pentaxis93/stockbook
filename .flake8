@@ -1,6 +1,6 @@
 [flake8]
 # Cognitive complexity configuration
-max-cognitive-complexity = 10
+max-cognitive-complexity = 8
 
 # Ignore codes that conflict with other tools in our pipeline
 ignore = 
