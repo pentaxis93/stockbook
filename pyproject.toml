@@ -218,6 +218,9 @@ addopts = [
     "--maxfail=5",  # stop after 5 failures to fail fast
 ]
 
+# Performance optimizations
+cache_dir = ".pytest_cache"
+
 # Filter warnings
 filterwarnings = [
     "ignore:.*PyType_Spec.*tp_new.*deprecated.*:DeprecationWarning",
@@ -303,6 +306,9 @@ strict_concatenate = true
 strict_optional = true
 explicit_package_bases = true
 namespace_packages = true
+# Performance optimizations
+incremental = true
+cache_dir = ".mypy_cache"
 
 # Per-module options for gradual adoption
 [[tool.mypy.overrides]]

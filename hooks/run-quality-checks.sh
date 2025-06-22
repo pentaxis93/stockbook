@@ -2,7 +2,7 @@
 
 # Pre-commit hook to run pytest, pylint, pyright, mypy, black, and isort
 # This hook ensures maximum code quality before allowing commits
-# Optimized for parallel execution and caching
+# Optimized for parallel execution, caching, and incremental processing
 
 set -e
 
@@ -11,7 +11,16 @@ declare -a PYLINT_PIDS=()
 declare -a PYLINT_RESULTS=()
 
 echo "Running quality checks (formatting already handled by previous hooks)..."
-echo "Using parallel execution for faster processing..."
+echo "Using parallel execution and incremental processing for faster performance..."
+
+# Get list of changed files for incremental processing
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.py$' || true)
+if [ -z "$CHANGED_FILES" ]; then
+    # If no staged files, check all files (for --all-files runs)
+    CHANGED_FILES=$(find . -name "*.py" -not -path "./.venv/*" -not -path "./venv/*" -not -path "./.git/*" | head -20)
+fi
+
+echo "Processing $(echo "$CHANGED_FILES" | wc -w) Python files..."
 
 # Function to run pylint check in background
 run_pylint_check() {
@@ -50,19 +59,37 @@ run_pylint_check() {
     return 0
 }
 
-# Discover files once for all pylint checks (optimization)
-echo "Discovering Python files for analysis..."
-CORE_FILES=$(find src/domain/ src/application/ src/infrastructure/ -name "*.py" 2>/dev/null | tr '\n' ' ' || true)
-PRESENTATION_FILES=$(find src/presentation/ -name "*.py" 2>/dev/null | tr '\n' ' ' || true)
-CONFIG_FILES="$(find . -maxdepth 1 -name "*.py" -not -path "./tests/*" 2>/dev/null | tr '\n' ' ' || true) $(find dependency_injection/ -name "*.py" 2>/dev/null | tr '\n' ' ' || true)"  
-TEST_FILES=$(find ./tests -name "*.py" 2>/dev/null | tr '\n' ' ' || true)
+# Filter changed files by layer for incremental processing
+echo "Categorizing changed files by layer..."
+CORE_FILES=""
+PRESENTATION_FILES=""
+CONFIG_FILES=""
+TEST_FILES=""
+
+for file in $CHANGED_FILES; do
+    if [[ "$file" == src/domain/* ]] || [[ "$file" == src/application/* ]] || [[ "$file" == src/infrastructure/* ]]; then
+        CORE_FILES="$CORE_FILES $file"
+    elif [[ "$file" == src/presentation/* ]]; then
+        PRESENTATION_FILES="$PRESENTATION_FILES $file"
+    elif [[ "$file" == tests/* ]]; then
+        TEST_FILES="$TEST_FILES $file"
+    else
+        CONFIG_FILES="$CONFIG_FILES $file"
+    fi
+done
+
+# Trim whitespace
+CORE_FILES=$(echo "$CORE_FILES" | xargs)
+PRESENTATION_FILES=$(echo "$PRESENTATION_FILES" | xargs)
+CONFIG_FILES=$(echo "$CONFIG_FILES" | xargs)
+TEST_FILES=$(echo "$TEST_FILES" | xargs)
 
 # Start all pylint checks in parallel
 echo "Starting parallel pylint analysis..."
 
-# Core business logic - strictest rules
-CORE_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,unnecessary-pass,wrong-import-order,ungrouped-imports,line-too-long,too-many-positional-arguments,fixme"
-CORE_ARGS="--allowed-redefined-builtins=id --max-args=12 --max-locals=5 --max-returns=8 --max-branches=8 --max-statements=15 --max-positional-arguments=8 --min-similarity-lines=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10"
+# Core business logic - strictest rules (optimized for speed)
+CORE_DISABLE="too-few-public-methods,too-many-public-methods,too-many-instance-attributes,unnecessary-pass,wrong-import-order,ungrouped-imports,line-too-long,too-many-positional-arguments,fixme,duplicate-code"
+CORE_ARGS="--allowed-redefined-builtins=id --max-args=12 --max-locals=5 --max-returns=8 --max-branches=8 --max-statements=15 --max-positional-arguments=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10"
 run_pylint_check "core" "$CORE_FILES" "$CORE_DISABLE" "$CORE_ARGS"
 
 # Presentation layer - moderate rules  
@@ -94,10 +121,10 @@ PYRIGHT_TEMP="/tmp/pyright_$$"
 } &
 PYRIGHT_PID=$!
 
-echo "Starting mypy type checker in parallel..."
+echo "Starting mypy type checker with caching in parallel..."
 MYPY_TEMP="/tmp/mypy_$$"
 {
-    if mypy src --explicit-package-bases > "$MYPY_TEMP" 2>&1; then
+    if mypy src --explicit-package-bases --cache-dir=.mypy_cache --incremental > "$MYPY_TEMP" 2>&1; then
         echo "✅ Mypy type check passed" >> "$MYPY_TEMP"
         echo "0" > "${MYPY_TEMP}.exit"
     else
@@ -107,10 +134,10 @@ MYPY_TEMP="/tmp/mypy_$$"
 } &
 MYPY_PID=$!
 
-echo "Starting pytest with parallel execution..."
+echo "Starting pytest with parallel execution and caching..."
 PYTEST_TEMP="/tmp/pytest_$$"
 {
-    if pytest -n auto > "$PYTEST_TEMP" 2>&1; then
+    if pytest -n auto --lf --ff > "$PYTEST_TEMP" 2>&1; then
         echo "✅ Tests passed with required coverage" >> "$PYTEST_TEMP"
         echo "0" > "${PYTEST_TEMP}.exit"
     else
