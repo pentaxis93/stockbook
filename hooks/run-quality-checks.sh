@@ -150,7 +150,7 @@ PYTEST_PID=$!
 echo "Starting flake8 cognitive complexity analysis..."
 FLAKE8_TEMP="/tmp/flake8_$$"
 {
-    if flake8 --max-cognitive-complexity=10 --select=CCR001 src/domain/ src/application/ > "$FLAKE8_TEMP" 2>&1; then
+    if flake8 src/domain/ src/application/ > "$FLAKE8_TEMP" 2>&1; then
         echo "✅ Flake8 cognitive complexity check passed" >> "$FLAKE8_TEMP"
         echo "0" > "${FLAKE8_TEMP}.exit"
     else

@@ -1,0 +1,39 @@
+[flake8]
+# Cognitive complexity configuration
+max-cognitive-complexity = 10
+
+# Ignore codes that conflict with other tools in our pipeline
+ignore = 
+    # Line length - handled by black
+    E501,
+    # Line break before binary operator - black prefers this style
+    W503,
+    # Whitespace before ':' - conflicts with black formatting  
+    E203,
+    # Multiple statements on one line - rarely relevant, handled by black
+    E701,
+    # Blank line at end of file - handled by black
+    W391,
+    # Import related - handled by isort
+    I001, I002, I003, I004, I005,
+    # Blank line formatting - handled by black
+    E302, E305
+
+# Focus on domain and application layers for cognitive complexity
+include = src/domain/*, src/application/*
+
+# Enable specific checks we want alongside cognitive complexity
+select = 
+    # PyFlakes errors (undefined names, unused imports, etc.)
+    F,
+    # PEP 8 errors (except those we ignore above)
+    E,
+    # PEP 8 warnings (except those we ignore above) 
+    W,
+    # McCabe complexity (complement to cognitive complexity)
+    C,
+    # Cognitive complexity violations
+    CCR001
+
+# McCabe complexity limit (lower than cognitive complexity)
+max-complexity = 8
