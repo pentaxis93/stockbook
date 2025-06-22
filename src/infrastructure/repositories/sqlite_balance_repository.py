@@ -45,7 +45,7 @@ class SqlitePortfolioBalanceRepository(IPortfolioBalanceRepository):
         """
         with self.db_connection.transaction() as conn:
             # Try to insert, replace if exists
-            conn.execute(
+            _ = conn.execute(
                 """
                 INSERT OR REPLACE INTO portfolio_balance 
                 (id, portfolio_id, balance_date, withdrawals, deposits, final_balance, index_change)

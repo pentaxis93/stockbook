@@ -260,7 +260,7 @@ class TestErrorHandling:
 
         # Act & Assert
         with pytest.raises(DependencyResolutionError) as exc_info:
-            container.resolve(MockTestService)  # Missing ITestRepository
+            _ = container.resolve(MockTestService)  # Missing ITestRepository
         assert "MockTestService" in str(exc_info.value)
         assert "not registered" in str(exc_info.value)
 
@@ -273,7 +273,7 @@ class TestErrorHandling:
 
         # Act & Assert
         with pytest.raises(CircularDependencyError) as exc_info:
-            container.resolve(MockServiceA)
+            _ = container.resolve(MockServiceA)
         assert "circular dependency" in str(exc_info.value).lower()
         assert "MockServiceA" in str(exc_info.value)
         assert "MockServiceB" in str(exc_info.value)
@@ -285,7 +285,7 @@ class TestErrorHandling:
 
         # Act & Assert
         with pytest.raises(DependencyResolutionError) as exc_info:
-            container.resolve(MockTestRepository)
+            _ = container.resolve(MockTestRepository)
         assert "MockTestRepository" in str(exc_info.value)
         assert "not registered" in str(exc_info.value)
 

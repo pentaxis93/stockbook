@@ -48,7 +48,7 @@ class SqliteStockRepository(IStockRepository):
         """
         try:
             with self.db_connection.transaction() as conn:
-                conn.execute(
+                _ = conn.execute(
                     """
                         INSERT INTO stock (id, symbol, name, sector, industry_group, grade, notes)
                         VALUES (?, ?, ?, ?, ?, ?, ?)

@@ -34,13 +34,13 @@ def db_connection() -> Iterator[DatabaseConnection]:
 
     # Create test data
     with connection.transaction() as conn:
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
             VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for journals', 50, 0.02, 1)
         """
         )
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
             VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
@@ -124,7 +124,7 @@ class TestJournalRepositoryBasic:
         ]
 
         for entry in entries:
-            journal_repository.create(entry)
+            _ = journal_repository.create(entry)
 
         # Act
         recent = journal_repository.get_recent(limit=5)

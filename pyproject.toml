@@ -270,3 +270,17 @@ typeCheckingMode = "strict"
 # Set python path to include project root for import resolution
 pythonPath = ["."]
 
+# Strict type checking options
+reportUnknownParameterType = true
+reportUnknownArgumentType = true
+reportUnknownLambdaType = true
+reportUnknownVariableType = true
+reportUnknownMemberType = true
+reportMissingParameterType = true
+reportUnnecessaryTypeIgnoreComment = true
+reportUnusedCallResult = true
+reportUnnecessaryCast = true
+reportAssertAlwaysTrue = true
+reportSelfClsParameterName = true
+reportImplicitStringConcatenation = true
+

@@ -139,7 +139,7 @@ class TestStockPageCoordinator:
         self.mock_adapter.render_stock_list.return_value = stock_list_response
 
         # Act
-        self.coordinator.render_stock_dashboard()
+        _ = self.coordinator.render_stock_dashboard()
 
         # Assert
         # Verify metrics are calculated and displayed
@@ -368,7 +368,7 @@ class TestStockPageCoordinator:
 
         # Act & Assert - Should not raise exception
         with patch("streamlit.error") as mock_error:
-            self.coordinator.render_stock_dashboard()
+            _ = self.coordinator.render_stock_dashboard()
             mock_error.assert_called_once()
             assert "An unexpected error occurred" in mock_error.call_args[0][0]
 

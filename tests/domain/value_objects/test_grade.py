@@ -41,17 +41,17 @@ class TestGradeValueObject:
         invalid_grades = ["E", "G", "1", "AA", "Z", "X"]
         for invalid_grade in invalid_grades:
             with pytest.raises(ValueError, match="Grade must be one of"):
-                Grade(invalid_grade)
+                _ = Grade(invalid_grade)
 
     def test_grade_creation_with_empty_string_raises_error(self) -> None:
         """Test grade creation with empty string raises ValueError."""
         with pytest.raises(ValueError, match="Grade cannot be empty"):
-            Grade("")
+            _ = Grade("")
 
     def test_grade_creation_with_whitespace_only_raises_error(self) -> None:
         """Test grade creation with whitespace-only string raises ValueError."""
         with pytest.raises(ValueError, match="Grade cannot be empty"):
-            Grade("   ")
+            _ = Grade("   ")
 
     def test_grade_equality(self) -> None:
         """Test grade equality comparison."""

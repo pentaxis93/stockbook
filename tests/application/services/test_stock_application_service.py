@@ -93,7 +93,7 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Stock with symbol AAPL already exists"):
-            self.service.create_stock(command)
+            _ = self.service.create_stock(command)
 
         # Verify no creation was attempted
         self.mock_stock_repository.create.assert_not_called()
@@ -109,7 +109,7 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(Exception, match="Database error"):
-            self.service.create_stock(command)
+            _ = self.service.create_stock(command)
 
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
@@ -426,7 +426,7 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Stock with ID stock-999 not found"):
-            self.service.update_stock(command)
+            _ = self.service.update_stock(command)
 
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
@@ -438,7 +438,7 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(ValueError, match="No fields to update"):
-            self.service.update_stock(command)
+            _ = self.service.update_stock(command)
 
     def test_update_stock_with_repository_failure_raises_error(self) -> None:
         """Should handle repository update failure."""
@@ -457,7 +457,7 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Failed to update stock"):
-            self.service.update_stock(command)
+            _ = self.service.update_stock(command)
 
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
@@ -479,7 +479,7 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(Exception, match="Database error"):
-            self.service.update_stock(command)
+            _ = self.service.update_stock(command)
 
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()

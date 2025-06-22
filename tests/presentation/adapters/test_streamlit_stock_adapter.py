@@ -434,7 +434,7 @@ class TestStreamlitStockAdapter:
         """Should refresh page after successful stock creation."""
         # Arrange
         success_response = CreateStockResponse.create_success(
-            "1", "AAPL", "Created successfully"  # type: ignore[misc] - temporary for UI migration
+            "1", "AAPL", "Created successfully"
         )
 
         with patch.multiple(
@@ -449,7 +449,7 @@ class TestStreamlitStockAdapter:
             self.mock_controller.create_stock.return_value = success_response
 
             # Act
-            self.adapter.render_create_stock_form(refresh_on_success=True)
+            _ = self.adapter.render_create_stock_form(refresh_on_success=True)
 
             # Assert
             mock_rerun.assert_called_once()

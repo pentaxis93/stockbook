@@ -55,7 +55,7 @@ class TestSqliteStockRepository:
         )
 
         # Act
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
 
         # Assert
         assert isinstance(stock_id, str)
@@ -83,7 +83,7 @@ class TestSqliteStockRepository:
         )
 
         # Act
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
 
         # Assert
         retrieved_stock = self.repository.get_by_id(stock_id)
@@ -105,10 +105,10 @@ class TestSqliteStockRepository:
         )
 
         # Act & Assert
-        self.repository.create(stock1)
+        _ = self.repository.create(stock1)
 
         with pytest.raises(ValueError, match="Stock with symbol AAPL already exists"):
-            self.repository.create(stock2)
+            _ = self.repository.create(stock2)
 
     def test_get_by_id_success(self) -> None:
         """Should retrieve stock by ID successfully."""
@@ -116,7 +116,7 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("GOOGL"), company_name=CompanyName("Alphabet Inc.")
         )
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
 
         # Act
         retrieved_stock = self.repository.get_by_id(stock_id)
@@ -141,7 +141,7 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("TSLA"), company_name=CompanyName("Tesla Inc.")
         )
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
 
         # Act
         retrieved_stock = self.repository.get_by_symbol(StockSymbol("TSLA"))
@@ -166,7 +166,7 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("AAPL"), company_name=CompanyName("Apple Inc.")
         )
-        self.repository.create(stock)
+        _ = self.repository.create(stock)
 
         # Act - symbol is stored as uppercase, so this tests normalization
         result = self.repository.get_by_symbol(StockSymbol("aapl"))
@@ -197,7 +197,7 @@ class TestSqliteStockRepository:
         ]
 
         for stock in stocks:
-            self.repository.create(stock)
+            _ = self.repository.create(stock)
 
         # Act
         result = self.repository.get_all()
@@ -223,7 +223,7 @@ class TestSqliteStockRepository:
             company_name=CompanyName("Amazon.com Inc."),
             grade=Grade("B"),
         )
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
 
         # Create updated entity (since IDs are immutable)
         updated_stock = StockEntity(
@@ -267,7 +267,7 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("META"), company_name=CompanyName("Meta Platforms")
         )
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
 
         # Verify stock exists
         assert self.repository.get_by_id(stock_id) is not None
@@ -295,7 +295,7 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("NVDA"), company_name=CompanyName("NVIDIA Corp.")
         )
-        self.repository.create(stock)
+        _ = self.repository.create(stock)
 
         # Act
         result = self.repository.exists_by_symbol(StockSymbol("NVDA"))
@@ -317,7 +317,7 @@ class TestSqliteStockRepository:
         stock = StockEntity(
             symbol=StockSymbol("IBM"), company_name=CompanyName("IBM Corp.")
         )
-        self.repository.create(stock)
+        _ = self.repository.create(stock)
 
         # Act
         result = self.repository.exists_by_symbol(StockSymbol("ibm"))
@@ -336,7 +336,7 @@ class TestSqliteStockRepository:
 
         # Act & Assert
         with pytest.raises(Exception):  # Should raise some database-related error
-            invalid_repository.create(stock)
+            _ = invalid_repository.create(stock)
 
     def test_repository_preserves_identity(self) -> None:
         """Should preserve entity identity and value object types."""
@@ -351,7 +351,7 @@ class TestSqliteStockRepository:
         )
 
         # Act
-        stock_id = self.repository.create(stock)
+        _ = stock_id = self.repository.create(stock)
         retrieved_stock = self.repository.get_by_id(stock_id)
 
         # Assert

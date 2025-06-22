@@ -75,7 +75,7 @@ class TestPortfolioBalanceEntity:
     ) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            PortfolioBalanceEntity(
+            _ = PortfolioBalanceEntity(
                 portfolio_id="",  # Invalid empty string
                 balance_date=date(2024, 1, 15),
                 final_balance=Money(Decimal("10000.00")),
@@ -88,7 +88,9 @@ class TestPortfolioBalanceEntity:
         from src.domain.value_objects import IndexChange
 
         with pytest.raises(ValueError, match="Index change cannot exceed"):
-            IndexChange(150.0)  # Error happens at IndexChange construction (over 100%)
+            _ = IndexChange(
+                150.0
+            )  # Error happens at IndexChange construction (over 100%)
 
     def test_portfolio_balance_equality(self) -> None:
         """Should compare portfolio balances based on business identity (portfolio_id, date)."""
@@ -333,7 +335,7 @@ class TestIndexChange:
         extreme_changes = [150.0, -150.0, 200.0, -200.0]
         for change in extreme_changes:
             with pytest.raises(ValueError):
-                IndexChange(change)
+                _ = IndexChange(change)
 
     def test_index_change_precision(self) -> None:
         """Test that index change values are properly rounded."""

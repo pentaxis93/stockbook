@@ -61,7 +61,7 @@ class TestDatabaseConnection:
             cursor = conn.cursor()
 
             # Check if stock table exists
-            cursor.execute(
+            _ = cursor.execute(
                 """
                 SELECT name FROM sqlite_master 
                 WHERE type='table' AND name='stock'
@@ -70,7 +70,7 @@ class TestDatabaseConnection:
             assert cursor.fetchone() is not None
 
             # Verify stock table structure
-            cursor.execute("PRAGMA table_info(stock)")
+            _ = cursor.execute("PRAGMA table_info(stock)")
             columns = cursor.fetchall()
             column_names = [col[1] for col in columns]
 
@@ -97,7 +97,7 @@ class TestDatabaseConnection:
         # Assert - tables should still exist and be functional
         with sqlite3.connect(self.temp_db.name) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM stock")
+            _ = cursor.execute("SELECT COUNT(*) FROM stock")
             result = cursor.fetchone()
             assert result[0] == 0  # Empty table
 
@@ -115,7 +115,7 @@ class TestDatabaseConnection:
 
         # Verify connection works
         cursor = connection.cursor()
-        cursor.execute("SELECT COUNT(*) FROM stock")
+        _ = cursor.execute("SELECT COUNT(*) FROM stock")
         result = cursor.fetchone()
         assert result[0] == 0
 
@@ -132,7 +132,7 @@ class TestDatabaseConnection:
 
         # Assert
         cursor = connection.cursor()
-        cursor.execute("PRAGMA foreign_keys")
+        _ = cursor.execute("PRAGMA foreign_keys")
         result = cursor.fetchone()
         assert result[0] == 1  # Foreign keys enabled
 
@@ -152,12 +152,12 @@ class TestDatabaseConnection:
 
         # Test row factory works
         cursor = connection.cursor()
-        cursor.execute(
+        _ = cursor.execute(
             "INSERT INTO stock (symbol, name) VALUES (?, ?)", ("TEST", "Test Inc.")
         )
         connection.commit()
 
-        cursor.execute("SELECT symbol, name FROM stock WHERE symbol = ?", ("TEST",))
+        _ = cursor.execute("SELECT symbol, name FROM stock WHERE symbol = ?", ("TEST",))
         row = cursor.fetchone()
 
         # Should be able to access by column name
@@ -178,13 +178,13 @@ class TestDatabaseConnection:
 
             # Use the connection
             cursor = conn.cursor()
-            cursor.execute(
+            _ = cursor.execute(
                 "INSERT INTO stock (symbol, name) VALUES (?, ?)",
                 ("CTX", "Context Inc."),
             )
             conn.commit()
 
-            cursor.execute("SELECT COUNT(*) FROM stock")
+            _ = cursor.execute("SELECT COUNT(*) FROM stock")
             result = cursor.fetchone()
             assert result[0] == 1
 
@@ -199,11 +199,11 @@ class TestDatabaseConnection:
         # Act - successful transaction
         with db_conn.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(
+            _ = cursor.execute(
                 "INSERT INTO stock (symbol, name) VALUES (?, ?)",
                 ("TXN1", "Transaction 1"),
             )
-            cursor.execute(
+            _ = cursor.execute(
                 "INSERT INTO stock (symbol, name) VALUES (?, ?)",
                 ("TXN2", "Transaction 2"),
             )
@@ -212,7 +212,7 @@ class TestDatabaseConnection:
         # Assert - both records should exist
         with db_conn.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM stock")
+            _ = cursor.execute("SELECT COUNT(*) FROM stock")
             result = cursor.fetchone()
             assert result[0] == 2
 
@@ -226,7 +226,7 @@ class TestDatabaseConnection:
         try:
             with db_conn.get_connection() as conn:
                 cursor = conn.cursor()
-                cursor.execute(
+                _ = cursor.execute(
                     "INSERT INTO stock (symbol, name) VALUES (?, ?)",
                     ("ROLL1", "Rollback 1"),
                 )
@@ -235,7 +235,7 @@ class TestDatabaseConnection:
                 conn.commit()
 
                 # This should fail (duplicate symbol)
-                cursor.execute(
+                _ = cursor.execute(
                     "INSERT INTO stock (symbol, name) VALUES (?, ?)",
                     ("ROLL1", "Rollback Duplicate"),
                 )
@@ -246,7 +246,9 @@ class TestDatabaseConnection:
         # Assert - only first record should exist
         with db_conn.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM stock WHERE symbol = ?", ("ROLL1",))
+            _ = cursor.execute(
+                "SELECT COUNT(*) FROM stock WHERE symbol = ?", ("ROLL1",)
+            )
             result = cursor.fetchone()
             assert result[0] == 1  # Only one record
 
@@ -266,7 +268,7 @@ class TestDatabaseConnection:
         # Note: SQLite connections don't have a simple "is_closed" check,
         # so we test by trying to use it
         with pytest.raises(sqlite3.ProgrammingError):
-            connection.execute("SELECT 1")
+            _ = connection.execute("SELECT 1")
 
     def test_connection_timeout_configuration(self) -> None:
         """Should configure connection timeout."""
@@ -277,7 +279,7 @@ class TestDatabaseConnection:
         # Assert - connection should work with timeout
         with db_conn.get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT 1")
+            _ = cursor.execute("SELECT 1")
             result = cursor.fetchone()
             assert result[0] == 1
 
@@ -317,12 +319,12 @@ class TestDatabaseConnection:
         cursor1 = conn1.cursor()
         cursor2 = conn2.cursor()
 
-        cursor1.execute(
+        _ = cursor1.execute(
             "INSERT INTO stock (symbol, name) VALUES (?, ?)", ("CON1", "Connection 1")
         )
         conn1.commit()
 
-        cursor2.execute("SELECT COUNT(*) FROM stock")
+        _ = cursor2.execute("SELECT COUNT(*) FROM stock")
         result = cursor2.fetchone()
         assert result[0] == 1  # Should see committed data
 

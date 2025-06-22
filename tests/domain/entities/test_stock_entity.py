@@ -133,7 +133,7 @@ class TestStockEntity:
     def test_create_stock_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade through Grade value object."""
         with pytest.raises(ValueError, match="Grade must be one of"):
-            Grade("Z")  # Error happens at Grade construction
+            _ = Grade("Z")  # Error happens at Grade construction
 
     def test_create_stock_with_too_long_name_raises_error(self) -> None:
         """Should raise error for company name that's too long (delegated to value object)."""
@@ -142,7 +142,7 @@ class TestStockEntity:
         with pytest.raises(
             ValueError, match="Company name cannot exceed 200 characters"
         ):
-            CompanyName(long_name)  # Error happens at CompanyName construction
+            _ = CompanyName(long_name)  # Error happens at CompanyName construction
 
     def test_create_stock_with_too_long_industry_raises_error(self) -> None:
         """Should raise error for industry group that's too long (delegated to value object)."""
@@ -151,14 +151,16 @@ class TestStockEntity:
         with pytest.raises(
             ValueError, match="Industry group cannot exceed 100 characters"
         ):
-            IndustryGroup(long_industry)  # Error happens at IndustryGroup construction
+            _ = IndustryGroup(
+                long_industry
+            )  # Error happens at IndustryGroup construction
 
     def test_create_stock_with_too_long_notes_raises_error(self) -> None:
         """Should raise error for notes that are too long (delegated to value object)."""
         long_notes = "A" * 1001  # Max is 1000 characters
 
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
-            Notes(long_notes)  # Error happens at Notes construction
+            _ = Notes(long_notes)  # Error happens at Notes construction
 
     def test_stock_equality(self) -> None:
         """Should compare stocks based on symbol (business key)."""
@@ -457,7 +459,7 @@ class TestStockEntity:
             ValueError,
             match="Industry group 'Pharmaceuticals' is not valid for sector 'Technology'",
         ):
-            StockEntity(
+            _ = StockEntity(
                 symbol=symbol,
                 company_name=company_name,
                 sector=sector,
@@ -473,7 +475,7 @@ class TestStockEntity:
         with pytest.raises(
             ValueError, match="Sector must be provided when industry_group is specified"
         ):
-            StockEntity(
+            _ = StockEntity(
                 symbol=symbol,
                 company_name=company_name,
                 industry_group=industry_group,
@@ -482,14 +484,14 @@ class TestStockEntity:
     def test_create_stock_with_empty_sector_raises_error(self) -> None:
         """Should raise error for empty sector string."""
         with pytest.raises(ValueError, match="Sector cannot be empty"):
-            Sector("")  # Error happens at Sector construction
+            _ = Sector("")  # Error happens at Sector construction
 
     def test_create_stock_with_too_long_sector_raises_error(self) -> None:
         """Should raise error for sector that's too long."""
         long_sector = "A" * 101  # Max is 100 characters
 
         with pytest.raises(ValueError, match="Sector cannot exceed 100 characters"):
-            Sector(long_sector)  # Error happens at Sector construction
+            _ = Sector(long_sector)  # Error happens at Sector construction
 
     def test_update_fields_sector_only(self) -> None:
         """Should update sector without industry_group."""

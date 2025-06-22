@@ -38,7 +38,7 @@ class TestSectorIndustryService:
     def test_get_industry_groups_for_invalid_sector_raises_error(self) -> None:
         """Test getting industry groups for invalid sector raises ValueError."""
         with pytest.raises(ValueError, match="Invalid sector 'InvalidSector'"):
-            self.service.get_industry_groups_for_sector("InvalidSector")
+            _ = self.service.get_industry_groups_for_sector("InvalidSector")
 
     def test_validate_sector_industry_combination_valid(self) -> None:
         """Test validating valid sector-industry combination."""
@@ -107,7 +107,7 @@ class TestSectorIndustryService:
         with pytest.raises(
             ValueError, match="Industry group 'InvalidIndustry' not found in any sector"
         ):
-            self.service.get_sector_for_industry_group("InvalidIndustry")
+            _ = self.service.get_sector_for_industry_group("InvalidIndustry")
 
     def test_sector_industry_mapping_completeness(self) -> None:
         """Test that sector-industry mapping is properly configured."""

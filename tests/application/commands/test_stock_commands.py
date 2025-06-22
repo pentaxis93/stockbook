@@ -69,22 +69,22 @@ class TestCreateStockCommand:
     def test_create_stock_command_with_empty_symbol_raises_error(self) -> None:
         """Should raise error for empty symbol."""
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
-            CreateStockCommand(symbol="", name="Apple Inc.")
+            _ = CreateStockCommand(symbol="", name="Apple Inc.")
 
     def test_create_stock_command_with_empty_name_raises_error(self) -> None:
         """Should raise error for empty name."""
         with pytest.raises(ValueError, match="Name cannot be empty"):
-            CreateStockCommand(symbol="AAPL", name="")
+            _ = CreateStockCommand(symbol="AAPL", name="")
 
     def test_create_stock_command_with_invalid_symbol_raises_error(self) -> None:
         """Should raise error for invalid symbol format."""
         with pytest.raises(ValueError, match="Invalid symbol format"):
-            CreateStockCommand(symbol="AAPL123", name="Apple Inc.")
+            _ = CreateStockCommand(symbol="AAPL123", name="Apple Inc.")
 
     def test_create_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
         with pytest.raises(ValueError, match="Invalid grade"):
-            CreateStockCommand(symbol="AAPL", name="Apple Inc.", grade="Z")
+            _ = CreateStockCommand(symbol="AAPL", name="Apple Inc.", grade="Z")
 
     def test_create_stock_command_equality(self) -> None:
         """Should compare commands for equality."""
@@ -177,23 +177,23 @@ class TestUpdateStockCommand:
     def test_update_stock_command_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            UpdateStockCommand(stock_id="")
+            _ = UpdateStockCommand(stock_id="")
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            UpdateStockCommand(stock_id="   ")  # whitespace-only string
+            _ = UpdateStockCommand(stock_id="   ")  # whitespace-only string
 
     def test_update_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
         with pytest.raises(ValueError, match="Invalid grade"):
-            UpdateStockCommand(stock_id="test-stock-1", grade="Z")
+            _ = UpdateStockCommand(stock_id="test-stock-1", grade="Z")
 
     def test_update_stock_command_with_empty_name_raises_error(self) -> None:
         """Should raise error for empty name."""
         with pytest.raises(ValueError, match="Name cannot be empty"):
-            UpdateStockCommand(stock_id="test-stock-1", name="")
+            _ = UpdateStockCommand(stock_id="test-stock-1", name="")
 
         with pytest.raises(ValueError, match="Name cannot be empty"):
-            UpdateStockCommand(stock_id="test-stock-1", name="   ")
+            _ = UpdateStockCommand(stock_id="test-stock-1", name="   ")
 
     def test_update_stock_command_equality(self) -> None:
         """Should compare commands for equality."""

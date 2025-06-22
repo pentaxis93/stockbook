@@ -54,7 +54,7 @@ class TestNotes:
         too_long_notes = "A" * 1001
 
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
-            Notes(too_long_notes)
+            _ = Notes(too_long_notes)
 
     def test_notes_equality(self) -> None:
         """Should compare Notes objects by value."""

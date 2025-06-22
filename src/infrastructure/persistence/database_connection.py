@@ -167,7 +167,7 @@ class DatabaseConnection(IDatabaseConnection):
         """
 
         with self.get_connection() as conn:
-            conn.executescript(schema_sql)
+            _ = conn.executescript(schema_sql)
             conn.commit()
 
     def get_connection(self) -> sqlite3.Connection:
@@ -185,8 +185,8 @@ class DatabaseConnection(IDatabaseConnection):
 
         # Configure connection
         connection.row_factory = sqlite3.Row  # Enable column access by name
-        connection.execute("PRAGMA foreign_keys = ON")  # Enable foreign keys
-        connection.execute("PRAGMA journal_mode = WAL")  # Better concurrency
+        _ = connection.execute("PRAGMA foreign_keys = ON")  # Enable foreign keys
+        _ = connection.execute("PRAGMA journal_mode = WAL")  # Better concurrency
 
         # Track this connection
         self._active_connections.append(connection)

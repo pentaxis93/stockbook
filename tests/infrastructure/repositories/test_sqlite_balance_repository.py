@@ -36,7 +36,7 @@ def db_connection() -> Iterator[IDatabaseConnection]:
 
     # Create test portfolio
     with connection.transaction() as conn:
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
             VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for balances', 50, 0.02, 1)
@@ -114,7 +114,7 @@ class TestPortfolioBalanceRepositoryRead:
     ) -> None:
         """Should retrieve balance by portfolio and date."""
         # Arrange
-        balance_repository.create(sample_balance)
+        _ = balance_repository.create(sample_balance)
 
         # Act
         retrieved = balance_repository.get_by_portfolio_and_date(
@@ -149,7 +149,7 @@ class TestPortfolioBalanceRepositoryRead:
         ]
 
         for balance in balances:
-            balance_repository.create(balance)
+            _ = balance_repository.create(balance)
 
         # Act
         history = balance_repository.get_history("portfolio-id-1")
@@ -179,8 +179,8 @@ class TestPortfolioBalanceRepositoryRead:
             final_balance=Money(Decimal("10500.00")),
         )
 
-        balance_repository.create(old_balance)
-        balance_repository.create(new_balance)
+        _ = balance_repository.create(old_balance)
+        _ = balance_repository.create(new_balance)
 
         # Act
         latest = balance_repository.get_latest_balance("portfolio-id-1")

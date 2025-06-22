@@ -36,7 +36,7 @@ def db_connection() -> Iterator[DatabaseConnection]:
     # Create test portfolios and stocks
     with connection.transaction() as conn:
         # Create test portfolio
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
             VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for targets', 50, 0.02, 1)
@@ -44,7 +44,7 @@ def db_connection() -> Iterator[DatabaseConnection]:
         )
 
         # Create test stock
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
             VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
@@ -86,7 +86,7 @@ class TestTargetRepositoryCreate:
     ) -> None:
         """Should create target and return database ID."""
         # Act
-        target_id = target_repository.create(sample_target)
+        _ = target_id = target_repository.create(sample_target)
 
         # Assert
         assert isinstance(target_id, str)
@@ -108,7 +108,7 @@ class TestTargetRepositoryCreate:
         )
 
         # Act
-        target_id = target_repository.create(active_target)
+        _ = target_id = target_repository.create(active_target)
 
         # Assert
         created_target = target_repository.get_by_id(target_id)
@@ -133,7 +133,7 @@ class TestTargetRepositoryCreate:
         )
 
         # Act
-        target_id = target_repository.create(minimal_target)
+        _ = target_id = target_repository.create(minimal_target)
 
         # Assert
         assert target_id is not None
@@ -150,7 +150,7 @@ class TestTargetRepositoryRead:
     ) -> None:
         """Should retrieve target by ID."""
         # Arrange
-        target_id = target_repository.create(sample_target)
+        _ = target_id = target_repository.create(sample_target)
 
         # Act
         retrieved_target = target_repository.get_by_id(target_id)
@@ -204,8 +204,8 @@ class TestTargetRepositoryRead:
             created_date=date(2024, 1, 1),
         )
 
-        active_id = target_repository.create(active_target)
-        target_repository.create(inactive_target)
+        _ = active_id = target_repository.create(active_target)
+        _ = target_repository.create(inactive_target)
 
         # Act
         active_targets = target_repository.get_active_by_portfolio("portfolio-id-1")
@@ -228,7 +228,7 @@ class TestTargetRepositoryRead:
             status=TargetStatus("active"),
             created_date=date(2024, 1, 1),
         )
-        target_id = target_repository.create(target)
+        _ = target_id = target_repository.create(target)
 
         # Act
         stock_targets = target_repository.get_active_by_stock("stock-id-1")
@@ -257,8 +257,8 @@ class TestTargetRepositoryRead:
             created_date=date.today(),
         )
 
-        active_id = target_repository.create(target1)
-        target_repository.create(target2)
+        _ = active_id = target_repository.create(target1)
+        _ = target_repository.create(target2)
 
         # Act
         all_active = target_repository.get_all_active()
@@ -276,7 +276,7 @@ class TestTargetRepositoryUpdate:
     ) -> None:
         """Should update existing target successfully."""
         # Arrange
-        target_id = target_repository.create(sample_target)
+        _ = target_id = target_repository.create(sample_target)
         updated_target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -326,7 +326,7 @@ class TestTargetRepositoryUpdate:
     ) -> None:
         """Should update target status."""
         # Arrange
-        target_id = target_repository.create(sample_target)
+        _ = target_id = target_repository.create(sample_target)
 
         # Act
         result = target_repository.update_status(target_id, "hit")
@@ -367,7 +367,7 @@ class TestTargetRepositoryIntegration:
             created_date=date(2024, 1, 1),
             notes=Notes("Lifecycle test"),
         )
-        target_id = target_repository.create(target)
+        _ = target_id = target_repository.create(target)
         assert target_id is not None
 
         # Read
@@ -436,7 +436,7 @@ class TestTargetRepositoryIntegration:
         ]
 
         for target in targets:
-            target_repository.create(target)
+            _ = target_repository.create(target)
 
         # Test get_active_by_portfolio
         active_targets = target_repository.get_active_by_portfolio("portfolio-id-1")
@@ -463,7 +463,7 @@ class TestTargetRepositoryErrorHandling:
                 status=TargetStatus("active"),
                 created_date=date(2024, 1, 1),
             )
-            target_repository.create(invalid_target)
+            _ = target_repository.create(invalid_target)
 
     def test_create_target_with_invalid_status(
         self, target_repository: SqliteTargetRepository
@@ -478,4 +478,4 @@ class TestTargetRepositoryErrorHandling:
                 status=TargetStatus("invalid_status"),  # Invalid status
                 created_date=date(2024, 1, 1),
             )
-            target_repository.create(invalid_target)
+            _ = target_repository.create(invalid_target)

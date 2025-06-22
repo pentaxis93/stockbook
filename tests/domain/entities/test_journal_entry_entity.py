@@ -58,7 +58,7 @@ class TestJournalEntryEntity:
         from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            JournalEntryEntity(
+            _ = JournalEntryEntity(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
                 portfolio_id="",  # Invalid empty string
@@ -69,7 +69,7 @@ class TestJournalEntryEntity:
         from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            JournalEntryEntity(
+            _ = JournalEntryEntity(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
                 stock_id="",  # Invalid empty string
@@ -84,7 +84,7 @@ class TestJournalEntryEntity:
         with pytest.raises(
             ValueError, match="Transaction ID must be a non-empty string"
         ):
-            JournalEntryEntity(
+            _ = JournalEntryEntity(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
                 transaction_id="",  # Invalid empty string
@@ -95,7 +95,7 @@ class TestJournalEntryEntity:
         from src.domain.value_objects import JournalContent
 
         with pytest.raises(ValueError, match="Journal content cannot be empty"):
-            JournalContent("")  # Error happens at JournalContent construction
+            _ = JournalContent("")  # Error happens at JournalContent construction
 
     def test_journal_entry_equality(self) -> None:
         """Should compare journal entries based on business identity (entry_date, content hash)."""
@@ -330,7 +330,7 @@ class TestJournalContent:
         empty_contents = ["", "   ", "\t", "\n"]
         for empty_content in empty_contents:
             with pytest.raises(ValueError, match="Journal content cannot be empty"):
-                JournalContent(empty_content)
+                _ = JournalContent(empty_content)
 
     def test_too_long_journal_content_rejected(self) -> None:
         """Test that excessively long journal content is rejected."""
@@ -340,7 +340,7 @@ class TestJournalContent:
         with pytest.raises(
             ValueError, match="Journal content cannot exceed 10000 characters"
         ):
-            JournalContent(long_content)
+            _ = JournalContent(long_content)
 
     def test_max_length_journal_content_accepted(self) -> None:
         """Test that journal content at max length is accepted."""

@@ -24,18 +24,18 @@ class TestSectorValueObject:
     def test_sector_creation_with_empty_string_raises_error(self) -> None:
         """Test sector creation with empty string raises ValueError."""
         with pytest.raises(ValueError, match="Sector cannot be empty"):
-            Sector("")
+            _ = Sector("")
 
     def test_sector_creation_with_whitespace_only_raises_error(self) -> None:
         """Test sector creation with whitespace-only string raises ValueError."""
         with pytest.raises(ValueError, match="Sector cannot be empty"):
-            Sector("   ")
+            _ = Sector("   ")
 
     def test_sector_creation_with_too_long_value_raises_error(self) -> None:
         """Test sector creation with string exceeding max length raises ValueError."""
         long_sector = "a" * 101
         with pytest.raises(ValueError, match="Sector cannot exceed 100 characters"):
-            Sector(long_sector)
+            _ = Sector(long_sector)
 
     def test_sector_creation_with_max_length_value_succeeds(self) -> None:
         """Test sector creation with exactly max length succeeds."""

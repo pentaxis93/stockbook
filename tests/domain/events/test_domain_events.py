@@ -94,10 +94,12 @@ class TestStockAddedEvent:
         symbol = StockSymbol("AAPL")
 
         with pytest.raises(ValueError, match="Stock name cannot be empty"):
-            StockAddedEvent(stock_symbol=symbol, stock_name="", stock_id=123)
+            _ = StockAddedEvent(stock_symbol=symbol, stock_name="", stock_id=123)
 
         with pytest.raises(ValueError, match="Stock ID must be positive"):
-            StockAddedEvent(stock_symbol=symbol, stock_name="Apple Inc.", stock_id=0)
+            _ = StockAddedEvent(
+                stock_symbol=symbol, stock_name="Apple Inc.", stock_id=0
+            )
 
     def test_stock_added_event_string_representation(self) -> None:
         """Should have meaningful string representation."""

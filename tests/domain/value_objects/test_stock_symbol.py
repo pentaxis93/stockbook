@@ -31,49 +31,49 @@ class TestStockSymbol:
     def test_create_stock_symbol_with_empty_string_raises_error(self) -> None:
         """Should raise error for empty symbol."""
         with pytest.raises(ValueError, match="Stock symbol cannot be empty"):
-            StockSymbol("")
+            _ = StockSymbol("")
 
     def test_create_stock_symbol_with_whitespace_only_raises_error(self) -> None:
         """Should raise error for whitespace-only symbol."""
         with pytest.raises(ValueError, match="Stock symbol cannot be empty"):
-            StockSymbol("   ")
+            _ = StockSymbol("   ")
 
     def test_create_stock_symbol_with_invalid_characters_raises_error(self) -> None:
         """Should raise error for symbols with invalid characters."""
         with pytest.raises(
             ValueError, match="Stock symbol must be between 1 and 5 characters"
         ):
-            StockSymbol("AAPL123")  # Too long takes precedence
+            _ = StockSymbol("AAPL123")  # Too long takes precedence
 
         with pytest.raises(
             ValueError, match="Stock symbol must contain only uppercase letters"
         ):
-            StockSymbol("AA-PL")
+            _ = StockSymbol("AA-PL")
 
         with pytest.raises(
             ValueError, match="Stock symbol must contain only uppercase letters"
         ):
-            StockSymbol("AA.PL")
+            _ = StockSymbol("AA.PL")
 
     def test_create_stock_symbol_with_too_short_symbol_raises_error(self) -> None:
         """Should raise error for symbols that are too short."""
         with pytest.raises(ValueError, match="Stock symbol cannot be empty"):
-            StockSymbol("")
+            _ = StockSymbol("")
 
     def test_create_stock_symbol_with_too_long_symbol_raises_error(self) -> None:
         """Should raise error for symbols that are too long."""
         with pytest.raises(
             ValueError, match="Stock symbol must be between 1 and 5 characters"
         ):
-            StockSymbol("TOOLONG")
+            _ = StockSymbol("TOOLONG")
 
     def test_create_stock_symbol_accepts_valid_lengths(self) -> None:
         """Should accept symbols of valid lengths (1-5 characters)."""
-        StockSymbol("A")  # 1 character
-        StockSymbol("AB")  # 2 characters
-        StockSymbol("ABC")  # 3 characters
-        StockSymbol("AAPL")  # 4 characters
-        StockSymbol("GOOGL")  # 5 characters
+        _ = StockSymbol("A")  # 1 character
+        _ = StockSymbol("AB")  # 2 characters
+        _ = StockSymbol("ABC")  # 3 characters
+        _ = StockSymbol("AAPL")  # 4 characters
+        _ = StockSymbol("GOOGL")  # 5 characters
 
     def test_stock_symbol_equality(self) -> None:
         """Should compare StockSymbol objects for equality."""

@@ -43,17 +43,17 @@ class TestQuantityCreation:
     def test_reject_negative_quantity(self) -> None:
         """Should reject negative quantities in business contexts."""
         with pytest.raises(ValueError, match="Quantity cannot be negative"):
-            Quantity(-10)
+            _ = Quantity(-10)
 
     def test_negative_quantities_not_allowed(self) -> None:
         """Should not allow negative quantities in simplified implementation."""
         with pytest.raises(ValueError, match="Quantity cannot be negative"):
-            Quantity(-10)
+            _ = Quantity(-10)
 
     def test_reject_invalid_value_type(self) -> None:
         """Should reject non-numeric value types."""
         with pytest.raises(TypeError):
-            Quantity("invalid")
+            _ = Quantity("invalid")
 
     def test_precision_handling(self) -> None:
         """Should handle high-precision decimal values."""

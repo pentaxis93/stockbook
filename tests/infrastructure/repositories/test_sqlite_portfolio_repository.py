@@ -187,7 +187,7 @@ class TestPortfolioRepositoryRead:
         )
 
         active_id = portfolio_repository.create(active_portfolio)
-        portfolio_repository.create(inactive_portfolio)
+        _ = portfolio_repository.create(inactive_portfolio)
 
         # Act
         active_portfolios = portfolio_repository.get_all_active()
@@ -209,8 +209,8 @@ class TestPortfolioRepositoryRead:
             name=PortfolioName("Inactive Portfolio"), is_active=False
         )
 
-        portfolio_repository.create(active_portfolio)
-        portfolio_repository.create(inactive_portfolio)
+        _ = portfolio_repository.create(active_portfolio)
+        _ = portfolio_repository.create(inactive_portfolio)
 
         # Act
         all_portfolios = portfolio_repository.get_all()
@@ -280,7 +280,7 @@ class TestPortfolioRepositoryUpdate:
         )
 
         # Act
-        portfolio_repository.update(portfolio_id, partial_update)
+        _ = portfolio_repository.update(portfolio_id, partial_update)
 
         # Assert
         retrieved = portfolio_repository.get_by_id(portfolio_id)
@@ -402,7 +402,7 @@ class TestPortfolioRepositoryIntegration:
         ]
 
         for portfolio in portfolios:
-            portfolio_repository.create(portfolio)
+            _ = portfolio_repository.create(portfolio)
 
         # Test get_all_active
         active_portfolios = portfolio_repository.get_all_active()
@@ -428,7 +428,7 @@ class TestPortfolioRepositoryErrorHandling:
             invalid_portfolio = PortfolioEntity(
                 name=PortfolioName("")
             )  # Empty name should fail
-            portfolio_repository.create(invalid_portfolio)
+            _ = portfolio_repository.create(invalid_portfolio)
 
     def test_database_connection_handling(
         self, portfolio_repository: SqlitePortfolioRepository

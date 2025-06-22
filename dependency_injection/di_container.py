@@ -74,7 +74,7 @@ class DIContainer:
         try:
             # Create singleton provider with auto-wiring
             provider = providers.Singleton(implementation_type)
-            provider.add_args(*self._get_constructor_args(implementation_type))
+            _ = provider.add_args(*self._get_constructor_args(implementation_type))
             setattr(self._container, self._get_provider_name(service_type), provider)
 
             # Track registration
@@ -114,7 +114,7 @@ class DIContainer:
         try:
             # Create factory provider for transient behavior with auto-wiring
             provider = providers.Factory(implementation_type)
-            provider.add_args(*self._get_constructor_args(implementation_type))
+            _ = provider.add_args(*self._get_constructor_args(implementation_type))
             setattr(self._container, self._get_provider_name(service_type), provider)
 
             # Track registration

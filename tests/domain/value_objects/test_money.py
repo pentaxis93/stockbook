@@ -48,7 +48,7 @@ class TestMoneyCreation:
     def test_reject_invalid_amount_type(self) -> None:
         """Should reject non-numeric amount types."""
         with pytest.raises(TypeError):
-            Money("invalid")
+            _ = Money("invalid")
 
     def test_precision_handling(self) -> None:
         """Should handle high-precision decimal amounts by rounding to currency precision."""

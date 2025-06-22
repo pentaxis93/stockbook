@@ -56,7 +56,7 @@ class TestIndustryGroup:
         with pytest.raises(
             ValueError, match="Industry group cannot exceed 100 characters"
         ):
-            IndustryGroup(too_long_industry)
+            _ = IndustryGroup(too_long_industry)
 
     def test_industry_group_equality(self) -> None:
         """Should compare IndustryGroup objects by value."""

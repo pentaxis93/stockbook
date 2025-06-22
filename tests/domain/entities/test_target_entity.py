@@ -80,7 +80,7 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            TargetEntity(
+            _ = TargetEntity(
                 portfolio_id="",  # Invalid empty string
                 stock_id="stock-id-1",
                 pivot_price=Money(Decimal("100.00")),
@@ -94,7 +94,7 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            TargetEntity(
+            _ = TargetEntity(
                 portfolio_id="portfolio-id-1",
                 stock_id="",  # Invalid empty string
                 pivot_price=Money(Decimal("100.00")),
@@ -108,7 +108,9 @@ class TestTargetEntity:
         from src.domain.value_objects import TargetStatus
 
         with pytest.raises(ValueError, match="Target status must be one of"):
-            TargetStatus("invalid_status")  # Error happens at TargetStatus construction
+            _ = TargetStatus(
+                "invalid_status"
+            )  # Error happens at TargetStatus construction
 
     def test_target_equality(self) -> None:
         """Should compare targets based on business identity (portfolio_id, stock_id)."""
@@ -449,4 +451,4 @@ class TestTargetStatus:
         invalid_statuses = ["pending", "unknown", "", "INVALID"]
         for status in invalid_statuses:
             with pytest.raises(ValueError):
-                TargetStatus(status)
+                _ = TargetStatus(status)

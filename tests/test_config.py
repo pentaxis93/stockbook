@@ -359,7 +359,7 @@ class TestConfigEnvironmentOverrides:
         """Test that invalid environment values raise appropriate errors."""
         with patch.dict(os.environ, {"STOCKBOOK_DECIMAL_PLACES": "invalid"}):
             with pytest.raises(ConfigError, match="Invalid integer value"):
-                Config()
+                _ = Config()
 
 
 class TestConfigMethods:

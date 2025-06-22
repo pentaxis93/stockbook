@@ -42,7 +42,7 @@ class SqliteJournalRepository(IJournalRepository):
             ID of the created entry
         """
         with self.db_connection.transaction() as conn:
-            conn.execute(
+            _ = conn.execute(
                 """
                 INSERT INTO journal_entry (id, entry_date, content, stock_id, portfolio_id, transaction_id)
                 VALUES (?, ?, ?, ?, ?, ?)

@@ -46,7 +46,7 @@ class SqlitePortfolioRepository(IPortfolioRepository):
             ValueError: If portfolio data is invalid
         """
         with self.db_connection.transaction() as conn:
-            conn.execute(
+            _ = conn.execute(
                 """
                     INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
                     VALUES (?, ?, ?, ?, ?, ?)

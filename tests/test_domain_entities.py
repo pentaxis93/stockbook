@@ -61,7 +61,7 @@ class TestStockEntity:
     def test_invalid_grade_rejected(self) -> None:
         """Test that invalid grades are rejected"""
         with pytest.raises(ValueError, match="Grade must be one of"):
-            Grade("X")  # Invalid grade, now tested at value object level
+            _ = Grade("X")  # Invalid grade, now tested at value object level
 
     def test_valid_grades_accepted(self) -> None:
         """Test that valid grades A, B, C, D, F are accepted"""
@@ -88,7 +88,7 @@ class TestStockEntity:
         invalid_symbols = ["123", "AA-PL", "TOOLONG", ""]
         for symbol in invalid_symbols:
             with pytest.raises(ValueError):
-                StockSymbol(symbol)
+                _ = StockSymbol(symbol)
 
 
 class TestPortfolioEntity:
@@ -120,7 +120,7 @@ class TestPortfolioEntity:
         from src.domain.value_objects import PortfolioName
 
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
-            PortfolioName("")  # Error happens at value object level
+            _ = PortfolioName("")  # Error happens at value object level
 
     def test_long_name_rejected(self) -> None:
         """Test that excessively long names are rejected"""
@@ -130,7 +130,7 @@ class TestPortfolioEntity:
         with pytest.raises(
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
-            PortfolioName(long_name)  # Error happens at value object level
+            _ = PortfolioName(long_name)  # Error happens at value object level
 
 
 class TestTransactionEntity:
@@ -177,14 +177,14 @@ class TestTransactionEntity:
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
         ):
-            TransactionType("transfer")  # Error happens at value object level
+            _ = TransactionType("transfer")  # Error happens at value object level
 
     def test_invalid_portfolio_id_rejected(self) -> None:
         """Test that invalid portfolio ID is rejected"""
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            TransactionEntity(
+            _ = TransactionEntity(
                 portfolio_id="",
                 stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
@@ -198,7 +198,7 @@ class TestTransactionEntity:
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            TransactionEntity(
+            _ = TransactionEntity(
                 portfolio_id="portfolio-id-1",
                 stock_id="",
                 transaction_type=TransactionType("buy"),
@@ -299,7 +299,7 @@ class TestStockSymbol:
         invalid_symbols = ["123", "AA-PL", "TOOLONG", "", "AA PL"]
         for symbol in invalid_symbols:
             with pytest.raises(ValueError):
-                StockSymbol(symbol)
+                _ = StockSymbol(symbol)
 
 
 class TestSharedKernelValueObjects:
@@ -318,7 +318,7 @@ class TestSharedKernelValueObjects:
     def test_negative_quantity_rejected(self) -> None:
         """Test that negative quantities are rejected"""
         with pytest.raises(ValueError):
-            Quantity(-100)
+            _ = Quantity(-100)
 
     def test_zero_quantity_rejected(self) -> None:
         """Test that zero quantities are rejected"""

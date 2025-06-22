@@ -48,7 +48,7 @@ class SqliteTransactionRepository(ITransactionRepository):
             DatabaseError: If creation fails
         """
         with self.db_connection.transaction() as conn:
-            conn.execute(
+            _ = conn.execute(
                 """
                     INSERT INTO stock_transaction (id, portfolio_id, stock_id, type, quantity, price, transaction_date, notes)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)

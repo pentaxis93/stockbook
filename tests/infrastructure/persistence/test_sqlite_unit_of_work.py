@@ -81,7 +81,7 @@ class TestSqliteUnitOfWork:
         # Act & Assert
         with pytest.raises(RuntimeError):
             with uow:
-                uow.stocks.create(stock)
+                _ = uow.stocks.create(stock)
                 # Simulate an error before commit
                 raise RuntimeError("Simulated error")
 
@@ -181,14 +181,14 @@ class TestSqliteUnitOfWork:
             stock1 = StockEntity(
                 symbol=StockSymbol("AMZN"), company_name=CompanyName("Amazon")
             )
-            uow.stocks.create(stock1)
+            _ = uow.stocks.create(stock1)
 
             # Nested context should work but share same transaction
             with uow:
                 stock2 = StockEntity(
                     symbol=StockSymbol("META"), company_name=CompanyName("Meta")
                 )
-                uow.stocks.create(stock2)
+                _ = uow.stocks.create(stock2)
                 uow.commit()
 
             # Both stocks should be committed
@@ -265,7 +265,7 @@ class TestSqliteUnitOfWork:
                 stock = StockEntity(
                     symbol=StockSymbol("ERR"), company_name=CompanyName("Error Inc.")
                 )
-                uow.stocks.create(stock)
+                _ = uow.stocks.create(stock)
                 uow.commit()
 
     def test_unit_of_work_commit_without_context_manager(self) -> None:
@@ -313,7 +313,7 @@ class TestSqliteUnitOfWork:
 
         # Act
         with uow:
-            uow.stocks.create(stock)
+            _ = uow.stocks.create(stock)
             uow.rollback()
             uow.rollback()  # Second rollback should be safe/no-op
 

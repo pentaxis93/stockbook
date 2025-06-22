@@ -124,12 +124,14 @@ class TestTransactionEntity:
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
         ):
-            TransactionType("transfer")  # Error happens at TransactionType construction
+            _ = TransactionType(
+                "transfer"
+            )  # Error happens at TransactionType construction
 
     def test_create_transaction_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            TransactionEntity(
+            _ = TransactionEntity(
                 portfolio_id="",  # Invalid empty string
                 stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
@@ -141,7 +143,7 @@ class TestTransactionEntity:
     def test_create_transaction_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            TransactionEntity(
+            _ = TransactionEntity(
                 portfolio_id="portfolio-id-1",
                 stock_id="",  # Invalid empty string
                 transaction_type=TransactionType("buy"),
@@ -371,4 +373,4 @@ class TestTransactionType:
         invalid_types = ["transfer", "dividend", "split", "", "INVALID"]
         for invalid_type in invalid_types:
             with pytest.raises(ValueError):
-                TransactionType(invalid_type)
+                _ = TransactionType(invalid_type)

@@ -82,7 +82,7 @@ class TestPortfolioEntity:
     def test_create_portfolio_with_invalid_name_raises_error(self) -> None:
         """Should raise error for invalid portfolio name through PortfolioName value object."""
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
-            PortfolioName("")  # Error happens at PortfolioName construction
+            _ = PortfolioName("")  # Error happens at PortfolioName construction
 
     def test_portfolio_equality(self) -> None:
         """Should compare portfolios based on business identity (name)."""
@@ -275,7 +275,7 @@ class TestPortfolioName:
         empty_names = ["", "   ", "\t", "\n"]
         for empty_name in empty_names:
             with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
-                PortfolioName(empty_name)
+                _ = PortfolioName(empty_name)
 
     def test_too_long_portfolio_names_rejected(self) -> None:
         """Test that excessively long portfolio names are rejected."""
@@ -283,7 +283,7 @@ class TestPortfolioName:
         with pytest.raises(
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
-            PortfolioName(long_name)
+            _ = PortfolioName(long_name)
 
     def test_max_length_portfolio_name_accepted(self) -> None:
         """Test that portfolio name at max length is accepted."""

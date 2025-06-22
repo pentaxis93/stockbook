@@ -48,7 +48,7 @@ class SqliteTargetRepository(ITargetRepository):
             DatabaseError: If creation fails
         """
         with self.db_connection.transaction() as conn:
-            conn.execute(
+            _ = conn.execute(
                 """
                 INSERT INTO target (id, stock_id, portfolio_id, pivot_price, failure_price, notes, status)
                 VALUES (?, ?, ?, ?, ?, ?, ?)

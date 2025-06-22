@@ -56,7 +56,7 @@ class TestCompanyName:
         with pytest.raises(
             ValueError, match="Company name cannot exceed 200 characters"
         ):
-            CompanyName(too_long_name)
+            _ = CompanyName(too_long_name)
 
     def test_company_name_equality(self) -> None:
         """Should compare CompanyName objects by value."""

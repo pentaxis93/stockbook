@@ -36,7 +36,7 @@ def db_connection() -> Iterator[DatabaseConnection]:
     # Create test portfolios and stocks
     with connection.transaction() as conn:
         # Create test portfolio
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
             VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for transactions', 50, 0.02, 1)
@@ -44,7 +44,7 @@ def db_connection() -> Iterator[DatabaseConnection]:
         )
 
         # Create test stock
-        conn.execute(
+        _ = conn.execute(
             """
             INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
             VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
@@ -90,7 +90,7 @@ class TestTransactionRepositoryCreate:
     ) -> None:
         """Should create transaction and return database ID."""
         # Act
-        transaction_id = transaction_repository.create(sample_transaction)
+        _ = transaction_id = transaction_repository.create(sample_transaction)
 
         # Assert
         assert isinstance(transaction_id, str)
@@ -112,7 +112,7 @@ class TestTransactionRepositoryCreate:
         )
 
         # Act
-        transaction_id = transaction_repository.create(buy_transaction)
+        _ = transaction_id = transaction_repository.create(buy_transaction)
 
         # Assert
         created_transaction = transaction_repository.get_by_id(transaction_id)
@@ -138,7 +138,7 @@ class TestTransactionRepositoryCreate:
         )
 
         # Act
-        transaction_id = transaction_repository.create(sell_transaction)
+        _ = transaction_id = transaction_repository.create(sell_transaction)
 
         # Assert
         created_transaction = transaction_repository.get_by_id(transaction_id)
@@ -162,7 +162,7 @@ class TestTransactionRepositoryCreate:
         )
 
         # Act
-        transaction_id = transaction_repository.create(minimal_transaction)
+        _ = transaction_id = transaction_repository.create(minimal_transaction)
 
         # Assert
         assert transaction_id is not None
@@ -181,7 +181,7 @@ class TestTransactionRepositoryRead:
     ) -> None:
         """Should retrieve transaction by ID."""
         # Arrange
-        transaction_id = transaction_repository.create(sample_transaction)
+        _ = transaction_id = transaction_repository.create(sample_transaction)
 
         # Act
         retrieved_transaction = transaction_repository.get_by_id(transaction_id)
@@ -266,7 +266,7 @@ class TestTransactionRepositoryRead:
                 price=Money(Decimal("50.00")),
                 transaction_date=date(2024, 1, i + 1),
             )
-            transaction_repository.create(transaction)
+            _ = transaction_repository.create(transaction)
 
         # Act
         limited_transactions = transaction_repository.get_by_portfolio(
@@ -289,7 +289,7 @@ class TestTransactionRepositoryRead:
             price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
-        transaction_id = transaction_repository.create(transaction)
+        _ = transaction_id = transaction_repository.create(transaction)
 
         # Act
         stock_transactions = transaction_repository.get_by_stock("stock-id-1")
@@ -311,7 +311,7 @@ class TestTransactionRepositoryRead:
             price=Money(Decimal("50.00")),
             transaction_date=date(2024, 1, 1),
         )
-        transaction_id = transaction_repository.create(transaction)
+        _ = transaction_id = transaction_repository.create(transaction)
 
         # Act
         filtered_transactions = transaction_repository.get_by_stock(
@@ -383,7 +383,7 @@ class TestTransactionRepositoryUpdate:
     ) -> None:
         """Should update existing transaction successfully."""
         # Arrange
-        transaction_id = transaction_repository.create(sample_transaction)
+        _ = transaction_id = transaction_repository.create(sample_transaction)
         updated_transaction = TransactionEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -439,7 +439,7 @@ class TestTransactionRepositoryDelete:
     ) -> None:
         """Should delete existing transaction."""
         # Arrange
-        transaction_id = transaction_repository.create(sample_transaction)
+        _ = transaction_id = transaction_repository.create(sample_transaction)
 
         # Act
         result = transaction_repository.delete(transaction_id)
@@ -479,7 +479,7 @@ class TestTransactionRepositoryIntegration:
             transaction_date=date(2024, 1, 1),
             notes=Notes("Lifecycle test"),
         )
-        transaction_id = transaction_repository.create(transaction)
+        _ = transaction_id = transaction_repository.create(transaction)
         assert transaction_id is not None
 
         # Read
@@ -533,7 +533,7 @@ class TestTransactionRepositoryErrorHandling:
                 price=Money(Decimal("50.00")),
                 transaction_date=date.today(),
             )
-            transaction_repository.create(invalid_transaction)
+            _ = transaction_repository.create(invalid_transaction)
 
     def test_create_transaction_with_invalid_type(
         self, transaction_repository: SqliteTransactionRepository
@@ -543,4 +543,4 @@ class TestTransactionRepositoryErrorHandling:
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
         ):
-            TransactionType("invalid")  # Error happens at value object level
+            _ = TransactionType("invalid")  # Error happens at value object level

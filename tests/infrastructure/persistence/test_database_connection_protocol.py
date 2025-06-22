@@ -366,13 +366,13 @@ class TestUnitOfWorkProtocolIntegration:
             uow._portfolios = None  # type: ignore[attr-defined] - Testing internal state
 
             stocks_repo_inside = uow.stocks
-            assert isinstance(  # type: ignore[attr-defined,reportPrivateUsage] - Testing internal connection type
+            assert isinstance(  # Testing internal connection type
                 stocks_repo_inside.db_connection, TransactionalDatabaseConnection  # type: ignore[attr-defined]
             )
 
             # Should be same connection instance across all repositories
             portfolios_repo_inside = uow.portfolios
-            assert (  # type: ignore[attr-defined] - Testing connection sharing
+            assert (  # Testing connection sharing
                 stocks_repo_inside.db_connection.connection  # type: ignore[attr-defined]
                 is portfolios_repo_inside.db_connection.connection  # type: ignore[attr-defined]
             )
