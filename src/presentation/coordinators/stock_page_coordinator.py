@@ -136,27 +136,7 @@ class StockPageCoordinator:
                 return None
 
             if selected_action == "search":
-                st.header("🔍 Search Stocks")
-                search_result = self.get_active_adapter().render_advanced_search_form()  # type: ignore[misc]
-                if search_result and search_result.has_filters:
-                    # Execute search through controller
-                    search_response = self.controller.search_stocks(search_result)  # type: ignore[misc]
-
-                    if isinstance(search_response, ValidationErrorResponse):
-                        self.handle_validation_errors(search_response)  # type: ignore[misc]
-                    elif search_response.success:
-                        st.success(search_response.message)
-                        if search_response.stocks:
-                            # Display search results
-                            self.get_active_adapter().render_stock_dataframe_with_data(
-                                search_response.stocks
-                            )  # type: ignore[misc]
-                        else:
-                            st.info("No stocks found matching your criteria")
-                    else:
-                        st.error(search_response.message)
-
-                return search_result
+                return self._handle_search_action()
 
             # Default to stock list
             return self.get_active_adapter().render_stock_list()  # type: ignore[misc]
@@ -165,6 +145,45 @@ class StockPageCoordinator:
             logger.error(f"Error rendering stock management page: {e}")  # type: ignore[misc]
             st.error("An unexpected error occurred while loading the page")
             return None
+
+    def _handle_search_action(self) -> Optional[Any]:
+        """Handle search action with reduced nesting complexity."""
+        st.header("🔍 Search Stocks")
+        search_result = self.get_active_adapter().render_advanced_search_form()  # type: ignore[misc]
+
+        if not search_result or not search_result.has_filters:
+            return search_result
+
+        search_response = self.controller.search_stocks(search_result)  # type: ignore[misc]
+        self._process_search_response(search_response)
+        return search_result
+
+    def _process_search_response(self, search_response: Any) -> None:
+        """Process search response with simplified control flow."""
+        if isinstance(search_response, ValidationErrorResponse):
+            self.handle_validation_errors(search_response)  # type: ignore[misc]
+            return
+
+        if not search_response.success:
+            st.error(search_response.message)
+            return
+
+        st.success(search_response.message)
+        if search_response.stocks:
+            self.get_active_adapter().render_stock_dataframe_with_data(
+                search_response.stocks
+            )  # type: ignore[misc]
+        else:
+            st.info("No stocks found matching your criteria")
+
+    def _is_valid_stock_detail_response(self, response: Any) -> bool:
+        """Check if response is a valid stock detail response."""
+        return (
+            response is not None
+            and not isinstance(response, ValidationErrorResponse)
+            and response.success
+            and response.stock is not None
+        )
 
     def render_stock_detail_page(
         self, symbol: str
@@ -183,12 +202,7 @@ class StockPageCoordinator:
 
             response = self.adapter.render_stock_detail(symbol)  # type: ignore[misc]
 
-            if (
-                response
-                and not isinstance(response, ValidationErrorResponse)  # type: ignore[misc]
-                and response.success
-                and response.stock
-            ):
+            if self._is_valid_stock_detail_response(response):
                 # Add additional detail sections
                 self._render_stock_detail_sections(response.stock)  # type: ignore[misc]
 

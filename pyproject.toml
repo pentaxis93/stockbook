@@ -84,11 +84,15 @@ enable = [
 # Improve duplicate code detection
 min-similarity-lines = 8  # Improved: reduced from 10 for better duplicate detection
 
-max-args = 12  # Exception classes need context parameters
-max-locals = 5  # Improved: reduced from 6 for cleaner function design
-max-returns = 8  # Allow reasonable branching in business logic
-max-branches = 8  # Improved: reduced from 10 for simpler logic
-max-statements = 15  # Improved: reduced from 20 to encourage smaller methods
+max-args = 8  # Further reduced from 12
+max-locals = 3  # Further reduced from 5
+max-returns = 3  # Significantly reduced from 8
+max-branches = 5  # Further reduced from 8
+max-statements = 10  # Reduced from 15
+max-nested-blocks = 3  # New: limit nesting depth
+max-bool-expr = 3  # New: limit boolean expression complexity
+max-public-methods = 10  # New: force interface segregation
+max-attributes = 7  # New: encourage composition over large classes
 max-positional-arguments = 8  # Domain entities need many fields
 good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
 allowed-redefined-builtins = ["id"]
