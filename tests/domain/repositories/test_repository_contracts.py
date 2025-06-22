@@ -7,16 +7,11 @@ proper abstractions for data persistence operations in the domain layer.
 
 from abc import ABC
 from typing import Any, Dict, List, Optional
-from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from src.domain.entities.journal_entry_entity import JournalEntryEntity
-from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
 from src.domain.entities.portfolio_entity import PortfolioEntity
 from src.domain.entities.stock_entity import StockEntity
-from src.domain.entities.target_entity import TargetEntity
-from src.domain.entities.transaction_entity import TransactionEntity
 from src.domain.repositories.interfaces import (
     IJournalRepository,
     IPortfolioBalanceRepository,
@@ -30,9 +25,7 @@ from src.domain.repositories.interfaces import (
 from src.domain.value_objects.company_name import CompanyName
 from src.domain.value_objects.grade import Grade
 from src.domain.value_objects.industry_group import IndustryGroup
-from src.domain.value_objects.money import Money
 from src.domain.value_objects.portfolio_name import PortfolioName
-from src.domain.value_objects.quantity import Quantity
 from src.domain.value_objects.sector import Sector
 from src.domain.value_objects.stock_symbol import StockSymbol
 
@@ -185,7 +178,7 @@ class MockUnitOfWork(IUnitOfWork):
         self.entered = True
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> Optional[bool]:
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> Optional[bool]:
         if exc_type is not None:
             self.rollback()
 
@@ -310,7 +303,7 @@ class TestStockRepositoryContract:
 
     def test_get_by_symbol_returns_stock_when_exists(self) -> None:
         """Should return stock when querying by existing symbol."""
-        self.repository.create(self.test_stock)
+        _ = self.repository.create(self.test_stock)
         retrieved_stock = self.repository.get_by_symbol(self.test_stock.symbol)
 
         assert retrieved_stock is not None
@@ -328,8 +321,8 @@ class TestStockRepositoryContract:
         stock1 = create_test_stock("AAPL", "A")
         stock2 = create_test_stock("MSFT", "B")
 
-        self.repository.create(stock1)
-        self.repository.create(stock2)
+        _ = self.repository.create(stock1)
+        _ = self.repository.create(stock2)
 
         all_stocks = self.repository.get_all()
 
@@ -346,6 +339,8 @@ class TestStockRepositoryContract:
 
         assert result is True
         retrieved_stock = self.repository.get_by_id(stock_id)
+        assert retrieved_stock is not None
+        assert retrieved_stock.grade is not None
         assert retrieved_stock.grade.value == "B"
 
     def test_update_returns_false_when_stock_not_exists(self) -> None:
@@ -373,7 +368,7 @@ class TestStockRepositoryContract:
 
     def test_exists_by_symbol_returns_true_when_exists(self) -> None:
         """Should return True when stock exists with given symbol."""
-        self.repository.create(self.test_stock)
+        _ = self.repository.create(self.test_stock)
 
         exists = self.repository.exists_by_symbol(self.test_stock.symbol)
 
@@ -393,34 +388,37 @@ class TestStockRepositoryContract:
         stock_a2 = create_test_stock("MSFT", "A")
         stock_b = create_test_stock("GOOGL"[:5], "B")
 
-        self.repository.create(stock_a1)
-        self.repository.create(stock_a2)
-        self.repository.create(stock_b)
+        _ = self.repository.create(stock_a1)
+        _ = self.repository.create(stock_a2)
+        _ = self.repository.create(stock_b)
 
         grade_a_stocks = self.repository.get_by_grade("A")
 
         assert len(grade_a_stocks) == 2
         for stock in grade_a_stocks:
+            assert stock.grade is not None
             assert stock.grade.value == "A"
 
     def test_get_by_industry_group_filters_correctly(self) -> None:
         """Should return only stocks with specified industry group."""
         # All test stocks have "Software" industry group by default
-        self.repository.create(self.test_stock)
+        _ = self.repository.create(self.test_stock)
 
         software_stocks = self.repository.get_by_industry_group("Software")
 
         assert len(software_stocks) == 1
+        assert software_stocks[0].industry_group is not None
         assert software_stocks[0].industry_group.value == "Software"
 
     def test_get_by_sector_filters_correctly(self) -> None:
         """Should return only stocks with specified sector."""
         # All test stocks have "Technology" sector by default
-        self.repository.create(self.test_stock)
+        _ = self.repository.create(self.test_stock)
 
         tech_stocks = self.repository.get_by_sector("Technology")
 
         assert len(tech_stocks) == 1
+        assert tech_stocks[0].sector is not None
         assert tech_stocks[0].sector.value == "Technology"
 
     def test_search_stocks_with_symbol_filter(self) -> None:
@@ -428,8 +426,8 @@ class TestStockRepositoryContract:
         apple_stock = create_test_stock("AAPL", "A")
         microsoft_stock = create_test_stock("MSFT", "A")
 
-        self.repository.create(apple_stock)
-        self.repository.create(microsoft_stock)
+        _ = self.repository.create(apple_stock)
+        _ = self.repository.create(microsoft_stock)
 
         results = self.repository.search_stocks(symbol_filter="AAP")
 
@@ -441,18 +439,19 @@ class TestStockRepositoryContract:
         stock_a = create_test_stock("AAPL", "A")
         stock_b = create_test_stock("MSFT", "B")
 
-        self.repository.create(stock_a)
-        self.repository.create(stock_b)
+        _ = self.repository.create(stock_a)
+        _ = self.repository.create(stock_b)
 
         results = self.repository.search_stocks(symbol_filter="AAP", grade_filter="A")
 
         assert len(results) == 1
         assert results[0].symbol.value == "AAPL"
+        assert results[0].grade is not None
         assert results[0].grade.value == "A"
 
     def test_search_stocks_returns_empty_when_no_matches(self) -> None:
         """Should return empty list when no stocks match criteria."""
-        self.repository.create(self.test_stock)
+        _ = self.repository.create(self.test_stock)
 
         results = self.repository.search_stocks(symbol_filter="NONEX")
 
@@ -491,7 +490,7 @@ class TestPortfolioRepositoryContract:
     def test_get_all_active_returns_only_active_portfolios(self) -> None:
         """Should return only active portfolios."""
         active_portfolio = create_test_portfolio("Active Portfolio")
-        self.repository.create(active_portfolio)
+        _ = self.repository.create(active_portfolio)
 
         active_portfolios = self.repository.get_all_active()
 
@@ -503,8 +502,8 @@ class TestPortfolioRepositoryContract:
         portfolio1 = create_test_portfolio("Portfolio 1")
         portfolio2 = create_test_portfolio("Portfolio 2")
 
-        self.repository.create(portfolio1)
-        self.repository.create(portfolio2)
+        _ = self.repository.create(portfolio1)
+        _ = self.repository.create(portfolio2)
 
         all_portfolios = self.repository.get_all()
 
@@ -678,13 +677,13 @@ class TestRepositoryContractPerformance:
         repository = MockStockRepository()
 
         # Create many stocks
-        stocks = []
+        stocks: List[StockEntity] = []
         for i in range(100):
             # Create valid 5-char symbols using letters only
             symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}"
             stock = create_test_stock(symbol, "A")
             stocks.append(stock)
-            repository.create(stock)
+            _ = repository.create(stock)
 
         # Bulk retrieval should work
         all_stocks = repository.get_all()
@@ -703,12 +702,12 @@ class TestRepositoryContractPerformance:
             # Create AAPL-like stocks (use only letters)
             symbol_a = f"A{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}"
             stock = create_test_stock(symbol_a, "A")
-            repository.create(stock)
+            _ = repository.create(stock)
 
             # Create MSFT-like stocks (use only letters)
             symbol_m = f"M{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}"
             stock = create_test_stock(symbol_m, "B")
-            repository.create(stock)
+            _ = repository.create(stock)
 
         # Search should filter correctly (both A and M symbols contain A)
         a_stocks = repository.search_stocks(symbol_filter="A")
@@ -739,6 +738,8 @@ class TestRepositoryContractPerformance:
             assert success is True
 
             retrieved = repository.get_by_id(stock_id)
+            assert retrieved is not None
+            assert retrieved.grade is not None
             assert retrieved.grade.value == grade
 
 

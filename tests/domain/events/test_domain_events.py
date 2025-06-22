@@ -12,7 +12,6 @@ import pytest
 
 from src.domain.events.base import DomainEvent
 from src.domain.events.stock_events import StockAddedEvent
-from src.domain.value_objects.company_name import CompanyName
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -217,7 +216,6 @@ class TestDomainEventConsistency:
     def test_event_data_consistency(self) -> None:
         """Should maintain data consistency throughout event lifecycle."""
         stock_symbol = StockSymbol("TSLA")
-        company_name = CompanyName("Tesla Inc.")
 
         event = StockAddedEvent(
             stock_symbol=stock_symbol, stock_name="Tesla Inc.", stock_id=1
@@ -232,10 +230,10 @@ class TestDomainEventConsistency:
 
     def test_event_uniqueness_guarantees(self) -> None:
         """Should guarantee event uniqueness through event IDs."""
-        events = []
+        events: List[StockAddedEvent] = []
 
         # Create multiple events
-        for i in range(100):
+        for _ in range(100):
             event = StockAddedEvent(
                 stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
             )
@@ -251,7 +249,7 @@ class TestDomainEventConsistency:
 
     def test_event_temporal_consistency(self) -> None:
         """Should maintain temporal consistency across events."""
-        events = []
+        events: List[StockAddedEvent] = []
 
         # Create events in sequence
         for i in range(10):
@@ -275,7 +273,7 @@ class TestDomainEventPatterns:
 
     def test_event_collection_operations(self) -> None:
         """Should work properly in event collections."""
-        events = []
+        events: List[StockAddedEvent] = []
 
         # Create diverse events
         events.append(
@@ -306,7 +304,7 @@ class TestDomainEventPatterns:
 
     def test_event_filtering_and_querying(self) -> None:
         """Should support event filtering and querying patterns."""
-        events = []
+        events: List[StockAddedEvent] = []
 
         # Create mixed events
         for i in range(20):
@@ -337,7 +335,7 @@ class TestDomainEventPatterns:
 
     def test_event_aggregation_patterns(self) -> None:
         """Should support event aggregation and summary patterns."""
-        events = []
+        events: List[StockAddedEvent] = []
 
         # Create events with timestamps over a time range (span multiple hours)
         base_time = datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
@@ -356,7 +354,7 @@ class TestDomainEventPatterns:
             events.append(event)
 
         # Group events by hour
-        events_by_hour = {}
+        events_by_hour: Dict[int, List[StockAddedEvent]] = {}
         for event in events:
             hour_key = event.occurred_at.hour
             if hour_key not in events_by_hour:
@@ -371,9 +369,9 @@ class TestDomainEventPatterns:
 
     def test_event_handler_simulation(self) -> None:
         """Should simulate event handler processing patterns."""
-        events = []
-        processed_events = []
-        failed_events = []
+        events: List[StockAddedEvent] = []
+        processed_events: List[StockAddedEvent] = []
+        failed_events: List[StockAddedEvent] = []
 
         # Create test events with different symbols
         for i in range(10):
@@ -463,7 +461,7 @@ class TestDomainEventEdgeCases:
 
     def test_event_memory_efficiency(self) -> None:
         """Should maintain memory efficiency with large event volumes."""
-        events = []
+        events: List[StockAddedEvent] = []
 
         # Create large number of events
         for i in range(1000):
@@ -488,8 +486,8 @@ class TestDomainEventEdgeCases:
 
     def test_event_concurrent_creation_simulation(self) -> None:
         """Should handle concurrent-like event creation patterns."""
-        events_batch_1 = []
-        events_batch_2 = []
+        events_batch_1: List[StockAddedEvent] = []
+        events_batch_2: List[StockAddedEvent] = []
 
         # Simulate concurrent batches of event creation
         for i in range(50):
@@ -575,7 +573,7 @@ class TestDomainEventArchitecturalConcerns:
 
         # Event should support metadata attachment (conceptually)
         # This tests the design's extensibility for adding metadata
-        event_data = {
+        event_data: Dict[str, Any] = {
             "event": event,
             "metadata": {
                 "source": "user_input",

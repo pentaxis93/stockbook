@@ -9,7 +9,9 @@ from decimal import Decimal
 from typing import Dict, List, Tuple
 
 from src.domain.entities.stock_entity import StockEntity
-from src.domain.services.portfolio_calculation_service import PortfolioCalculationService
+from src.domain.services.portfolio_calculation_service import (
+    PortfolioCalculationService,
+)
 from src.domain.services.risk_assessment_service import (
     RiskAssessmentConfig,
     RiskAssessmentService,
@@ -198,23 +200,26 @@ class TestRiskAssessmentEdgeCases:
     """Test edge cases and boundary conditions for risk assessment."""
 
     def test_assess_portfolio_risk_empty_portfolio(self) -> None:
-        """Should handle empty portfolio gracefully."""
+        """Should raise error for empty portfolio."""
+        import pytest
+
+        from src.domain.services.exceptions import InsufficientDataError
+
         service = RiskAssessmentService()
         empty_portfolio: List[Tuple[StockEntity, Quantity]] = []
         empty_prices: Dict[str, Money] = {}
 
-        portfolio_risk = service.assess_portfolio_risk(empty_portfolio, empty_prices)
-
-        assert portfolio_risk.overall_risk_level == RiskLevel.HIGH
-        assert portfolio_risk.risk_score == Decimal("100.0")
-        assert "Empty portfolio" in " ".join(portfolio_risk.risk_factors)
+        with pytest.raises(
+            InsufficientDataError, match="Cannot assess risk of empty portfolio"
+        ):
+            _ = service.assess_portfolio_risk(empty_portfolio, empty_prices)
 
     def test_assess_portfolio_risk_single_stock(self) -> None:
         """Should assess single-stock portfolio as very high risk."""
         service = RiskAssessmentService()
-        single_stock = [create_test_stock("SINGLE", 100.00, "A", "Technology")]
-        portfolio = [(single_stock[0], Quantity(100))]
-        prices = {"SINGLE": Money("100.00")}
+        single_stock = create_test_stock("SINGL", 100.00, "A", "Technology")
+        portfolio = [(single_stock, Quantity(100))]
+        prices = {"SINGL": Money("100.00")}
 
         portfolio_risk = service.assess_portfolio_risk(portfolio, prices)
 
@@ -234,7 +239,11 @@ class TestRiskAssessmentEdgeCases:
 
         # Should still assess based on non-zero positions
         assert isinstance(portfolio_risk, RiskAssessment)
-        assert portfolio_risk.overall_risk_level in [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.HIGH]
+        assert portfolio_risk.overall_risk_level in [
+            RiskLevel.LOW,
+            RiskLevel.MEDIUM,
+            RiskLevel.HIGH,
+        ]
 
     def test_assess_portfolio_risk_with_missing_prices(self) -> None:
         """Should handle missing price data appropriately."""
@@ -256,9 +265,9 @@ class TestRiskAssessmentEdgeCases:
     def test_assess_stock_risk_grade_variations(self) -> None:
         """Should assess risk differently based on stock grades."""
         service = RiskAssessmentService()
-        
-        grade_a_stock = create_test_stock("GRADEA", 100.00, "A", "Technology")
-        grade_d_stock = create_test_stock("GRADED", 100.00, "D", "Technology")
+
+        grade_a_stock = create_test_stock("GRADA", 100.00, "A", "Technology")
+        grade_d_stock = create_test_stock("GRADD", 100.00, "D", "Technology")
 
         risk_a = service.assess_stock_risk(grade_a_stock)
         risk_d = service.assess_stock_risk(grade_d_stock)
@@ -271,7 +280,7 @@ class TestRiskAssessmentEdgeCases:
     def test_assess_stock_risk_sector_variations(self) -> None:
         """Should assess risk differently based on sectors."""
         service = RiskAssessmentService()
-        
+
         tech_stock = create_test_stock("TECH", 100.00, "A", "Technology")
         utility_stock = create_test_stock("UTIL", 100.00, "A", "Utilities")
 
@@ -292,13 +301,13 @@ class TestRiskAssessmentIntegration:
         """Should integrate with allocation calculations for comprehensive risk assessment."""
         risk_service = RiskAssessmentService()
         calc_service = PortfolioCalculationService()
-        
+
         portfolio = create_conservative_portfolio()
         prices = create_test_prices(portfolio)
 
         # Get portfolio allocations
         allocations = calc_service.calculate_position_allocations(portfolio, prices)
-        
+
         # Assess portfolio risk
         portfolio_risk = risk_service.assess_portfolio_risk(portfolio, prices)
 
@@ -334,19 +343,20 @@ class TestRiskAssessmentIntegration:
     def test_large_portfolio_risk_assessment_performance(self) -> None:
         """Should handle large portfolios efficiently in risk assessment."""
         service = RiskAssessmentService()
-        
+
         # Create large portfolio with diverse holdings
         large_portfolio: List[Tuple[StockEntity, Quantity]] = []
         prices: Dict[str, Money] = {}
-        
+
         sectors = ["Technology", "Healthcare", "Financial", "Industrial", "Consumer"]
         grades = ["A", "B", "C", "D"]
-        
+
         for i in range(100):  # 100 positions
             sector = sectors[i % len(sectors)]
             grade = grades[i % len(grades)]
-            symbol = f"STOCK{i:03d}"
-            
+            # Create 5-char symbols using letters only
+            symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}{chr(ord('A') + ((i // 17576) % 26))}{chr(ord('A') + ((i // 456976) % 26))}"
+
             stock = create_test_stock(symbol, 50.00 + (i % 100), grade, sector)
             large_portfolio.append((stock, Quantity(10 + (i % 50))))
             prices[symbol] = Money(f"{50.00 + (i % 100):.2f}")
@@ -380,18 +390,18 @@ class TestRiskAssessmentAlgorithms:
     def test_risk_score_calculation_boundaries(self) -> None:
         """Should calculate risk scores within valid boundaries."""
         service = RiskAssessmentService()
-        
+
         # Test various portfolio configurations
         portfolios = [
             create_conservative_portfolio(),
             create_aggressive_portfolio(),
-            create_concentrated_portfolio()
+            create_concentrated_portfolio(),
         ]
-        
+
         for portfolio in portfolios:
             prices = create_test_prices(portfolio)
             risk = service.assess_portfolio_risk(portfolio, prices)
-            
+
             # Risk score should be between 0 and 100
             assert Decimal("0.0") <= risk.risk_score <= Decimal("100.0")
 
@@ -414,27 +424,33 @@ class TestRiskAssessmentAlgorithms:
     def test_diversification_impact_on_risk(self) -> None:
         """Should assess diversification impact on portfolio risk."""
         service = RiskAssessmentService()
-        
+
         # Create portfolios with different diversification levels
-        
+
         # Undiversified: 2 stocks same sector
-        undiversified = []
-        for i in range(2):
-            stock = create_test_stock(f"TECH{i}", 100.00, "A", "Technology")
+        undiversified: List[Tuple[StockEntity, Quantity]] = []
+        tech_symbols = ["TECHA", "TECHB"]
+        for i, symbol in enumerate(tech_symbols):
+            stock = create_test_stock(symbol, 100.00, "A", "Technology")
             undiversified.append((stock, Quantity(50)))
-        
+
         # Diversified: 5 stocks different sectors
-        diversified = []
+        diversified: List[Tuple[StockEntity, Quantity]] = []
         sectors = ["Technology", "Healthcare", "Financial", "Industrial", "Consumer"]
+        div_symbols = ["DIVA", "DIVB", "DIVC", "DIVD", "DIVE"]
         for i, sector in enumerate(sectors):
-            stock = create_test_stock(f"DIV{i}", 100.00, "A", sector)
+            stock = create_test_stock(div_symbols[i], 100.00, "A", sector)
             diversified.append((stock, Quantity(20)))
 
         undiversified_prices = create_test_prices(undiversified)
         diversified_prices = create_test_prices(diversified)
 
-        undiversified_risk = service.assess_portfolio_risk(undiversified, undiversified_prices)
-        diversified_risk = service.assess_portfolio_risk(diversified, diversified_prices)
+        undiversified_risk = service.assess_portfolio_risk(
+            undiversified, undiversified_prices
+        )
+        diversified_risk = service.assess_portfolio_risk(
+            diversified, diversified_prices
+        )
 
         # Diversified portfolio should generally have lower risk
         # Note: Current implementation may be stubbed
@@ -444,27 +460,33 @@ class TestRiskAssessmentAlgorithms:
     def test_position_size_impact_on_risk(self) -> None:
         """Should assess position size concentration impact on risk."""
         service = RiskAssessmentService()
-        
+
         # Create two portfolios: one balanced, one concentrated
-        balanced_portfolio = []
-        concentrated_portfolio = []
-        
+        balanced_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        concentrated_portfolio: List[Tuple[StockEntity, Quantity]] = []
+
         # Balanced: equal positions
-        for i in range(4):
-            stock = create_test_stock(f"BAL{i}", 100.00, "A", "Technology")
+        bal_symbols = ["BALA", "BALB", "BALC", "BALD"]
+        for i, symbol in enumerate(bal_symbols):
+            stock = create_test_stock(symbol, 100.00, "A", "Technology")
             balanced_portfolio.append((stock, Quantity(25)))
-        
+
         # Concentrated: one large position
-        for i in range(4):
-            stock = create_test_stock(f"CON{i}", 100.00, "A", "Technology")
+        con_symbols = ["CONA", "CONB", "CONC", "COND"]
+        for i, symbol in enumerate(con_symbols):
+            stock = create_test_stock(symbol, 100.00, "A", "Technology")
             quantity = Quantity(70) if i == 0 else Quantity(10)
             concentrated_portfolio.append((stock, quantity))
 
         balanced_prices = create_test_prices(balanced_portfolio)
         concentrated_prices = create_test_prices(concentrated_portfolio)
 
-        balanced_risk = service.assess_portfolio_risk(balanced_portfolio, balanced_prices)
-        concentrated_risk = service.assess_portfolio_risk(concentrated_portfolio, concentrated_prices)
+        balanced_risk = service.assess_portfolio_risk(
+            balanced_portfolio, balanced_prices
+        )
+        concentrated_risk = service.assess_portfolio_risk(
+            concentrated_portfolio, concentrated_prices
+        )
 
         # Both should return valid assessments
         assert isinstance(balanced_risk, RiskAssessment)
@@ -480,9 +502,9 @@ class TestRiskAssessmentConfigurationImpact:
         custom_config = RiskAssessmentConfig(
             concentration_threshold=Decimal("0.05"),  # Very strict
             high_volatility_threshold=Decimal("0.20"),
-            high_beta_threshold=Decimal("1.2")
+            high_beta_threshold=Decimal("1.2"),
         )
-        
+
         service = RiskAssessmentService(config=custom_config)
         portfolio = create_conservative_portfolio()
         prices = create_test_prices(portfolio)
@@ -498,16 +520,16 @@ class TestRiskAssessmentConfigurationImpact:
         configs = [
             RiskAssessmentConfig(var_confidence_level=Decimal("0.90")),
             RiskAssessmentConfig(var_confidence_level=Decimal("0.95")),
-            RiskAssessmentConfig(var_confidence_level=Decimal("0.99"))
+            RiskAssessmentConfig(var_confidence_level=Decimal("0.99")),
         ]
-        
+
         portfolio = create_conservative_portfolio()
         prices = create_test_prices(portfolio)
 
         for config in configs:
             service = RiskAssessmentService(config=config)
             risk = service.assess_portfolio_risk(portfolio, prices)
-            
+
             assert isinstance(risk, RiskAssessment)
             # Future enhancement: VaR calculations should reflect confidence level
 
@@ -517,22 +539,22 @@ class TestRiskAssessmentConfigurationImpact:
         permissive_config = RiskAssessmentConfig(
             concentration_threshold=Decimal("0.90"),
             high_volatility_threshold=Decimal("0.90"),
-            high_beta_threshold=Decimal("10.0")
+            high_beta_threshold=Decimal("10.0"),
         )
-        
+
         # Very strict thresholds
         strict_config = RiskAssessmentConfig(
             concentration_threshold=Decimal("0.01"),
             high_volatility_threshold=Decimal("0.01"),
-            high_beta_threshold=Decimal("0.5")
+            high_beta_threshold=Decimal("0.5"),
         )
-        
+
         portfolio = create_conservative_portfolio()
         prices = create_test_prices(portfolio)
 
         for config in [permissive_config, strict_config]:
             service = RiskAssessmentService(config=config)
             risk = service.assess_portfolio_risk(portfolio, prices)
-            
+
             assert isinstance(risk, RiskAssessment)
             assert Decimal("0.0") <= risk.risk_score <= Decimal("100.0")

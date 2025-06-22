@@ -143,7 +143,7 @@ class TestPortfolioValueCalculations:
         prices: Dict[str, Money] = {}  # Missing price for AAPL
 
         with pytest.raises(CalculationError, match="Stock AAPL missing current price"):
-            service.calculate_total_value(portfolio, prices)
+            _ = service.calculate_total_value(portfolio, prices)
 
     def test_calculate_portfolio_value_with_zero_prices(self) -> None:
         """Should handle portfolio with zero-priced stocks."""

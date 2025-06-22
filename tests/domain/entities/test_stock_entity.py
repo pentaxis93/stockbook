@@ -645,6 +645,7 @@ class TestStockEntityLifecycle:
         stock.update_fields(
             grade="A", notes="Upgraded to A after excellent Q1 earnings"
         )
+        assert stock.grade is not None
         assert stock.grade.value == "A"
 
         # Quarter 2: Add sector classification
@@ -653,7 +654,9 @@ class TestStockEntityLifecycle:
             industry_group="Software",
             notes="Added sector classification during portfolio rebalancing",
         )
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Software"
 
         # Quarter 3: Company name change (acquisition/rebrand)
@@ -692,6 +695,9 @@ class TestStockEntityLifecycle:
         }
 
         # Simulate retrieval from persistence
+        assert persisted_data["id"] is not None
+        assert persisted_data["symbol"] is not None
+        assert persisted_data["company_name"] is not None
         restored_stock = StockEntity.from_persistence(
             persisted_data["id"],
             symbol=StockSymbol(persisted_data["symbol"]),
@@ -772,6 +778,7 @@ class TestStockEntityDomainInvariants:
 
         # Valid updates should work
         stock.update_fields(industry_group="Hardware")  # Still valid for Technology
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Hardware"
 
         # Invalid updates should fail and maintain consistency
@@ -781,7 +788,9 @@ class TestStockEntityDomainInvariants:
             )  # Invalid for Technology
 
         # Stock should maintain valid state after failed update
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Hardware"  # Still the last valid value
 
     def test_data_completeness_progression(self) -> None:
@@ -795,16 +804,20 @@ class TestStockEntityDomainInvariants:
 
         # Add sector (still valid state)
         stock.update_fields(sector="Consumer Goods")
+        assert stock.sector is not None
         assert stock.sector.value == "Consumer Goods"
         assert stock.industry_group is None
 
         # Add compatible industry group (still valid state)
         stock.update_fields(industry_group="Automotive")
+        assert stock.sector is not None
         assert stock.sector.value == "Consumer Goods"
+        assert stock.industry_group is not None
         assert stock.industry_group.value == "Automotive"
 
         # Change to incompatible sector should clear industry group
         stock.update_fields(sector="Technology")
+        assert stock.sector is not None
         assert stock.sector.value == "Technology"
         assert stock.industry_group is None  # Cleared automatically
 
@@ -917,17 +930,17 @@ class TestStockEntityConcurrencyScenarios:
             grade=Grade("B"),
         )
 
-        original_grade = stock.grade.value
-
         # Apply same update multiple times
         for _ in range(3):
             stock.update_fields(grade="A", notes="Upgraded rating")
 
+        assert stock.grade is not None
         assert stock.grade.value == "A"
         assert "Upgraded rating" in stock.notes.value
 
         # Apply update with same values (should be idempotent)
         stock.update_fields(grade="A", notes="Upgraded rating")
+        assert stock.grade is not None
         assert stock.grade.value == "A"
 
     def test_stock_state_consistency_after_partial_failures(self) -> None:
@@ -943,8 +956,11 @@ class TestStockEntityConcurrencyScenarios:
 
         # Capture original state
         original_name = stock.company_name.value
+        assert stock.sector is not None
         original_sector = stock.sector.value
+        assert stock.industry_group is not None
         original_industry = stock.industry_group.value
+        assert stock.grade is not None
         original_grade = stock.grade.value
         original_notes = stock.notes.value
 
@@ -960,8 +976,11 @@ class TestStockEntityConcurrencyScenarios:
 
         # Verify all original values are preserved (atomic update failure)
         assert stock.company_name.value == original_name
+        assert stock.sector is not None
         assert stock.sector.value == original_sector
+        assert stock.industry_group is not None
         assert stock.industry_group.value == original_industry
+        assert stock.grade is not None
         assert stock.grade.value == original_grade
         assert stock.notes.value == original_notes
 
