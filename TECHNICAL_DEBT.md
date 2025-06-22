@@ -4,6 +4,23 @@ This document tracks temporary implementations, architectural compromises, and t
 
 ## High Priority (Blocking Clean Architecture Completion)
 
+### 0. Strategic Streamlit Type Ignores (NEW - 2025-06-21)
+- **Issue**: Broad `# type: ignore` statements added to Streamlit UI files during type safety improvements
+- **Reason**: Dev team plans to replace Streamlit with different UI framework - investing in perfect Streamlit typing is wasteful
+- **Impact**: Temporary reduction in type safety for UI layer only (business logic remains fully typed)
+- **Files Affected**:
+  - `src/presentation/adapters/streamlit_stock_adapter.py` 
+  - `src/presentation/adapters/streamlit_ui_operations.py`
+  - `tests/presentation/adapters/test_streamlit_stock_adapter.py`
+- **Documentation**: Clear TODO comments added explaining cleanup requirements
+- **MANDATORY CLEANUP when migrating UI framework**:
+  1. Remove all `# type: ignore[import-untyped]` and `# type: ignore[misc]` statements
+  2. Replace Streamlit-specific code with new UI framework implementation  
+  3. Preserve clean controller interfaces (they should work unchanged)
+  4. Add proper typing for new UI framework
+- **Strategic Value**: Allows team to achieve 60%+ type error elimination while focusing on permanent business logic
+- **Review Date**: When UI framework migration begins
+
 ### 1. ✅ RESOLVED: Enhanced Pylint Configuration (COMPLETED - 2025-06-21)
 - **Achievement**: Successfully implemented significantly stricter pylint rules for better code quality
 - **Improvements Made**:
