@@ -55,6 +55,6 @@ class DomainEvent:
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"{self.__class__.__name__}(event_id='{self.event_id}', "
+            f"{self.__class__.__name__}(event_id={self.event_id!r}, "
             f"occurred_at={self.occurred_at.isoformat()})"
         )

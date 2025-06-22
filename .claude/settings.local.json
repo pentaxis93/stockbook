@@ -182,7 +182,27 @@
       "Bash(PYTHONPATH=. pylint -j 0 --persistent=yes --disable=\"too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,too-many-arguments,too-many-positional-arguments,fixme,duplicate-code,import-outside-toplevel,broad-exception-caught,missing-class-docstring,consider-using-join,reimported\" --allowed-redefined-builtins=id --max-args=10 --max-locals=12 --max-returns=8 --max-branches=15 --max-statements=35 --docstring-min-length=10 src/presentation/controllers/stock_controller.py)",
       "Bash(PYTHONPATH=. pylint:*)",
       "mcp__serena__insert_before_symbol",
-      "Bash(pre-commit run:*)"
+      "Bash(pre-commit run:*)",
+      "Bash(mypy:*)",
+      "Bash(flake8:*)",
+      "Bash(bandit:*)",
+      "Bash(safety check)",
+      "Bash(safety scan)",
+      "Bash(pip-audit:*)",
+      "mcp__serena__initial_instructions",
+      "mcp__serena__check_onboarding_performed",
+      "mcp__serena__find_file",
+      "mcp__serena__read_file",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__replace_regex",
+      "Bash(PYTHONPATH=. python -c:*)",
+      "mcp__serena__get_symbols_overview",
+      "Bash(PYTHONPATH=. pytest tests/infrastructure/persistence/test_sqlite_unit_of_work.py -v)",
+      "Bash(PYTHONPATH=. pytest tests/presentation/view_models/ -v)",
+      "Bash(PYTHONPATH=. pytest tests/presentation/view_models/ tests/infrastructure/persistence/test_sqlite_unit_of_work.py -v)",
+      "Bash(PYTHONPATH=. pytest tests/infrastructure/persistence/test_database_connection_protocol.py::TestUnitOfWorkProtocolIntegration::test_unit_of_work_transaction_isolation -v)",
+      "mcp__serena__find_referencing_symbols"
     ],
     "deny": []
   }

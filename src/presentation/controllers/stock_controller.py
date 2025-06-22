@@ -235,7 +235,7 @@ class StockController:
                 message = f"Retrieved {len(stock_view_models)} stocks"
             elif filter_count == 1:
                 filter_name, filter_value = next(iter(active_filters.items()))
-                message = f"Retrieved {len(stock_view_models)} stocks with {filter_name} containing '{filter_value}'"
+                message = f"Retrieved {len(stock_view_models)} stocks with {filter_name} containing {filter_value!r}"
             else:
                 message = f"Retrieved {len(stock_view_models)} stocks matching {filter_count} filters"
 

@@ -135,4 +135,4 @@ class TransactionEntity(BaseEntity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"TransactionEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, type='{self._transaction_type.value}', quantity={self._quantity.value}, price={self._price})"
+        return f"TransactionEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, type={self._transaction_type.value!r}, quantity={self._quantity.value}, price={self._price})"

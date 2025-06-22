@@ -8,8 +8,7 @@ ignore =
     E501,
     # Bugbear line length - conflicts with black
     B950,
-    # String formatting - can be addressed in future commits
-    B907,
+
     # Line break before binary operator - black prefers this style
     W503,
     # Whitespace before ':' - conflicts with black formatting  

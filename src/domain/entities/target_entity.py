@@ -149,4 +149,4 @@ class TargetEntity(BaseEntity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"TargetEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, status='{self._status.value}')"
+        return f"TargetEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, status={self._status.value!r})"

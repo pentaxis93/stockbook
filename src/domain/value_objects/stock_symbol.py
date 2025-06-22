@@ -77,7 +77,7 @@ class StockSymbol:
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"StockSymbol('{self.value}')"
+        return f"StockSymbol({self.value!r})"
 
     @classmethod
     def normalize(cls, symbol: str) -> str:

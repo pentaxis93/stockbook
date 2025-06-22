@@ -87,7 +87,7 @@ class SectorIndustryService:
         if sector not in self.SECTOR_INDUSTRY_MAPPING:
             available_sectors = ", ".join(self.get_available_sectors())
             raise ValueError(
-                f"Invalid sector '{sector}'. Available sectors: {available_sectors}"
+                f"Invalid sector {sector!r}. Available sectors: {available_sectors}"
             )
 
         return self.SECTOR_INDUSTRY_MAPPING[sector]
@@ -128,7 +128,7 @@ class SectorIndustryService:
             valid_industries = self.get_industry_groups_for_sector(sector)
             valid_industries_str = ", ".join(valid_industries)
             raise ValueError(
-                f"Industry group '{industry_group}' is not valid for sector '{sector}'. "
+                f"Industry group {industry_group!r} is not valid for sector {sector!r}. "
                 + f"Valid industry groups for this sector: {valid_industries_str}"
             )
 
@@ -156,6 +156,6 @@ class SectorIndustryService:
 
         available_industries = ", ".join(sorted(all_industries))
         raise ValueError(
-            f"Industry group '{industry_group}' not found in any sector. "
+            f"Industry group {industry_group!r} not found in any sector. "
             + f"Available industry groups: {available_industries}"
         )

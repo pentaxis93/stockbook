@@ -231,8 +231,8 @@ class DatabaseConnection(IDatabaseConnection):
 
     def __str__(self) -> str:
         """String representation of the database connection."""
-        return f"DatabaseConnection(path='{self.database_path}')"
+        return f"DatabaseConnection(path={self.database_path!r})"
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"DatabaseConnection(database_path='{self.database_path}', timeout={self.timeout})"
+        return f"DatabaseConnection(database_path={self.database_path!r}, timeout={self.timeout})"

@@ -68,12 +68,12 @@ class StockAddedEvent(DomainEvent):
 
     def __str__(self) -> str:
         """String representation for display."""
-        return f"StockAddedEvent(symbol={self.stock_symbol}, name='{self.stock_name}')"
+        return f"StockAddedEvent(symbol={self.stock_symbol}, name={self.stock_name!r})"
 
     def __repr__(self) -> str:
         """Developer representation."""
         return (
             f"StockAddedEvent(stock_symbol={self.stock_symbol!r}, "
-            f"stock_name='{self.stock_name}', stock_id={self.stock_id}, "
+            f"stock_name={self.stock_name!r}, stock_id={self.stock_id}, "
             f"occurred_at={self.occurred_at.isoformat()})"
         )
