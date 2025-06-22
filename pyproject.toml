@@ -71,6 +71,16 @@ disable = [
     # "raise-missing-from",  # Now enabled for better exception chaining
 ]
 
+# Enable more checks for better code quality
+enable = [
+    "useless-suppression",  # Find unnecessary pylint disables
+    "use-implicit-booleaness-not-comparison",
+    "use-implicit-booleaness-not-len",
+    "unnecessary-comprehension",
+    "unnecessary-dict-index-lookup",
+    "unnecessary-list-index-lookup",
+]
+
 # Improve duplicate code detection
 min-similarity-lines = 8  # Improved: reduced from 10 for better duplicate detection
 
