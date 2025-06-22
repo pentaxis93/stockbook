@@ -42,6 +42,11 @@ class RiskAssessmentService:
     """
 
     def __init__(self, config: Optional[RiskAssessmentConfig] = None):
+        """Initialize risk assessment service with optional configuration.
+
+        Args:
+            config: Configuration settings for risk assessment, uses defaults if None
+        """
         self.config = config or RiskAssessmentConfig()
 
     def assess_stock_risk(self, stock: StockEntity) -> RiskAssessment:

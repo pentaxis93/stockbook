@@ -186,6 +186,19 @@ PYDOCSTYLE_TEMP="/tmp/pydocstyle_$$"
 } &
 PYDOCSTYLE_PID=$!
 
+echo "Starting docstr-coverage docstring coverage analysis..."
+DOCSTRCOVERAGE_TEMP="/tmp/docstrcoverage_$$"
+{
+    if docstr-coverage src/ --fail-under 100.0 --skip-magic --percentage-only > "$DOCSTRCOVERAGE_TEMP" 2>&1; then
+        echo "✅ Docstr-coverage docstring coverage check passed ($(cat "$DOCSTRCOVERAGE_TEMP")%)" >> "$DOCSTRCOVERAGE_TEMP"
+        echo "0" > "${DOCSTRCOVERAGE_TEMP}.exit"
+    else
+        echo "❌ Docstr-coverage found insufficient docstring coverage. Add missing docstrings to meet 100% threshold." >> "$DOCSTRCOVERAGE_TEMP"
+        echo "1" > "${DOCSTRCOVERAGE_TEMP}.exit"
+    fi
+} &
+DOCSTRCOVERAGE_PID=$!
+
 echo "Running security checks..."
 BANDIT_TEMP="/tmp/bandit_$$"
 {
@@ -282,6 +295,13 @@ cat "$PYDOCSTYLE_TEMP"
 PYDOCSTYLE_EXIT=$(cat "${PYDOCSTYLE_TEMP}.exit")
 rm -f "$PYDOCSTYLE_TEMP" "${PYDOCSTYLE_TEMP}.exit"
 
+# Wait for docstr-coverage and display results
+echo "Waiting for docstr-coverage docstring coverage analysis to complete..."
+wait $DOCSTRCOVERAGE_PID
+cat "$DOCSTRCOVERAGE_TEMP"
+DOCSTRCOVERAGE_EXIT=$(cat "${DOCSTRCOVERAGE_TEMP}.exit")
+rm -f "$DOCSTRCOVERAGE_TEMP" "${DOCSTRCOVERAGE_TEMP}.exit"
+
 # Wait for security tools and display results
 echo "Waiting for bandit security scan to complete..."
 wait $BANDIT_PID
@@ -297,7 +317,7 @@ PIPAUDIT_EXIT=$(cat "${PIPAUDIT_TEMP}.exit")
 rm -f "$PIPAUDIT_TEMP" "${PIPAUDIT_TEMP}.exit"
 
 # Check all results
-if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$PYDOCSTYLE_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
+if [ "$HAS_PYLINT_ERRORS" = "1" ] || [ "$PYRIGHT_EXIT" != "0" ] || [ "$MYPY_EXIT" != "0" ] || [ "$PYTEST_EXIT" != "0" ] || [ "$FLAKE8_EXIT" != "0" ] || [ "$IMPORTLINTER_EXIT" != "0" ] || [ "$PYDOCSTYLE_EXIT" != "0" ] || [ "$DOCSTRCOVERAGE_EXIT" != "0" ] || [ "$BANDIT_EXIT" != "0" ] || [ "$PIPAUDIT_EXIT" != "0" ]; then
     echo "❌ One or more quality checks failed. Please fix the issues before committing."
     exit 1
 fi

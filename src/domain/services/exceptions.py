@@ -18,6 +18,12 @@ class DomainServiceError(Exception):
     """
 
     def __init__(self, message: str, context: Optional[Dict[str, Any]] = None):
+        """Initialize domain service error with message and optional context.
+
+        Args:
+            message: Error message describing the problem
+            context: Optional dictionary with additional error context
+        """
         self.message = message
         self.context = context or {}
         super().__init__(message)
@@ -32,6 +38,13 @@ class ValidationError(DomainServiceError):
     """
 
     def __init__(self, message: str, field: Optional[str] = None, value: Any = None):
+        """Initialize validation error with field and value context.
+
+        Args:
+            message: Validation error message
+            field: Name of the field that failed validation
+            value: Value that failed validation
+        """
         context: Dict[str, Any] = {}
         if field:
             context["field"] = field
@@ -49,6 +62,12 @@ class CalculationError(DomainServiceError):
     """
 
     def __init__(self, message: str, operation: Optional[str] = None):
+        """Initialize calculation error with operation context.
+
+        Args:
+            message: Calculation error message
+            operation: Name of the calculation operation that failed
+        """
         context: Dict[str, Any] = {"operation": operation} if operation else {}
         super().__init__(message, context)
 
@@ -62,5 +81,11 @@ class InsufficientDataError(DomainServiceError):
     """
 
     def __init__(self, message: str, required_fields: Optional[List[str]] = None):
+        """Initialize insufficient data error with required fields context.
+
+        Args:
+            message: Error message describing missing data
+            required_fields: List of field names that are required but missing
+        """
         context: Dict[str, Any] = {"required_fields": required_fields or []}
         super().__init__(message, context)

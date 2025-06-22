@@ -41,6 +41,11 @@ class PortfolioCalculationService:
     """
 
     def __init__(self, config: Optional[PortfolioCalculationConfig] = None):
+        """Initialize portfolio calculation service with optional configuration.
+
+        Args:
+            config: Configuration settings for portfolio calculations, uses defaults if None
+        """
         self.config = config or PortfolioCalculationConfig()
 
     def calculate_total_value(

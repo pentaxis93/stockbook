@@ -353,4 +353,11 @@ layers = [
 convention = "google"
 add-ignore = ["D100", "D104"]  # Module and package docstrings
 match-dir = "^(?!tests|migrations|\\.)"
-
+[tool.docstr-coverage]
+# Configuration for docstr-coverage
+fail-under = 100.0  # Require 100% docstring coverage
+skip-magic = false  # Include magic methods (except __init__)
+skip-file-doc = false  # Include module docstrings  
+skip-init = false  # Include __init__ method docstrings for comprehensive coverage
+skip-class-def = false  # Include class definition docstrings
+skip-private = false  # Include private method docstrings

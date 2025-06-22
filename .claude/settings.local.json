@@ -206,7 +206,13 @@
       "mcp__serena__think_about_task_adherence",
       "mcp__serena__insert_after_symbol",
       "mcp__serena__execute_shell_command",
-      "Bash(lint-imports)"
+      "Bash(lint-imports)",
+      "Bash(pydocstyle:*)",
+      "Bash(interrogate:*)",
+      "Bash(pip show:*)",
+      "Bash(pip index versions:*)",
+      "Bash(docstr-coverage:*)",
+      "Bash(pip uninstall:*)"
     ],
     "deny": []
   }
