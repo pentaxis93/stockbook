@@ -270,8 +270,3 @@ typeCheckingMode = "strict"
 # Set python path to include project root for import resolution
 pythonPath = ["."]
 
-# REASONABLE configuration for TEST files - matches pylint.tests philosophy
-[[tool.pyright.executionEnvironments]]
-root = "tests"
-typeCheckingMode = "standard"
-extraPaths = ["."]
