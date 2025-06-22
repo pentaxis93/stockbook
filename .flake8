@@ -36,34 +36,10 @@ exclude =
     dist,
     build
 
-# Enable specific checks we want alongside cognitive complexity
-select = 
-    # Bugbear: likely bugs and design problems
-    B,
-    # Comprehensions: list/dict/set comprehension improvements
-    C,
-    # PEP 8 errors (except those we ignore above)
-    E,
-    # PyFlakes errors (undefined names, unused imports, etc.)
-    F,
-    # PEP 8 warnings (except those we ignore above) 
-    W,
-    # Print statement usage
-    T4,
-    # Bugbear opinionated warnings
-    B9,
-    # McCabe complexity (complement to cognitive complexity)
-    C90,
-    # Security issues (bandit)
-    S,
-    # Code simplification suggestions
-    SIM,
-    # Cognitive complexity violations
-    CCR001
 
 # McCabe complexity limit (lower than cognitive complexity)
 max-complexity = 8
 
 # Per-file ignores
 per-file-ignores = 
-    tests/*:S101
+    tests/*:S101,B018,SIM117

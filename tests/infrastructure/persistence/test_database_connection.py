@@ -5,6 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the database connection management.
 """
 
+import contextlib
 import os
 import sqlite3
 import tempfile
@@ -223,7 +224,7 @@ class TestDatabaseConnection:
         db_conn.initialize_schema()
 
         # Act - transaction that fails
-        try:
+        with contextlib.suppress(sqlite3.IntegrityError):
             with db_conn.get_connection() as conn:
                 cursor = conn.cursor()
                 _ = cursor.execute(
@@ -240,8 +241,6 @@ class TestDatabaseConnection:
                     ("ROLL1", "Rollback Duplicate"),
                 )
                 conn.commit()
-        except sqlite3.IntegrityError:
-            pass  # Expected error
 
         # Assert - only first record should exist
         with db_conn.get_connection() as conn:
@@ -289,7 +288,7 @@ class TestDatabaseConnection:
         invalid_path = "/nonexistent/directory/database.db"
 
         # Act & Assert
-        with pytest.raises(Exception):  # Could be various exceptions depending on OS
+        with pytest.raises((OSError, sqlite3.OperationalError, PermissionError)):
             db_conn = DatabaseConnection(invalid_path)
             db_conn.initialize_schema()
 

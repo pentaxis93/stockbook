@@ -163,7 +163,7 @@ class TestStockPageCoordinator:
         )
 
         # Act
-        _result = self.coordinator.render_stock_management_page()
+        _ = self.coordinator.render_stock_management_page()
 
         # Assert
         self.mock_adapter.render_sidebar_navigation.assert_called_once()
@@ -176,21 +176,21 @@ class TestStockPageCoordinator:
             StockListResponse.create_success([], "No stocks")
         )
 
-        _result = self.coordinator.render_stock_management_page()
+        _ = self.coordinator.render_stock_management_page()
         self.mock_presentation_adapter.render_stock_list.assert_called_once()
 
         # Test "create" action - should use the active adapter (presentation adapter)
         self.mock_adapter.render_sidebar_navigation.return_value = "create"
         self.mock_presentation_adapter.render_create_stock_form.return_value = None
 
-        _result = self.coordinator.render_stock_management_page()
+        _ = self.coordinator.render_stock_management_page()
         self.mock_presentation_adapter.render_create_stock_form.assert_called()
 
         # Test "search" action - should use the active adapter (presentation adapter)
         self.mock_adapter.render_sidebar_navigation.return_value = "search"
         self.mock_presentation_adapter.render_advanced_search_form.return_value = None
 
-        _result = self.coordinator.render_stock_management_page()
+        _ = self.coordinator.render_stock_management_page()
         self.mock_presentation_adapter.render_advanced_search_form.assert_called()
 
     @patch("streamlit.header")

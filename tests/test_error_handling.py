@@ -183,15 +183,14 @@ class TestErrorLogger:
         logger = ErrorLogger(log_file=temp_log_file)
         error = StockBookError("Test error")
 
-        _before_time = datetime.now()
+        before_time = datetime.now()
         logger.log_error(error)
-        _after_time = datetime.now()
 
         with open(temp_log_file, "r", encoding="utf-8") as f:
             log_content = f.read()
 
         # Check that timestamp is in reasonable range
-        assert str(_before_time.year) in log_content
+        assert str(before_time.year) in log_content
 
     def test_error_logger_with_user_context(self, temp_log_file: Path) -> None:
         """Test logging with user context information."""
@@ -398,15 +397,14 @@ class TestMessageSystem:
         """Test messages with auto-dismiss timer."""
         message_system = MessageSystem()
 
-        with patch("time.sleep") as mock_sleep:
-            with patch("streamlit.empty") as mock_empty:
-                container = MagicMock()
-                mock_empty.return_value = container
+        with patch("time.sleep") as mock_sleep, patch("streamlit.empty") as mock_empty:
+            container = MagicMock()
+            mock_empty.return_value = container
 
-                message_system.success("Saved!", auto_dismiss=2.0)
+            message_system.success("Saved!", auto_dismiss=2.0)
 
-                mock_sleep.assert_called_with(2.0)
-                container.empty.assert_called_once()
+            mock_sleep.assert_called_with(2.0)
+            container.empty.assert_called_once()
 
     def test_message_queue_functionality(self) -> None:
         """Test message queueing and batch display."""
@@ -418,14 +416,14 @@ class TestMessageSystem:
 
         assert len(message_system.message_queue) == 3
 
-        with patch("streamlit.success") as mock_success:
-            with patch("streamlit.info") as mock_info:
-                with patch("streamlit.warning") as mock_warning:
-                    message_system.display_queued_messages()
+        with patch("streamlit.success") as mock_success, patch(
+            "streamlit.info"
+        ) as mock_info, patch("streamlit.warning") as mock_warning:
+            message_system.display_queued_messages()
 
-                    mock_success.assert_called_once_with("First message")
-                    mock_info.assert_called_once_with("Second message")
-                    mock_warning.assert_called_once_with("Third message")
+            mock_success.assert_called_once_with("First message")
+            mock_info.assert_called_once_with("Second message")
+            mock_warning.assert_called_once_with("Third message")
 
         assert len(message_system.message_queue) == 0
 
@@ -534,28 +532,25 @@ class TestErrorHandlingIntegration:
     def test_full_error_handling_workflow(self) -> None:
         """Test complete error handling workflow from error to user message."""
         # Create error handling components
-        _logger = ErrorLogger()
-        _mapper = ErrorMessageMapper()
         boundary = StreamlitErrorBoundary()
-        _recovery = ErrorRecovery()
+        recovery = ErrorRecovery()
 
         # Create an error
         error = ValidationError("Invalid symbol format", field="symbol", value="123")
 
         # Test the full workflow
         with patch("streamlit.error") as mock_error:
-            with patch("streamlit.info") as _mock_info:
-                # Handle the error
-                boundary.handle_error(error)
+            # Handle the error
+            boundary.handle_error(error)
 
-                # Should display user-friendly error
-                mock_error.assert_called_once()
+            # Should display user-friendly error
+            mock_error.assert_called_once()
 
-                # Get recovery suggestions
-                suggestions = _recovery.get_suggestions(error)
+            # Get recovery suggestions
+            suggestions = recovery.get_suggestions(error)
 
-                # Should have suggestions
-                assert len(suggestions) > 0
+            # Should have suggestions
+            assert len(suggestions) > 0
 
     def test_error_context_preservation(self) -> None:
         """Test that error context is preserved through the handling pipeline."""

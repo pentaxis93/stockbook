@@ -89,7 +89,7 @@ class TestStockSymbol:
         symbol = StockSymbol("AAPL")
         assert symbol != "AAPL"
         assert symbol != 123
-        assert symbol != None
+        assert symbol is not None
 
     def test_stock_symbol_hash(self) -> None:
         """Should be hashable for use in sets/dicts."""
@@ -134,11 +134,11 @@ class TestStockSymbol:
 
     def test_stock_symbol_is_valid_class_method(self) -> None:
         """Should provide class method to validate symbols without creating instance."""
-        assert StockSymbol.is_valid("AAPL") == True
-        assert StockSymbol.is_valid("aapl") == True  # Case insensitive
-        assert StockSymbol.is_valid("AAPL123") == False
-        assert StockSymbol.is_valid("") == False
-        assert StockSymbol.is_valid("TOOLONG") == False
+        assert StockSymbol.is_valid("AAPL") is True
+        assert StockSymbol.is_valid("aapl") is True  # Case insensitive
+        assert StockSymbol.is_valid("AAPL123") is False
+        assert StockSymbol.is_valid("") is False
+        assert StockSymbol.is_valid("TOOLONG") is False
 
     def test_stock_symbol_normalize_class_method(self) -> None:
         """Should provide class method to normalize symbol format."""

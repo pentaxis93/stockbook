@@ -391,7 +391,7 @@ class TestStreamlitStockAdapter:
 
         # Act & Assert - Should not raise exception
         with patch("streamlit.error") as mock_error:
-            _result = self.adapter.render_stock_list()
+            _ = self.adapter.render_stock_list()
             mock_error.assert_called_once()
             assert "An unexpected error occurred" in mock_error.call_args[0][0]
 
@@ -420,7 +420,7 @@ class TestStreamlitStockAdapter:
         # Arrange
         with patch("streamlit.error") as mock_error:
             # Act
-            _result = self.adapter.render_stock_detail("")  # Empty symbol
+            _ = self.adapter.render_stock_detail("")  # Empty symbol
 
             # Assert
             mock_error.assert_called_once()

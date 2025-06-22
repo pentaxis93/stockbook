@@ -102,6 +102,6 @@ class TestNotes:
         notes_empty = Notes("")
         notes_whitespace = Notes("   ")
 
-        assert notes_with_content.has_content() == True
-        assert notes_empty.has_content() == False
-        assert notes_whitespace.has_content() == False
+        assert notes_with_content.has_content() is True
+        assert notes_empty.has_content() is False
+        assert notes_whitespace.has_content() is False

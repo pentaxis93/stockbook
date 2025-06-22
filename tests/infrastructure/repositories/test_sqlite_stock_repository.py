@@ -6,6 +6,7 @@ of the concrete repository implementation.
 """
 
 import os
+import sqlite3
 import tempfile
 
 import pytest
@@ -335,7 +336,7 @@ class TestSqliteStockRepository:
         )
 
         # Act & Assert
-        with pytest.raises(Exception):  # Should raise some database-related error
+        with pytest.raises(sqlite3.Error):  # Should raise some database-related error
             _ = invalid_repository.create(stock)
 
     def test_repository_preserves_identity(self) -> None:

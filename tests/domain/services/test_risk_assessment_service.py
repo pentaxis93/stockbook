@@ -17,7 +17,6 @@ from src.domain.services.value_objects import (
     RiskAssessment,
     RiskLevel,
 )
-from src.domain.value_objects import Money, Quantity
 from src.domain.value_objects.company_name import CompanyName
 from src.domain.value_objects.grade import Grade
 from src.domain.value_objects.industry_group import IndustryGroup

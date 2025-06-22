@@ -74,7 +74,7 @@ class TestGradeValueObject:
         grade = Grade("A")
         assert grade != "A"
         assert grade != 123
-        assert grade != None
+        assert grade is not None
 
     def test_grade_hash(self) -> None:
         """Test grade can be used as dictionary key."""

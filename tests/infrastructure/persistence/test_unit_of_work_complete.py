@@ -2,6 +2,7 @@
 Test the complete Unit of Work implementation with all repositories.
 """
 
+import contextlib
 import os
 import tempfile
 from pathlib import Path
@@ -93,7 +94,7 @@ def test_unit_of_work_transactional_context(unit_of_work: SqliteUnitOfWork) -> N
 def test_unit_of_work_rollback_on_exception(unit_of_work: SqliteUnitOfWork) -> None:
     """Should rollback transaction on exception."""
 
-    try:
+    with contextlib.suppress(ValueError):
         with unit_of_work:
             # Create a stock
             stock = StockEntity(
@@ -111,9 +112,6 @@ def test_unit_of_work_rollback_on_exception(unit_of_work: SqliteUnitOfWork) -> N
 
             # Raise an exception to trigger rollback
             raise ValueError("Test exception for rollback")
-
-    except ValueError:
-        pass  # Expected
 
     # After rollback, the stock should not exist
     # Create a new unit of work to verify

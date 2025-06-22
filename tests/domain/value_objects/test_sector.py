@@ -58,7 +58,7 @@ class TestSectorValueObject:
         sector = Sector("Technology")
         assert sector != "Technology"
         assert sector != 123
-        assert sector != None
+        assert sector is not None
 
     def test_sector_hash(self) -> None:
         """Test sector can be used as dictionary key."""

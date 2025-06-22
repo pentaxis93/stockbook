@@ -6,6 +6,7 @@ of transaction management and repository coordination.
 """
 
 import os
+import sqlite3
 import tempfile
 
 import pytest
@@ -79,11 +80,10 @@ class TestSqliteUnitOfWork:
         )
 
         # Act & Assert
-        with pytest.raises(RuntimeError):
-            with uow:
-                _ = uow.stocks.create(stock)
-                # Simulate an error before commit
-                raise RuntimeError("Simulated error")
+        with pytest.raises(RuntimeError), uow:
+            _ = uow.stocks.create(stock)
+            # Simulate an error before commit
+            raise RuntimeError("Simulated error")
 
         # Verify data was not committed (rollback occurred)
         with uow:
@@ -128,7 +128,7 @@ class TestSqliteUnitOfWork:
 
         # Act
         with uow:
-            _stock_id = uow.stocks.create(stock)
+            _ = uow.stocks.create(stock)
             # Explicitly rollback
             uow.rollback()
 
@@ -207,7 +207,7 @@ class TestSqliteUnitOfWork:
         uow2 = SqliteUnitOfWork(self.db_connection)
 
         with uow1:
-            _stock_id = uow1.stocks.create(stock)
+            _ = uow1.stocks.create(stock)
             # Don't commit in uow1
 
             # uow2 should not see the uncommitted data
@@ -260,13 +260,12 @@ class TestSqliteUnitOfWork:
         uow = SqliteUnitOfWork(invalid_db)
 
         # Act & Assert
-        with pytest.raises(Exception):  # Should raise database error
-            with uow:
-                stock = StockEntity(
-                    symbol=StockSymbol("ERR"), company_name=CompanyName("Error Inc.")
-                )
-                _ = uow.stocks.create(stock)
-                uow.commit()
+        with pytest.raises(sqlite3.Error), uow:  # Should raise database error
+            stock = StockEntity(
+                symbol=StockSymbol("ERR"), company_name=CompanyName("Error Inc.")
+            )
+            _ = uow.stocks.create(stock)
+            uow.commit()
 
     def test_unit_of_work_commit_without_context_manager(self) -> None:
         """Should handle commit/rollback outside context manager."""
