@@ -166,31 +166,6 @@ class TestRiskAssessmentStubs:
         assert portfolio_risk.risk_score == Decimal("80.0")
         assert "Insufficient diversification" in " ".join(portfolio_risk.risk_factors)
 
-    def test_private_methods_removed(self) -> None:
-        """All private risk assessment methods should be removed."""
-        service = RiskAssessmentService()
-
-        # Verify all private methods are removed
-        private_methods = [
-            "_assess_volatility_risk",
-            "_assess_beta_risk",
-            "_assess_fundamental_risk",
-            "_assess_sector_risk",
-            "_calculate_overall_risk_score",
-            "_score_to_risk_level",
-            "_collect_risk_factors",
-            "_calculate_portfolio_risk_metrics",
-            "_identify_concentration_risks",
-            "_assess_portfolio_sector_risks",
-            "_generate_risk_warnings",
-            "_suggest_mitigation_strategies",
-        ]
-
-        for method_name in private_methods:
-            assert not hasattr(
-                service, method_name
-            ), f"Private method {method_name} should be removed"
-
 
 class TestRiskAssessmentConfig:
     """Test risk assessment configuration."""

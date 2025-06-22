@@ -146,34 +146,6 @@ class TestPortfolioAllocationAnalysis:
         tech_allocation = industry_allocations.get_allocation_percentage("Software")
         assert tech_allocation == Decimal("100.0")  # All are Software
 
-    def test_calculate_grade_allocations_method_removed(self) -> None:
-        """Grade allocation method should be removed from service."""
-        service = PortfolioCalculationService()
-
-        # Method should not exist
-        assert not hasattr(service, "calculate_grade_allocations")
-
-    def test_calculate_diversity_score_method_removed(self) -> None:
-        """Diversity score method should be removed from service."""
-        service = PortfolioCalculationService()
-
-        # Method should not exist
-        assert not hasattr(service, "calculate_diversity_score")
-
-    def test_calculate_weighted_average_grade_method_removed(self) -> None:
-        """Weighted average grade method should be removed from service."""
-        service = PortfolioCalculationService()
-
-        # Method should not exist
-        assert not hasattr(service, "calculate_weighted_average_grade")
-
-    def test_generate_portfolio_summary_method_removed(self) -> None:
-        """Portfolio summary generation method should be removed from service."""
-        service = PortfolioCalculationService()
-
-        # Method should not exist
-        assert not hasattr(service, "generate_portfolio_summary")
-
     def test_identify_concentration_risks(self) -> None:
         """Should identify positions that are overly concentrated."""
         # service = PortfolioCalculationService()
