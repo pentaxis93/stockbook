@@ -4,7 +4,7 @@ Personal stock trading tracker for managing family investments with portfolio an
 
 ## Overview
 
-StockBook is a lightweight web application built with Python and Streamlit to help track personal and family stock investments. It provides a simple interface for recording trades, monitoring portfolio performance, and analyzing investment history.
+StockBook is a modern web application built with Python and FastAPI to help track personal and family stock investments. It provides a RESTful API for recording trades, monitoring portfolio performance, and analyzing investment history.
 
 ## Features (Planned)
 
@@ -18,7 +18,8 @@ StockBook is a lightweight web application built with Python and Streamlit to he
 ## Tech Stack
 
 - **Python** - Core programming language with type safety
-- **Streamlit** - Web application framework
+- **FastAPI** - Modern async web framework with automatic OpenAPI documentation
+- **Pydantic** - Data validation and serialization with comprehensive type checking
 - **SQLite** - Local database for data persistence
 - **Clean Architecture** - Layered architecture with dependency inversion
 - **Domain-Driven Design** - Rich domain models and business logic
@@ -48,36 +49,61 @@ pre-commit install
 ## Usage
 
 ```bash
-# Run the application
-streamlit run app.py
+# Run the FastAPI application
+uvicorn src.infrastructure.web.main:app --reload
+
+# Or run with development settings
+python -m uvicorn src.infrastructure.web.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-The application will open in your default web browser at `http://localhost:8501`.
+The API will be available at:
+- **API Base URL**: `http://localhost:8000`
+- **Interactive API Docs**: `http://localhost:8000/docs` (Swagger UI)
+- **Alternative API Docs**: `http://localhost:8000/redoc` (ReDoc)
+
+### Available Endpoints
+
+- `GET /health` - Health check endpoint
+- `GET /stocks` - List all stocks
+- `POST /stocks` - Create a new stock
+- `GET /stocks/{stock_id}` - Get stock by ID
+- `PUT /stocks/{stock_id}` - Update stock by ID
+- `DELETE /stocks/{stock_id}` - Delete stock by ID
 
 ## Project Structure
 
 ```
 stockbook/
-├── app.py                    # Main Streamlit application (legacy)
-├── domain/                   # Domain layer (entities, services, repositories)
-│   ├── entities/            # Rich domain entities with business logic
-│   ├── value_objects/       # Immutable value types (Money, Quantity, etc.)
-│   ├── services/            # Domain services for complex business logic
-│   └── repositories/        # Repository interfaces
-├── application/              # Application layer (use cases, commands)
-│   ├── services/            # Application services
-│   └── commands/            # Command objects for operations
-├── infrastructure/           # Infrastructure layer (data access, external services)
-│   ├── persistence/         # Database connections and unit of work
-│   └── repositories/        # Repository implementations
-├── presentation/             # Presentation layer (UI, controllers, view models)
-│   ├── controllers/         # Business logic controllers
-│   ├── view_models/         # Data transfer objects for UI
-│   ├── adapters/            # Framework adapters
-│   └── coordinators/        # UI workflow coordination
+├── src/                      # Source code following clean architecture
+│   ├── domain/              # Domain layer (entities, services, repositories)
+│   │   ├── entities/        # Rich domain entities with business logic
+│   │   ├── value_objects/   # Immutable value types (Money, Quantity, etc.)
+│   │   ├── services/        # Domain services for complex business logic
+│   │   └── repositories/    # Repository interfaces
+│   ├── application/         # Application layer (use cases, commands)
+│   │   ├── services/        # Application services
+│   │   ├── commands/        # Command objects for operations
+│   │   └── dto/            # Data transfer objects
+│   ├── infrastructure/      # Infrastructure layer (data access, external services)
+│   │   ├── persistence/     # Database connections and unit of work
+│   │   ├── repositories/    # Repository implementations
+│   │   └── web/            # FastAPI application and API routes
+│   │       ├── main.py     # FastAPI application entry point
+│   │       ├── models/     # Pydantic models for API
+│   │       ├── routers/    # API route handlers
+│   │       └── mappers/    # Data mapping between layers
+│   └── presentation/        # Presentation layer (API controllers, view models)
+│       ├── controllers/     # Business logic controllers
+│       ├── view_models/     # Data transfer objects for API
+│       ├── adapters/        # Framework adapters
+│       └── coordinators/    # API workflow coordination
 ├── dependency_injection/     # IoC container and composition root
-
 ├── tests/                   # Comprehensive test suite
+│   ├── integration/         # Full-stack integration tests
+│   ├── domain/             # Domain layer tests
+│   ├── application/        # Application layer tests
+│   ├── infrastructure/     # Infrastructure layer tests
+│   └── presentation/       # Presentation layer tests
 ├── config.py                # Centralized configuration management
 ├── requirements.txt         # Python dependencies
 └── docs/                    # Documentation and roadmap
@@ -85,7 +111,7 @@ stockbook/
 
 ## Development Status
 
-🏗️ **Architecture Complete, Integration Phase** - Clean architecture foundation is complete, now integrating with main application.
+🚀 **FastAPI Migration Complete** - Modern REST API with comprehensive test coverage and clean architecture.
 
 ### Completed Architecture (Phase 0) ✅
 
@@ -114,8 +140,8 @@ stockbook/
 **Test Coverage**: Comprehensive test suite with layer-specific coverage enforcement:
 - Domain Layer: 100% minimum (business logic) - **ACHIEVED**
 - Application Layer: 90% minimum (use cases) - **ACHIEVED (100%)**
-- Infrastructure Layer: 85% minimum (data persistence)
-- Presentation Layer: 75% minimum (UI components)
+- Infrastructure Layer: 100% minimum (data persistence) - **ACHIEVED**
+- Presentation Layer: 100% minimum (API components) - **ACHIEVED**
 
 **Architecture Compliance**: 100% clean architecture principles
 **Code Quality**: Strict linting (pylint 10/10), type-safe (pyright standard mode), comprehensive error handling
@@ -138,7 +164,7 @@ The coverage thresholds reflect the criticality of each layer:
 - **Domain layer (100%)**: Contains core business logic and rules
 - **Application layer (90%)**: Orchestrates use cases and workflows  
 - **Infrastructure layer (100%)**: Handles data persistence and external services
-- **Presentation layer (75%)**: UI components and user interactions
+- **Presentation layer (100%)**: API components and request/response handling
 
 Coverage analysis runs automatically during pre-commit hooks and provides detailed reporting on which files in each layer need additional tests.
 
