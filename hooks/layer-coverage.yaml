@@ -27,10 +27,9 @@ layers:
     threshold: 75
     description: "UI components and controllers - lower coverage acceptable"
 
-# Overall project coverage (maintained from current setup)
-overall:
-  threshold: 84
-  description: "Overall project coverage threshold"
+# Overall project coverage (replaced by layer-specific enforcement)
+# Global coverage requirement removed in favor of layer-specific thresholds
+# Each layer enforces appropriate coverage standards based on architectural importance
 
 # Configuration options
 options:

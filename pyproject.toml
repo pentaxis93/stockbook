@@ -264,7 +264,6 @@ addopts = [
     "--cov=.",  # coverage for all source code
     "--cov-report=term-missing",  # show missing lines in terminal
     "--cov-report=html:htmlcov",  # generate HTML coverage report
-    "--cov-fail-under=84",  # fail if coverage below 84%
     "--dist=worksteal",  # better load balancing for parallel execution
     "--maxfail=5",  # stop after 5 failures to fail fast
 ]

@@ -34,12 +34,11 @@ class LayerCoverageChecker:
             # Default configuration if file doesn't exist
             return {
                 "layers": {
-                    "domain": {"path": "src/domain", "threshold": 95},
+                    "domain": {"path": "src/domain", "threshold": 100},
                     "application": {"path": "src/application", "threshold": 90},
                     "infrastructure": {"path": "src/infrastructure", "threshold": 85},
-                    "presentation": {"path": "src/presentation", "threshold": 80},
+                    "presentation": {"path": "src/presentation", "threshold": 75},
                 },
-                "overall": {"threshold": 84},
             }
 
         with open(self.config_path, "r", encoding="utf-8") as f:
@@ -127,31 +126,11 @@ class LayerCoverageChecker:
         cov.load()
 
         results = {}
-        overall_statements = 0
-        overall_missing = 0
 
         for layer_name, layer_config in self.config["layers"].items():
             layer_result = self._analyze_single_layer(cov, layer_name, layer_config)
             if layer_result:
                 results[layer_name] = layer_result
-                overall_statements += layer_result["statements"]
-                overall_missing += layer_result["missing"]
-
-        # Calculate overall coverage
-        if overall_statements > 0:
-            overall_coverage = (
-                (overall_statements - overall_missing) / overall_statements
-            ) * 100
-        else:
-            overall_coverage = 100.0
-
-        results["overall"] = {
-            "coverage": round(overall_coverage, 2),
-            "threshold": self.config["overall"]["threshold"],
-            "passed": overall_coverage >= self.config["overall"]["threshold"],
-            "statements": overall_statements,
-            "missing": overall_missing,
-        }
 
         return results
 
@@ -165,28 +144,11 @@ class LayerCoverageChecker:
         report_lines.append("LAYER-SPECIFIC COVERAGE REPORT")
         report_lines.append("=" * 80 + "\n")
 
-        # Overall coverage
-        overall = results.get("overall", {})
-        overall_status = "✅" if overall.get("passed", False) else "❌"
-        report_lines.append(
-            f"{overall_status} Overall Coverage: {overall.get('coverage', 0):.2f}% "
-            f"(threshold: {overall.get('threshold', 0)}%)"
-        )
-        report_lines.append(
-            f"   Total statements: {overall.get('statements', 0)}, "
-            f"Missing: {overall.get('missing', 0)}\n"
-        )
-
-        if not overall.get("passed", False):
-            all_passed = False
-
         # Layer-by-layer breakdown
-        report_lines.append("Layer Breakdown:")
+        report_lines.append("Coverage by Architectural Layer:")
         report_lines.append("-" * 60)
 
         for layer_name, layer_data in results.items():
-            if layer_name == "overall":
-                continue
 
             status = "✅" if layer_data["passed"] else "❌"
             report_lines.append(
