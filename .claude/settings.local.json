@@ -68,8 +68,6 @@
       "Bash(python -m pytest tests/presentation/controllers/test_stock_controller.py::TestStockController::test_controller_input_sanitization -v)",
       "Bash(python -m pytest tests/presentation/controllers/test_stock_controller.py -v)",
       "Bash(python -m pytest tests/presentation/ -v)",
-      "Bash(python -m pytest tests/presentation/adapters/test_streamlit_stock_adapter.py::TestStreamlitStockAdapter::test_render_sidebar_navigation -v)",
-      "Bash(python -m pytest tests/presentation/adapters/test_streamlit_stock_adapter.py::TestStreamlitStockAdapter::test_adapter_session_state_management -v)",
       "Bash(python -m pytest tests/presentation/coordinators/test_stock_page_coordinator.py -v)",
       "Bash(python -m pytest tests/ --tb=no -q)",
       "Bash(python -m pytest tests/presentation/ --tb=short -q)",
@@ -222,7 +220,8 @@
       "Bash(coverage run:*)",
       "Bash(coverage report:*)",
       "Bash(coverage --version)",
-      "Bash(true)"
+      "Bash(true)",
+      "Bash(git rm:*)"
     ],
     "deny": []
   }

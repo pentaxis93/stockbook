@@ -7,7 +7,7 @@ with proper configuration and dependency injection integration.
 
 from fastapi import FastAPI
 
-from src.infrastructure.web.routers.stock_router import reset_stock_storage
+from src.infrastructure.web.routers.stock_router import reset_container
 from src.infrastructure.web.routers.stock_router import router as stock_router
 
 
@@ -18,8 +18,8 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI application instance with proper configuration.
     """
-    # Reset in-memory storage for testing isolation
-    reset_stock_storage()
+    # Reset container for testing isolation
+    reset_container()
     app = FastAPI(
         title="StockBook API",
         version="1.0.0",
@@ -56,7 +56,13 @@ def create_app() -> FastAPI:
         Returns:
             Dictionary with status and service information.
         """
-        return {"status": "healthy", "service": "StockBook API"}
+        from datetime import datetime, timezone
+
+        return {
+            "status": "healthy",
+            "service": "StockBook API",
+            "timestamp": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        }
 
     # Include routers
     app.include_router(stock_router)

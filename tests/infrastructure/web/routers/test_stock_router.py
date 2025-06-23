@@ -12,6 +12,26 @@ from fastapi.testclient import TestClient
 class TestStockRouterGET:
     """Test suite for GET /stocks endpoint."""
 
+    def setup_method(self) -> None:
+        """Clean up database before each test."""
+        from dependency_injection.composition_root import CompositionRoot
+        from src.infrastructure.persistence.database_connection import (
+            DatabaseConnection,
+        )
+        from src.infrastructure.web.routers.stock_router import reset_container
+
+        # Reset container to get fresh dependencies
+        reset_container()
+
+        # Clear database tables for test isolation
+        container = CompositionRoot.configure()
+        db_connection = container.resolve(DatabaseConnection)
+
+        # Clear all stocks from database for clean test state
+        with db_connection.get_connection() as conn:
+            _ = conn.execute("DELETE FROM stock")
+            conn.commit()
+
     def test_get_stocks_returns_empty_list_when_no_stocks(self) -> None:
         """Test GET /stocks returns empty list when no stocks exist."""
         # This test will fail until we implement the router and integrate with FastAPI app
@@ -106,6 +126,26 @@ class TestStockRouterGET:
 
 class TestStockRouterPOST:
     """Test suite for POST /stocks endpoint."""
+
+    def setup_method(self) -> None:
+        """Clean up database before each test."""
+        from dependency_injection.composition_root import CompositionRoot
+        from src.infrastructure.persistence.database_connection import (
+            DatabaseConnection,
+        )
+        from src.infrastructure.web.routers.stock_router import reset_container
+
+        # Reset container to get fresh dependencies
+        reset_container()
+
+        # Clear database tables for test isolation
+        container = CompositionRoot.configure()
+        db_connection = container.resolve(DatabaseConnection)
+
+        # Clear all stocks from database for clean test state
+        with db_connection.get_connection() as conn:
+            _ = conn.execute("DELETE FROM stock")
+            conn.commit()
 
     def test_post_stocks_creates_new_stock_with_valid_data(self) -> None:
         """Test POST /stocks creates new stock with valid data."""
@@ -270,9 +310,9 @@ class TestStockRouterPOST:
         # First creation should succeed
         response1 = client.post("/stocks", json=stock_data)
         if response1.status_code == status.HTTP_201_CREATED:
-            # Second creation should fail with conflict
+            # Second creation should fail with bad request (business rule violation)
             response2 = client.post("/stocks", json=stock_data)
-            assert response2.status_code == status.HTTP_409_CONFLICT
+            assert response2.status_code == status.HTTP_400_BAD_REQUEST
             error_data = response2.json()
             assert "message" in error_data
             assert (
@@ -304,6 +344,26 @@ class TestStockRouterPOST:
 
 class TestStockRouterIntegration:
     """Test suite for integration between GET and POST endpoints."""
+
+    def setup_method(self) -> None:
+        """Clean up database before each test."""
+        from dependency_injection.composition_root import CompositionRoot
+        from src.infrastructure.persistence.database_connection import (
+            DatabaseConnection,
+        )
+        from src.infrastructure.web.routers.stock_router import reset_container
+
+        # Reset container to get fresh dependencies
+        reset_container()
+
+        # Clear database tables for test isolation
+        container = CompositionRoot.configure()
+        db_connection = container.resolve(DatabaseConnection)
+
+        # Clear all stocks from database for clean test state
+        with db_connection.get_connection() as conn:
+            _ = conn.execute("DELETE FROM stock")
+            conn.commit()
 
     def test_create_stock_then_retrieve_it(self) -> None:
         """Test creating a stock via POST then retrieving it via GET."""

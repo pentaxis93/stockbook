@@ -7,21 +7,16 @@ HTTP requests/responses and coordinating with application services.
 
 from typing import Optional, Union
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 
-# TODO: Re-enable these imports when implementing full integration
-# from src.application.services.stock_application_service import StockApplicationService
-# from src.domain.services.exceptions import DomainServiceError
-# from src.presentation.controllers.stock_controller import StockController
-# from src.presentation.view_models.stock_view_models import (
-#     CreateStockRequest as ViewModelCreateRequest,
-#     StockSearchRequest,
-#     ValidationErrorResponse,
-# )
+from dependency_injection.composition_root import CompositionRoot
+from dependency_injection.di_container import DIContainer
+from src.application.commands.stock_commands import CreateStockCommand
+from src.application.services.stock_application_service import StockApplicationService
+from src.domain.services.exceptions import DomainServiceError
 from src.infrastructure.web.mappers.stock_mappers import (
-    entity_to_response,
-    request_to_entity,
+    entity_list_to_response_list,
 )
 from src.infrastructure.web.models.stock_models import (
     StockListResponse,
@@ -32,38 +27,33 @@ from src.infrastructure.web.models.stock_models import (
 # Create router instance
 router = APIRouter(prefix="/stocks", tags=["stocks"])
 
-# TODO: Remove this in-memory storage when persistence is integrated
-# This is a temporary solution to make duplicate detection tests pass
-_created_stocks: set[str] = set()
+# Global container instance for dependency injection
+_container: Optional[DIContainer] = None
 
 
-def reset_stock_storage() -> None:
-    """Reset the in-memory stock storage for testing purposes."""
-    global _created_stocks
-    _created_stocks = set()
+def get_container() -> DIContainer:
+    """Get the configured dependency injection container."""
+    global _container
+    if _container is None:
+        _container = CompositionRoot.configure()
+    return _container
 
 
-# TODO: Re-enable dependency injection when implementing full integration
-# def get_stock_controller() -> StockController:
-#     """
-#     Dependency to get stock controller.
-#
-#     This will be replaced with proper dependency injection later.
-#     For now, we'll create a mock implementation for testing.
-#     """
-#     # TODO: Replace with proper dependency injection
-#     # For now, create a simple mock that returns empty data
-#     from unittest.mock import Mock
-#
-#     mock_service = Mock(spec=StockApplicationService)
-#
-#     # Create a proper mock response object
-#     mock_result = Mock()
-#     mock_result.stocks = []
-#     mock_result.total_count = 0
-#     mock_service.search_stocks.return_value = mock_result
-#
-#     return StockController(mock_service)
+def get_stock_service() -> StockApplicationService:
+    """
+    Dependency to get stock application service.
+
+    Returns:
+        StockApplicationService: Configured stock service instance
+    """
+    container = get_container()
+    return container.resolve(StockApplicationService)
+
+
+def reset_container() -> None:
+    """Reset the container for testing purposes."""
+    global _container
+    _container = None
 
 
 @router.get("", response_model=StockListResponse)
@@ -71,6 +61,7 @@ async def get_stocks(
     symbol: Optional[str] = Query(None, description="Filter by stock symbol"),
     sector: Optional[str] = Query(None, description="Filter by sector"),
     grade: Optional[str] = Query(None, description="Filter by grade"),
+    stock_service: StockApplicationService = Depends(get_stock_service),
 ) -> StockListResponse:
     """
     Get list of stocks with optional filtering.
@@ -79,6 +70,7 @@ async def get_stocks(
         symbol: Optional stock symbol filter
         sector: Optional sector filter
         grade: Optional grade filter
+        stock_service: Injected stock application service
 
     Returns:
         StockListResponse: List of stocks matching filters
@@ -87,10 +79,63 @@ async def get_stocks(
         HTTPException: If service operation fails
     """
     try:
-        # For now, return empty list to get basic routing working
-        # TODO: Integrate with controller and proper dependency injection
-        return StockListResponse(stocks=[], total=0)
+        # Create search request based on query parameters
+        search_request = {}
+        if symbol:
+            search_request["symbol"] = symbol
+        if sector:
+            search_request["sector"] = sector
+        if grade:
+            search_request["grade"] = grade
 
+        # Get stocks from service
+        if search_request:
+            # Use search if filters provided
+            # For now, get all stocks - search implementation can be added later
+            result = stock_service.get_all_stocks()
+        else:
+            result = stock_service.get_all_stocks()
+
+        # Convert DTO list to API response
+        # result is List[StockDto] from the application service
+        if result:
+            # Convert DTOs to entities for the mapper
+            from src.domain.entities.stock_entity import StockEntity
+            from src.domain.value_objects import (
+                CompanyName,
+                Grade,
+                IndustryGroup,
+                Notes,
+                Sector,
+                StockSymbol,
+            )
+
+            entities: list[StockEntity] = []
+            for dto in result:
+                entity = StockEntity(
+                    id=dto.id,
+                    symbol=StockSymbol(dto.symbol),
+                    company_name=CompanyName(dto.name),
+                    sector=Sector(dto.sector) if dto.sector else None,
+                    industry_group=(
+                        IndustryGroup(dto.industry_group)
+                        if dto.industry_group
+                        else None
+                    ),
+                    grade=Grade(dto.grade) if dto.grade else None,
+                    notes=Notes(dto.notes) if dto.notes else Notes(""),
+                )
+                entities.append(entity)
+
+            return entity_list_to_response_list(entities)
+        else:
+            return StockListResponse(stocks=[], total=0)
+
+    except DomainServiceError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"message": str(e), "code": "DOMAIN_ERROR"},
+        ) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -101,12 +146,14 @@ async def get_stocks(
 @router.post("", response_model=StockResponse, status_code=status.HTTP_201_CREATED)
 async def create_stock(
     stock_request: StockRequest,
+    stock_service: StockApplicationService = Depends(get_stock_service),
 ) -> Union[StockResponse, JSONResponse]:
     """
     Create a new stock.
 
     Args:
         stock_request: Stock creation request data
+        stock_service: Injected stock application service
 
     Returns:
         StockResponse: Created stock data
@@ -115,35 +162,65 @@ async def create_stock(
         HTTPException: If validation fails or stock already exists
     """
     try:
-        # Convert API request to domain entity (this validates the data)
-        entity = request_to_entity(stock_request)
+        # Create command from API request
+        command = CreateStockCommand(
+            symbol=stock_request.symbol,
+            name=stock_request.name,
+            sector=stock_request.sector,
+            industry_group=stock_request.industry_group,
+            grade=stock_request.grade,
+            notes=stock_request.notes or "",
+        )
 
-        # TODO: Remove this duplicate check when persistence is integrated
-        # This is a temporary solution to make duplicate detection tests pass
-        symbol_upper = entity.symbol.value.upper()
-        if symbol_upper in _created_stocks:
-            return JSONResponse(
-                status_code=status.HTTP_409_CONFLICT,
-                content={
-                    "message": f"Stock with symbol '{symbol_upper}' already exists",
-                    "code": "DUPLICATE_STOCK",
-                },
-            )
+        # Create stock through application service
+        stock_dto = stock_service.create_stock(command)
 
-        # Track created stock in memory
-        _created_stocks.add(symbol_upper)
+        # Convert DTO directly to API response
+        response = StockResponse(
+            id=stock_dto.id or "",  # Provide empty string if no ID
+            symbol=stock_dto.symbol,
+            name=stock_dto.name,
+            sector=stock_dto.sector,
+            industry_group=stock_dto.industry_group,
+            grade=stock_dto.grade,
+            notes=stock_dto.notes,
+        )
 
-        # For now, return the converted entity to get basic routing working
-        # TODO: Integrate with controller and proper persistence
-        response = entity_to_response(entity)
         return response
 
     except ValueError as e:
-        # Handle validation errors from value objects
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail={"message": str(e), "code": "VALIDATION_ERROR"},
-        ) from e
+        # Handle validation errors from value objects and business logic
+        error_message = str(e).lower()
+        if "already exists" in error_message:
+            # This is a business rule violation, not a validation error
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "message": str(e),
+                    "code": "DUPLICATE_STOCK",
+                },
+            )
+        else:
+            # This is a true validation error
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail={"message": str(e), "code": "VALIDATION_ERROR"},
+            ) from e
+    except DomainServiceError as e:
+        # Handle domain service errors (like duplicate stock)
+        if "already exists" in str(e).lower():
+            return JSONResponse(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                content={
+                    "message": str(e),
+                    "code": "DUPLICATE_STOCK",
+                },
+            )
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail={"message": str(e), "code": "DOMAIN_ERROR"},
+            ) from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

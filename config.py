@@ -44,13 +44,13 @@ class Config:
     _instance = None
     _initialized = False
 
-    def __new__(cls):
+    def __new__(cls) -> "Config":
         """Implement singleton pattern."""
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize configuration with defaults and environment overrides."""
         if self._initialized:
             return
@@ -59,12 +59,12 @@ class Config:
         self._initialized = True
 
     @classmethod
-    def reset(cls):
+    def reset(cls) -> None:
         """Reset singleton for testing purposes."""
         cls._instance = None
         cls._initialized = False
 
-    def _load_configuration(self):
+    def _load_configuration(self) -> None:
         """Load all configuration settings."""
         # Application settings
         self.app_name = self._get_env_str("STOCKBOOK_APP_NAME", "StockBook")
@@ -118,10 +118,7 @@ class Config:
         self.business_days = {0, 1, 2, 3, 4}  # Monday through Friday
         self.market_holidays: List[str] = []  # Can be populated from external source
 
-        # Streamlit configuration
-        self._setup_streamlit_config()
-
-    def _setup_validation_rules(self):
+    def _setup_validation_rules(self) -> None:
         """Setup validation rules for different data types."""
         # Stock symbol validation
         self.stock_symbol_pattern = self._get_env_str(
@@ -153,7 +150,7 @@ class Config:
             "STOCKBOOK_MAX_RISK_LIMIT", 10.0
         )
 
-    def _setup_portfolio_defaults(self):
+    def _setup_portfolio_defaults(self) -> None:
         """Setup default portfolio configuration."""
         self.portfolio_defaults = {
             "max_positions": self._get_env_int("STOCKBOOK_MAX_POSITIONS", 10),
@@ -163,7 +160,7 @@ class Config:
             "name_prefix": self._get_env_str("STOCKBOOK_PORTFOLIO_PREFIX", "Portfolio"),
         }
 
-    def _setup_feature_flags(self):
+    def _setup_feature_flags(self) -> None:
         """Setup feature flags for different development phases."""
         self.features = {
             # Core features (Phase 1-2)
@@ -183,15 +180,6 @@ class Config:
                 "STOCKBOOK_FEATURE_MULTI_ACCOUNT", False
             ),
             "api_integration": self._get_env_bool("STOCKBOOK_FEATURE_API", False),
-        }
-
-    def _setup_streamlit_config(self):
-        """Setup Streamlit-specific configuration."""
-        self.streamlit_config = {
-            "page_title": self.app_name,
-            "page_icon": "📈",
-            "layout": "wide",
-            "initial_sidebar_state": "expanded",
         }
 
     def _get_env_str(self, key: str, default: str) -> str:
@@ -232,7 +220,7 @@ class Config:
             return default
         return [item.strip() for item in value.split(",")]
 
-    def validate(self, skip_file_checks: bool = False):
+    def validate(self, skip_file_checks: bool = False) -> None:
         """
         Validate configuration settings.
 
@@ -247,18 +235,19 @@ class Config:
         if not skip_file_checks:
             self._validate_paths()
 
-    def _validate_paths(self):
+    def _validate_paths(self) -> None:
         """Validate file and directory paths."""
         # Schema file must exist
         if not self.schema_path.exists():
             raise ValidationError(f"Schema file does not exist: {self.schema_path}")
 
-    def _validate_values(self):
+    def _validate_values(self) -> None:
         """Validate configuration values."""
         if self.decimal_places < 0:
             raise ValidationError("decimal_places must be non-negative")
 
-        if self.portfolio_defaults["max_positions"] <= 0:
+        max_positions = self.portfolio_defaults.get("max_positions", 0)
+        if isinstance(max_positions, int) and max_positions <= 0:
             raise ValidationError("max_positions must be positive")
 
         if self.min_price <= 0:
@@ -276,7 +265,7 @@ class Config:
         if self.max_rows_display < self.table_page_size:
             raise ValidationError("max_rows_display must be >= table_page_size")
 
-    def _validate_patterns(self):
+    def _validate_patterns(self) -> None:
         """Validate regex patterns."""
         try:
             re.compile(self.stock_symbol_pattern)
@@ -289,7 +278,7 @@ class Config:
         """Get database connection string."""
         return f"sqlite:///{self.db_path}"
 
-    def ensure_directories(self):
+    def ensure_directories(self) -> None:
         """Create necessary directories if they don't exist."""
         directories = [
             self.db_path.parent,

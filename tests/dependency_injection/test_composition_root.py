@@ -64,17 +64,10 @@ class TestCompositionRoot:
 
         # Act
         # controller = container.resolve(StockController)
-        # adapter = container.resolve(StreamlitStockAdapter)
-        # coordinator = container.resolve(StockPageCoordinator)
 
         # Assert
         # assert isinstance(controller, StockController)
-        # assert isinstance(adapter, StreamlitStockAdapter)
-        # assert isinstance(coordinator, StockPageCoordinator)
         # assert isinstance(controller.stock_service, StockApplicationService)
-        # assert adapter.controller is controller
-        # assert coordinator.controller is controller
-        # assert coordinator.adapter is adapter
         pass
 
     def test_complete_object_graph_wiring(self) -> None:
@@ -186,15 +179,14 @@ class TestBootstrapIntegration:
         # assert isinstance(app_components['coordinator'], StockPageCoordinator)
         pass
 
-    def test_streamlit_integration_ready(self) -> None:
-        """Should provide components ready for Streamlit integration."""
+    def test_fastapi_integration_ready(self) -> None:
+        """Should provide components ready for FastAPI integration."""
         # container = CompositionRoot.configure()
-        # coordinator = container.resolve(StockPageCoordinator)
+        # stock_service = container.resolve(StockApplicationService)
 
-        # Test that coordinator can be used in Streamlit context
+        # Test that service can be used in FastAPI context
         # This validates the wiring is correct for actual usage
-        # assert hasattr(coordinator, 'render_stock_dashboard')
-        # assert hasattr(coordinator.adapter, 'render_create_stock_form')
+        # assert hasattr(stock_service, 'create_stock')
         pass
 
 

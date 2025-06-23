@@ -42,7 +42,7 @@ class DIContainer:
     to provide a clean, testable interface.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the DI container."""
         self._container = containers.DeclarativeContainer()
         self._registrations: Dict[Type[Any], RegistrationInfo] = {}

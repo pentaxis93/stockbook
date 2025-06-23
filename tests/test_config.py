@@ -420,15 +420,3 @@ class TestConfigIntegration:
         # Verify paths are accessible
         assert config.db_path.name == "stockbook.db"
         assert config.schema_path.name == "schema.sql"
-
-    def test_config_provides_streamlit_settings(self) -> None:
-        """Test that config provides Streamlit configuration."""
-        config = Config()
-
-        assert hasattr(config, "streamlit_config")
-        st_config = config.streamlit_config
-
-        assert "page_title" in st_config
-        assert "page_icon" in st_config
-        assert "layout" in st_config
-        assert st_config["page_title"] == config.app_name

@@ -29,7 +29,9 @@ class TestHealthCheck:
 
         assert response.status_code == 200
         json_data = response.json()
-        assert json_data == {"status": "healthy", "service": "StockBook API"}
+        assert json_data["status"] == "healthy"
+        assert json_data["service"] == "StockBook API"
+        assert "timestamp" in json_data
 
     def test_health_check_content_type(self) -> None:
         """Test health check endpoint returns JSON content type."""

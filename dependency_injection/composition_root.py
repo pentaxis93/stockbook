@@ -7,6 +7,9 @@ following clean architecture principles.
 
 from typing import Any, Callable, Dict, Optional
 
+# Configuration
+from config import Config
+
 # Application layer imports
 from src.application.services.stock_application_service import StockApplicationService
 
@@ -21,10 +24,6 @@ from src.infrastructure.repositories.sqlite_stock_repository import (
 )
 from src.presentation.adapters.stock_presentation_adapter import (
     StockPresentationAdapter,
-)
-from src.presentation.adapters.streamlit_stock_adapter import StreamlitStockAdapter
-from src.presentation.adapters.streamlit_ui_operations import (
-    StreamlitUIOperationsFacade,
 )
 
 # Presentation layer imports
@@ -45,7 +44,7 @@ class CompositionRoot:
     @classmethod
     def configure(
         cls,
-        database_path: str = "stockbook.db",
+        database_path: Optional[str] = None,
         config: Optional[Dict[str, Any]] = None,
         extra_registrations: Optional[Callable[[DIContainer], None]] = None,
     ) -> DIContainer:
@@ -53,7 +52,7 @@ class CompositionRoot:
         Configure the complete application dependency graph.
 
         Args:
-            database_path: Path to the SQLite database file
+            database_path: Path to the SQLite database file (defaults to Config.db_path)
             config: Optional configuration overrides
             extra_registrations: Optional function to register additional services
 
@@ -63,7 +62,9 @@ class CompositionRoot:
         container = DIContainer()
         config = config or {}
 
-        # Override database path from config if provided
+        # Use Config class database path as default, then check overrides
+        if database_path is None:
+            database_path = str(Config().db_path)
         db_path = config.get("database_path", database_path)
 
         # Configure infrastructure layer (outermost layer)
@@ -88,9 +89,12 @@ class CompositionRoot:
         """Configure infrastructure layer dependencies."""
 
         # Database connection - singleton for connection pooling
-        container.register_factory(
-            DatabaseConnection, lambda: DatabaseConnection(database_path)
-        )
+        def create_database_connection() -> DatabaseConnection:
+            connection = DatabaseConnection(database_path)
+            connection.initialize_schema()  # Ensure schema exists
+            return connection
+
+        container.register_factory(DatabaseConnection, create_database_connection)
 
         # Unit of Work - singleton to ensure transaction consistency
         container.register_singleton(IStockBookUnitOfWork, SqliteUnitOfWork)
@@ -112,34 +116,8 @@ class CompositionRoot:
         # Controllers - transient for request isolation
         container.register_transient(StockController, StockController)
 
-        # UI Operations - singleton for shared UI state
-        container.register_singleton(
-            StreamlitUIOperationsFacade, StreamlitUIOperationsFacade
-        )
-
-        # Legacy Streamlit Adapter - transient for UI state isolation
-        container.register_transient(StreamlitStockAdapter, StreamlitStockAdapter)
-
         # Framework-agnostic adapter - transient for UI state isolation
-        container.register_factory(
-            StockPresentationAdapter,
-            lambda: StockPresentationAdapter(
-                controller=container.resolve(StockController),
-                ui_operations=container.resolve(StreamlitUIOperationsFacade).operations,
-                layout_operations=container.resolve(
-                    StreamlitUIOperationsFacade
-                ).layout_operations,
-                validation_operations=container.resolve(
-                    StreamlitUIOperationsFacade
-                ).validation_operations,
-            ),
-        )
+        container.register_transient(StockPresentationAdapter, StockPresentationAdapter)
 
         # Coordinators - transient for page-level state management
-        container.register_factory(
-            StockPageCoordinator,
-            lambda: StockPageCoordinator(
-                controller=container.resolve(StockController),
-                presentation_adapter=container.resolve(StockPresentationAdapter),
-            ),
-        )
+        container.register_transient(StockPageCoordinator, StockPageCoordinator)

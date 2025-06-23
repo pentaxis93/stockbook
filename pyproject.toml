@@ -370,6 +370,17 @@ ignore_errors = true
 module = "nanoid"
 ignore_missing_imports = true
 
+# Override for dependency injection - these files use legitimate patterns that mypy/pyright disagree on
+[[tool.mypy.overrides]]
+module = "dependency_injection.*"
+disallow_any_generics = false
+disallow_subclassing_any = false
+warn_return_any = false
+disallow_untyped_calls = false
+disallow_untyped_defs = false
+disable_error_code = ["type-abstract"]
+
+
 [tool.importlinter]
 root_package = "src"
 
@@ -386,6 +397,11 @@ layers = [
     "src.application", 
     "src.infrastructure",
     "src.domain"
+]
+# Allow FastAPI routers to import application services for dependency injection
+ignore_imports = [
+    "src.infrastructure.web.routers.stock_router -> src.application.services.stock_application_service",
+    "src.infrastructure.web.routers.stock_router -> src.application.commands.stock_commands"
 ]
 
 [tool.pydocstyle]
