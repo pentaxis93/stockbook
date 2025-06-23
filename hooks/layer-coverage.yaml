@@ -18,7 +18,7 @@ layers:
   # Infrastructure layer - moderate coverage requirement
   infrastructure:
     path: src/infrastructure
-    threshold: 85
+    threshold: 100
     description: "Data persistence and external integrations - moderate coverage"
     
   # Presentation layer - lower coverage requirement (UI code)

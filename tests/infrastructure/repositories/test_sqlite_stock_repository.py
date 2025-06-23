@@ -380,3 +380,321 @@ class TestSqliteStockRepository:
         assert id1 != id2
         assert self.repository.get_by_id(id1) is not None
         assert self.repository.get_by_id(id2) is not None
+
+
+class TestStockRepositoryFilteringOperations:
+    """Test stock repository filtering operations by grade, industry, and sector."""
+
+    def setup_method(self) -> None:
+        """Set up test database and repository."""
+        # Create temporary database file
+        self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
+        self.temp_db.close()
+
+        # Initialize database connection and repository
+        self.db_connection = DatabaseConnection(self.temp_db.name)
+        self.db_connection.initialize_schema()
+
+        self.repository = SqliteStockRepository(self.db_connection)
+
+        # Create test stocks with different attributes using valid combinations
+        self.test_stocks = [
+            StockEntity(
+                symbol=StockSymbol("AAPL"),
+                company_name=CompanyName("Apple Inc."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Hardware"),
+                grade=Grade("A"),
+                notes=Notes("Premium tech stock"),
+            ),
+            StockEntity(
+                symbol=StockSymbol("MSFT"),
+                company_name=CompanyName("Microsoft Corp."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Software"),
+                grade=Grade("A"),
+                notes=Notes("Software giant"),
+            ),
+            StockEntity(
+                symbol=StockSymbol("JNJ"),
+                company_name=CompanyName("Johnson & Johnson"),
+                sector=Sector("Healthcare"),
+                industry_group=IndustryGroup("Pharmaceuticals"),
+                grade=Grade("B"),
+                notes=Notes("Healthcare leader"),
+            ),
+            StockEntity(
+                symbol=StockSymbol("XOM"),
+                company_name=CompanyName("Exxon Mobil Corp."),
+                sector=Sector("Energy"),
+                industry_group=IndustryGroup("Oil & Gas"),
+                grade=Grade("C"),
+                notes=Notes("Energy company"),
+            ),
+        ]
+
+        # Create all test stocks
+        for stock in self.test_stocks:
+            _ = self.repository.create(stock)
+
+    def teardown_method(self) -> None:
+        """Clean up test database."""
+        if os.path.exists(self.temp_db.name):
+            os.unlink(self.temp_db.name)
+
+    def test_get_by_grade_returns_matching_stocks(self) -> None:
+        """Should return all stocks with specified grade."""
+        # Act
+        grade_a_stocks = self.repository.get_by_grade("A")
+
+        # Assert
+        assert len(grade_a_stocks) == 2
+        symbols = [str(stock.symbol) for stock in grade_a_stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+        # Should be sorted by symbol
+        assert symbols == ["AAPL", "MSFT"]
+
+    def test_get_by_grade_returns_empty_list_for_no_matches(self) -> None:
+        """Should return empty list when no stocks have the specified grade."""
+        # Act
+        grade_d_stocks = self.repository.get_by_grade("D")
+
+        # Assert
+        assert grade_d_stocks == []
+
+    def test_get_by_grade_connection_cleanup(self) -> None:
+        """Should properly close connections in non-transactional context."""
+        # This tests the connection cleanup path in get_by_grade
+        # Act
+        grade_b_stocks = self.repository.get_by_grade("B")
+
+        # Assert
+        assert len(grade_b_stocks) == 1
+        assert str(grade_b_stocks[0].symbol) == "JNJ"
+
+    def test_get_by_industry_group_returns_matching_stocks(self) -> None:
+        """Should return all stocks in specified industry group."""
+        # Act
+        software_stocks = self.repository.get_by_industry_group("Software")
+
+        # Assert
+        assert len(software_stocks) == 1
+        assert str(software_stocks[0].symbol) == "MSFT"
+        assert software_stocks[0].industry_group is not None
+        assert software_stocks[0].industry_group.value == "Software"
+
+    def test_get_by_industry_group_returns_empty_list_for_no_matches(self) -> None:
+        """Should return empty list when no stocks in specified industry group."""
+        # Act
+        mining_stocks = self.repository.get_by_industry_group("Mining")
+
+        # Assert
+        assert mining_stocks == []
+
+    def test_get_by_industry_group_connection_cleanup(self) -> None:
+        """Should properly close connections in non-transactional context."""
+        # This tests the connection cleanup path in get_by_industry_group
+        # Act
+        pharma_stocks = self.repository.get_by_industry_group("Pharmaceuticals")
+
+        # Assert
+        assert len(pharma_stocks) == 1
+        assert str(pharma_stocks[0].symbol) == "JNJ"
+
+    def test_get_by_sector_returns_matching_stocks(self) -> None:
+        """Should return all stocks in specified sector."""
+        # Act
+        tech_stocks = self.repository.get_by_sector("Technology")
+
+        # Assert
+        assert len(tech_stocks) == 2
+        symbols = [str(stock.symbol) for stock in tech_stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+        # Should be sorted by symbol
+        assert symbols == ["AAPL", "MSFT"]
+
+    def test_get_by_sector_returns_empty_list_for_no_matches(self) -> None:
+        """Should return empty list when no stocks in specified sector."""
+        # Act
+        finance_stocks = self.repository.get_by_sector("Finance")
+
+        # Assert
+        assert finance_stocks == []
+
+    def test_get_by_sector_connection_cleanup(self) -> None:
+        """Should properly close connections in non-transactional context."""
+        # This tests the connection cleanup path in get_by_sector
+        # Act
+        energy_stocks = self.repository.get_by_sector("Energy")
+
+        # Assert
+        assert len(energy_stocks) == 1
+        assert str(energy_stocks[0].symbol) == "XOM"
+
+
+class TestStockRepositorySearchOperations:
+    """Test stock repository search operations with multiple filters."""
+
+    def setup_method(self) -> None:
+        """Set up test database and repository."""
+        # Create temporary database file
+        self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
+        self.temp_db.close()
+
+        # Initialize database connection and repository
+        self.db_connection = DatabaseConnection(self.temp_db.name)
+        self.db_connection.initialize_schema()
+
+        self.repository = SqliteStockRepository(self.db_connection)
+
+        # Create diverse test stocks for search testing with valid combinations
+        self.test_stocks = [
+            StockEntity(
+                symbol=StockSymbol("AAPL"),
+                company_name=CompanyName("Apple Inc."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Hardware"),
+                grade=Grade("A"),
+                notes=Notes("Premium tech stock"),
+            ),
+            StockEntity(
+                symbol=StockSymbol("MSFT"),
+                company_name=CompanyName("Microsoft Corporation"),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Software"),
+                grade=Grade("A"),
+                notes=Notes("Software giant"),
+            ),
+            StockEntity(
+                symbol=StockSymbol("GOOGL"),
+                company_name=CompanyName("Alphabet Inc."),
+                sector=Sector("Technology"),
+                industry_group=IndustryGroup("Internet Services"),
+                grade=Grade("B"),
+                notes=Notes("Search engine leader"),
+            ),
+            StockEntity(
+                symbol=StockSymbol("JNJ"),
+                company_name=CompanyName("Johnson & Johnson"),
+                sector=Sector("Healthcare"),
+                industry_group=IndustryGroup("Pharmaceuticals"),
+                grade=Grade("B"),
+                notes=Notes("Healthcare leader"),
+            ),
+        ]
+
+        # Create all test stocks
+        for stock in self.test_stocks:
+            _ = self.repository.create(stock)
+
+    def teardown_method(self) -> None:
+        """Clean up test database."""
+        if os.path.exists(self.temp_db.name):
+            os.unlink(self.temp_db.name)
+
+    def test_search_stocks_by_symbol_filter(self) -> None:
+        """Should search stocks by symbol containing specified string."""
+        # Act
+        apple_stocks = self.repository.search_stocks(symbol_filter="APL")
+
+        # Assert
+        assert len(apple_stocks) == 1
+        assert str(apple_stocks[0].symbol) == "AAPL"
+
+    def test_search_stocks_by_name_filter(self) -> None:
+        """Should search stocks by company name containing specified string."""
+        # Act
+        microsoft_stocks = self.repository.search_stocks(name_filter="Microsoft")
+
+        # Assert
+        assert len(microsoft_stocks) == 1
+        assert str(microsoft_stocks[0].symbol) == "MSFT"
+
+    def test_search_stocks_by_sector_filter(self) -> None:
+        """Should search stocks by sector containing specified string."""
+        # Act
+        tech_stocks = self.repository.search_stocks(sector_filter="tech")
+
+        # Assert
+        assert len(tech_stocks) == 3
+        symbols = [str(stock.symbol) for stock in tech_stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+        assert "GOOGL" in symbols
+
+    def test_search_stocks_by_industry_filter(self) -> None:
+        """Should search stocks by industry group containing specified string."""
+        # Act
+        software_stocks = self.repository.search_stocks(industry_filter="Software")
+
+        # Assert
+        assert len(software_stocks) == 1
+        assert str(software_stocks[0].symbol) == "MSFT"
+
+    def test_search_stocks_by_grade_filter(self) -> None:
+        """Should search stocks by exact grade match."""
+        # Act
+        grade_a_stocks = self.repository.search_stocks(grade_filter="A")
+
+        # Assert
+        assert len(grade_a_stocks) == 2
+        symbols = [str(stock.symbol) for stock in grade_a_stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+
+    def test_search_stocks_with_multiple_filters(self) -> None:
+        """Should search stocks with multiple filter criteria combined."""
+        # Act
+        filtered_stocks = self.repository.search_stocks(
+            sector_filter="Technology", grade_filter="A"
+        )
+
+        # Assert
+        assert len(filtered_stocks) == 2
+        symbols = [str(stock.symbol) for stock in filtered_stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+
+    def test_search_stocks_no_filters_returns_all(self) -> None:
+        """Should return all stocks when no filters are specified."""
+        # Act
+        all_stocks = self.repository.search_stocks()
+
+        # Assert
+        assert len(all_stocks) == 4
+        symbols = [str(stock.symbol) for stock in all_stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+        assert "GOOGL" in symbols
+        assert "JNJ" in symbols
+
+    def test_search_stocks_no_matches_returns_empty(self) -> None:
+        """Should return empty list when no stocks match the filters."""
+        # Act
+        no_matches = self.repository.search_stocks(symbol_filter="NONEXISTENT")
+
+        # Assert
+        assert no_matches == []
+
+    def test_search_stocks_connection_cleanup(self) -> None:
+        """Should properly close connections in non-transactional context."""
+        # This tests the connection cleanup path in search_stocks
+        # Act
+        healthcare_stocks = self.repository.search_stocks(sector_filter="Healthcare")
+
+        # Assert
+        assert len(healthcare_stocks) == 1
+        assert str(healthcare_stocks[0].symbol) == "JNJ"
+
+    def test_search_stocks_case_insensitive_filters(self) -> None:
+        """Should perform case-insensitive filtering for text fields."""
+        # Act - test with mixed case
+        tech_stocks = self.repository.search_stocks(sector_filter="TECHNOLOGY")
+        name_stocks = self.repository.search_stocks(name_filter="apple")
+
+        # Assert
+        assert len(tech_stocks) == 3  # Should find Technology stocks
+        assert len(name_stocks) == 1  # Should find Apple
+        assert str(name_stocks[0].symbol) == "AAPL"

@@ -220,7 +220,8 @@
       "mcp__serena__list_memories",
       "Bash(coverage debug:*)",
       "Bash(coverage run:*)",
-      "Bash(coverage report:*)"
+      "Bash(coverage report:*)",
+      "Bash(coverage --version)"
     ],
     "deny": []
   }

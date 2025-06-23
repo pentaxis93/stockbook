@@ -135,9 +135,9 @@ cat hooks/layer-coverage.yaml
 ```
 
 The coverage thresholds reflect the criticality of each layer:
-- **Domain layer (90%)**: Contains core business logic and rules
+- **Domain layer (100%)**: Contains core business logic and rules
 - **Application layer (90%)**: Orchestrates use cases and workflows  
-- **Infrastructure layer (85%)**: Handles data persistence and external services
+- **Infrastructure layer (100%)**: Handles data persistence and external services
 - **Presentation layer (75%)**: UI components and user interactions
 
 Coverage analysis runs automatically during pre-commit hooks and provides detailed reporting on which files in each layer need additional tests.

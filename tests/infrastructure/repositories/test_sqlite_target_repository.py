@@ -447,6 +447,74 @@ class TestTargetRepositoryIntegration:
         assert len(all_active) == 2
 
 
+class TestTargetRepositoryDateParsing:
+    """Test date parsing edge cases in _row_to_entity method."""
+
+    def setup_method(self) -> None:
+        """Set up test database and repository."""
+        # Create temporary database file
+        self.temp_db = tempfile.NamedTemporaryFile(delete=False, suffix=".db")
+        self.temp_db.close()
+
+        # Initialize database connection and repository
+        self.db_connection = DatabaseConnection(self.temp_db.name)
+        self.db_connection.initialize_schema()
+
+        self.repository = SqliteTargetRepository(self.db_connection)
+
+        # Create test portfolio and stock
+        with self.db_connection.transaction() as conn:
+            _ = conn.execute(
+                """
+                INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
+                VALUES ('portfolio-id-1', 'Test Portfolio', 'Test portfolio for targets', 50, 0.02, 1)
+            """
+            )
+            _ = conn.execute(
+                """
+                INSERT INTO stock (id, symbol, name, industry_group, grade, notes)
+                VALUES ('stock-id-1', 'AAPL', 'Apple Inc.', 'Technology', 'A', 'Test stock')
+            """
+            )
+
+    def teardown_method(self) -> None:
+        """Clean up test database."""
+        if os.path.exists(self.temp_db.name):
+            os.unlink(self.temp_db.name)
+
+    def test_row_to_entity_handles_invalid_date_format(self) -> None:
+        """Should use today's date when created_at parsing fails."""
+        from unittest.mock import patch
+
+        # Arrange
+        # Create a mock row with invalid date format that would cause parsing to fail
+        mock_row = {
+            "id": "test-id",
+            "created_at": "invalid-date-format",  # This will cause parsing to fail
+            "portfolio_id": "portfolio-1",
+            "stock_id": "stock-1",
+            "pivot_price": "100.00",
+            "failure_price": "95.00",
+            "target_price": "110.00",
+            "status": "active",
+            "notes": "Test notes",
+        }
+
+        # Mock date.today() to return a predictable date
+        expected_date = date(2024, 6, 23)
+        with patch(
+            "src.infrastructure.repositories.sqlite_target_repository.date"
+        ) as mock_date:
+            mock_date.today.return_value = expected_date
+
+            # Act
+            entity = self.repository._row_to_entity(mock_row)  # type: ignore[attr-defined,arg-type]
+
+            # Assert
+            assert entity.created_date == expected_date
+            mock_date.today.assert_called_once()
+
+
 class TestTargetRepositoryErrorHandling:
     """Test error handling and edge cases."""
 

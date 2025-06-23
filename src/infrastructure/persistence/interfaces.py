@@ -43,7 +43,7 @@ class IDatabaseConnection(Protocol):
         Yields:
             SQLite connection within transaction context
         """
-        yield  # type: ignore
+        yield  # type: ignore  # pragma: no cover
 
     def initialize_schema(self) -> None:
         """

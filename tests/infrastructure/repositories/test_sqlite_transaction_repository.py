@@ -372,6 +372,52 @@ class TestTransactionRepositoryRead:
         assert middle_id in transaction_ids
         assert late_id not in transaction_ids
 
+    def test_get_by_date_range_with_portfolio_filter(
+        self, transaction_repository: SqliteTransactionRepository
+    ) -> None:
+        """Should filter by date range and portfolio."""
+        # Arrange
+        # Create transactions for different portfolios
+        portfolio1_transaction = TransactionEntity(
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            transaction_type=TransactionType("buy"),
+            quantity=Quantity(50),
+            price=Money(Decimal("100.00")),
+            transaction_date=date(2024, 1, 15),
+        )
+
+        # Create second portfolio entry first
+        with transaction_repository.db_connection.transaction() as conn:
+            _ = conn.execute(
+                """
+                INSERT INTO portfolio (id, name, description, max_positions, max_risk_per_trade, is_active)
+                VALUES ('portfolio-id-2', 'Test Portfolio 2', 'Second test portfolio', 50, 0.02, 1)
+            """
+            )
+
+        portfolio2_transaction = TransactionEntity(
+            portfolio_id="portfolio-id-2",
+            stock_id="stock-id-1",
+            transaction_type=TransactionType("buy"),
+            quantity=Quantity(75),
+            price=Money(Decimal("105.00")),
+            transaction_date=date(2024, 1, 16),
+        )
+
+        portfolio1_id = transaction_repository.create(portfolio1_transaction)
+        _ = transaction_repository.create(portfolio2_transaction)
+
+        # Act
+        portfolio1_transactions = transaction_repository.get_by_date_range(
+            date(2024, 1, 1), date(2024, 1, 31), portfolio_id="portfolio-id-1"
+        )
+
+        # Assert
+        assert len(portfolio1_transactions) == 1
+        assert portfolio1_transactions[0].id == portfolio1_id
+        assert portfolio1_transactions[0].portfolio_id == "portfolio-id-1"
+
 
 class TestTransactionRepositoryUpdate:
     """Test transaction update operations."""

@@ -225,3 +225,135 @@ class TestPortfolioBalanceRepositoryIntegration:
         latest = balance_repository.get_latest_balance("portfolio-id-1")
         assert latest is not None
         assert latest.id == balance_id
+
+
+class TestPortfolioBalanceRepositoryNotFoundScenarios:
+    """Test scenarios where records are not found."""
+
+    def test_get_by_id_returns_none_for_nonexistent_balance(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
+        """Should return None when balance ID does not exist."""
+        # Act
+        result = balance_repository.get_by_id("nonexistent-id")
+
+        # Assert
+        assert result is None
+
+    def test_get_by_portfolio_and_date_returns_none_for_nonexistent_balance(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
+        """Should return None when no balance exists for portfolio and date."""
+        # Act
+        result = balance_repository.get_by_portfolio_and_date(
+            "nonexistent-portfolio", date(2024, 1, 1)
+        )
+
+        # Assert
+        assert result is None
+
+    def test_get_latest_balance_returns_none_for_nonexistent_portfolio(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
+        """Should return None when no balances exist for portfolio."""
+        # Act
+        result = balance_repository.get_latest_balance("nonexistent-portfolio")
+
+        # Assert
+        assert result is None
+
+
+class TestPortfolioBalanceRepositoryAdvancedOperations:
+    """Test advanced repository operations and edge cases."""
+
+    def test_get_history_with_limit(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
+        """Should respect limit parameter when retrieving history."""
+        # Arrange - Create multiple balance records
+        balances = [
+            PortfolioBalanceEntity(
+                portfolio_id="portfolio-id-1",
+                balance_date=date(2024, 1, i),
+                withdrawals=Money(Decimal("0.00")),
+                deposits=Money(Decimal("0.00")),
+                final_balance=Money(Decimal("10000.00") + Decimal(i * 100)),
+            )
+            for i in range(1, 6)  # Create 5 balance records
+        ]
+
+        for balance in balances:
+            _ = balance_repository.create(balance)
+
+        # Act
+        limited_history = balance_repository.get_history("portfolio-id-1", limit=3)
+
+        # Assert
+        assert len(limited_history) == 3
+        # Should be ordered by date (newest first)
+        assert limited_history[0].balance_date == date(2024, 1, 5)
+        assert limited_history[1].balance_date == date(2024, 1, 4)
+        assert limited_history[2].balance_date == date(2024, 1, 3)
+
+    def test_get_history_without_limit_returns_all(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
+        """Should return all records when no limit is specified."""
+        # Arrange - Create multiple balance records
+        balances = [
+            PortfolioBalanceEntity(
+                portfolio_id="portfolio-id-1",
+                balance_date=date(2024, 1, i),
+                withdrawals=Money(Decimal("0.00")),
+                deposits=Money(Decimal("0.00")),
+                final_balance=Money(Decimal("10000.00")),
+            )
+            for i in range(1, 4)  # Create 3 balance records
+        ]
+
+        for balance in balances:
+            _ = balance_repository.create(balance)
+
+        # Act
+        all_history = balance_repository.get_history("portfolio-id-1", limit=None)
+
+        # Assert
+        assert len(all_history) == 3
+
+
+class TestPortfolioBalanceRepositoryDateParsing:
+    """Test date parsing edge cases in _row_to_entity method."""
+
+    def test_row_to_entity_handles_invalid_date_format(
+        self, balance_repository: SqlitePortfolioBalanceRepository
+    ) -> None:
+        """Should use today's date when balance_date parsing fails."""
+        from unittest.mock import patch
+
+        # Arrange
+        # Create a mock row with invalid date format that would cause parsing to fail
+        mock_row = {
+            "id": "test-id",
+            "balance_date": "invalid-date-format",  # This will cause parsing to fail
+            "portfolio_id": "portfolio-1",
+            "withdrawals": 0.0,
+            "deposits": 1000.0,
+            "final_balance": 10000.0,
+            "index_change": 2.5,
+            "created_at": "2024-01-01 12:00:00",
+        }
+
+        # Mock date.today() to return a predictable date
+        expected_date = date(2024, 6, 23)
+        with patch(
+            "src.infrastructure.repositories.sqlite_balance_repository.date"
+        ) as mock_date:
+            mock_date.today.return_value = expected_date
+            mock_date.fromisoformat.side_effect = ValueError("Invalid date format")
+
+            # Act - Access private method for testing edge case
+            entity = balance_repository._row_to_entity(mock_row)  # type: ignore[attr-defined,arg-type]
+
+            # Assert
+            assert entity.balance_date == expected_date
+            mock_date.today.assert_called_once()

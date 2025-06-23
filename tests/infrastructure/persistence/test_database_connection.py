@@ -329,3 +329,19 @@ class TestDatabaseConnection:
 
         conn1.close()
         conn2.close()
+
+    def test_close_with_persistent_connection(self) -> None:
+        """Should close persistent connection when it exists."""
+        # Arrange
+        db_conn = DatabaseConnection(self.temp_db.name)
+        db_conn.initialize_schema()
+
+        # Create a persistent connection by setting it directly
+        db_conn._connection = db_conn.get_connection()  # type: ignore[attr-defined]
+
+        # Act
+        db_conn.close()
+
+        # Assert
+        assert db_conn._connection is None  # type: ignore[attr-defined]
+        assert len(db_conn._active_connections) == 0  # type: ignore[attr-defined]

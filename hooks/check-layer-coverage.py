@@ -36,7 +36,7 @@ class LayerCoverageChecker:
                 "layers": {
                     "domain": {"path": "src/domain", "threshold": 100},
                     "application": {"path": "src/application", "threshold": 90},
-                    "infrastructure": {"path": "src/infrastructure", "threshold": 85},
+                    "infrastructure": {"path": "src/infrastructure", "threshold": 100},
                     "presentation": {"path": "src/presentation", "threshold": 75},
                 },
             }
