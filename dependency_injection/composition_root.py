@@ -140,7 +140,6 @@ class CompositionRoot:
             StockPageCoordinator,
             lambda: StockPageCoordinator(
                 controller=container.resolve(StockController),
-                adapter=container.resolve(StreamlitStockAdapter),
                 presentation_adapter=container.resolve(StockPresentationAdapter),
             ),
         )
