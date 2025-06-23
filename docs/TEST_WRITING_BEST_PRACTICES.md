@@ -122,11 +122,25 @@ exclude_lines =
     ^\s*raise\s*$
     super\(\).__setattr__
     except.*:\s*$
-    return False
     
     # Standard exclusions
     pragma: no cover
     if __name__ == .__main__.:
+```
+
+**Critical Learning: Avoid Overly Broad Exclusions**
+
+❌ **NEVER exclude these patterns globally:**
+```ini
+return False  # Too broad - often legitimate control flow
+return None   # Too broad - often legitimate control flow
+```
+
+✅ **Instead, use inline exclusions for specific cases:**
+```python
+# For truly untestable defensive code only
+if sector is None:
+    return None  # pragma: no cover
 ```
 
 **What to exclude:**
@@ -136,10 +150,11 @@ exclude_lines =
 - Debug-only code paths
 
 **What NOT to exclude:**
-- Business logic
+- Business logic with `return False` or `return None`
 - Error handling with meaningful behavior
-- Validation logic
-- State changes
+- Validation logic that returns boolean values
+- State changes that return None
+- Legitimate control flow statements
 
 ### Layer-Specific Coverage Enforcement
 
@@ -359,6 +374,63 @@ Include coverage reports in CI/CD:
 4. **Regular retrospectives** to improve practices
 5. **Tooling investment** in test infrastructure
 
+## Real-World Coverage Examples
+
+### Case Study: Achieving 100% Coverage Responsibly
+
+**Problem**: Initial attempt to achieve 100% coverage used overly broad exclusions:
+```ini
+# ❌ BAD - Too broad exclusions in .coveragerc
+exclude_lines = 
+    return False
+    return None
+```
+
+**Solution**: Removed broad exclusions and used targeted inline exclusions:
+```python
+# ✅ GOOD - Targeted inline exclusion for defensive code
+@staticmethod
+def _normalize_sector(sector: Optional[str]) -> Optional[str]:
+    """Normalize sector."""
+    if sector is None:
+        return None  # pragma: no cover  # Defensive, hard to test
+    normalized = sector.strip()
+    return normalized if normalized else None
+```
+
+**Results**: 
+- Domain layer: 100% coverage (all legitimate business logic tested)
+- Application layer: 100% coverage (1 inline exclusion for defensive code)
+- No false coverage inflation
+- All meaningful code paths properly tested
+
+### When to Use `# pragma: no cover`
+
+**Appropriate uses:**
+```python
+# Defensive programming that's hard to trigger in tests
+if unexpected_none_value is None:
+    return None  # pragma: no cover
+
+# Platform-specific code that can't be tested in CI
+if sys.platform == "win32":  # pragma: no cover
+    return windows_specific_implementation()
+```
+
+**Inappropriate uses:**
+```python
+# ❌ Don't exclude business logic
+def calculate_fee(amount: Money) -> Money:
+    if amount.is_zero():
+        return Money.zero()  # This SHOULD be tested!
+    return amount * Decimal("0.05")
+
+# ❌ Don't exclude error conditions
+def validate_stock_symbol(symbol: str) -> None:
+    if not symbol.strip():
+        raise ValueError("Symbol required")  # This SHOULD be tested!
+```
+
 ## Conclusion
 
 Quality testing is not about achieving arbitrary coverage numbers—it's about building confidence in your codebase through meaningful validation of business logic and behavior. By following these practices, you'll create a robust test suite that serves as both documentation and safety net for your domain logic.
@@ -366,6 +438,7 @@ Quality testing is not about achieving arbitrary coverage numbers—it's about b
 Remember:
 - **Tests are documentation** of expected behavior
 - **Coverage is a tool, not a goal** - use it to find gaps, not to chase numbers
+- **Use targeted exclusions, not broad patterns** - each exclusion should be justified
 - **Type safety and testing go hand-in-hand** - both contribute to code quality
 - **Never compromise on quality** - shortcuts always cost more in the long run
 

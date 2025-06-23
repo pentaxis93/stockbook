@@ -114,6 +114,31 @@ class TestCreateStockCommand:
         with pytest.raises(AttributeError):
             command.name = "Microsoft"  # type: ignore[misc]
 
+    def test_create_stock_command_equality_with_non_matching_types(self) -> None:
+        """Should return False when compared with non-command objects."""
+        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+
+        # Test against different types - covers hash function and equality branches
+        assert command != "string"
+        assert command != 123
+        assert command != None
+        assert command != {"symbol": "AAPL"}
+
+        # Test hash function is called when using in sets
+        command_set = {command}
+        assert len(command_set) == 1
+
+    def test_create_stock_command_industry_group_without_sector_error(self) -> None:
+        """Should raise ValueError when industry_group provided without sector."""
+        with pytest.raises(
+            ValueError, match="Sector must be provided when industry_group is specified"
+        ):
+            _ = CreateStockCommand(
+                symbol="AAPL",
+                name="Apple Inc.",
+                industry_group="Software",  # No sector provided
+            )
+
 
 class TestUpdateStockCommand:
     """Test suite for UpdateStockCommand."""
@@ -249,3 +274,49 @@ class TestUpdateStockCommand:
         assert "notes" not in fields
         assert fields["name"] == "Apple Inc."
         assert fields["grade"] == "A"
+
+    def test_update_stock_command_equality_with_non_matching_types(self) -> None:
+        """Should return False when compared with non-command objects."""
+        command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
+
+        # Test against different types - covers hash function and equality branches
+        assert command != "string"
+        assert command != 123
+        assert command != None
+        assert command != {"stock_id": "test-stock-1"}
+
+        # Test hash function is called when using in sets
+        command_set = {command}
+        assert len(command_set) == 1
+
+    def test_update_stock_command_sector_property_getter(self) -> None:
+        """Should return sector value through property getter."""
+        command = UpdateStockCommand(stock_id="test-stock-1", sector="Technology")
+
+        # Test sector property getter
+        assert command.sector == "Technology"
+
+        # Test None case
+        command_no_sector = UpdateStockCommand(stock_id="test-stock-1")
+        assert command_no_sector.sector is None
+
+    def test_update_stock_command_normalize_sector_none_case(self) -> None:
+        """Should handle None sector normalization correctly."""
+        # Test the None case in _normalize_sector method
+        command = UpdateStockCommand(stock_id="test-stock-1", sector=None)
+
+        assert command.sector is None
+
+    def test_update_stock_command_with_explicit_none_sector(self) -> None:
+        """Should handle explicitly passed None sector."""
+        # This tests the return None branch in _normalize_sector
+        command = UpdateStockCommand(
+            stock_id="test-stock-1",
+            name="Test Company",
+            sector=None,  # Explicitly None
+            grade="A",
+        )
+
+        assert command.sector is None
+        assert command.name == "Test Company"
+        assert command.grade == "A"

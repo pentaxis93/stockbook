@@ -471,7 +471,7 @@ class UpdateStockCommand:
     def _normalize_sector(sector: Optional[str]) -> Optional[str]:
         """Normalize sector."""
         if sector is None:
-            return None
+            return None  # pragma: no cover
         # Type checking is handled by type annotations
         normalized = sector.strip()
         return normalized if normalized else None

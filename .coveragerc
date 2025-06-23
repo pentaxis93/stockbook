@@ -48,7 +48,6 @@ exclude_lines =
     ^\s*raise\s*$
     super\(\).__setattr__
     except.*:\s*$
-    return False
 
 # Skip files with 100% coverage in report (reduces noise)
 skip_covered = False
