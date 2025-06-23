@@ -186,3 +186,87 @@ class TestStockPageCoordinator:
         assert metrics["grade_b_count"] == 0
         assert metrics["grade_c_count"] == 0
         assert metrics["high_grade_percentage"] == 0.0
+
+    def test_get_stock_management_data_create_action(self) -> None:
+        """Should return form data for create action."""
+        # Act
+        result = self.coordinator.get_stock_management_data("create")
+
+        # Assert
+        assert result is not None
+        assert result["action"] == "create"
+        assert "form_fields" in result["data"]
+        assert "validation_rules" in result["data"]
+
+        expected_fields = [
+            "symbol",
+            "name",
+            "sector",
+            "industry_group",
+            "grade",
+            "notes",
+        ]
+        assert result["data"]["form_fields"] == expected_fields
+
+        expected_rules = {
+            "symbol": "required|max:5|alpha",
+            "name": "required|max:200",
+            "grade": "in:A,B,C",
+        }
+        assert result["data"]["validation_rules"] == expected_rules
+
+    def test_get_stock_management_data_search_action(self) -> None:
+        """Should return search form data for search action."""
+        # Act
+        result = self.coordinator.get_stock_management_data("search")
+
+        # Assert
+        assert result is not None
+        assert result["action"] == "search"
+        assert "search_fields" in result["data"]
+        assert "filter_options" in result["data"]
+
+        expected_fields = ["symbol", "name", "sector", "grade"]
+        assert result["data"]["search_fields"] == expected_fields
+
+        expected_options = {
+            "grade": ["A", "B", "C"],
+            "sector": [],  # Would be populated from existing stocks
+        }
+        assert result["data"]["filter_options"] == expected_options
+
+    def test_get_stock_management_data_default_action(self) -> None:
+        """Should default to list action for unknown actions."""
+        # Arrange
+        stock_view_model = StockViewModel(
+            id="stock-id-1", symbol="AAPL", name="Apple Inc.", grade="A"
+        )
+        stock_list_response = StockListResponse.create_success(
+            [stock_view_model], "Retrieved 1 stock"
+        )
+        self.mock_controller.get_stock_list.return_value = stock_list_response
+
+        # Act
+        result = self.coordinator.get_stock_management_data("unknown_action")
+
+        # Assert
+        assert result is not None
+        assert result["action"] == "unknown_action"
+        assert result["data"] == [stock_view_model]
+        assert result["success"] is True
+
+    def test_get_stock_detail_data_failure(self) -> None:
+        """Should handle failure in stock detail retrieval."""
+        # Arrange
+        detail_response = StockDetailResponse.create_error("Stock not found")
+        self.mock_controller.get_stock_by_symbol.return_value = detail_response
+
+        # Act
+        result = self.coordinator.get_stock_detail_data("NOTFOUND")
+
+        # Assert
+        assert result is not None
+        assert result["stock"] is None
+        assert result["sections"] == []
+        assert result["success"] is False
+        assert result["message"] == "Stock not found"

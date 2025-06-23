@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the decoupled presentation adapter that doesn't depend on specific UI frameworks.
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from src.presentation.adapters.stock_presentation_adapter import (
     StockPresentationAdapter,
@@ -20,6 +20,7 @@ from src.presentation.view_models.stock_view_models import (
     CreateStockResponse,
     StockDetailResponse,
     StockListResponse,
+    StockSearchRequest,
     StockViewModel,
     ValidationErrorResponse,
 )
@@ -430,5 +431,444 @@ class TestStockPresentationAdapter:
         self.mock_controller.get_stock_list.assert_called_once()
         self.mock_ui_operations.render_data_table.assert_called_once()
 
-        # Verify no direct framework calls were made
-        # (This is implicit since we're using mocks for all UI operations)
+    def test_render_create_stock_form_exception_handling(self) -> None:
+        """Should handle exceptions during form rendering gracefully."""
+        # Arrange
+        self.mock_ui_operations.create_form.side_effect = Exception("UI Error")
+
+        # Act
+        result = self.adapter.render_create_stock_form()
+
+        # Assert
+        assert result is None
+        self.mock_ui_operations.show_error.assert_called_once()
+
+    def test_render_create_stock_form_trigger_rerun(self) -> None:
+        """Should trigger rerun when refresh_on_success is True."""
+        # Arrange
+        self.mock_ui_operations.create_form.return_value.__enter__ = Mock()
+        self.mock_ui_operations.create_form.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_text_input.side_effect = [
+            "AAPL",
+            "Apple Inc.",
+            "Technology",
+        ]
+        self.mock_ui_operations.create_selectbox.return_value = "A"
+        self.mock_ui_operations.create_text_area.return_value = ""
+        self.mock_ui_operations.create_form_submit_button.return_value = True
+
+        success_response = CreateStockResponse.create_success(
+            stock_id="stock-id-1", symbol="AAPL", message="Stock created successfully"
+        )
+        self.mock_controller.create_stock.return_value = success_response
+
+        # Act
+        result = self.adapter.render_create_stock_form(refresh_on_success=True)
+
+        # Assert
+        assert result == success_response
+        self.mock_ui_operations.trigger_rerun.assert_called_once()
+
+    def test_render_create_stock_form_failure_response(self) -> None:
+        """Should handle failed creation response."""
+        # Arrange
+        self.mock_ui_operations.create_form.return_value.__enter__ = Mock()
+        self.mock_ui_operations.create_form.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_text_input.side_effect = [
+            "AAPL",
+            "Apple Inc.",
+            "Technology",
+        ]
+        self.mock_ui_operations.create_selectbox.return_value = "A"
+        self.mock_ui_operations.create_text_area.return_value = ""
+        self.mock_ui_operations.create_form_submit_button.return_value = True
+
+        failure_response = CreateStockResponse.create_error("Creation failed")
+        self.mock_controller.create_stock.return_value = failure_response
+
+        # Act
+        result = self.adapter.render_create_stock_form()
+
+        # Assert
+        assert result == failure_response
+        self.mock_ui_operations.show_error.assert_called_once_with("Creation failed")
+
+    def test_render_stock_detail_validation_error(self) -> None:
+        """Should handle validation errors in stock detail."""
+        # Arrange
+        validation_response = ValidationErrorResponse(
+            {"symbol": "Invalid symbol format"}
+        )
+        self.mock_controller.get_stock_by_symbol.return_value = validation_response
+
+        # Act
+        result = self.adapter.render_stock_detail("INVALID")
+
+        # Assert
+        assert result == validation_response
+        self.mock_validation_operations.display_validation_errors.assert_called_once_with(
+            {"symbol": "Invalid symbol format"}
+        )
+
+    def test_render_stock_detail_whitespace_symbol(self) -> None:
+        """Should handle whitespace-only symbol."""
+        # Act
+        result = self.adapter.render_stock_detail("   ")
+
+        # Assert
+        assert result is None
+        self.mock_ui_operations.show_error.assert_called_once_with(
+            "Symbol cannot be empty"
+        )
+
+    def test_render_stock_detail_missing_stock_data(self) -> None:
+        """Should handle response with missing stock data."""
+        # Arrange
+        stock = StockViewModel(
+            id="stock-123", symbol="AAPL", name="Apple Inc.", grade="A"
+        )
+        response = StockDetailResponse.create_success(stock, "Stock found")
+        response.stock = None  # Simulate missing stock data
+        self.mock_controller.get_stock_by_symbol.return_value = response
+
+        # Act
+        result = self.adapter.render_stock_detail("AAPL")
+
+        # Assert
+        assert result == response
+        self.mock_ui_operations.show_error.assert_called_once_with(
+            "Stock data is missing"
+        )
+
+    def test_render_stock_detail_exception_handling(self) -> None:
+        """Should handle exceptions during stock detail rendering."""
+        # Arrange
+        self.mock_controller.get_stock_by_symbol.side_effect = Exception(
+            "Controller error"
+        )
+
+        # Act
+        result = self.adapter.render_stock_detail("AAPL")
+
+        # Assert
+        assert result is None
+        self.mock_ui_operations.show_error.assert_called_once()
+
+    def test_render_grade_filter_widget_no_selection(self) -> None:
+        """Should handle grade filter without selection."""
+        # Arrange
+        columns = [Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_selectbox.return_value = ""  # No selection
+        self.mock_ui_operations.create_button.return_value = True
+
+        # Act
+        result = self.adapter.render_grade_filter_widget()
+
+        # Assert
+        assert result is None
+
+    def test_render_grade_filter_widget_no_apply(self) -> None:
+        """Should handle grade filter without applying."""
+        # Arrange
+        columns = [Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_selectbox.return_value = "A"
+        self.mock_ui_operations.create_button.return_value = False  # Not applied
+
+        # Act
+        result = self.adapter.render_grade_filter_widget()
+
+        # Assert
+        assert result is None
+
+    def test_render_grade_filter_widget_exception(self) -> None:
+        """Should handle exceptions in grade filter widget."""
+        # Arrange
+        self.mock_ui_operations.create_columns.side_effect = Exception("Column error")
+
+        # Act
+        result = self.adapter.render_grade_filter_widget()
+
+        # Assert
+        assert result is None
+        self.mock_ui_operations.show_error.assert_called_once()
+
+    def test_render_grade_filter_widget_validation_error(self) -> None:
+        """Should handle validation errors in grade filter results through public interface."""
+        # Arrange
+        columns = [Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_selectbox.return_value = "X"  # Invalid grade
+        self.mock_ui_operations.create_button.return_value = True
+
+        validation_response = ValidationErrorResponse({"grade": "Invalid grade"})
+        self.mock_controller.search_stocks.return_value = validation_response
+
+        # Act
+        result = self.adapter.render_grade_filter_widget()
+
+        # Assert
+        assert result == validation_response
+        self.mock_validation_operations.display_validation_errors.assert_called_once_with(
+            {"grade": "Invalid grade"}
+        )
+
+    def test_render_grade_filter_widget_no_matching_stocks(self) -> None:
+        """Should handle grade filter with no matching stocks through public interface."""
+        # Arrange
+        columns = [Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_selectbox.return_value = "C"
+        self.mock_ui_operations.create_button.return_value = True
+
+        response = StockListResponse.create_success([], "No stocks found")
+        self.mock_controller.search_stocks.return_value = response
+
+        # Act
+        result = self.adapter.render_grade_filter_widget()
+
+        # Assert
+        assert result == response
+        self.mock_ui_operations.show_info.assert_any_call("**No stocks found**")
+        self.mock_ui_operations.show_info.assert_any_call(
+            "No stocks found with grade C"
+        )
+
+    def test_render_grade_filter_widget_service_failure(self) -> None:
+        """Should handle failed grade filter response through public interface."""
+        # Arrange
+        columns = [Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_selectbox.return_value = "A"
+        self.mock_ui_operations.create_button.return_value = True
+
+        response = StockListResponse.create_error("Filter failed")
+        self.mock_controller.search_stocks.return_value = response
+
+        # Act
+        result = self.adapter.render_grade_filter_widget()
+
+        # Assert
+        assert result == response
+        self.mock_ui_operations.show_error.assert_called_once_with("Filter failed")
+
+    def test_render_stock_filters_no_apply(self) -> None:
+        """Should handle stock filters without applying."""
+        # Arrange
+        columns = [Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+        self.mock_ui_operations.create_button.return_value = False  # Not applied
+
+        # Act
+        result = self.adapter.render_stock_filters()
+
+        # Assert
+        assert result is None
+
+    def test_render_stock_filters_exception(self) -> None:
+        """Should handle exceptions in stock filters."""
+        # Arrange
+        self.mock_ui_operations.render_subheader.side_effect = Exception("Header error")
+
+        # Act
+        result = self.adapter.render_stock_filters()
+
+        # Assert
+        assert result is None
+        self.mock_ui_operations.show_error.assert_called_once()
+
+    def test_render_sidebar_navigation_exception(self) -> None:
+        """Should handle exceptions in sidebar navigation."""
+        # Arrange
+        self.mock_layout_operations.create_sidebar.side_effect = Exception(
+            "Sidebar error"
+        )
+
+        # Act
+        result = self.adapter.render_sidebar_navigation()
+
+        # Assert
+        assert result == "list"  # Default return value
+
+    def test_render_advanced_search_form_exception(self) -> None:
+        """Should handle exceptions in advanced search form."""
+        # Arrange
+        self.mock_layout_operations.create_expander.side_effect = Exception(
+            "Expander error"
+        )
+
+        # Act
+        result = self.adapter.render_advanced_search_form()
+
+        # Assert
+        assert result is None
+        self.mock_ui_operations.show_error.assert_called_once()
+
+    def test_render_advanced_search_form_no_filters(self) -> None:
+        """Should handle advanced search with no filter results."""
+        # Arrange
+        expander_mock = Mock()
+        self.mock_layout_operations.create_expander.return_value = expander_mock
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+
+        # Mock render_stock_filters to return None (no filters applied)
+        with patch.object(self.adapter, "render_stock_filters", return_value=None):
+            # Act
+            result = self.adapter.render_advanced_search_form()
+
+            # Assert
+            assert isinstance(result, StockSearchRequest)
+
+    def test_render_stock_list_dataframe_exception(self) -> None:
+        """Should handle exceptions in dataframe rendering through public interface."""
+        # Arrange
+        stocks = [StockViewModel(id="1", symbol="AAPL", name="Apple", grade="A")]
+        response = StockListResponse.create_success(stocks, "Retrieved 1 stock")
+        self.mock_controller.get_stock_list.return_value = response
+
+        # Mock prepare_display_data to raise exception
+        with patch.object(
+            self.adapter, "prepare_display_data", side_effect=Exception("Data error")
+        ):
+            # Act
+            result = self.adapter.render_stock_list()
+
+            # Assert
+            assert result == response
+            self.mock_ui_operations.show_error.assert_called_once_with(
+                "Error displaying stock data"
+            )
+
+    def test_render_advanced_search_form_with_filters(self) -> None:
+        """Should handle advanced search with filter results."""
+        # Arrange
+        expander_mock = Mock()
+        self.mock_layout_operations.create_expander.return_value = expander_mock
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+
+        search_request = StockSearchRequest(symbol_filter="AAPL")
+
+        # Mock render_stock_filters to return search request
+        with patch.object(
+            self.adapter, "render_stock_filters", return_value=search_request
+        ):
+            # Act
+            result = self.adapter.render_advanced_search_form()
+
+            # Assert
+            assert result == search_request
+
+    def test_render_stock_list_with_metrics_and_data(self) -> None:
+        """Should render metrics and dataframe through public interface."""
+        # Arrange
+        stocks = [
+            StockViewModel(
+                id="1", symbol="AAPL", name="Apple", grade="A", notes="Notes"
+            ),
+            StockViewModel(id="2", symbol="GOOGL", name="Google", grade="A", notes=""),
+            StockViewModel(
+                id="3", symbol="MSFT", name="Microsoft", grade="B", notes="More notes"
+            ),
+        ]
+        response = StockListResponse.create_success(stocks, "Retrieved 3 stocks")
+        self.mock_controller.get_stock_list.return_value = response
+
+        # Mock the layout operations for metrics rendering
+        columns = [Mock(), Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+
+        # Act
+        result = self.adapter.render_stock_list()
+
+        # Assert - Verify both metrics and dataframe rendering were called through public interface
+        assert result == response
+        self.mock_ui_operations.render_metric.assert_called()
+        self.mock_ui_operations.render_data_table.assert_called_once()
+
+    def test_render_stock_list_no_metrics_option(self) -> None:
+        """Should render dataframe without explicit metrics call when tested through public interface."""
+        # Arrange
+        stocks = [StockViewModel(id="1", symbol="AAPL", name="Apple", grade="A")]
+        response = StockListResponse.create_success(stocks, "Retrieved 1 stock")
+        self.mock_controller.get_stock_list.return_value = response
+
+        # Act
+        result = self.adapter.render_stock_list()
+
+        # Assert - Verify dataframe rendering was called through public interface
+        assert result == response
+        self.mock_ui_operations.render_data_table.assert_called_once()
+
+    def test_render_stock_dataframe_with_data_metrics_enabled(self) -> None:
+        """Should render dataframe with metrics when explicitly called with show_metrics=True."""
+        # Arrange
+        stocks = [
+            StockViewModel(
+                id="1", symbol="AAPL", name="Apple", grade="A", notes="Notes"
+            )
+        ]
+        columns = [Mock(), Mock(), Mock()]
+        self.mock_ui_operations.create_columns.return_value = columns
+        self.mock_layout_operations.within_container.return_value.__enter__ = Mock()
+        self.mock_layout_operations.within_container.return_value.__exit__ = Mock(
+            return_value=None
+        )
+
+        # Act
+        self.adapter.render_stock_dataframe_with_data(stocks, show_metrics=True)
+
+        # Assert
+        self.mock_ui_operations.render_metric.assert_called()
+        self.mock_ui_operations.render_data_table.assert_called_once()
+
+    def test_render_stock_dataframe_with_data_no_metrics(self) -> None:
+        """Should render dataframe without metrics when show_metrics=False."""
+        # Arrange
+        stocks = [StockViewModel(id="1", symbol="AAPL", name="Apple", grade="A")]
+
+        # Act
+        self.adapter.render_stock_dataframe_with_data(stocks, show_metrics=False)
+
+        # Assert
+        self.mock_ui_operations.render_data_table.assert_called_once()
+        # render_metric should not be called when show_metrics=False
+        self.mock_ui_operations.render_metric.assert_not_called()

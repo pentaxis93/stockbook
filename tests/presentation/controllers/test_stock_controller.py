@@ -16,6 +16,8 @@ from src.presentation.view_models.stock_view_models import (
     CreateStockResponse,
     StockDetailResponse,
     StockListResponse,
+    StockSearchRequest,
+    UpdateStockRequest,
     UpdateStockResponse,
     ValidationErrorResponse,
 )
@@ -245,7 +247,7 @@ class TestStockController:
         # Assert
         assert isinstance(response, StockListResponse)
         assert response.success is False
-        assert response.stocks == []
+        assert not response.stocks
         assert response.message == "Database error"
 
     def test_get_stock_by_symbol_success(self) -> None:
@@ -409,8 +411,6 @@ class TestStockController:
     def test_search_stocks_success(self) -> None:
         """Should search stocks successfully with filters."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import StockSearchRequest
-
         search_request = StockSearchRequest(
             symbol_filter="APP",
             name_filter="Apple",
@@ -457,8 +457,6 @@ class TestStockController:
     def test_search_stocks_no_filters_fallback(self) -> None:
         """Should fallback to get_stock_list when no filters are provided."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import StockSearchRequest
-
         search_request = StockSearchRequest()  # No filters
 
         mock_stocks = [
@@ -500,8 +498,6 @@ class TestStockController:
     def test_search_stocks_validation_error(self) -> None:
         """Should handle validation errors in search request."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import StockSearchRequest
-
         search_request = StockSearchRequest(
             grade_filter="Z",  # Invalid grade
         )
@@ -521,8 +517,6 @@ class TestStockController:
     def test_search_stocks_empty_results(self) -> None:
         """Should handle empty search results gracefully."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import StockSearchRequest
-
         search_request = StockSearchRequest(symbol_filter="NOTFOUND")
 
         self.mock_stock_service.search_stocks.return_value = []
@@ -540,8 +534,6 @@ class TestStockController:
     def test_search_stocks_service_error(self) -> None:
         """Should handle application service errors in search."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import StockSearchRequest
-
         search_request = StockSearchRequest(symbol_filter="AAPL")
 
         self.mock_stock_service.search_stocks.side_effect = Exception("Database error")
@@ -557,8 +549,6 @@ class TestStockController:
     def test_search_stocks_filter_message_formatting(self) -> None:
         """Should format filter messages correctly based on filter count."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import StockSearchRequest
-
         # Test single filter
         search_request_single = StockSearchRequest(symbol_filter="AAPL")
         self.mock_stock_service.search_stocks.return_value = [
@@ -580,8 +570,6 @@ class TestStockController:
     def test_update_stock_with_valid_request(self) -> None:
         """Should update stock successfully with valid request."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import UpdateStockRequest
-
         request = UpdateStockRequest(
             stock_id="stock-id-1",
             name="Apple Inc. (Updated)",
@@ -613,8 +601,6 @@ class TestStockController:
     def test_update_stock_with_validation_errors(self) -> None:
         """Should return validation errors for invalid update request."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import UpdateStockRequest
-
         request = UpdateStockRequest(
             stock_id="stock-id-1",
             name="",  # Invalid empty name
@@ -632,8 +618,6 @@ class TestStockController:
     def test_update_stock_with_nonexistent_stock(self) -> None:
         """Should handle update of nonexistent stock."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import UpdateStockRequest
-
         request = UpdateStockRequest(stock_id="stock-id-999", grade="A")
 
         self.mock_stock_service.update_stock.side_effect = ValueError(
@@ -651,8 +635,6 @@ class TestStockController:
     def test_update_stock_with_no_fields_to_update(self) -> None:
         """Should handle update request with no fields to update."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import UpdateStockRequest
-
         request = UpdateStockRequest(stock_id="stock-id-1")  # No fields to update
 
         # Act
@@ -665,8 +647,6 @@ class TestStockController:
     def test_update_stock_with_service_error(self) -> None:
         """Should handle application service errors during update."""
         # Arrange
-        from src.presentation.view_models.stock_view_models import UpdateStockRequest
-
         request = UpdateStockRequest(stock_id="stock-id-1", grade="A")
 
         self.mock_stock_service.update_stock.side_effect = Exception("Database error")
@@ -678,3 +658,113 @@ class TestStockController:
         assert isinstance(response, UpdateStockResponse)
         assert response.success is False
         assert "Unexpected error: Database error" in response.message
+
+    def test_create_stock_with_missing_id_in_response(self) -> None:
+        """Should handle case when created stock DTO has no ID."""
+        # Arrange
+        request = CreateStockRequest(
+            symbol="AAPL", name="Apple Inc.", sector="Technology", grade="A"
+        )
+
+        # Mock service to return DTO without ID
+        stock_dto_without_id = StockDto(
+            id=None,  # Missing ID
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group=None,
+            grade="A",
+            notes="",
+        )
+        self.mock_stock_service.create_stock.return_value = stock_dto_without_id
+
+        # Act
+        response = self.controller.create_stock(request)
+
+        # Assert
+        assert isinstance(response, CreateStockResponse)
+        assert response.success is False
+        assert "Created stock should have a valid ID" in response.message
+
+    def test_get_stock_by_symbol_empty_symbol_validation(self) -> None:
+        """Should return validation error for empty symbol."""
+        # Act
+        result = self.controller.get_stock_by_symbol("")
+
+        # Assert
+        assert isinstance(result, ValidationErrorResponse)
+        assert "symbol" in result.errors
+        assert "Symbol cannot be empty" in result.errors["symbol"]
+
+    def test_update_stock_with_missing_id_in_response(self) -> None:
+        """Should handle case when updated stock DTO has no ID."""
+        # Arrange
+        request = UpdateStockRequest(
+            stock_id="stock-123", name="Updated Apple Inc.", sector="Technology"
+        )
+
+        # Mock service to return DTO without ID
+        stock_dto_without_id = StockDto(
+            id=None,  # Missing ID
+            symbol="AAPL",
+            name="Updated Apple Inc.",
+            sector="Technology",
+            industry_group=None,
+            grade="A",
+            notes="",
+        )
+        self.mock_stock_service.update_stock.return_value = stock_dto_without_id
+
+        # Act
+        response = self.controller.update_stock(request)
+
+        # Assert
+        assert isinstance(response, UpdateStockResponse)
+        assert response.success is False
+        assert "Updated stock should have a valid ID" in response.message
+
+    def test_search_stocks_no_filters_message_formatting(self) -> None:
+        """Should format message correctly when no filters are applied."""
+        # Arrange
+        request = StockSearchRequest()  # No filters
+
+        # Mock service response
+        stock_dtos = [
+            StockDto("1", "AAPL", "Apple Inc.", "Technology", None, "A", ""),
+            StockDto("2", "GOOGL", "Google Inc.", "Technology", None, "A", ""),
+        ]
+        self.mock_stock_service.get_all_stocks.return_value = stock_dtos
+
+        # Act
+        result = self.controller.search_stocks(request)
+
+        # Assert
+        assert isinstance(result, StockListResponse)
+        assert result.success
+        assert "Retrieved 2 stocks" in result.message
+        assert len(result.stocks) == 2
+
+    def test_search_stocks_empty_active_filters_message(self) -> None:
+        """Should format message correctly when active_filters is empty but search_stocks is called."""
+        # Arrange - Create a mock request that has_filters=True but active_filters={}
+        mock_request = Mock()
+        mock_request.has_filters = True
+        mock_request.active_filters = {}
+        mock_request.symbol_filter = "A"
+        mock_request.name_filter = None
+        mock_request.industry_filter = None
+        mock_request.grade_filter = None
+        mock_request.validate.return_value = {}
+
+        stock_dtos = [
+            StockDto("1", "AAPL", "Apple Inc.", "Technology", None, "A", ""),
+        ]
+        self.mock_stock_service.search_stocks.return_value = stock_dtos
+
+        # Act
+        result = self.controller.search_stocks(mock_request)
+
+        # Assert
+        assert isinstance(result, StockListResponse)
+        assert result.success
+        assert "Retrieved 1 stocks" in result.message  # Line 235 - filter_count == 0

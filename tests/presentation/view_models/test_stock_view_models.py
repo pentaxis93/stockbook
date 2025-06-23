@@ -5,13 +5,18 @@ Following TDD approach - these tests define the expected behavior
 of view models for data transfer between UI and controllers.
 """
 
+import pytest
+
 from src.application.dto.stock_dto import StockDto
 from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
+    StockDetailResponse,
     StockListResponse,
     StockSearchRequest,
     StockViewModel,
+    UpdateStockRequest,
+    UpdateStockResponse,
     ValidationErrorResponse,
 )
 
@@ -330,7 +335,7 @@ class TestStockListResponse:
 
         # Assert
         assert response.success is False
-        assert response.stocks == []
+        assert not response.stocks
         assert response.total_count == 0
         assert response.message == "Database error"
 
@@ -486,3 +491,236 @@ class TestStockSearchRequest:
         invalid_request = StockSearchRequest(grade_filter="Z")
         errors = invalid_request.validate()
         assert "grade_filter" in errors
+
+
+class TestUpdateStockRequest:
+    """Test suite for UpdateStockRequest view model."""
+
+    def test_update_stock_request_initialization(self) -> None:
+        """Should initialize update request with required and optional fields."""
+        request = UpdateStockRequest(
+            stock_id="stock-123",
+            name="Updated Apple Inc.",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="Updated notes",
+        )
+
+        assert request.stock_id == "stock-123"
+        assert request.name == "Updated Apple Inc."
+        assert request.sector == "Technology"
+        assert request.industry_group == "Software"
+        assert request.grade == "A"
+        assert request.notes == "Updated notes"
+
+    def test_update_stock_request_validation_success(self) -> None:
+        """Should pass validation with valid data."""
+
+        request = UpdateStockRequest(
+            stock_id="stock-123",
+            name="Apple Inc.",
+            grade="A",
+            industry_group="Software",
+            notes="Good stock",
+        )
+
+        errors = request.validate()
+        assert not errors
+
+    def test_update_stock_request_validation_empty_stock_id(self) -> None:
+        """Should fail validation with empty stock ID."""
+
+        request = UpdateStockRequest(stock_id="   ")
+
+        errors = request.validate()
+        assert "stock_id" in errors
+        assert "Stock ID must be a non-empty string" in errors["stock_id"]
+
+    def test_update_stock_request_validation_empty_name(self) -> None:
+        """Should fail validation with empty name."""
+
+        request = UpdateStockRequest(stock_id="stock-123", name="   ")
+
+        errors = request.validate()
+        assert "name" in errors
+        assert "Stock name cannot be empty" in errors["name"]
+
+    def test_update_stock_request_validation_name_too_long(self) -> None:
+        """Should fail validation with name too long."""
+
+        long_name = "A" * 201  # Exceeds 200 character limit
+        request = UpdateStockRequest(stock_id="stock-123", name=long_name)
+
+        errors = request.validate()
+        assert "name" in errors
+        assert "Name cannot exceed 200 characters" in errors["name"]
+
+    def test_update_stock_request_validation_invalid_grade(self) -> None:
+        """Should fail validation with invalid grade."""
+
+        request = UpdateStockRequest(stock_id="stock-123", grade="Z")
+
+        errors = request.validate()
+        assert "grade" in errors
+        assert "Grade must be A, B, or C" in errors["grade"]
+
+    def test_update_stock_request_validation_industry_group_too_long(self) -> None:
+        """Should fail validation with industry group too long."""
+
+        long_industry = "A" * 101  # Exceeds 100 character limit
+        request = UpdateStockRequest(stock_id="stock-123", industry_group=long_industry)
+
+        errors = request.validate()
+        assert "industry_group" in errors
+        assert "Industry group cannot exceed 100 characters" in errors["industry_group"]
+
+    def test_update_stock_request_validation_notes_too_long(self) -> None:
+        """Should fail validation with notes too long."""
+
+        long_notes = "A" * 1001  # Exceeds 1000 character limit
+        request = UpdateStockRequest(stock_id="stock-123", notes=long_notes)
+
+        errors = request.validate()
+        assert "notes" in errors
+        assert "Notes cannot exceed 1000 characters" in errors["notes"]
+
+    def test_update_stock_request_has_updates_true(self) -> None:
+        """Should return True when there are fields to update."""
+
+        request = UpdateStockRequest(stock_id="stock-123", name="Updated Name")
+
+        assert request.has_updates() is True
+
+    def test_update_stock_request_has_updates_false(self) -> None:
+        """Should return False when there are no fields to update."""
+
+        request = UpdateStockRequest(stock_id="stock-123")
+
+        assert request.has_updates() is False
+
+    def test_update_stock_request_sanitization(self) -> None:
+        """Should sanitize input data."""
+
+        request = UpdateStockRequest(
+            stock_id="stock-123",
+            name="  apple inc.  ",
+            sector="  technology  ",
+            industry_group="  software  ",
+            grade="a",
+            notes="  some notes  ",
+        )
+
+        sanitized = request.sanitize()
+
+        assert sanitized.stock_id == "stock-123"
+        assert sanitized.name == "Apple Inc."
+        assert sanitized.sector == "technology"
+        assert sanitized.industry_group == "software"
+        assert sanitized.grade == "A"
+        assert sanitized.notes == "some notes"
+
+    def test_update_stock_request_to_command_conversion(self) -> None:
+        """Should convert to application command correctly."""
+
+        request = UpdateStockRequest(
+            stock_id="stock-123",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="High quality stock",
+        )
+
+        command = request.to_command()
+
+        assert command.stock_id == "stock-123"
+        assert command.name == "Apple Inc."
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
+        assert command.grade == "A"
+        assert command.notes == "High quality stock"
+
+
+class TestStockDetailResponseEdgeCases:
+    """Test suite for StockDetailResponse edge cases."""
+
+    def test_stock_detail_response_create_error(self) -> None:
+        """Should create error response correctly."""
+        response = StockDetailResponse.create_error("Stock not found")
+
+        assert response.success is False
+        assert response.stock is None
+        assert response.message == "Stock not found"
+
+    def test_stock_detail_response_create_success(self) -> None:
+        """Should create success response correctly."""
+        stock = StockViewModel(
+            id="stock-123", symbol="AAPL", name="Apple Inc.", grade="A"
+        )
+        response = StockDetailResponse.create_success(stock, "Stock retrieved")
+
+        assert response.success is True
+        assert response.stock == stock
+        assert response.message == "Stock retrieved"
+
+
+class TestUpdateStockResponseEdgeCases:
+    """Test suite for UpdateStockResponse edge cases."""
+
+    def test_update_stock_response_create_success(self) -> None:
+        """Should create success response correctly."""
+        response = UpdateStockResponse.create_success("stock-123", "Stock updated")
+
+        assert response.success is True
+        assert response.stock_id == "stock-123"
+        assert response.message == "Stock updated"
+
+    def test_update_stock_response_create_error(self) -> None:
+        """Should create error response correctly."""
+        response = UpdateStockResponse.create_error("Update failed")
+
+        assert response.success is False
+        assert response.stock_id is None
+        assert response.message == "Update failed"
+
+
+class TestStockSearchRequestFilters:
+    """Test suite for StockSearchRequest filter coverage."""
+
+    def test_stock_search_request_with_name_filter(self) -> None:
+        """Should include name filter in active filters."""
+        request = StockSearchRequest(name_filter="Apple")
+
+        active_filters = request.active_filters
+        assert "name" in active_filters
+        assert active_filters["name"] == "Apple"
+
+    def test_stock_search_request_with_industry_filter(self) -> None:
+        """Should include industry filter in active filters."""
+        request = StockSearchRequest(industry_filter="Technology")
+
+        active_filters = request.active_filters
+        assert "industry" in active_filters
+        assert active_filters["industry"] == "Technology"
+
+
+class TestStockViewModelEdgeCases:
+    """Test suite for StockViewModel edge cases."""
+
+    def test_stock_view_model_from_dto_without_id(self) -> None:
+        """Should raise error when creating view model from DTO without ID."""
+        dto_without_id = StockDto(
+            id=None,  # Missing ID
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="",
+        )
+
+        with pytest.raises(
+            ValueError, match="Cannot create view model from DTO without ID"
+        ):
+            _ = StockViewModel.from_dto(dto_without_id)

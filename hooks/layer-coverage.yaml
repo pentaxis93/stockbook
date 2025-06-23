@@ -21,11 +21,11 @@ layers:
     threshold: 100
     description: "Data persistence and external integrations - moderate coverage"
     
-  # Presentation layer - lower coverage requirement (UI code)
+  # Presentation layer - highest coverage requirement (API layer)
   presentation:
     path: src/presentation
-    threshold: 75
-    description: "UI components and controllers - lower coverage acceptable"
+    threshold: 100
+    description: "UI components and controllers - requires 100% coverage"
 
 # Overall project coverage (replaced by layer-specific enforcement)
 # Global coverage requirement removed in favor of layer-specific thresholds
