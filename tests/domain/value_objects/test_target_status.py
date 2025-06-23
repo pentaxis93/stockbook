@@ -149,7 +149,13 @@ class TestTargetStatusEquality:
         assert active_status != "active"
         assert active_status != 1
         assert active_status != None
-        assert active_status
+        assert active_status != {"value": "active"}
+
+    def test_target_status_base_class_coverage(self) -> None:
+        """Test base class coverage for TargetStatus missing lines."""
+        # Test that normal initialization works (covers base class __setattr__)
+        status = TargetStatus("active")
+        assert status.value == "active"
 
     def test_target_status_hashable(self) -> None:
         """Should be hashable for use in collections."""

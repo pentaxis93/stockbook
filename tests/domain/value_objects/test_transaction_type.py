@@ -139,4 +139,29 @@ class TestTransactionTypeEquality:
         assert buy_type != "buy"
         assert buy_type != 1
         assert buy_type != None
-        assert buy_type  # Test that buy_type is truthy (not empty list)
+        assert buy_type != {"value": "buy"}
+
+    def test_transaction_type_immutability(self) -> None:
+        """Should be immutable after creation."""
+        transaction_type = TransactionType("buy")
+
+        # Test that attempting to modify raises AttributeError
+        with pytest.raises(AttributeError, match="TransactionType is immutable"):
+            transaction_type.value = "sell"  # type: ignore[misc]
+
+        with pytest.raises(AttributeError, match="TransactionType is immutable"):
+            transaction_type._value = "sell"  # type: ignore[misc]
+
+    def test_transaction_type_base_class_coverage(self) -> None:
+        """Test base class coverage for TransactionType missing lines."""
+        # Test that normal initialization works (covers line 91 - super().__setattr__)
+        transaction_type = TransactionType("buy")
+        assert transaction_type.value == "buy"
+
+        # Test __str__ method (covers line 71)
+        assert str(transaction_type) == "buy"
+
+        # Test hash method (covers line 85)
+        transaction_type1 = TransactionType("buy")
+        transaction_type2 = TransactionType("buy")
+        assert hash(transaction_type1) == hash(transaction_type2)

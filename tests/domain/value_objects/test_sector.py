@@ -58,7 +58,14 @@ class TestSectorValueObject:
         sector = Sector("Technology")
         assert sector != "Technology"
         assert sector != 123
-        assert sector is not None
+        assert sector != None
+        assert sector != {"value": "Technology"}
+
+    def test_sector_base_class_coverage(self) -> None:
+        """Test base class coverage for Sector missing lines."""
+        # Test that normal initialization works (covers base class __setattr__)
+        sector = Sector("Technology")
+        assert sector.value == "Technology"
 
     def test_sector_hash(self) -> None:
         """Test sector can be used as dictionary key."""

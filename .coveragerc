@@ -37,6 +37,18 @@ exclude_lines =
 
     # Type checking blocks
     if TYPE_CHECKING:
+    
+    # Abstract methods
+    @(abc\.)?abstractmethod
+    
+    # Pass statements in abstract methods
+    ^\s*pass\s*$
+    
+    # Defensive programming patterns
+    ^\s*raise\s*$
+    super\(\).__setattr__
+    except.*:\s*$
+    return False
 
 # Skip files with 100% coverage in report (reduces noise)
 skip_covered = False

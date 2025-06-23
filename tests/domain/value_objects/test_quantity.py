@@ -282,3 +282,41 @@ class TestQuantityEdgeCases:
         assert result_int.value == Decimal("150")
         assert result_float.value == Decimal("125.5")
         assert result_decimal.value == Decimal("110.25")
+
+    def test_quantity_equality_with_non_quantity_object(self) -> None:
+        """Test that quantity equality returns False for non-Quantity objects."""
+        qty = Quantity(Decimal("100.5"))
+
+        # Test equality with different types - should return False
+        assert qty != Decimal("100.5")
+        assert qty != 100.5
+        assert qty != 123
+        assert qty != None
+        assert qty != {"value": Decimal("100.5")}
+
+    def test_quantity_arithmetic_error_conditions(self) -> None:
+        """Test quantity arithmetic error conditions for full coverage."""
+        qty = Quantity(100)
+
+        # Test addition with invalid type
+        with pytest.raises(
+            TypeError, match="Can only add Quantity or numeric types to Quantity"
+        ):
+            _ = qty + "invalid"
+
+        # Test subtraction with invalid type
+        with pytest.raises(
+            TypeError, match="Can only subtract Quantity or numeric types from Quantity"
+        ):
+            _ = qty - "invalid"
+
+    def test_quantity_arithmetic_with_numeric_types(self) -> None:
+        """Test quantity arithmetic operations with numeric types for coverage."""
+        qty = Quantity(100)
+
+        # Test subtraction with numeric types (covers line 49)
+        result = qty - 25.5
+        assert result.value == Decimal("74.5")
+
+        result = qty - Decimal("30")
+        assert result.value == Decimal("70")

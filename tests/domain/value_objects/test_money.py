@@ -439,6 +439,60 @@ class TestMoneyArithmeticErrorCases:
         neg_value = -value
         assert neg_value.value == Decimal("-100")
 
-        # Test __abs__ method (line 144-146)
+        # Test __abs__ method
         abs_value = abs(TestNumeric(-50))
         assert abs_value.value == Decimal("50")
+
+    def test_base_numeric_missing_coverage_lines(self) -> None:
+        """Test specific missing coverage lines in BaseNumericValueObject."""
+        from src.domain.value_objects.money import BaseNumericValueObject
+
+        class TestNumeric(BaseNumericValueObject):
+            pass
+
+        value = TestNumeric(100)
+
+        # Test lines that Money overrides but base class still needs coverage
+        # Line 104: isinstance check in BaseNumericValueObject.__add__
+        result = value + TestNumeric(50)
+        assert result.value == Decimal("150")
+
+        # Line 114: isinstance check in BaseNumericValueObject.__sub__
+        result = value - TestNumeric(30)
+        assert result.value == Decimal("70")
+
+        # Line 126: return in BaseNumericValueObject.__mul__
+        result = value * 2
+        assert result.value == Decimal("200")
+
+        # Line 138: return in BaseNumericValueObject.__truediv__
+        result = value / 4
+        assert result.value == Decimal("25")
+
+    def test_money_equality_with_non_money_object(self) -> None:
+        """Test that money equality returns False for non-Money objects."""
+        money = Money(Decimal("100.50"))
+
+        # Test equality with different types - should return False
+        assert money != Decimal("100.50")
+        assert money != 100.50
+        assert money != 123
+        assert money != None
+        assert money != {"value": Decimal("100.50")}
+
+    def test_money_arithmetic_edge_cases(self) -> None:
+        """Test money arithmetic operations with edge cases."""
+        money = Money(Decimal("100.00"))
+
+        # Test operations that might have missing coverage
+        result = money + Money(Decimal("0.01"))
+        assert result.value == Decimal("100.01")
+
+        result = money - Money(Decimal("0.01"))
+        assert result.value == Decimal("99.99")
+
+        result = money * 2
+        assert result.value == Decimal("200.00")
+
+        result = money / 2
+        assert result.value == Decimal("50.00")

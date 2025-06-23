@@ -374,3 +374,36 @@ class TestTransactionType:
         for invalid_type in invalid_types:
             with pytest.raises(ValueError):
                 _ = TransactionType(invalid_type)
+
+    def test_transaction_equality_and_hash_with_non_transaction_object(self) -> None:
+        """Test that transaction equality and hash work correctly."""
+
+        transaction = TransactionEntity(
+            portfolio_id="portfolio-1",
+            stock_id="stock-1",
+            transaction_date=date(2024, 1, 15),
+            transaction_type=TransactionType("buy"),
+            price=Money(Decimal("100.00")),
+            quantity=Quantity(10),
+        )
+
+        # Test equality with different types - should return False (covers line 109)
+        assert transaction != "not a transaction"
+        assert transaction != 123
+        assert transaction != None
+        assert transaction != {"portfolio_id": "portfolio-1", "stock_id": "stock-1"}
+
+        # Test hash method for collections usage (covers line 121)
+        transaction_hash = hash(transaction)
+        assert isinstance(transaction_hash, int)
+
+        # Test that equal transactions have equal hashes
+        same_transaction = TransactionEntity(
+            portfolio_id="portfolio-1",
+            stock_id="stock-1",
+            transaction_date=date(2024, 1, 15),
+            transaction_type=TransactionType("buy"),
+            price=Money(Decimal("100.00")),
+            quantity=Quantity(10),
+        )
+        assert hash(transaction) == hash(same_transaction)

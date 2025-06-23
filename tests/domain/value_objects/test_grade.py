@@ -104,6 +104,22 @@ class TestGradeValueObject:
         with pytest.raises(AttributeError, match="Grade is immutable"):
             grade._value = "B"  # type: ignore[attr-defined]
 
+    def test_grade_equality_with_non_grade_object(self) -> None:
+        """Test that grade equality returns False for non-Grade objects."""
+        grade = Grade("A")
+
+        # Test equality with different types - should return False
+        assert grade != "A"
+        assert grade != 123
+        assert grade != None
+        assert grade != {"value": "A"}
+
     def test_grade_valid_grades_constant(self) -> None:
         """Test that VALID_GRADES constant is accessible and correct."""
         assert Grade.VALID_GRADES == {"A", "B", "C", "D", "F"}
+
+    def test_grade_base_class_coverage(self) -> None:
+        """Test base class coverage for Grade missing lines."""
+        # Test that normal initialization works (covers line 71 - super().__setattr__)
+        grade = Grade("A")
+        assert grade.value == "A"

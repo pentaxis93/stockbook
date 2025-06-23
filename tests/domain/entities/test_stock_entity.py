@@ -1013,3 +1013,19 @@ class TestStockEntityConcurrencyScenarios:
         # Should be able to retrieve using different AAPL instance with same symbol
         assert portfolio_weights[aapl2] == 0.6  # aapl2 should map to same key as aapl1
         assert portfolio_weights[msft] == 0.4
+
+    def test_stock_equality_with_non_stock_object(self) -> None:
+        """Test that stock equality returns False for non-StockEntity objects."""
+        stock = StockEntity(
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),  # Valid for Technology sector
+            grade=Grade("A"),
+        )
+
+        # Test equality with different types - should return False (covers line 121)
+        assert stock != "not a stock"
+        assert stock != 123
+        assert stock != None
+        assert stock != {"symbol": "AAPL", "company_name": "Apple Inc."}

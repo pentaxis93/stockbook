@@ -804,3 +804,53 @@ class TestRepositoryContractCompliance:
 
         assert uow.committed is True
         assert uow.entered is True
+
+
+class TestAbstractMethodCoverage:
+    """Test abstract method coverage for repository interfaces."""
+
+    def test_repository_interfaces_are_properly_abstract(self) -> None:
+        """Test that repository interfaces cannot be instantiated directly."""
+        abstract_classes = [
+            IStockRepository,
+            IPortfolioRepository,
+            ITransactionRepository,
+            IPortfolioBalanceRepository,
+            ITargetRepository,
+            IJournalRepository,
+            IUnitOfWork,
+            IStockBookUnitOfWork,
+        ]
+
+        for abstract_class in abstract_classes:
+            with pytest.raises(TypeError):
+                abstract_class()  # type: ignore
+
+    def test_abstract_method_contracts_exist(self) -> None:
+        """Test that all repository interfaces define proper abstract method contracts."""
+        # Test IStockRepository methods exist
+        assert hasattr(IStockRepository, "create")
+        assert hasattr(IStockRepository, "get_by_id")
+        assert hasattr(IStockRepository, "get_by_symbol")
+        assert hasattr(IStockRepository, "get_all")
+        assert hasattr(IStockRepository, "update")
+        assert hasattr(IStockRepository, "delete")
+        assert hasattr(IStockRepository, "exists_by_symbol")
+        assert hasattr(IStockRepository, "get_by_grade")
+        assert hasattr(IStockRepository, "get_by_industry_group")
+        assert hasattr(IStockRepository, "search_stocks")
+        assert hasattr(IStockRepository, "get_by_sector")
+
+        # Test that all interfaces have abstractmethods
+        for interface in [
+            IStockRepository,
+            IPortfolioRepository,
+            ITransactionRepository,
+            IPortfolioBalanceRepository,
+            ITargetRepository,
+            IJournalRepository,
+            IUnitOfWork,
+            IStockBookUnitOfWork,
+        ]:
+            assert hasattr(interface, "__abstractmethods__")
+            assert len(interface.__abstractmethods__) > 0

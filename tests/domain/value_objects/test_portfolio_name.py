@@ -354,3 +354,19 @@ class TestPortfolioNameEdgeCases:
             ValueError, match="Portfolio name cannot exceed 100 characters"
         ):
             _ = PortfolioName(too_long_unicode_name)
+
+    def test_portfolio_name_equality_with_non_portfolio_name_object(self) -> None:
+        """Test that portfolio name equality returns False for non-PortfolioName objects."""
+        name = PortfolioName("Growth Portfolio")
+
+        # Test equality with different types - should return False
+        assert name != "Growth Portfolio"
+        assert name != 123
+        assert name != None
+        assert name != {"value": "Growth Portfolio"}
+
+    def test_portfolio_name_base_class_coverage(self) -> None:
+        """Test base class coverage for PortfolioName missing lines."""
+        # Test that normal initialization works (covers base class __setattr__)
+        name = PortfolioName("Valid name")
+        assert name.value == "Valid name"

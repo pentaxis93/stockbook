@@ -356,3 +356,13 @@ class TestIndexChangeEdgeCases:
         except ValueError:
             # This is expected if the implementation validates after rounding
             pass
+
+    def test_index_change_equality_with_non_index_change_object(self) -> None:
+        """Test that index change equality returns False for non-IndexChange objects."""
+        change = IndexChange(5.25)
+
+        # Test equality with different types - should return False
+        assert change != 5.25
+        assert change != 123
+        assert change != None
+        assert change != {"value": 5.25}

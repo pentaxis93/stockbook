@@ -212,7 +212,13 @@
       "Bash(pip show:*)",
       "Bash(pip index versions:*)",
       "Bash(docstr-coverage:*)",
-      "Bash(pip uninstall:*)"
+      "Bash(pip uninstall:*)",
+      "mcp__serena__create_text_file",
+      "mcp__serena__activate_project",
+      "mcp__serena__get_current_config",
+      "mcp__serena__switch_modes",
+      "mcp__serena__list_memories",
+      "Bash(coverage debug:*)"
     ],
     "deny": []
   }

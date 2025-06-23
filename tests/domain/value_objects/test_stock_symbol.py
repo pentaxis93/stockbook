@@ -89,7 +89,8 @@ class TestStockSymbol:
         symbol = StockSymbol("AAPL")
         assert symbol != "AAPL"
         assert symbol != 123
-        assert symbol is not None
+        assert symbol != None
+        assert symbol != {"value": "AAPL"}
 
     def test_stock_symbol_hash(self) -> None:
         """Should be hashable for use in sets/dicts."""
@@ -139,6 +140,21 @@ class TestStockSymbol:
         assert StockSymbol.is_valid("AAPL123") is False
         assert StockSymbol.is_valid("") is False
         assert StockSymbol.is_valid("TOOLONG") is False
+
+        # Test error handling in is_valid method - this will cause TypeError/ValueError
+        assert (
+            StockSymbol.is_valid("AA-PL") is False
+        )  # Special characters cause validation error
+
+    def test_stock_symbol_base_class_coverage(self) -> None:
+        """Test base class coverage for StockSymbol missing lines."""
+        # Test that normal initialization works (covers line 62 - super().__setattr__)
+        symbol = StockSymbol("AAPL")
+        assert symbol.value == "AAPL"
+
+        # Test exception handling in is_valid with invalid symbols (covers lines 109-110)
+        # This will trigger ValueError that gets caught and returns False
+        assert StockSymbol.is_valid("") is False  # Empty string causes validation error
 
     def test_stock_symbol_normalize_class_method(self) -> None:
         """Should provide class method to normalize symbol format."""

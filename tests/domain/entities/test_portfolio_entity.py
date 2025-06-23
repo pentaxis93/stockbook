@@ -291,3 +291,15 @@ class TestPortfolioName:
         portfolio_name = PortfolioName(max_length_name)
         assert portfolio_name.value == max_length_name
         assert len(portfolio_name.value) == 100
+
+    def test_portfolio_equality_with_non_portfolio_object(self) -> None:
+        """Test that portfolio equality returns False for non-PortfolioEntity objects."""
+        portfolio = PortfolioEntity(
+            name=PortfolioName("Test Portfolio"),
+        )
+
+        # Test equality with different types - should return False (covers line 94)
+        assert portfolio != "not a portfolio"
+        assert portfolio != 123
+        assert portfolio != None
+        assert portfolio != {"name": "Test Portfolio", "risk_percentage": 15.0}

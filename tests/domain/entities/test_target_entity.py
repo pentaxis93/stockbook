@@ -11,7 +11,7 @@ from decimal import Decimal
 import pytest
 
 from src.domain.entities.target_entity import TargetEntity
-from src.domain.value_objects import Money, Notes
+from src.domain.value_objects import Money, Notes, TargetStatus
 
 
 class TestTargetEntity:
@@ -19,8 +19,6 @@ class TestTargetEntity:
 
     def test_create_target_with_value_objects(self) -> None:
         """Test creating a target with all value objects."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -41,8 +39,6 @@ class TestTargetEntity:
 
     def test_create_target_with_minimal_data(self) -> None:
         """Test creating target with only required fields."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -61,8 +57,6 @@ class TestTargetEntity:
 
     def test_create_target_with_none_notes_allowed(self) -> None:
         """Should allow creating target with None for notes."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -77,8 +71,6 @@ class TestTargetEntity:
 
     def test_create_target_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
-        from src.domain.value_objects import TargetStatus
-
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
             _ = TargetEntity(
                 portfolio_id="",  # Invalid empty string
@@ -91,8 +83,6 @@ class TestTargetEntity:
 
     def test_create_target_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
-        from src.domain.value_objects import TargetStatus
-
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
             _ = TargetEntity(
                 portfolio_id="portfolio-id-1",
@@ -105,8 +95,6 @@ class TestTargetEntity:
 
     def test_create_target_with_invalid_status_raises_error(self) -> None:
         """Should raise error for invalid target status through TargetStatus value object."""
-        from src.domain.value_objects import TargetStatus
-
         with pytest.raises(ValueError, match="Target status must be one of"):
             _ = TargetStatus(
                 "invalid_status"
@@ -114,8 +102,6 @@ class TestTargetEntity:
 
     def test_target_equality(self) -> None:
         """Should compare targets based on business identity (portfolio_id, stock_id)."""
-        from src.domain.value_objects import TargetStatus
-
         target1 = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -148,8 +134,6 @@ class TestTargetEntity:
 
     def test_target_hash(self) -> None:
         """Should hash consistently based on business identity."""
-        from src.domain.value_objects import TargetStatus
-
         target1 = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -172,8 +156,6 @@ class TestTargetEntity:
 
     def test_target_string_representation(self) -> None:
         """Should have informative string representation."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -189,8 +171,6 @@ class TestTargetEntity:
 
     def test_target_repr(self) -> None:
         """Should have detailed repr representation."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -206,8 +186,6 @@ class TestTargetEntity:
     # Business behavior tests
     def test_target_activate(self) -> None:
         """Should be able to activate target."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -222,8 +200,6 @@ class TestTargetEntity:
 
     def test_target_mark_as_hit(self) -> None:
         """Should be able to mark target as hit."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -238,8 +214,6 @@ class TestTargetEntity:
 
     def test_target_mark_as_failed(self) -> None:
         """Should be able to mark target as failed."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -254,8 +228,6 @@ class TestTargetEntity:
 
     def test_target_cancel(self) -> None:
         """Should be able to cancel target."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -270,8 +242,6 @@ class TestTargetEntity:
 
     def test_target_is_active(self) -> None:
         """Should check if target is active."""
-        from src.domain.value_objects import TargetStatus
-
         active_target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -295,8 +265,6 @@ class TestTargetEntity:
 
     def test_target_is_hit(self) -> None:
         """Should check if target is hit."""
-        from src.domain.value_objects import TargetStatus
-
         hit_target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -320,8 +288,6 @@ class TestTargetEntity:
 
     def test_target_has_notes(self) -> None:
         """Should check if target has notes."""
-        from src.domain.value_objects import TargetStatus
-
         target_with_notes = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -346,8 +312,6 @@ class TestTargetEntity:
 
     def test_target_update_notes(self) -> None:
         """Should be able to update target notes."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -367,8 +331,6 @@ class TestTargetEntity:
 
     def test_target_create_with_id(self) -> None:
         """Should create target with provided ID."""
-        from src.domain.value_objects import TargetStatus
-
         test_id = "target-id-123"
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
@@ -384,8 +346,6 @@ class TestTargetEntity:
 
     def test_target_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
-        from src.domain.value_objects import TargetStatus
-
         target = TargetEntity(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -402,8 +362,6 @@ class TestTargetEntity:
 
     def test_target_from_persistence(self) -> None:
         """Should create target from persistence with existing ID."""
-        from src.domain.value_objects import TargetStatus
-
         test_id = "persistence-id-456"
         target = TargetEntity.from_persistence(
             test_id,
@@ -425,8 +383,6 @@ class TestTargetStatus:
 
     def test_valid_target_statuses_accepted(self) -> None:
         """Test that valid target statuses are accepted."""
-        from src.domain.value_objects import TargetStatus
-
         valid_statuses = ["active", "hit", "failed", "cancelled"]
         for status in valid_statuses:
             target_status = TargetStatus(status)
@@ -434,8 +390,6 @@ class TestTargetStatus:
 
     def test_target_status_case_insensitive(self) -> None:
         """Test that target statuses are case insensitive."""
-        from src.domain.value_objects import TargetStatus
-
         status1 = TargetStatus("ACTIVE")
         status2 = TargetStatus("Active")
         status3 = TargetStatus("active")
@@ -446,9 +400,52 @@ class TestTargetStatus:
 
     def test_invalid_target_statuses_rejected(self) -> None:
         """Test that invalid target statuses are rejected."""
-        from src.domain.value_objects import TargetStatus
-
         invalid_statuses = ["pending", "unknown", "", "INVALID"]
         for status in invalid_statuses:
             with pytest.raises(ValueError):
                 _ = TargetStatus(status)
+
+    def test_target_status_checks_failed_and_cancelled(self) -> None:
+        """Test that target status property methods work correctly."""
+
+        # Test failed status (covers line 115)
+        failed_target = TargetEntity(
+            portfolio_id="portfolio-1",
+            stock_id="stock-1",
+            failure_price=Money(Decimal("90.00")),
+            pivot_price=Money(Decimal("110.00")),
+            status=TargetStatus("failed"),
+            created_date=date(2024, 1, 15),
+        )
+        assert failed_target.is_failed()
+        assert not failed_target.is_cancelled()
+
+        # Test cancelled status (covers line 119)
+        cancelled_target = TargetEntity(
+            portfolio_id="portfolio-1",
+            stock_id="stock-2",
+            failure_price=Money(Decimal("90.00")),
+            pivot_price=Money(Decimal("110.00")),
+            status=TargetStatus("cancelled"),
+            created_date=date(2024, 1, 15),
+        )
+        assert cancelled_target.is_cancelled()
+        assert not cancelled_target.is_failed()
+
+    def test_target_equality_with_non_target_object(self) -> None:
+        """Test that target equality returns False for non-TargetEntity objects."""
+
+        target = TargetEntity(
+            portfolio_id="portfolio-1",
+            stock_id="stock-1",
+            failure_price=Money(Decimal("90.00")),
+            pivot_price=Money(Decimal("110.00")),
+            status=TargetStatus("active"),
+            created_date=date(2024, 1, 15),
+        )
+
+        # Test equality with different types - should return False (covers line 136)
+        assert target != "not a target"
+        assert target != 123
+        assert target != None
+        assert target != {"portfolio_id": "portfolio-1", "stock_id": "stock-1"}

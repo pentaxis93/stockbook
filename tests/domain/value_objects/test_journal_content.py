@@ -347,3 +347,19 @@ class TestJournalContentEdgeCases:
         # Only internal whitespace preserved
         internal_whitespace = JournalContent("  Word1    Word2  ")
         assert internal_whitespace.value == "Word1    Word2"
+
+    def test_journal_content_equality_with_non_journal_content_object(self) -> None:
+        """Test that journal content equality returns False for non-JournalContent objects."""
+        content = JournalContent("Market analysis content")
+
+        # Test equality with different types - should return False
+        assert content != "Market analysis content"
+        assert content != 123
+        assert content != None
+        assert content != {"value": "Market analysis content"}
+
+    def test_journal_content_base_class_coverage(self) -> None:
+        """Test base class coverage for JournalContent missing lines."""
+        # Test that normal initialization works (covers base class __setattr__)
+        content = JournalContent("Valid content")
+        assert content.value == "Valid content"

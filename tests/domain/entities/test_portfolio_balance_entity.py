@@ -11,7 +11,7 @@ from decimal import Decimal
 import pytest
 
 from src.domain.entities.portfolio_balance_entity import PortfolioBalanceEntity
-from src.domain.value_objects import Money
+from src.domain.value_objects import IndexChange, Money
 
 
 class TestPortfolioBalanceEntity:
@@ -19,8 +19,6 @@ class TestPortfolioBalanceEntity:
 
     def test_create_portfolio_balance_with_value_objects(self) -> None:
         """Test creating a portfolio balance with all value objects."""
-        from src.domain.value_objects import IndexChange
-
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
@@ -85,8 +83,6 @@ class TestPortfolioBalanceEntity:
         self,
     ) -> None:
         """Should raise error for invalid index change through IndexChange value object."""
-        from src.domain.value_objects import IndexChange
-
         with pytest.raises(ValueError, match="Index change cannot exceed"):
             _ = IndexChange(
                 150.0
@@ -171,8 +167,6 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_has_positive_change(self) -> None:
         """Should check if portfolio has positive index change."""
-        from src.domain.value_objects import IndexChange
-
         positive_balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
@@ -199,8 +193,6 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_has_negative_change(self) -> None:
         """Should check if portfolio has negative index change."""
-        from src.domain.value_objects import IndexChange
-
         negative_balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
@@ -293,8 +285,6 @@ class TestPortfolioBalanceEntity:
 
     def test_portfolio_balance_update_index_change(self) -> None:
         """Should be able to update index change."""
-        from src.domain.value_objects import IndexChange
-
         balance = PortfolioBalanceEntity(
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
@@ -321,8 +311,6 @@ class TestIndexChange:
 
     def test_valid_index_changes_accepted(self) -> None:
         """Test that valid index changes are accepted."""
-        from src.domain.value_objects import IndexChange
-
         valid_changes = [0.0, 5.25, -2.5, 50.0, -25.0, 99.99, -99.99]
         for change in valid_changes:
             index_change = IndexChange(change)
@@ -330,8 +318,6 @@ class TestIndexChange:
 
     def test_extreme_index_changes_rejected(self) -> None:
         """Test that extreme index changes are rejected."""
-        from src.domain.value_objects import IndexChange
-
         extreme_changes = [150.0, -150.0, 200.0, -200.0]
         for change in extreme_changes:
             with pytest.raises(ValueError):
@@ -339,8 +325,25 @@ class TestIndexChange:
 
     def test_index_change_precision(self) -> None:
         """Test that index change values are properly rounded."""
-        from src.domain.value_objects import IndexChange
-
         # Should round to 2 decimal places
         change = IndexChange(5.123456)
         assert change.value == 5.12
+
+    def test_portfolio_balance_equality_with_non_portfolio_balance_object(self) -> None:
+        """Test that portfolio balance equality returns False for non-PortfolioBalanceEntity objects."""
+
+        balance = PortfolioBalanceEntity(
+            portfolio_id="portfolio-1",
+            balance_date=date(2024, 1, 15),
+            final_balance=Money(Decimal("10000.00")),
+            index_change=IndexChange(2.5),
+        )
+
+        # Test equality with different types - should return False (covers line 114)
+        assert balance != "not a balance"
+        assert balance != 123
+        assert balance != None
+        assert balance != {
+            "portfolio_id": "portfolio-1",
+            "balance_date": date(2024, 1, 15),
+        }
