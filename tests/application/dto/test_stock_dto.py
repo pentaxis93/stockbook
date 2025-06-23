@@ -199,3 +199,160 @@ class TestStockDto:
         # Should be able to use as dict keys
         dto_dict = {dto1: "value"}
         assert dto_dict[dto2] == "value"  # Same data should work as key
+
+    def test_stock_dto_validation_whitespace_only_symbol_allowed(self) -> None:
+        """Should allow whitespace-only symbol (current behavior)."""
+        # Note: Current implementation allows whitespace-only strings
+        # This documents the current behavior - could be improved in future
+        dto = StockDto(id=None, symbol="   ", name="Test Company")
+        assert dto.symbol == "   "
+
+    def test_stock_dto_validation_whitespace_only_name_allowed(self) -> None:
+        """Should allow whitespace-only name (current behavior)."""
+        # Note: Current implementation allows whitespace-only strings
+        # This documents the current behavior - could be improved in future
+        dto = StockDto(id=None, symbol="TEST", name="   ")
+        assert dto.name == "   "
+
+    def test_stock_dto_validation_none_id_allowed(self) -> None:
+        """Should allow None ID without raising error."""
+        dto = StockDto(id=None, symbol="TEST", name="Test Company")
+        assert dto.id is None
+
+    def test_stock_dto_from_entity_with_entity_having_empty_notes(self) -> None:
+        """Should handle entity with empty notes value."""
+        # Import here to avoid circular dependency issues in test
+        from src.domain.entities.stock_entity import StockEntity
+
+        # Create mock StockEntity with empty notes
+        mock_entity = Mock(spec=StockEntity)
+        mock_entity.id = "stock-1"
+        mock_entity.symbol.value = "AAPL"
+        mock_entity.company_name.value = "Apple Inc."
+        mock_entity.sector = None
+        mock_entity.industry_group = None
+        mock_entity.grade = None
+        mock_entity.notes.value = ""  # Empty notes
+
+        # Mock the str() call on symbol
+        mock_entity.symbol.__str__ = Mock(return_value="AAPL")
+
+        dto = StockDto.from_entity(mock_entity)
+
+        assert dto.notes == ""
+
+    def test_stock_dto_from_entity_edge_case_all_optional_fields_present(self) -> None:
+        """Should handle entity with all optional fields present."""
+        # Import here to avoid circular dependency issues in test
+        from src.domain.entities.stock_entity import StockEntity
+
+        # Create mock StockEntity with all optional fields
+        mock_entity = Mock(spec=StockEntity)
+        mock_entity.id = "stock-1"
+        mock_entity.symbol.value = "AAPL"
+        mock_entity.company_name.value = "Apple Inc."
+
+        # Mock all optional fields as present
+        mock_entity.sector = Mock()
+        mock_entity.sector.value = "Technology"
+        mock_entity.industry_group = Mock()
+        mock_entity.industry_group.value = "Software"
+        mock_entity.grade = Mock()
+        mock_entity.grade.value = "A"
+        mock_entity.notes.value = "Test notes"
+
+        # Mock the str() call on symbol
+        mock_entity.symbol.__str__ = Mock(return_value="AAPL")
+
+        dto = StockDto.from_entity(mock_entity)
+
+        assert dto.id == "stock-1"
+        assert dto.symbol == "AAPL"
+        assert dto.name == "Apple Inc."
+        assert dto.sector == "Technology"
+        assert dto.industry_group == "Software"
+        assert dto.grade == "A"
+        assert dto.notes == "Test notes"
+
+    def test_stock_dto_from_entity_with_mock_isinstance_failure(self) -> None:
+        """Should raise TypeError when isinstance check fails."""
+        # Create a mock that will fail isinstance check
+        invalid_mock = Mock()
+
+        # This should fail the isinstance check and raise TypeError
+        with pytest.raises(TypeError, match="Expected StockEntity instance"):
+            _ = StockDto.from_entity(invalid_mock)
+
+    def test_stock_dto_dataclass_field_defaults(self) -> None:
+        """Should have correct default values for optional fields."""
+        dto = StockDto(id="test-id", symbol="TEST", name="Test Company")
+
+        # Check defaults
+        assert dto.sector is None
+        assert dto.industry_group is None
+        assert dto.grade is None
+        assert dto.notes == ""
+
+    def test_stock_dto_dataclass_frozen_behavior(self) -> None:
+        """Should be properly frozen and immutable."""
+        dto = StockDto(id=None, symbol="TEST", name="Test Company")
+
+        # Test that it's actually frozen using dataclass mechanism
+        with pytest.raises(Exception):  # FrozenInstanceError or AttributeError
+            dto.symbol = "CHANGED"  # type: ignore[misc]
+
+        with pytest.raises(Exception):  # FrozenInstanceError or AttributeError
+            dto.name = "Changed Company"  # type: ignore[misc]
+
+    def test_stock_dto_equality_with_all_field_combinations(self) -> None:
+        """Should test equality with various field combinations."""
+        base_dto = StockDto(
+            id="test-id",
+            symbol="TEST",
+            name="Test Company",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="Test notes",
+        )
+
+        # Test equality with same values
+        identical_dto = StockDto(
+            id="test-id",
+            symbol="TEST",
+            name="Test Company",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="Test notes",
+        )
+
+        assert base_dto == identical_dto
+
+        # Test inequality with different values for each field
+        different_fields = [
+            ("id", "different-id"),
+            ("symbol", "DIFF"),
+            ("name", "Different Company"),
+            ("sector", "Healthcare"),
+            ("industry_group", "Banking"),
+            ("grade", "B"),
+            ("notes", "Different notes"),
+        ]
+
+        for field_name, different_value in different_fields:
+            kwargs = {
+                "id": "test-id",
+                "symbol": "TEST",
+                "name": "Test Company",
+                "sector": "Technology",
+                "industry_group": "Software",
+                "grade": "A",
+                "notes": "Test notes",
+            }
+            kwargs[field_name] = different_value
+
+            different_dto = StockDto(**kwargs)
+            assert (
+                base_dto != different_dto
+            ), f"Failed inequality test for field {field_name}"

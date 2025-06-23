@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the application service that orchestrates stock operations.
 """
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -479,6 +479,209 @@ class TestStockApplicationService:
 
         # Act & Assert
         with pytest.raises(Exception, match="Database error"):
+            _ = self.service.update_stock(command)
+
+        # Verify rollback was called
+        self.mock_unit_of_work.rollback.assert_called_once()
+
+    def test_create_stock_with_value_object_creation_error(self) -> None:
+        """Should handle errors during value object creation."""
+        # Arrange
+        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+
+        # Mock repository to return None (stock doesn't exist)
+        self.mock_stock_repository.get_by_symbol.return_value = None
+
+        # Mock StockSymbol to raise an error during creation
+        with patch(
+            "src.application.services.stock_application_service.StockSymbol"
+        ) as mock_symbol_class:
+            mock_symbol_class.side_effect = ValueError("Invalid symbol format")
+
+            # Act & Assert
+            with pytest.raises(ValueError, match="Invalid symbol format"):
+                _ = self.service.create_stock(command)
+
+            # Verify rollback was called
+            self.mock_unit_of_work.rollback.assert_called_once()
+
+    def test_create_stock_with_context_manager_exit_exception(self) -> None:
+        """Should handle exceptions in context manager exit."""
+        # Arrange
+        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+
+        # Mock repository to return None (stock doesn't exist)
+        self.mock_stock_repository.get_by_symbol.return_value = None
+
+        # Mock __exit__ to raise an exception
+        self.mock_unit_of_work.__exit__.side_effect = Exception("Context manager error")
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Context manager error"):
+            _ = self.service.create_stock(command)
+
+    def test_validate_update_command_and_get_stock_success(self) -> None:
+        """Should validate command and return stock entity successfully."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", name="Apple Inc.")
+        stock_entity = StockEntity(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        self.mock_stock_repository.get_by_id.return_value = stock_entity
+
+        # Act
+        result = self.service._validate_update_command_and_get_stock(command)  # type: ignore[reportPrivateUsage]
+
+        # Assert
+        assert result == stock_entity
+        self.mock_stock_repository.get_by_id.assert_called_once_with("stock-1")
+
+    def test_validate_update_command_and_get_stock_not_found(self) -> None:
+        """Should raise error when stock not found."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-999", name="Apple Inc.")
+        self.mock_stock_repository.get_by_id.return_value = None
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Stock with ID stock-999 not found"):
+            _ = self.service._validate_update_command_and_get_stock(command)  # type: ignore[reportPrivateUsage]
+
+    def test_validate_update_command_and_get_stock_no_updates(self) -> None:
+        """Should raise error when no fields to update."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1")  # No fields to update
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="No fields to update"):
+            _ = self.service._validate_update_command_and_get_stock(command)  # type: ignore[reportPrivateUsage]
+
+    def test_apply_updates_and_save_success(self) -> None:
+        """Should apply updates and save successfully."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        stock_entity = StockEntity(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        self.mock_stock_repository.update.return_value = True
+
+        # Mock the update_fields method on the entity
+        stock_entity.update_fields = Mock()
+
+        # Act
+        self.service._apply_updates_and_save(command, stock_entity)  # type: ignore[reportPrivateUsage]
+
+        # Assert
+        stock_entity.update_fields.assert_called_once_with(name="Updated Apple Inc.")
+        self.mock_stock_repository.update.assert_called_once_with(
+            "stock-1", stock_entity
+        )
+
+    def test_apply_updates_and_save_update_failure(self) -> None:
+        """Should raise error when repository update fails."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        stock_entity = StockEntity(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        self.mock_stock_repository.update.return_value = False  # Simulate failure
+
+        # Mock the update_fields method on the entity
+        stock_entity.update_fields = Mock()
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Failed to update stock"):
+            self.service._apply_updates_and_save(command, stock_entity)  # type: ignore[reportPrivateUsage]
+
+    def test_get_stock_by_symbol_with_invalid_symbol_format(self) -> None:
+        """Should handle invalid symbol format in get_stock_by_symbol."""
+        # This tests the case where StockSymbol creation might fail
+        with patch(
+            "src.application.services.stock_application_service.StockSymbol"
+        ) as mock_symbol_class:
+            mock_symbol_class.side_effect = ValueError("Invalid symbol format")
+
+            # Act & Assert
+            with pytest.raises(ValueError, match="Invalid symbol format"):
+                _ = self.service.get_stock_by_symbol("INVALID")
+
+    def test_stock_exists_with_invalid_symbol_format(self) -> None:
+        """Should handle invalid symbol format in stock_exists."""
+        # This tests the case where StockSymbol creation might fail
+        with patch(
+            "src.application.services.stock_application_service.StockSymbol"
+        ) as mock_symbol_class:
+            mock_symbol_class.side_effect = ValueError("Invalid symbol format")
+
+            # Act & Assert
+            with pytest.raises(ValueError, match="Invalid symbol format"):
+                _ = self.service.stock_exists("INVALID")
+
+    def test_search_stocks_with_repository_error(self) -> None:
+        """Should handle repository errors in search_stocks."""
+        # Arrange
+        self.mock_stock_repository.search_stocks.side_effect = Exception(
+            "Database error"
+        )
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Database error"):
+            _ = self.service.search_stocks(symbol_filter="AAPL")
+
+    def test_get_all_stocks_with_repository_error(self) -> None:
+        """Should handle repository errors in get_all_stocks."""
+        # Arrange
+        self.mock_stock_repository.get_all.side_effect = Exception("Database error")
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Database error"):
+            _ = self.service.get_all_stocks()
+
+    def test_create_stock_with_commit_failure(self) -> None:
+        """Should handle commit failure in create_stock."""
+        # Arrange
+        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        self.mock_stock_repository.get_by_symbol.return_value = None
+
+        # Mock commit to fail
+        self.mock_unit_of_work.commit.side_effect = Exception("Commit failed")
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Commit failed"):
+            _ = self.service.create_stock(command)
+
+        # Verify rollback was called
+        self.mock_unit_of_work.rollback.assert_called_once()
+
+    def test_update_stock_with_commit_failure(self) -> None:
+        """Should handle commit failure in update_stock."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        stock_entity = StockEntity(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        self.mock_stock_repository.get_by_id.return_value = stock_entity
+        self.mock_stock_repository.update.return_value = True
+
+        # Mock the update_fields method on the entity
+        stock_entity.update_fields = Mock()
+
+        # Mock commit to fail
+        self.mock_unit_of_work.commit.side_effect = Exception("Commit failed")
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Commit failed"):
             _ = self.service.update_stock(command)
 
         # Verify rollback was called
