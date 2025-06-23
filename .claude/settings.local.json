@@ -221,7 +221,8 @@
       "Bash(coverage debug:*)",
       "Bash(coverage run:*)",
       "Bash(coverage report:*)",
-      "Bash(coverage --version)"
+      "Bash(coverage --version)",
+      "Bash(true)"
     ],
     "deny": []
   }

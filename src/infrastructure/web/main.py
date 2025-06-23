@@ -7,6 +7,9 @@ with proper configuration and dependency injection integration.
 
 from fastapi import FastAPI
 
+from src.infrastructure.web.routers.stock_router import reset_stock_storage
+from src.infrastructure.web.routers.stock_router import router as stock_router
+
 
 def create_app() -> FastAPI:
     """
@@ -15,6 +18,8 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI application instance with proper configuration.
     """
+    # Reset in-memory storage for testing isolation
+    reset_stock_storage()
     app = FastAPI(
         title="StockBook API",
         version="1.0.0",
@@ -52,5 +57,8 @@ def create_app() -> FastAPI:
             Dictionary with status and service information.
         """
         return {"status": "healthy", "service": "StockBook API"}
+
+    # Include routers
+    app.include_router(stock_router)
 
     return app
