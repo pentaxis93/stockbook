@@ -42,4 +42,15 @@ def create_app() -> FastAPI:
         ],
     )
 
+    # Add health check endpoint
+    @app.get("/health", tags=["health"])
+    async def health_check() -> dict[str, str]:  # pyright: ignore[reportUnusedFunction]
+        """
+        Health check endpoint for monitoring system status.
+
+        Returns:
+            Dictionary with status and service information.
+        """
+        return {"status": "healthy", "service": "StockBook API"}
+
     return app
