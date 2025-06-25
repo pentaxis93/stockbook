@@ -221,7 +221,8 @@
       "Bash(coverage report:*)",
       "Bash(coverage --version)",
       "Bash(true)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(PYTHONPATH=. pyright src/presentation/ --pythonpath . --typechecking strict)"
     ],
     "deny": []
   }

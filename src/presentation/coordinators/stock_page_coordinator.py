@@ -8,15 +8,16 @@ with any UI framework through clean data interfaces.
 import logging
 from typing import Any, Dict, List, Optional
 
-from src.presentation.adapters.stock_presentation_adapter import (  # type: ignore[misc]
+from src.presentation.adapters.stock_presentation_adapter import (
     StockPresentationAdapter,
 )
 from src.presentation.controllers.stock_controller import StockController
-from src.presentation.view_models.stock_view_models import (  # type: ignore[misc]
+from src.presentation.view_models.stock_view_models import (
     StockViewModel,
+    ValidationErrorResponse,
 )
 
-logger = logging.getLogger(__name__)  # type: ignore[misc]
+logger = logging.getLogger(__name__)
 
 
 class StockPageCoordinator:
@@ -99,6 +100,7 @@ class StockPageCoordinator:
             navigation_options = ["list", "create", "search"]
 
             # Route to appropriate data based on action
+            data: Any
             if action == "list":
                 stock_response = self.controller.get_stock_list()
                 data = stock_response.stocks if stock_response.success else []
@@ -167,6 +169,16 @@ class StockPageCoordinator:
             # Get stock detail from controller
             detail_response = self.controller.get_stock_by_symbol(symbol)
 
+            # Handle validation errors
+            if isinstance(detail_response, ValidationErrorResponse):
+                return {
+                    "stock": None,
+                    "sections": [],
+                    "success": False,
+                    "message": detail_response.message,
+                }
+
+            # Handle unsuccessful responses
             if not detail_response.success:
                 return {
                     "stock": None,
@@ -176,6 +188,15 @@ class StockPageCoordinator:
                 }
 
             stock = detail_response.stock
+
+            # Handle case where stock is None (shouldn't happen with successful response)
+            if stock is None:
+                return {
+                    "stock": None,
+                    "sections": [],
+                    "success": False,
+                    "message": "Stock data is missing",
+                }
 
             # Define detail sections
             sections = {
@@ -212,8 +233,7 @@ class StockPageCoordinator:
 
     def calculate_stock_metrics(self, stocks: List[StockViewModel]) -> Dict[str, Any]:
         """Calculate summary metrics for stock list."""
-        total_stocks = len(stocks)  # type: ignore[misc]
-
+        total_stocks = len(stocks)
         grade_counts = {"A": 0, "B": 0, "C": 0}
         for stock in stocks:
             grade_value = stock.grade if stock.grade else "Ungraded"
@@ -222,8 +242,7 @@ class StockPageCoordinator:
 
         high_grade_percentage = (
             (grade_counts["A"] / total_stocks * 100) if total_stocks > 0 else 0
-        )  # type: ignore[misc]
-
+        )
         return {
             "total_stocks": total_stocks,
             "grade_a_count": grade_counts["A"],

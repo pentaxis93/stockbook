@@ -16,6 +16,7 @@ from src.presentation.view_models.stock_view_models import (
     StockDetailResponse,
     StockListResponse,
     StockViewModel,
+    ValidationErrorResponse,
 )
 
 
@@ -270,3 +271,40 @@ class TestStockPageCoordinator:
         assert result["sections"] == []
         assert result["success"] is False
         assert result["message"] == "Stock not found"
+
+    def test_get_stock_detail_data_validation_error(self) -> None:
+        """Should handle validation error response from controller."""
+        # Arrange
+        validation_response = ValidationErrorResponse(
+            {"symbol": "Invalid stock symbol format"}
+        )
+        self.mock_controller.get_stock_by_symbol.return_value = validation_response
+
+        # Act
+        result = self.coordinator.get_stock_detail_data("INVALID$SYMBOL")
+
+        # Assert
+        assert result is not None
+        assert result["stock"] is None
+        assert result["sections"] == []
+        assert result["success"] is False
+        assert result["message"] == "Validation failed"
+
+    def test_get_stock_detail_data_success_with_none_stock(self) -> None:
+        """Should handle case where successful response has None stock (edge case)."""
+        # Arrange
+        # Create a successful response but with None stock (shouldn't happen in practice)
+        detail_response = StockDetailResponse(
+            success=True, message="Success", stock=None
+        )
+        self.mock_controller.get_stock_by_symbol.return_value = detail_response
+
+        # Act
+        result = self.coordinator.get_stock_detail_data("AAPL")
+
+        # Assert
+        assert result is not None
+        assert result["stock"] is None
+        assert result["sections"] == []
+        assert result["success"] is False
+        assert result["message"] == "Stock data is missing"

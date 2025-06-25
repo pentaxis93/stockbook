@@ -28,7 +28,10 @@ class TestIDatabaseConnectionProtocol:
         from src.infrastructure.persistence.interfaces import IDatabaseConnection
 
         # Protocol should be runtime checkable
-        assert hasattr(IDatabaseConnection, "__protocol_attrs__")
+        # Check for protocol attributes that exist in Python 3.10+
+        assert hasattr(IDatabaseConnection, "__protocol__") or hasattr(
+            IDatabaseConnection, "_is_protocol"
+        )
 
     def test_get_connection_method_required(self) -> None:
         """Test that protocol requires get_connection method."""

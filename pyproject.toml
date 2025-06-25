@@ -140,39 +140,58 @@ disable = [
 allowed-redefined-builtins = ["id"]
 
 [tool.pylint.presentation]
-# MODERATE configuration for PRESENTATION layer
-# More lenient than core but stricter than tests
+# STRICT configuration for PRESENTATION layer - same as core business logic
+# Only disable rules that are genuinely necessary or handled by other tools
 disable = [
-    # Production rules
-    "too-few-public-methods",
-    "too-many-public-methods",
+    # Code structure - reasonable for presentation layer
+    "too-many-public-methods", 
     "too-many-instance-attributes",
+    
+    # Abstract base classes - pass statements are required
+    "unnecessary-pass",
+    
+    # Import organization - handled by isort
     "wrong-import-order",
-    "ungrouped-imports", 
+    "ungrouped-imports",
+    
+    # Line length - handled by black
     "line-too-long",
-    "no-member",
-    # UI-specific allowances
-    "too-many-arguments",  # UI components often need many parameters
-    "too-many-positional-arguments",
-    "fixme",  # UI development often has TODOs
-    "duplicate-code",  # Similar UI patterns are acceptable
-    "import-outside-toplevel",  # Conditional imports for UI frameworks
-    "broad-exception-caught",  # UI error handling is often broad
-    # \"missing-class-docstring\",  # Now enabled - controllers should have docstrings
-    # \"consider-using-join\",  # FIXED: Replaced string concatenation with .join()
-    # \"reimported\",  # FIXED: Removed duplicate local imports
+    
+    # Technical debt and development patterns
+    "fixme",  # TODO comments are legitimate in presentation logic
+    
+    # Enable better code quality (removed from disable list)
+    # "consider-using-f-string",  # Now enabled for better string formatting
+    # "consider-using-dict-items",  # Now enabled for better dictionary iteration
+    # "unused-import",  # Now enabled for cleaner imports
     # "raise-missing-from",  # Now enabled for better exception chaining
 ]
 
-# More reasonable complexity for presentation layer
-max-args = 6  # Improved: reduced from 8, UI should be well-designed
-max-locals = 10  # Improved: reduced from 12 for better organization
-max-returns = 8  # Add explicit return limit
-max-branches = 15  # Add explicit branch limit
-max-statements = 30  # Improved: reduced from 35 for better method design
-allowed-redefined-builtins = ["id"]
+# Enable more checks for better code quality
+enable = [
+    "useless-suppression",  # Find unnecessary pylint disables
+    "use-implicit-booleaness-not-comparison",
+    "use-implicit-booleaness-not-len",
+    "unnecessary-comprehension",
+    "unnecessary-dict-index-lookup",
+    "unnecessary-list-index-lookup",
+]
 
-# Require docstrings for public controller methods (but not UI components)
+# Improve duplicate code detection
+min-similarity-lines = 8  # Improved: reduced from 10 for better duplicate detection
+
+max-args = 8  # Further reduced from 12
+max-locals = 3  # Further reduced from 5
+max-returns = 3  # Significantly reduced from 8
+max-branches = 5  # Further reduced from 8
+max-statements = 10  # Reduced from 15
+max-nested-blocks = 3  # New: limit nesting depth
+max-bool-expr = 3  # New: limit boolean expression complexity
+max-public-methods = 10  # New: force interface segregation
+max-attributes = 7  # New: encourage composition over large classes
+max-positional-arguments = 8  # Presentation layer same as domain entities
+good-names = ["i", "j", "k", "ex", "Run", "_", "id"]
+allowed-redefined-builtins = ["id"]
 docstring-min-length = 10
 
 [tool.pylint.config]
@@ -313,9 +332,7 @@ exclude_lines = [
 include = ["src", "tests", "dependency_injection"]
 exclude = [
     "**/node_modules", 
-    "**/__pycache__",
-    # Strategic exclusion: presentation layer during Streamlit→new UI migration
-    "src/presentation/**"
+    "**/__pycache__"
 ]
 
 # Use strict mode everywhere
@@ -362,10 +379,6 @@ incremental = true
 cache_dir = ".mypy_cache"
 
 # Per-module options for gradual adoption
-[[tool.mypy.overrides]]
-module = "src.presentation.*"
-ignore_errors = true
-
 [[tool.mypy.overrides]]
 module = "nanoid"
 ignore_missing_imports = true

@@ -5,10 +5,15 @@ These models handle validation, serialization, and documentation
 for the FastAPI endpoints.
 """
 
+from __future__ import annotations
+
 import re
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 from pydantic import BaseModel, Field, field_validator
+
+if TYPE_CHECKING:
+    pass
 
 
 class StockRequest(BaseModel):
@@ -109,9 +114,7 @@ class StockResponse(BaseModel):
 class StockListResponse(BaseModel):
     """Response model for a list of stocks."""
 
-    stocks: List[StockResponse] = Field(
-        default_factory=list, description="List of stocks"
-    )
+    stocks: List[StockResponse] = Field(default=[], description="List of stocks")
     total: int = Field(..., description="Total number of stocks")
 
     model_config = {"from_attributes": True}

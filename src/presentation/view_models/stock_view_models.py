@@ -360,7 +360,7 @@ class ValidationErrorResponse:
     success: bool = field(default=False, init=False)
     message: str = field(init=False)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """Set computed fields after initialization."""
         # Set message based on error count
         if len(self.errors) == 1:

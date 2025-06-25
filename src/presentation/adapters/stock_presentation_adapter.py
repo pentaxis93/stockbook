@@ -9,12 +9,12 @@ import logging
 from typing import Any, Dict, List, Optional, Union
 
 from src.presentation.controllers.stock_controller import StockController
-from src.presentation.interfaces.ui_operations import (  # type: ignore[misc]
+from src.presentation.interfaces.ui_operations import (
     IUILayoutOperations,
     IUIOperations,
     IUIValidationOperations,
 )
-from src.presentation.view_models.stock_view_models import (  # type: ignore[misc]
+from src.presentation.view_models.stock_view_models import (
     CreateStockRequest,
     CreateStockResponse,
     StockDetailResponse,
@@ -24,7 +24,7 @@ from src.presentation.view_models.stock_view_models import (  # type: ignore[mis
     ValidationErrorResponse,
 )
 
-logger = logging.getLogger(__name__)  # type: ignore[misc]
+logger = logging.getLogger(__name__)
 
 
 class StockPresentationAdapter:
@@ -70,10 +70,10 @@ class StockPresentationAdapter:
         """
         try:
             with self.ui.create_form("create_stock_form"):
-                self.ui.render_subheader("📝 Add New Stock")  # type: ignore[misc]
+                self.ui.render_subheader("📝 Add New Stock")
 
                 form_inputs = self._render_stock_form_inputs()
-                submitted = self.ui.create_form_submit_button("Create Stock")  # type: ignore[misc]
+                submitted = self.ui.create_form_submit_button("Create Stock")
 
                 if submitted:
                     return self._process_stock_creation(form_inputs, refresh_on_success)
@@ -81,8 +81,8 @@ class StockPresentationAdapter:
             return None
 
         except Exception as e:
-            logger.error(f"Error rendering create stock form: {e}")  # type: ignore[misc]
-            self.ui.show_error("An unexpected error occurred while rendering the form")  # type: ignore[misc]
+            logger.error(f"Error rendering create stock form: {e}")
+            self.ui.show_error("An unexpected error occurred while rendering the form")
             return None
 
     def _render_stock_form_inputs(self) -> Dict[str, str]:
@@ -91,26 +91,26 @@ class StockPresentationAdapter:
             "Stock Symbol *",
             placeholder="e.g., AAPL",
             help_text="1-5 uppercase letters",
-        )  # type: ignore[misc]
+        )
 
         name = self.ui.create_text_input(
             "Company Name *", placeholder="e.g., Apple Inc."
-        )  # type: ignore[misc]
+        )
 
         industry_group = self.ui.create_text_input(
             "Industry Group", placeholder="e.g., Technology"
-        )  # type: ignore[misc]
+        )
 
         grade = self.ui.create_selectbox(
             "Grade",
             options=["", "A", "B", "C"],
             index=0,
             help_text="Investment grade: A (High), B (Medium), C (Low)",
-        )  # type: ignore[misc]
+        )
 
         notes = self.ui.create_text_area(
             "Notes", placeholder="Additional notes about this stock..."
-        )  # type: ignore[misc]
+        )
 
         return {
             "symbol": symbol,
@@ -132,9 +132,9 @@ class StockPresentationAdapter:
             ),
             grade=form_inputs["grade"] if form_inputs["grade"] else None,
             notes=form_inputs["notes"],
-        )  # type: ignore[misc]
+        )
 
-        response = self.controller.create_stock(request)  # type: ignore[misc]
+        response = self.controller.create_stock(request)
         self._handle_stock_creation_response(response, refresh_on_success)
         return response
 
@@ -145,13 +145,13 @@ class StockPresentationAdapter:
     ) -> None:
         """Handle the response from stock creation."""
         if isinstance(response, ValidationErrorResponse):
-            self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
+            self.validation.display_validation_errors(response.errors)
         elif response.success:
-            self.ui.show_success(response.message)  # type: ignore[misc]
+            self.ui.show_success(response.message)
             if refresh_on_success:
-                self.ui.trigger_rerun()  # type: ignore[misc]
+                self.ui.trigger_rerun()
         else:
-            self.ui.show_error(response.message)  # type: ignore[misc]
+            self.ui.show_error(response.message)
 
     def render_stock_list(
         self, show_metrics: bool = True
@@ -166,28 +166,28 @@ class StockPresentationAdapter:
             Stock list response
         """
         try:
-            response = self.controller.get_stock_list()  # type: ignore[misc]
+            response = self.controller.get_stock_list()
 
             if not response.success:
-                self.ui.show_error(response.message)  # type: ignore[misc]
+                self.ui.show_error(response.message)
                 return response
 
             if not response.stocks:
-                self.ui.show_info(response.message)  # type: ignore[misc]
+                self.ui.show_info(response.message)
                 return response
 
             # Show metrics if requested
             if show_metrics:
-                self._render_stock_metrics_summary(response.stocks)  # type: ignore[misc]
+                self._render_stock_metrics_summary(response.stocks)
 
             # Render stock dataframe
-            self._render_stock_dataframe(response.stocks)  # type: ignore[misc]
+            self._render_stock_dataframe(response.stocks)
 
             return response
 
         except Exception as e:
-            logger.error(f"Error rendering stock list: {e}")  # type: ignore[misc]
-            self.ui.show_error("An unexpected error occurred while loading stocks")  # type: ignore[misc]
+            logger.error(f"Error rendering stock list: {e}")
+            self.ui.show_error("An unexpected error occurred while loading stocks")
             return None
 
     def render_stock_detail(
@@ -205,50 +205,50 @@ class StockPresentationAdapter:
         try:
             # Validate input
             if not symbol or not symbol.strip():
-                self.ui.show_error("Symbol cannot be empty")  # type: ignore[misc]
+                self.ui.show_error("Symbol cannot be empty")
                 return None
 
-            response = self.controller.get_stock_by_symbol(symbol)  # type: ignore[misc]
+            response = self.controller.get_stock_by_symbol(symbol)
 
             if isinstance(response, ValidationErrorResponse):
-                self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
+                self.validation.display_validation_errors(response.errors)
                 return response
 
             if not response.success:
-                self.ui.show_warning(response.message)  # type: ignore[misc]
+                self.ui.show_warning(response.message)
                 return response
 
             # Render stock details
             stock = response.stock
             if stock is None:
-                self.ui.show_error("Stock data is missing")  # type: ignore[misc]
+                self.ui.show_error("Stock data is missing")
                 return response
 
-            self.ui.render_header(f"{stock.symbol} - {stock.name}")  # type: ignore[misc]
+            self.ui.render_header(f"{stock.symbol} - {stock.name}")
 
-            columns = self.ui.create_columns(2)  # type: ignore[misc]
+            columns = self.ui.create_columns(2)
 
             with self.layout.within_container(columns[0]):
-                self.ui.render_metric("Symbol", stock.symbol)  # type: ignore[misc]
-                self.ui.render_metric("Grade", stock.grade_display)  # type: ignore[misc]
+                self.ui.render_metric("Symbol", stock.symbol)
+                self.ui.render_metric("Grade", stock.grade_display)
 
             with self.layout.within_container(columns[1]):
                 self.ui.render_metric(
                     "Industry",
                     stock.industry_group if stock.industry_group else "Not specified",
-                )  # type: ignore[misc]
+                )
                 if stock.has_notes:
                     # For notes, we'll use a simple display since text_area is input-specific
-                    self.ui.render_subheader("Notes")  # type: ignore[misc]
+                    self.ui.render_subheader("Notes")
                     # TODO: Add read-only text display to UI operations interface
 
             return response
 
         except Exception as e:
-            logger.error(f"Error rendering stock detail: {e}")  # type: ignore[misc]
+            logger.error(f"Error rendering stock detail: {e}")
             self.ui.show_error(
                 "An unexpected error occurred while loading stock details"
-            )  # type: ignore[misc]
+            )
             return None
 
     def render_grade_filter_widget(
@@ -261,7 +261,7 @@ class StockPresentationAdapter:
             Filtered stock list response
         """
         try:
-            columns = self.ui.create_columns(2)  # type: ignore[misc]
+            columns = self.ui.create_columns(2)
             selected_grade, apply_filter = self._render_grade_filter_inputs(columns[0])
 
             if apply_filter and selected_grade:
@@ -270,27 +270,27 @@ class StockPresentationAdapter:
             return None
 
         except Exception as e:
-            logger.error(f"Error rendering grade filter: {e}")  # type: ignore[misc]
-            self.ui.show_error("An unexpected error occurred with the grade filter")  # type: ignore[misc]
+            logger.error(f"Error rendering grade filter: {e}")
+            self.ui.show_error("An unexpected error occurred with the grade filter")
             return None
 
-    def _render_grade_filter_inputs(self, column_container) -> tuple[str, bool]:
+    def _render_grade_filter_inputs(self, column_container: Any) -> tuple[str, bool]:
         """Render grade filter input controls."""
         with self.layout.within_container(column_container):
             selected_grade = self.ui.create_selectbox(
                 "Filter by Grade", options=["A", "B", "C"], index=0
-            )  # type: ignore[misc]
+            )
 
-            apply_filter = self.ui.create_button("Apply Filter", "secondary")  # type: ignore[misc]
+            apply_filter = self.ui.create_button("Apply Filter", "secondary")
 
         return selected_grade, apply_filter
 
     def _process_grade_filter(
-        self, selected_grade: str, result_column_container
+        self, selected_grade: str, result_column_container: Any
     ) -> Union[StockListResponse, ValidationErrorResponse]:
         """Process the grade filter request and display results."""
-        search_request = StockSearchRequest(grade_filter=selected_grade)  # type: ignore[misc]
-        response = self.controller.search_stocks(search_request)  # type: ignore[misc]
+        search_request = StockSearchRequest(grade_filter=selected_grade)
+        response = self.controller.search_stocks(search_request)
 
         with self.layout.within_container(result_column_container):
             self._display_grade_filter_results(response, selected_grade)
@@ -304,18 +304,16 @@ class StockPresentationAdapter:
     ) -> None:
         """Display the results of grade filtering."""
         if isinstance(response, ValidationErrorResponse):
-            self.validation.display_validation_errors(response.errors)  # type: ignore[misc]
+            self.validation.display_validation_errors(response.errors)
         elif response.success:
             # TODO: Add bold text formatting to UI operations
-            self.ui.show_info(f"**{response.message}**")  # type: ignore[misc]
+            self.ui.show_info(f"**{response.message}**")
             if response.stocks:
-                self._render_stock_dataframe(response.stocks)  # type: ignore[misc]
+                self._render_stock_dataframe(response.stocks)
             else:
-                self.ui.show_info(
-                    f"No stocks found with grade {selected_grade}"
-                )  # type: ignore[misc]
+                self.ui.show_info(f"No stocks found with grade {selected_grade}")
         else:
-            self.ui.show_error(response.message)  # type: ignore[misc]
+            self.ui.show_error(response.message)
 
     def render_stock_filters(self) -> Optional[StockSearchRequest]:
         """
@@ -325,10 +323,10 @@ class StockPresentationAdapter:
             Search request if filters applied
         """
         try:
-            self.ui.render_subheader("🔍 Stock Filters")  # type: ignore[misc]
+            self.ui.render_subheader("🔍 Stock Filters")
 
             filter_values = self._render_filter_inputs()
-            apply_filters = self.ui.create_button("Apply Filters", "primary")  # type: ignore[misc]
+            apply_filters = self.ui.create_button("Apply Filters", "primary")
 
             if apply_filters:
                 return self._create_search_request(filter_values)
@@ -336,30 +334,30 @@ class StockPresentationAdapter:
             return None
 
         except Exception as e:
-            logger.error(f"Error rendering stock filters: {e}")  # type: ignore[misc]
-            self.ui.show_error("An unexpected error occurred with the filters")  # type: ignore[misc]
+            logger.error(f"Error rendering stock filters: {e}")
+            self.ui.show_error("An unexpected error occurred with the filters")
             return None
 
     def _render_filter_inputs(self) -> Dict[str, str]:
         """Render filter input controls and return values."""
-        columns = self.ui.create_columns(2)  # type: ignore[misc]
+        columns = self.ui.create_columns(2)
 
         with self.layout.within_container(columns[0]):
             symbol_filter = self.ui.create_text_input(
                 "Symbol contains", placeholder="e.g., APP"
-            )  # type: ignore[misc]
+            )
             grade_filter = self.ui.create_selectbox(
                 "Grade", options=["", "A", "B", "C"]
-            )  # type: ignore[misc]
+            )
 
         with self.layout.within_container(columns[1]):
             name_filter = self.ui.create_text_input(
                 "Name contains", placeholder="e.g., Apple"
-            )  # type: ignore[misc]
+            )
             industry_filter = self.ui.create_selectbox(
                 "Industry",
                 options=["", "Technology", "Healthcare", "Finance", "Energy"],
-            )  # type: ignore[misc]
+            )
 
         return {
             "symbol_filter": symbol_filter,
@@ -389,7 +387,7 @@ class StockPresentationAdapter:
                 if filter_values["industry_filter"]
                 else None
             ),
-        )  # type: ignore[misc]
+        )
 
     def render_sidebar_navigation(self) -> str:
         """
@@ -400,18 +398,18 @@ class StockPresentationAdapter:
         """
         try:
             with self.layout.within_container(self.layout.create_sidebar()):
-                self.ui.render_header("📈 Stock Management")  # type: ignore[misc]
+                self.ui.render_header("📈 Stock Management")
 
                 # TODO: Add radio button widget to UI operations interface
                 # For now, we'll simulate with selectbox
                 action = self.ui.create_selectbox(
                     "Choose Action", options=["list", "create", "search"], index=0
-                )  # type: ignore[misc]
+                )
 
                 return action
 
         except Exception as e:
-            logger.error(f"Error rendering sidebar navigation: {e}")  # type: ignore[misc]
+            logger.error(f"Error rendering sidebar navigation: {e}")
             return "list"
 
     def render_advanced_search_form(self) -> Optional[StockSearchRequest]:
@@ -423,17 +421,17 @@ class StockPresentationAdapter:
         """
         try:
             with self.layout.within_container(
-                self.layout.create_expander("Advanced Search")  # type: ignore[misc]
+                self.layout.create_expander("Advanced Search")
             ):
-                search_result = self.render_stock_filters()  # type: ignore[misc]
+                search_result = self.render_stock_filters()
                 if search_result:
                     return search_result
                 # Return empty search request for testing purposes
-                return StockSearchRequest()  # type: ignore[misc]
+                return StockSearchRequest()
 
         except Exception as e:
-            logger.error(f"Error rendering advanced search: {e}")  # type: ignore[misc]
-            self.ui.show_error("An unexpected error occurred with advanced search")  # type: ignore[misc]
+            logger.error(f"Error rendering advanced search: {e}")
+            self.ui.show_error("An unexpected error occurred with advanced search")
             return None
 
     def render_stock_dataframe_with_data(
@@ -441,13 +439,13 @@ class StockPresentationAdapter:
     ) -> None:
         """Public method to render stocks dataframe when data is already available."""
         if show_metrics:
-            self._render_stock_metrics_summary(stocks)  # type: ignore[misc]
-        self._render_stock_dataframe(stocks)  # type: ignore[misc]
+            self._render_stock_metrics_summary(stocks)
+        self._render_stock_dataframe(stocks)
 
     def _render_stock_dataframe(self, stocks: List[StockViewModel]) -> None:
         """Render stocks as a formatted dataframe."""
         try:
-            display_data = self.prepare_display_data(stocks)  # type: ignore[misc]
+            display_data = self.prepare_display_data(stocks)
 
             # Configure column display
             column_config = {
@@ -462,11 +460,11 @@ class StockPresentationAdapter:
                 use_container_width=True,
                 hide_index=True,
                 column_config=column_config,
-            )  # type: ignore[misc]
+            )
 
         except Exception as e:
-            logger.error(f"Error rendering stock dataframe: {e}")  # type: ignore[misc]
-            self.ui.show_error("Error displaying stock data")  # type: ignore[misc]
+            logger.error(f"Error rendering stock dataframe: {e}")
+            self.ui.show_error("Error displaying stock data")
 
     def prepare_display_data(
         self, stocks: List[StockViewModel]
@@ -488,20 +486,20 @@ class StockPresentationAdapter:
     def _render_stock_metrics_summary(self, stocks: List[StockViewModel]) -> None:
         """Render summary metrics for stock list."""
         try:
-            columns = self.ui.create_columns(3)  # type: ignore[misc]
+            columns = self.ui.create_columns(3)
 
-            total_stocks = len(stocks)  # type: ignore[misc]
-            high_grade_count = sum(1 for stock in stocks if stock.is_high_grade)  # type: ignore[misc]
-            with_notes_count = sum(1 for stock in stocks if stock.has_notes)  # type: ignore[misc]
+            total_stocks = len(stocks)
+            high_grade_count = sum(1 for stock in stocks if stock.is_high_grade)
+            with_notes_count = sum(1 for stock in stocks if stock.has_notes)
 
             with self.layout.within_container(columns[0]):
-                self.ui.render_metric("Total Stocks", str(total_stocks))  # type: ignore[misc]
+                self.ui.render_metric("Total Stocks", str(total_stocks))
 
             with self.layout.within_container(columns[1]):
-                self.ui.render_metric("Grade A Stocks", str(high_grade_count))  # type: ignore[misc]
+                self.ui.render_metric("Grade A Stocks", str(high_grade_count))
 
             with self.layout.within_container(columns[2]):
-                self.ui.render_metric("With Notes", str(with_notes_count))  # type: ignore[misc]
+                self.ui.render_metric("With Notes", str(with_notes_count))
 
         except Exception as e:
-            logger.error(f"Error rendering metrics: {e}")  # type: ignore[misc]
+            logger.error(f"Error rendering metrics: {e}")
