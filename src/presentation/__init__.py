@@ -7,6 +7,6 @@ and application services while maintaining clean architecture principles.
 Components:
 - Controllers: Handle user input and coordinate with application services
 - View Models: Data transfer objects for the presentation layer
-- Adapters: Framework-specific UI integration (Streamlit)
+- Adapters: Framework-agnostic UI integration
 - Coordinators: Page-level orchestration and workflow management
 """

@@ -4,6 +4,12 @@ This roadmap outlines the structured development approach for StockBook, priorit
 
 ## Current Status
 
+✅ **Completed - Dependency Modernization (June 2025)**
+- Removed Streamlit and 9 exclusive dependencies (altair, pydeck, blinker, etc.)
+- Updated all packages to latest versions: NumPy 2.2.6, mypy 1.16.1, and more
+- Documented Python 3.13.5 upgrade plan for future implementation
+- Reduced total dependencies by ~20 packages for cleaner dependency tree
+
 ✅ **Completed - FastAPI Migration & Modern Architecture**
 - Complete FastAPI REST API with comprehensive endpoint coverage
 - 100% test coverage across all architectural layers (Domain, Application, Infrastructure, Presentation)

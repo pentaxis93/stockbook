@@ -222,7 +222,8 @@
       "Bash(coverage --version)",
       "Bash(true)",
       "Bash(git rm:*)",
-      "Bash(PYTHONPATH=. pyright src/presentation/ --pythonpath . --typechecking strict)"
+      "Bash(PYTHONPATH=. pyright src/presentation/ --pythonpath . --typechecking strict)",
+      "Bash(pip freeze)"
     ],
     "deny": []
   }

@@ -2,6 +2,18 @@
 
 This document tracks temporary implementations, architectural compromises, and technical debt that should be addressed in future iterations.
 
+## Recently Resolved (June 2025)
+
+### ✅ RESOLVED: Outdated Dependencies
+- **Achievement**: Updated all dependencies to latest stable versions
+- **Updates**: NumPy 1.26.4→2.2.6, mypy 1.8.0→1.16.1, and ~30 other packages
+- **Impact**: Better performance, security patches, and modern features
+
+### ✅ RESOLVED: Streamlit Dependencies
+- **Achievement**: Removed Streamlit and all exclusive dependencies
+- **Removed**: streamlit, altair, pydeck, blinker, GitPython, tornado, cachetools, and dependencies
+- **Impact**: Reduced total dependencies by ~20 packages, cleaner dependency tree
+
 ## High Priority (Blocking Clean Architecture Completion)
 
 ### 0. Strategic Presentation Layer Type Checking Exemption (UPDATED - 2025-06-21)
