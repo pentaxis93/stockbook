@@ -6,9 +6,11 @@ This roadmap outlines the structured development approach for StockBook, priorit
 
 ✅ **Completed - Dependency Modernization & Python Upgrade (June 2025)**
 - Removed Streamlit and 9 exclusive dependencies (altair, pydeck, blinker, etc.)
-- Updated all packages to latest versions: NumPy 2.2.6, mypy 1.16.1, and more
+- Removed unused data science packages (numpy, pandas, plotly, pillow, pyarrow)
+- Removed unused utility packages (freezegun, python-dateutil, pytz, narwhals, tzdata)
+- Updated core packages: tenacity 9.1.2, license-expression 30.4.3
 - Successfully upgraded Python from 3.10.12 to 3.13.5
-- Reduced total dependencies by ~20 packages for cleaner dependency tree
+- Reduced total dependencies by ~30 packages for MVP-focused deployment
 - All tests passing (1366 tests) with Python 3.13.5
 
 ✅ **Completed - FastAPI Migration & Modern Architecture**

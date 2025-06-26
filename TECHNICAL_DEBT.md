@@ -9,10 +9,11 @@ This document tracks temporary implementations, architectural compromises, and t
 - **Updates**: All 1366 tests passing with Python 3.13.5
 - **Impact**: Extended support until October 2029, better performance, improved type system
 
-### ✅ RESOLVED: Outdated Dependencies
-- **Achievement**: Updated all dependencies to latest stable versions
-- **Updates**: NumPy 1.26.4→2.2.6, mypy 1.8.0→1.16.1, and ~30 other packages
-- **Impact**: Better performance, security patches, and modern features
+### ✅ RESOLVED: Outdated Dependencies & MVP-Focused Cleanup
+- **Achievement**: Updated all dependencies and removed unused packages for lean MVP
+- **Removed**: numpy, pandas, plotly, pillow, pyarrow, freezegun, python-dateutil, pytz (~10 packages)
+- **Updates**: tenacity 8.5.0→9.1.2, license-expression 30.4.2→30.4.3, and other core packages
+- **Impact**: Reduced dependency footprint by ~30%, faster installs, cleaner deployment
 
 ### ✅ RESOLVED: Streamlit Dependencies
 - **Achievement**: Removed Streamlit and all exclusive dependencies

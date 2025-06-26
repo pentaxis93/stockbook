@@ -21,8 +21,6 @@ StockBook is a modern web application built with Python and FastAPI to help trac
 - **FastAPI** - Modern async web framework with automatic OpenAPI documentation
 - **Pydantic** - Data validation and serialization with comprehensive type checking
 - **SQLite** - Local database for data persistence
-- **NumPy 2.2+** - High-performance numerical computing
-- **Pandas 2.3+** - Data analysis and manipulation
 - **Clean Architecture** - Layered architecture with dependency inversion
 - **Domain-Driven Design** - Rich domain models and business logic
 - **Dependency Injection** - Professional IoC container for testability
