@@ -28,6 +28,52 @@ StockBook is a modern web application built with Python and FastAPI to help trac
 
 ## Installation
 
+### Option 1: Docker (Recommended)
+
+The easiest way to run StockBook is using Docker:
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/stockbook.git
+cd stockbook
+
+# Build and run with Docker Compose
+docker-compose up --build
+
+# Or run in detached mode
+docker-compose up -d --build
+```
+
+The application will be available at:
+- **API Base URL**: `http://localhost:8000`
+- **Interactive API Docs**: `http://localhost:8000/docs`
+- **Alternative API Docs**: `http://localhost:8000/redoc`
+
+#### Docker Commands
+
+```bash
+# Stop the application
+docker-compose down
+
+# View logs
+docker-compose logs -f
+
+# Rebuild after code changes
+docker-compose up --build
+
+# Access the container shell
+docker-compose exec stockbook bash
+
+# Run tests inside container
+docker-compose exec stockbook pytest
+
+# Run linting and type checking
+docker-compose exec stockbook pylint src/
+docker-compose exec stockbook pyright
+```
+
+### Option 2: Local Installation
+
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/stockbook.git
@@ -48,6 +94,17 @@ pre-commit install
 
 ## Usage
 
+### Running with Docker
+
+```bash
+# Start the application
+docker-compose up
+
+# The API will be available at http://localhost:8000
+```
+
+### Running Locally
+
 ```bash
 # Run the FastAPI application
 uvicorn src.infrastructure.web.main:app --reload
@@ -60,6 +117,24 @@ The API will be available at:
 - **API Base URL**: `http://localhost:8000`
 - **Interactive API Docs**: `http://localhost:8000/docs` (Swagger UI)
 - **Alternative API Docs**: `http://localhost:8000/redoc` (ReDoc)
+
+## Docker Configuration
+
+### Volumes
+
+The Docker setup uses the following volume mappings:
+
+- `./data/database:/app/data/database` - SQLite database persistence
+- `./logs:/app/logs` - Application logs
+- `./data/backups:/app/data/backups` - Database backups
+
+### Environment Variables
+
+You can configure the application using environment variables in `docker-compose.yml`:
+
+- `DATABASE_PATH` - Path to SQLite database (default: `/app/data/database/stockbook.db`)
+- `LOG_LEVEL` - Logging level (default: `INFO`)
+- `PYTHONUNBUFFERED` - Ensures real-time log output (default: `1`)
 
 ### Available Endpoints
 
