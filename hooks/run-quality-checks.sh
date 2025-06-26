@@ -28,7 +28,7 @@ echo "Using parallel execution and incremental processing for faster performance
 CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.py$' || true)
 if [ -z "$CHANGED_FILES" ]; then
     # If no staged files, check all files (for --all-files runs)
-    CHANGED_FILES=$(find . -name "*.py" -not -path "./.venv/*" -not -path "./venv/*" -not -path "./.git/*" | head -20)
+    CHANGED_FILES=$(find . -name "*.py" -not -path "./.venv/*" -not -path "./venv/*" -not -path "./.git/*")
 fi
 
 echo "Processing $(echo "$CHANGED_FILES" | wc -w) Python files..."
@@ -78,11 +78,11 @@ CONFIG_FILES=""
 TEST_FILES=""
 
 for file in $CHANGED_FILES; do
-    if [[ "$file" == src/domain/* ]] || [[ "$file" == src/application/* ]] || [[ "$file" == src/infrastructure/* ]]; then
+    if [[ "$file" == ./src/domain/* ]] || [[ "$file" == ./src/application/* ]] || [[ "$file" == ./src/infrastructure/* ]]; then
         CORE_FILES="$CORE_FILES $file"
-    elif [[ "$file" == src/presentation/* ]]; then
+    elif [[ "$file" == ./src/presentation/* ]]; then
         PRESENTATION_FILES="$PRESENTATION_FILES $file"
-    elif [[ "$file" == tests/* ]]; then
+    elif [[ "$file" == ./tests/* ]]; then
         TEST_FILES="$TEST_FILES $file"
     else
         CONFIG_FILES="$CONFIG_FILES $file"
@@ -148,7 +148,7 @@ MYPY_PID=$!
 echo "Starting pytest with parallel execution and caching..."
 PYTEST_TEMP="/tmp/pytest_$$"
 {
-    if pytest -n auto --lf --ff > "$PYTEST_TEMP" 2>&1; then
+    if pytest -n auto --lf --ff -q --tb=short > "$PYTEST_TEMP" 2>&1; then
         echo "✅ Tests passed with required coverage" >> "$PYTEST_TEMP"
         echo "0" > "${PYTEST_TEMP}.exit"
     else

@@ -296,27 +296,26 @@ class Config:
 
     def get_validation_rules(self, entity_type: str) -> Dict[str, Any]:
         """Get validation rules for a specific entity type."""
-        if entity_type == "stock":
-            return {
+        validation_rules_map: Dict[str, Dict[str, Any]] = {
+            "stock": {
                 "symbol_pattern": self.stock_symbol_pattern,
                 "symbol_max_length": self.stock_symbol_max_length,
                 "valid_grades": self.valid_grades,
-            }
-        elif entity_type == "portfolio":
-            return {
+            },
+            "portfolio": {
                 "name_max_length": self.portfolio_name_max_length,
                 "max_risk_limit": self.max_risk_per_trade_limit,
-            }
-        elif entity_type == "transaction":
-            return {
+            },
+            "transaction": {
                 "valid_types": self.valid_transaction_types,
                 "min_price": self.min_price,
                 "max_price": self.max_price,
                 "min_quantity": self.min_quantity,
                 "max_quantity": self.max_quantity,
-            }
-        else:
-            return {}
+            },
+        }
+        default: Dict[str, Any] = {}
+        return validation_rules_map.get(entity_type, default)
 
     def format_currency(self, amount: Union[int, float]) -> str:
         """Format amount as currency string."""
