@@ -17,7 +17,7 @@ StockBook is a modern web application built with Python and FastAPI to help trac
 
 ## Tech Stack
 
-- **Python 3.10+** - Core programming language with type safety (3.13 upgrade planned)
+- **Python 3.13** - Core programming language with type safety
 - **FastAPI** - Modern async web framework with automatic OpenAPI documentation
 - **Pydantic** - Data validation and serialization with comprehensive type checking
 - **SQLite** - Local database for data persistence

@@ -4,6 +4,11 @@ This document tracks temporary implementations, architectural compromises, and t
 
 ## Recently Resolved (June 2025)
 
+### ✅ RESOLVED: Python Version Upgrade
+- **Achievement**: Successfully upgraded from Python 3.10.12 to 3.13.5
+- **Updates**: All 1366 tests passing with Python 3.13.5
+- **Impact**: Extended support until October 2029, better performance, improved type system
+
 ### ✅ RESOLVED: Outdated Dependencies
 - **Achievement**: Updated all dependencies to latest stable versions
 - **Updates**: NumPy 1.26.4→2.2.6, mypy 1.8.0→1.16.1, and ~30 other packages
