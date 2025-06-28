@@ -15,14 +15,20 @@
 - When writing git commit messages, omit all references to authorship, and especially omit references to Claude.
 
 - Always run `pytest`, `pylint`, `pyright`, `black`, and `isort` and fix all issues before making a commit.
+  - Use `make quality` to run all quality checks that match the pre-commit hooks
+  - Use `make lint` to run layer-specific pylint checks
+  - Use `make test` to run tests with coverage
+  - Use `make format` to run black and isort formatters
+  - Use `make typecheck` to run both pyright and mypy type checkers
+  - Use `make test-fast` for quick test runs during development
+  - Use `make test-watch` to automatically re-run tests on file changes
+  - Use `make all` to format code and run all quality checks in sequence
+  - Use `make help` to see all available commands
 
 - Always update the ROADMAP.md, TECHNICAL_DEBT.md, and README.md files in the project root with the latest changes.
-
-- ALWAYS call Serena and read Serena's initial instructions before starting any work.
 
 - NEVER disable the pre-commit hooks.
 
 - NEVER force a commit if the pre-commit hooks fail.
 
 - NEVER use `--no-verify` to bypass pre-commit hooks. If your code does not pass tests or checks, fix it. Bypassing verification is never acceptable and will result in a rejected commit.
-
