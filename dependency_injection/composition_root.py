@@ -12,16 +12,6 @@ from config import Config
 
 # Application layer imports
 from src.application.services.stock_application_service import StockApplicationService
-
-# Domain layer imports
-from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
-
-# Infrastructure layer imports
-from src.infrastructure.persistence.database_connection import DatabaseConnection
-from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
-from src.infrastructure.repositories.sqlite_stock_repository import (
-    SqliteStockRepository,
-)
 from src.presentation.adapters.stock_presentation_adapter import (
     StockPresentationAdapter,
 )
@@ -31,6 +21,11 @@ from src.presentation.controllers.stock_controller import StockController
 from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 from .di_container import DIContainer
+
+# Domain layer imports
+# Repository interfaces will be used when infrastructure is rebuilt
+
+# Infrastructure layer imports removed - will be rebuilt later
 
 
 class CompositionRoot:
@@ -67,8 +62,9 @@ class CompositionRoot:
             database_path = str(Config().db_path)
         db_path = config.get("database_path", database_path)
 
-        # Configure infrastructure layer (outermost layer)
-        cls._configure_infrastructure_layer(container, db_path)
+        # Infrastructure layer configuration removed - will be rebuilt later
+        # db_path parameter kept for future use
+        _ = db_path  # Will be used when infrastructure is rebuilt
 
         # Configure application layer (business logic)
         cls._configure_application_layer(container)
@@ -81,26 +77,6 @@ class CompositionRoot:
             extra_registrations(container)
 
         return container
-
-    @classmethod
-    def _configure_infrastructure_layer(
-        cls, container: DIContainer, database_path: str
-    ) -> None:
-        """Configure infrastructure layer dependencies."""
-
-        # Database connection - singleton for connection pooling
-        def create_database_connection() -> DatabaseConnection:
-            connection = DatabaseConnection(database_path)
-            connection.initialize_schema()  # Ensure schema exists
-            return connection
-
-        container.register_factory(DatabaseConnection, create_database_connection)
-
-        # Unit of Work - singleton to ensure transaction consistency
-        container.register_singleton(IStockBookUnitOfWork, SqliteUnitOfWork)
-
-        # Repositories - transient since they're lightweight
-        container.register_transient(IStockRepository, SqliteStockRepository)
 
     @classmethod
     def _configure_application_layer(cls, container: DIContainer) -> None:

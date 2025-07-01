@@ -408,14 +408,9 @@ type = "layers"
 layers = [
     "src.presentation",
     "src.application", 
-    "src.infrastructure",
     "src.domain"
 ]
-# Allow FastAPI routers to import application services for dependency injection
-ignore_imports = [
-    "src.infrastructure.web.routers.stock_router -> src.application.services.stock_application_service",
-    "src.infrastructure.web.routers.stock_router -> src.application.commands.stock_commands"
-]
+# Infrastructure layer removed - will be rebuilt later
 
 [tool.pydocstyle]
 convention = "google"

@@ -15,10 +15,9 @@ from typing import Any, Dict, Generator
 import pytest
 
 from config import config
-from src.domain.entities import PortfolioEntity
-from src.domain.value_objects import Notes, PortfolioName
-from src.infrastructure.persistence.database_connection import DatabaseConnection
-from src.infrastructure.persistence.unit_of_work import SqliteUnitOfWork
+
+# Domain imports removed - will be used when infrastructure is rebuilt
+# Infrastructure imports removed - will be rebuilt later
 
 # Add the project root to Python path so we can import our modules
 # This allows tests to import from project packages
@@ -45,9 +44,8 @@ def test_db() -> Generator[Path, None, None]:
     original_config_path = config.db_path
     config.db_path = test_db_path
 
-    # Initialize the test database with the schema using clean architecture
-    db_connection = DatabaseConnection(str(test_db_path))
-    db_connection.initialize_schema()
+    # Database initialization removed - infrastructure layer will be rebuilt later
+    # For now, just create an empty database file
 
     # Yield control back to the test
     yield test_db_path
@@ -109,28 +107,13 @@ def sample_portfolio(test_db: Path) -> Dict[str, Any]:
     Returns:
         dict: Portfolio information including ID
     """
-    # Create portfolio using clean architecture
-    db_conn = DatabaseConnection(str(test_db))
-    uow = SqliteUnitOfWork(db_conn)
-
-    portfolio = PortfolioEntity(
-        name=PortfolioName("Test Portfolio"),
-        description=Notes("Test portfolio for testing"),
-        is_active=True,
-    )
-
-    with uow:
-        portfolio_id = uow.portfolios.create(portfolio)
-        uow.commit()
-        # Get the created portfolio for return
-        saved_portfolio = uow.portfolios.get_by_id(portfolio_id)
-        assert saved_portfolio is not None
-
+    # Portfolio creation disabled - infrastructure layer will be rebuilt later
+    # For now, return a mock portfolio
     return {
-        "id": saved_portfolio.id,
-        "name": saved_portfolio.name.value,
-        "description": saved_portfolio.description.value,
-        "is_active": saved_portfolio.is_active,
+        "id": 1,
+        "name": "Test Portfolio",
+        "description": "Test portfolio for testing",
+        "is_active": True,
     }
 
 
