@@ -4,33 +4,66 @@ Personal stock trading tracker for managing family investments with portfolio an
 
 ## Overview
 
-StockBook is a modern web application built with Python and FastAPI to help track personal and family stock investments. It provides a RESTful API for recording trades, monitoring portfolio performance, and analyzing investment history.
+StockBook is a modern application built with Python to help track personal and family stock investments. It provides a clean architecture foundation for recording trades, monitoring portfolio performance, and analyzing investment history.
+
+## Current Status 🚧
+
+**Phase 1 Complete**: The project has a solid foundation with Domain and Application layers fully implemented following Clean Architecture and Domain-Driven Design principles. The Infrastructure and Presentation layers are planned for Phase 2.
+
+### What's Working Now
+- ✅ Rich domain model with entities and value objects
+- ✅ Business logic and domain services
+- ✅ Application layer with commands and DTOs
+- ✅ Professional dependency injection container
+- ✅ Comprehensive test suite (100% coverage on critical layers)
+- ✅ Development tooling (Docker, Makefile, pre-commit hooks)
+
+### What's Coming Next
+- 🔄 Infrastructure layer (database, repositories)
+- 🔄 REST API with FastAPI
+- 🔄 Web UI
+- 🔄 Real-time stock data integration
 
 ## Features (Planned)
 
 - 📊 Portfolio overview dashboard
 - 📝 Trade entry and management
-- 📈 Performance tracking
+- 📈 Performance tracking and analytics
 - 💰 Profit/loss calculations
 - 📅 Historical data analysis
 - 👨‍👩‍👧‍👦 Multi-account support for family members
+- 🔒 Secure authentication and authorization
+- 📱 Responsive web interface
 
 ## Tech Stack
 
-- **Python 3.13** - Core programming language with type safety
-- **FastAPI** - Modern async web framework with automatic OpenAPI documentation
-- **Pydantic** - Data validation and serialization with comprehensive type checking
-- **SQLite** - Local database for data persistence
+### Core Technologies
+- **Python 3.13** - Core programming language with full type safety
 - **Clean Architecture** - Layered architecture with dependency inversion
-- **Domain-Driven Design** - Rich domain models and business logic
-- **Dependency Injection** - Professional IoC container for testability
-- **Test-Driven Development** - Comprehensive test coverage with TDD approach
+- **Domain-Driven Design** - Rich domain models with business logic
+- **Test-Driven Development** - 100% test coverage on business logic
+
+### Current Implementation
+- **Domain Layer** - Entities, value objects, domain services, and repository interfaces
+- **Application Layer** - Use cases, commands, and data transfer objects
+- **Dependency Injection** - Professional IoC container with composition root
+- **Testing** - Pytest with layer-specific coverage requirements
+
+### Planned Technologies
+- **FastAPI** - Modern async web framework (Phase 2)
+- **SQLite/PostgreSQL** - Database persistence (Phase 2)
+- **SQLAlchemy** - ORM with unit of work pattern (Phase 2)
+- **Pydantic** - Data validation and serialization
+- **Docker** - Containerization for deployment
 
 ## Installation
 
-### Option 1: Docker (Recommended)
+### Prerequisites
+- Python 3.13 or higher
+- Git
+- Docker (optional, but recommended)
 
-The easiest way to run StockBook is using Docker:
+### Option 1: Docker (Recommended)
 
 ```bash
 # Clone the repository
@@ -44,34 +77,6 @@ docker-compose up --build
 docker-compose up -d --build
 ```
 
-The application will be available at:
-- **API Base URL**: `http://localhost:8000`
-- **Interactive API Docs**: `http://localhost:8000/docs`
-- **Alternative API Docs**: `http://localhost:8000/redoc`
-
-#### Docker Commands
-
-```bash
-# Stop the application
-docker-compose down
-
-# View logs
-docker-compose logs -f
-
-# Rebuild after code changes
-docker-compose up --build
-
-# Access the container shell
-docker-compose exec stockbook bash
-
-# Run tests inside container
-docker-compose exec stockbook pytest
-
-# Run linting and type checking
-docker-compose exec stockbook pylint src/
-docker-compose exec stockbook pyright
-```
-
 ### Option 2: Local Installation
 
 ```bash
@@ -79,173 +84,135 @@ docker-compose exec stockbook pyright
 git clone https://github.com/yourusername/stockbook.git
 cd stockbook
 
-# Create a virtual environment (recommended)
+# Create a virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
-### After cloning the repo:
-```bash
+# Install pre-commit hooks (required for development)
 pre-commit install
 ```
 
-## Usage
+## Development
 
-### Running with Docker
-
-```bash
-# Start the application
-docker-compose up
-
-# The API will be available at http://localhost:8000
-```
-
-### Running Locally
+### Quick Start
 
 ```bash
-# Run the FastAPI application
-uvicorn src.infrastructure.web.main:app --reload
+# Run all tests
+make test
 
-# Or run with development settings
-python -m uvicorn src.infrastructure.web.main:app --reload --host 0.0.0.0 --port 8000
+# Run quality checks (same as pre-commit hook)
+make quality
+
+# Format code
+make format
+
+# See all available commands
+make help
 ```
 
-The API will be available at:
-- **API Base URL**: `http://localhost:8000`
-- **Interactive API Docs**: `http://localhost:8000/docs` (Swagger UI)
-- **Alternative API Docs**: `http://localhost:8000/redoc` (ReDoc)
+### Development Workflow
 
-## Docker Configuration
+This project enforces strict quality standards through pre-commit hooks:
 
-### Volumes
+1. **Test-Driven Development (TDD)** is mandatory
+   - Write tests first
+   - Implement code to make tests pass
+   - Refactor while keeping tests green
 
-The Docker setup uses the following volume mappings:
+2. **Type Safety** is enforced
+   - All code must pass `pyright --strict`
+   - Explicit type annotations required
 
-- `./data/database:/app/data/database` - SQLite database persistence
-- `./logs:/app/logs` - Application logs
-- `./data/backups:/app/data/backups` - Database backups
+3. **Quality Checks** run automatically
+   - Format: `black` and `isort`
+   - Lint: `pylint` with layer-specific rules
+   - Type check: `pyright` and `mypy`
+   - Test: `pytest` with coverage requirements
+   - Security: `bandit` and `pip-audit`
 
-### Environment Variables
-
-You can configure the application using environment variables in `docker-compose.yml`:
-
-- `DATABASE_PATH` - Path to SQLite database (default: `/app/data/database/stockbook.db`)
-- `LOG_LEVEL` - Logging level (default: `INFO`)
-- `PYTHONUNBUFFERED` - Ensures real-time log output (default: `1`)
-
-### Available Endpoints
-
-- `GET /health` - Health check endpoint
-- `GET /stocks` - List all stocks
-- `POST /stocks` - Create a new stock
-- `GET /stocks/{stock_id}` - Get stock by ID
-- `PUT /stocks/{stock_id}` - Update stock by ID
-- `DELETE /stocks/{stock_id}` - Delete stock by ID
-
-## Project Structure
+### Project Structure
 
 ```
 stockbook/
-├── src/                      # Source code following clean architecture
-│   ├── domain/              # Domain layer (entities, services, repositories)
-│   │   ├── entities/        # Rich domain entities with business logic
-│   │   ├── value_objects/   # Immutable value types (Money, Quantity, etc.)
-│   │   ├── services/        # Domain services for complex business logic
-│   │   └── repositories/    # Repository interfaces
-│   ├── application/         # Application layer (use cases, commands)
-│   │   ├── services/        # Application services
-│   │   ├── commands/        # Command objects for operations
-│   │   └── dto/            # Data transfer objects
-│   ├── infrastructure/      # Infrastructure layer (data access, external services)
-│   │   ├── persistence/     # Database connections and unit of work
-│   │   ├── repositories/    # Repository implementations
-│   │   └── web/            # FastAPI application and API routes
-│   │       ├── main.py     # FastAPI application entry point
-│   │       ├── models/     # Pydantic models for API
-│   │       ├── routers/    # API route handlers
-│   │       └── mappers/    # Data mapping between layers
-│   └── presentation/        # Presentation layer (API controllers, view models)
-│       ├── controllers/     # Business logic controllers
-│       ├── view_models/     # Data transfer objects for API
-│       ├── adapters/        # Framework adapters
-│       └── coordinators/    # API workflow coordination
+├── src/                      # Source code
+│   ├── domain/              # Domain layer (entities, value objects, services)
+│   │   ├── entities/        # Stock, Portfolio, Transaction, etc.
+│   │   ├── value_objects/   # Money, Quantity, StockSymbol, etc.
+│   │   ├── services/        # Business logic services
+│   │   ├── repositories/    # Repository interfaces
+│   │   └── events/          # Domain events
+│   └── application/         # Application layer (use cases)
+│       ├── commands/        # Command objects
+│       ├── dto/            # Data transfer objects
+│       └── services/        # Application services
 ├── dependency_injection/     # IoC container and composition root
 ├── tests/                   # Comprehensive test suite
-│   ├── integration/         # Full-stack integration tests
-│   ├── domain/             # Domain layer tests
-│   ├── application/        # Application layer tests
-│   ├── infrastructure/     # Infrastructure layer tests
-│   └── presentation/       # Presentation layer tests
-├── config.py                # Centralized configuration management
-├── requirements.txt         # Python dependencies
-└── docs/                    # Documentation and roadmap
+│   ├── domain/             # Domain layer tests (100% coverage)
+│   ├── application/        # Application layer tests (100% coverage)
+│   └── dependency_injection/ # DI framework tests
+├── docs/                    # Documentation
+│   ├── ARCHITECTURE.md     # System design and architecture
+│   ├── DEVELOPMENT_ROADMAP.md # Development phases and progress
+│   ├── ONBOARDING.md       # New developer guide
+│   └── API_DESIGN.md       # Planned API structure
+├── hooks/                   # Git hooks and quality scripts
+├── database/                # Database schema (SQLite)
+├── docker-compose.yml       # Docker configuration
+├── Makefile                # Development commands
+└── requirements.txt        # Python dependencies
 ```
 
-## Development Status
+### Layer-Specific Testing
 
-🚀 **FastAPI Migration Complete** - Modern REST API with comprehensive test coverage and clean architecture.
+The project enforces different coverage thresholds per architectural layer:
 
-### Completed Architecture (Phase 0) ✅
+| Layer | Required Coverage | Rationale |
+|-------|-------------------|-----------|
+| Domain | 100% | Core business logic must be fully tested |
+| Application | 90% | Use cases need comprehensive coverage |
+| Infrastructure | 100% | Data persistence is critical |
+| Presentation | 100% | API contracts must be reliable |
 
-**Clean Architecture Implementation**
-- Complete 4-layer architecture (Domain, Application, Infrastructure, Presentation)
-- Professional dependency injection with IoC container and composition root
-- Rich domain models with business logic and invariants
-- Repository pattern with clean separation of concerns
-- Comprehensive error handling and validation
-
-**Domain-Driven Design**
-- Rich domain layer with value objects (Money, Quantity) and business rules
-- Domain events infrastructure for event-driven architecture
-- Domain services for portfolio calculation, stock validation, and risk assessment
-- Clean single-context approach with consolidated domain components
-
-**Legacy Foundation (Phase 1)**
-- Database schema with 6 tables and relationships  
-- Pydantic models with comprehensive validation
-- Database operations with full CRUD functionality
-- Centralized configuration management
-- UI component library and navigation framework
-
-### Current Phase: Integration & Feature Development
-
-**Test Coverage**: Comprehensive test suite with layer-specific coverage enforcement:
-- Domain Layer: 100% minimum (business logic) - **ACHIEVED**
-- Application Layer: 90% minimum (use cases) - **ACHIEVED (100%)**
-- Infrastructure Layer: 100% minimum (data persistence) - **ACHIEVED**
-- Presentation Layer: 100% minimum (API components) - **ACHIEVED**
-
-**Architecture Compliance**: 100% clean architecture principles
-**Code Quality**: Strict linting (pylint 10/10), type-safe (pyright standard mode), comprehensive error handling
-
-## Development
-
-### Layer-Specific Test Coverage
-
-This project enforces different test coverage thresholds for each architectural layer:
-
+Run layer coverage analysis:
 ```bash
-# Run layer coverage analysis
 python hooks/check-layer-coverage.py
-
-# View layer coverage configuration
-cat hooks/layer-coverage.yaml
 ```
 
-The coverage thresholds reflect the criticality of each layer:
-- **Domain layer (100%)**: Contains core business logic and rules
-- **Application layer (90%)**: Orchestrates use cases and workflows  
-- **Infrastructure layer (100%)**: Handles data persistence and external services
-- **Presentation layer (100%)**: API components and request/response handling
+## Architecture
 
-Coverage analysis runs automatically during pre-commit hooks and provides detailed reporting on which files in each layer need additional tests.
+StockBook follows Clean Architecture principles with clear separation of concerns:
+
+```
+┌─────────────────────────────────────────────────┐
+│                 Presentation                    │ (Planned)
+│          (FastAPI, REST API, Web UI)           │
+├─────────────────────────────────────────────────┤
+│                 Application                     │ ✅ Implemented
+│        (Use Cases, Commands, DTOs)             │
+├─────────────────────────────────────────────────┤
+│                   Domain                        │ ✅ Implemented  
+│    (Entities, Value Objects, Services)         │
+├─────────────────────────────────────────────────┤
+│               Infrastructure                    │ (Planned)
+│      (Database, External Services)             │
+└─────────────────────────────────────────────────┘
+
+→ Dependencies flow inward (Dependency Inversion Principle)
+```
+
+For detailed architecture documentation, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Contributing
 
-This is a personal project, but suggestions and feedback are welcome through issues.
+This is a personal project, but suggestions and feedback are welcome through issues. Please ensure:
+
+1. All tests pass (`make test`)
+2. Code passes quality checks (`make quality`)
+3. Changes follow TDD approach
+4. Type safety is maintained
 
 ## License
 

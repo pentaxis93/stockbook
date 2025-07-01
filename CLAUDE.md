@@ -25,7 +25,7 @@
   - Use `make all` to format code and run all quality checks in sequence
   - Use `make help` to see all available commands
 
-- Always update the ROADMAP.md, TECHNICAL_DEBT.md, and README.md files in the project root with the latest changes.
+- Always update the docs/DEVELOPMENT_ROADMAP.md and README.md files with the latest changes when significant progress is made.
 
 - NEVER disable the pre-commit hooks.
 
