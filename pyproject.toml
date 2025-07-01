@@ -406,11 +406,10 @@ modules = ["src.domain"]
 name = "Layered architecture"
 type = "layers"
 layers = [
-    "src.presentation",
     "src.application", 
     "src.domain"
 ]
-# Infrastructure layer removed - will be rebuilt later
+# Infrastructure and presentation layers removed - will be rebuilt later
 
 [tool.pydocstyle]
 convention = "google"

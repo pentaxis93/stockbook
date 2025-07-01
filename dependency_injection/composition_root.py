@@ -12,15 +12,11 @@ from config import Config
 
 # Application layer imports
 from src.application.services.stock_application_service import StockApplicationService
-from src.presentation.adapters.stock_presentation_adapter import (
-    StockPresentationAdapter,
-)
-
-# Presentation layer imports
-from src.presentation.controllers.stock_controller import StockController
-from src.presentation.coordinators.stock_page_coordinator import StockPageCoordinator
 
 from .di_container import DIContainer
+
+# Presentation layer imports removed - will be rebuilt later
+
 
 # Domain layer imports
 # Repository interfaces will be used when infrastructure is rebuilt
@@ -69,8 +65,7 @@ class CompositionRoot:
         # Configure application layer (business logic)
         cls._configure_application_layer(container)
 
-        # Configure presentation layer (UI/controllers)
-        cls._configure_presentation_layer(container)
+        # Presentation layer configuration removed - will be rebuilt later
 
         # Apply any additional registrations
         if extra_registrations:
@@ -85,15 +80,4 @@ class CompositionRoot:
         # Application services - transient to avoid state issues
         container.register_transient(StockApplicationService, StockApplicationService)
 
-    @classmethod
-    def _configure_presentation_layer(cls, container: DIContainer) -> None:
-        """Configure presentation layer dependencies."""
-
-        # Controllers - transient for request isolation
-        container.register_transient(StockController, StockController)
-
-        # Framework-agnostic adapter - transient for UI state isolation
-        container.register_transient(StockPresentationAdapter, StockPresentationAdapter)
-
-        # Coordinators - transient for page-level state management
-        container.register_transient(StockPageCoordinator, StockPageCoordinator)
+    # Presentation layer configuration method removed - will be rebuilt later
