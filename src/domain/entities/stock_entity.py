@@ -31,10 +31,10 @@ class StockEntity(BaseEntity):
     # Type annotations for instance variables
     _symbol: StockSymbol
     _company_name: CompanyName
-    _sector_vo: Optional[Sector]
-    _industry_group_vo: Optional[IndustryGroup]
-    _grade_vo: Optional[Grade]
-    _notes_vo: Notes
+    _sector: Optional[Sector]
+    _industry_group: Optional[IndustryGroup]
+    _grade: Optional[Grade]
+    _notes: Notes
 
     def __init__(
         self,
@@ -70,10 +70,10 @@ class StockEntity(BaseEntity):
         super().__init__(id=id)
         self._symbol = symbol
         self._company_name = company_name
-        self._sector_vo = sector
-        self._industry_group_vo = industry_group
-        self._grade_vo = grade
-        self._notes_vo = notes if notes is not None else Notes("")
+        self._sector = sector
+        self._industry_group = industry_group
+        self._grade = grade
+        self._notes = notes if notes is not None else Notes("")
 
         # Validate domain business rules (sector-industry relationship)
         sector_str = sector.value if sector else None
@@ -93,22 +93,22 @@ class StockEntity(BaseEntity):
     @property
     def sector(self) -> Optional[Sector]:
         """Get the sector value object."""
-        return self._sector_vo
+        return self._sector
 
     @property
     def industry_group(self) -> Optional[IndustryGroup]:
         """Get the industry group value object."""
-        return self._industry_group_vo
+        return self._industry_group
 
     @property
     def grade(self) -> Optional[Grade]:
         """Get the grade value object."""
-        return self._grade_vo
+        return self._grade
 
     @property
     def notes(self) -> Notes:
         """Get the notes value object."""
-        return self._notes_vo
+        return self._notes
 
     def __eq__(self, other: Any) -> bool:
         """
@@ -156,7 +156,7 @@ class StockEntity(BaseEntity):
         Returns:
             True if notes are present and not empty
         """
-        return self._notes_vo.has_content()
+        return self._notes.has_content()
 
     def update_fields(self, **kwargs: Any) -> None:
         """
@@ -204,7 +204,7 @@ class StockEntity(BaseEntity):
         """Create sector value object if present."""
         if "sector" in kwargs:
             sector = kwargs["sector"]
-            temp_values["sector_vo"] = Sector(sector) if sector is not None else None
+            temp_values["sector"] = Sector(sector) if sector is not None else None
 
     def _create_industry_group_vo(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
@@ -212,7 +212,7 @@ class StockEntity(BaseEntity):
         """Create industry group value object if present."""
         if "industry_group" in kwargs:
             industry_group = kwargs["industry_group"]
-            temp_values["industry_group_vo"] = (
+            temp_values["industry_group"] = (
                 IndustryGroup(industry_group) if industry_group else None
             )
 
@@ -222,7 +222,7 @@ class StockEntity(BaseEntity):
         """Create grade value object if present."""
         if "grade" in kwargs:
             grade_value = kwargs["grade"]
-            temp_values["grade_vo"] = (
+            temp_values["grade"] = (
                 Grade(grade_value) if grade_value is not None else None
             )
 
@@ -231,7 +231,7 @@ class StockEntity(BaseEntity):
     ) -> None:
         """Create notes value object if present."""
         if "notes" in kwargs:
-            temp_values["notes_vo"] = Notes(kwargs["notes"])
+            temp_values["notes"] = Notes(kwargs["notes"])
 
     def _validate_and_adjust_sector_industry(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
@@ -249,7 +249,7 @@ class StockEntity(BaseEntity):
             and self._should_clear_industry_group_for_new_sector(new_sector)
         ):
             new_industry_group = None
-            temp_values["industry_group_vo"] = None
+            temp_values["industry_group"] = None
 
         # Validate the final sector-industry combination
         self._validate_sector_industry_combination(new_sector, new_industry_group)
@@ -270,14 +270,14 @@ class StockEntity(BaseEntity):
         """Apply validated field updates to the entity."""
         if "company_name" in temp_values:
             self._company_name = temp_values["company_name"]
-        if "sector_vo" in temp_values:
-            self._sector_vo = temp_values["sector_vo"]
-        if "industry_group_vo" in temp_values:
-            self._industry_group_vo = temp_values["industry_group_vo"]
-        if "grade_vo" in temp_values:
-            self._grade_vo = temp_values["grade_vo"]
-        if "notes_vo" in temp_values:
-            self._notes_vo = temp_values["notes_vo"]
+        if "sector" in temp_values:
+            self._sector = temp_values["sector"]
+        if "industry_group" in temp_values:
+            self._industry_group = temp_values["industry_group"]
+        if "grade" in temp_values:
+            self._grade = temp_values["grade"]
+        if "notes" in temp_values:
+            self._notes = temp_values["notes"]
 
     def _validate_sector_industry_combination(
         self, sector: Optional[str], industry_group: Optional[str]
