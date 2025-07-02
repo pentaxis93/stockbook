@@ -5,13 +5,20 @@ Provides common functionality for all domain entities following DDD principles.
 """
 
 import uuid
-from typing import Any, Optional, TypeVar
+from abc import ABC
+from typing import Any, Optional, Self, Type, TypeVar
 
 T = TypeVar("T", bound="Entity")
 
 
-class Entity:
+class Entity(ABC):  # noqa: B024
     """Base class for all domain entities with immutable string IDs."""
+
+    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
+        """Prevent direct instantiation of Entity base class."""
+        if cls is Entity:
+            raise TypeError("Can't instantiate abstract class Entity directly")
+        return super().__new__(cls)
 
     def __init__(self, id: Optional[str] = None) -> None:
         """Initialize entity with either provided ID or generate new UUID."""
@@ -23,7 +30,7 @@ class Entity:
         return self._id
 
     @classmethod
-    def from_persistence(cls: type[T], id: str, **kwargs: Any) -> T:
+    def from_persistence(cls: Type[Self], id: str, **kwargs: Any) -> Self:
         """Create entity from persistence layer with existing ID."""
         # This will call the subclass constructor with the id parameter
         return cls(id=id, **kwargs)
@@ -44,5 +51,17 @@ class Entity:
         return f"{class_name}(id={self._id})"
 
     def __repr__(self) -> str:
-        """Detailed string representation of entity."""
-        return self.__str__()
+        """Detailed string representation of entity showing all public attributes."""
+        class_name = self.__class__.__name__
+
+        # Collect all public attributes (not starting with _)
+        attrs: list[str] = []
+        for key in sorted(dir(self)):
+            if not key.startswith("_") and not callable(getattr(self, key)):
+                value = getattr(self, key)
+                if isinstance(value, str):
+                    attrs.append(f"{key}='{value}'")
+                else:
+                    attrs.append(f"{key}={value}")
+
+        return f"{class_name}({', '.join(attrs)})"

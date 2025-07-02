@@ -5,6 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the Entity with focus on ID management and equality behavior.
 """
 
+from abc import ABC
 from typing import Optional
 
 import pytest
@@ -22,6 +23,15 @@ class ConcreteEntity(Entity):
 
 class TestEntity:
     """Test suite for Entity domain entity."""
+
+    def test_entity_is_abstract_base_class(self) -> None:
+        """Entity should be an ABC and not instantiable directly."""
+        # Entity should inherit from ABC
+        assert issubclass(Entity, ABC)
+
+        # Should not be able to instantiate Entity directly
+        with pytest.raises(TypeError, match="Can't instantiate abstract class"):
+            Entity()  # type: ignore
 
     def test_create_entity_without_id(self) -> None:
         """Should create entity with generated UUID by default."""
@@ -113,10 +123,35 @@ class TestEntity:
         entity = ConcreteEntity(id=test_id)
         assert str(entity) == f"ConcreteEntity(id={test_id})"
 
-    def test_repr_same_as_str(self) -> None:
-        """Should have same repr as str representation."""
-        entity = ConcreteEntity(id="test-id-1")
-        assert repr(entity) == str(entity)
+    def test_repr_shows_all_public_attributes(self) -> None:
+        """Repr should show class name, ID, and all public attributes."""
+        test_id = "test-repr-id"
+        entity = ConcreteEntity(name="test-name", id=test_id)
+
+        repr_str = repr(entity)
+
+        # Should contain class name
+        assert "ConcreteEntity" in repr_str
+
+        # Should contain ID
+        assert f"id='{test_id}'" in repr_str
+
+        # Should contain other attributes
+        assert "name='test-name'" in repr_str
+
+        # Should be properly formatted
+        assert repr_str.startswith("ConcreteEntity(")
+        assert repr_str.endswith(")")
+
+    def test_repr_excludes_private_attributes(self) -> None:
+        """Repr should not include private attributes."""
+        entity = ConcreteEntity(id="private-test")
+        entity._private_attr = "should-not-appear"  # type: ignore
+
+        repr_str = repr(entity)
+
+        assert "_private_attr" not in repr_str
+        assert "should-not-appear" not in repr_str
 
 
 class TestEntityArchitecturalConcerns:
@@ -212,6 +247,16 @@ class TestEntityArchitecturalConcerns:
         other_entity = ConcreteEntity("other", id="test-id-1")
         assert entity == other_entity
         assert hash(entity) == hash(other_entity)
+
+    def test_from_persistence_type_safety(self) -> None:
+        """from_persistence should return the correct subclass type."""
+        # Type checker should recognize this returns ConcreteEntity
+        entity = ConcreteEntity.from_persistence("test-id", name="typed")
+        assert isinstance(entity, ConcreteEntity)
+        assert entity.name == "typed"  # Should have access to ConcreteEntity attributes
+
+        # The returned type should be recognized as ConcreteEntity by type checkers
+        # This is a compile-time check but we verify runtime behavior here
 
     def test_entity_collections_work_properly_with_hash(self) -> None:
         """
