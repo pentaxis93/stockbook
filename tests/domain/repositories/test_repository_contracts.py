@@ -71,27 +71,6 @@ class MockStockRepository(IStockRepository):
     def exists_by_symbol(self, symbol: StockSymbol) -> bool:
         return self.get_by_symbol(symbol) is not None
 
-    def get_by_grade(self, grade: str) -> List[StockEntity]:
-        return [
-            stock
-            for stock in self.stocks.values()
-            if stock.grade and stock.grade.value == grade
-        ]
-
-    def get_by_industry_group(self, industry_group: str) -> List[StockEntity]:
-        return [
-            stock
-            for stock in self.stocks.values()
-            if stock.industry_group and stock.industry_group.value == industry_group
-        ]
-
-    def get_by_sector(self, sector: str) -> List[StockEntity]:
-        return [
-            stock
-            for stock in self.stocks.values()
-            if stock.sector and stock.sector.value == sector
-        ]
-
     def search_stocks(
         self,
         symbol_filter: Optional[str] = None,
@@ -382,45 +361,6 @@ class TestStockRepositoryContract:
 
         assert exists is False
 
-    def test_get_by_grade_filters_correctly(self) -> None:
-        """Should return only stocks with specified grade."""
-        stock_a1 = create_test_stock("AAPL", "A")
-        stock_a2 = create_test_stock("MSFT", "A")
-        stock_b = create_test_stock("GOOGL"[:5], "B")
-
-        _ = self.repository.create(stock_a1)
-        _ = self.repository.create(stock_a2)
-        _ = self.repository.create(stock_b)
-
-        grade_a_stocks = self.repository.get_by_grade("A")
-
-        assert len(grade_a_stocks) == 2
-        for stock in grade_a_stocks:
-            assert stock.grade is not None
-            assert stock.grade.value == "A"
-
-    def test_get_by_industry_group_filters_correctly(self) -> None:
-        """Should return only stocks with specified industry group."""
-        # All test stocks have "Software" industry group by default
-        _ = self.repository.create(self.test_stock)
-
-        software_stocks = self.repository.get_by_industry_group("Software")
-
-        assert len(software_stocks) == 1
-        assert software_stocks[0].industry_group is not None
-        assert software_stocks[0].industry_group.value == "Software"
-
-    def test_get_by_sector_filters_correctly(self) -> None:
-        """Should return only stocks with specified sector."""
-        # All test stocks have "Technology" sector by default
-        _ = self.repository.create(self.test_stock)
-
-        tech_stocks = self.repository.get_by_sector("Technology")
-
-        assert len(tech_stocks) == 1
-        assert tech_stocks[0].sector is not None
-        assert tech_stocks[0].sector.value == "Technology"
-
     def test_search_stocks_with_symbol_filter(self) -> None:
         """Should filter stocks by symbol containing given string."""
         apple_stock = create_test_stock("AAPL", "A")
@@ -592,8 +532,7 @@ class TestRepositoryContractEdgeCases:
         repository = MockStockRepository()
 
         assert not repository.get_all()
-        assert repository.get_by_grade("A") == []
-        assert repository.get_by_sector("Technology") == []
+
         assert repository.search_stocks() == []
 
     def test_repository_handles_invalid_parameters(self) -> None:
@@ -602,7 +541,7 @@ class TestRepositoryContractEdgeCases:
 
         # These should not raise exceptions but return appropriate values
         assert repository.get_by_id("") is None
-        assert repository.get_by_grade("") == []
+
         assert repository.search_stocks(symbol_filter="") == []
 
     def test_portfolio_repository_handles_empty_collections(self) -> None:
@@ -690,7 +629,7 @@ class TestRepositoryContractPerformance:
         assert len(all_stocks) == 100
 
         # Filtering should work with large dataset
-        grade_a_stocks = repository.get_by_grade("A")
+        grade_a_stocks = repository.search_stocks(grade_filter="A")
         assert len(grade_a_stocks) == 100
 
     def test_search_operations_scalability(self) -> None:
@@ -836,10 +775,7 @@ class TestAbstractMethodCoverage:
         assert hasattr(IStockRepository, "update")
         assert hasattr(IStockRepository, "delete")
         assert hasattr(IStockRepository, "exists_by_symbol")
-        assert hasattr(IStockRepository, "get_by_grade")
-        assert hasattr(IStockRepository, "get_by_industry_group")
         assert hasattr(IStockRepository, "search_stocks")
-        assert hasattr(IStockRepository, "get_by_sector")
 
         # Test that all interfaces have abstractmethods
         for interface in [

@@ -181,9 +181,7 @@ def mock_stock_repository() -> Mock:
     mock.update.return_value = True
     mock.delete.return_value = True
     mock.exists_by_symbol.return_value = False
-    mock.get_by_grade.return_value = []
-    mock.get_by_industry_group.return_value = []
-    mock.get_by_sector.return_value = []
+
     mock.search_stocks.return_value = []
 
     return mock

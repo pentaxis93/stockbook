@@ -126,45 +126,6 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_grade(self, grade: str) -> List[StockEntity]:
-        """
-        Retrieve stocks by grade.
-
-        Args:
-            grade: Stock grade to filter by (A, B, or C)
-
-        Returns:
-            List of StockEntity domain models with the specified grade
-        """
-        pass
-
-    @abstractmethod
-    def get_by_industry_group(self, industry_group: str) -> List[StockEntity]:
-        """
-        Retrieve all stocks in a specific industry group.
-
-        Args:
-            industry_group: Industry group to filter by
-
-        Returns:
-            List of StockEntity domain models in the industry group
-        """
-        pass
-
-    @abstractmethod
-    def get_by_sector(self, sector: str) -> List[StockEntity]:
-        """
-        Retrieve all stocks in a specific sector.
-
-        Args:
-            sector: Sector to filter by
-
-        Returns:
-            List of StockEntity domain models in the sector
-        """
-        pass
-
-    @abstractmethod
     def search_stocks(
         self,
         symbol_filter: Optional[str] = None,
