@@ -58,9 +58,8 @@ class CompositionRoot:
             database_path = str(Config().db_path)
         db_path = config.get("database_path", database_path)
 
-        # Infrastructure layer configuration removed - will be rebuilt later
-        # db_path parameter kept for future use
-        _ = db_path  # Will be used when infrastructure is rebuilt
+        # Configure infrastructure layer (database, repositories)
+        cls._configure_infrastructure_layer(container, db_path)
 
         # Configure application layer (business logic)
         cls._configure_application_layer(container)
@@ -74,10 +73,41 @@ class CompositionRoot:
         return container
 
     @classmethod
+    def _configure_infrastructure_layer(
+        cls, container: DIContainer, db_path: str
+    ) -> None:
+        """
+        Configure infrastructure layer dependencies.
+
+        Args:
+            container: DI container to configure
+            db_path: Path to the database file
+        """
+        from sqlalchemy.engine import Engine
+
+        from src.domain.repositories.interfaces import IStockBookUnitOfWork
+        from src.infrastructure.persistence.database_factory import create_engine
+        from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
+
+        # Database engine - singleton
+        engine = create_engine(db_path)
+        container.register_instance(Engine, engine)
+
+        # Unit of Work - transient for transaction isolation
+        container.register_factory(
+            IStockBookUnitOfWork,
+            lambda: SqlAlchemyUnitOfWork(container.resolve(Engine)),
+        )
+
+    @classmethod
     def _configure_application_layer(cls, container: DIContainer) -> None:
         """Configure application layer dependencies."""
+        from src.domain.repositories.interfaces import IStockBookUnitOfWork
 
         # Application services - transient to avoid state issues
-        container.register_transient(StockApplicationService, StockApplicationService)
+        container.register_factory(
+            StockApplicationService,
+            lambda: StockApplicationService(container.resolve(IStockBookUnitOfWork)),
+        )
 
     # Presentation layer configuration method removed - will be rebuilt later

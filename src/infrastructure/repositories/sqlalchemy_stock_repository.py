@@ -98,7 +98,9 @@ class SqlAlchemyStockRepository(IStockRepository):
             return None
 
         # Convert row to domain entity
-        return self._row_to_entity(dict(row))
+        # Handle both dict (from mocks) and Row objects (from SQLAlchemy)
+        row_dict = row._asdict() if hasattr(row, "_asdict") else row
+        return self._row_to_entity(row_dict)
 
     def _entity_to_row(self, stock: Stock) -> Dict[str, Any]:
         """
@@ -173,7 +175,9 @@ class SqlAlchemyStockRepository(IStockRepository):
             return None
 
         # Convert row to domain entity
-        return self._row_to_entity(dict(row))
+        # Handle both dict (from mocks) and Row objects (from SQLAlchemy)
+        row_dict = row._asdict() if hasattr(row, "_asdict") else row
+        return self._row_to_entity(row_dict)
 
     def get_all(self) -> List[Stock]:
         """
@@ -190,7 +194,10 @@ class SqlAlchemyStockRepository(IStockRepository):
         rows = result.fetchall()
 
         # Convert rows to domain entities
-        return [self._row_to_entity(dict(row)) for row in rows]
+        return [
+            self._row_to_entity(row._asdict() if hasattr(row, "_asdict") else row)
+            for row in rows
+        ]
 
     def update(self, stock_id: str, stock: Stock) -> bool:
         """
@@ -346,4 +353,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         rows = result.fetchall()
 
         # Convert rows to domain entities
-        return [self._row_to_entity(dict(row)) for row in rows]
+        return [
+            self._row_to_entity(row._asdict() if hasattr(row, "_asdict") else row)
+            for row in rows
+        ]

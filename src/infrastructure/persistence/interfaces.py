@@ -8,9 +8,10 @@ clean architecture boundaries.
 
 # pyright: reportUnknownParameterType=false
 
-from typing import Any, Dict, List, Optional, Protocol, Union
+from typing import Any, Dict, List, Optional, Protocol, Union, runtime_checkable
 
 
+@runtime_checkable
 class IDatabaseConnection(Protocol):
     """
     Protocol for database connections supporting SQLAlchemy Core operations.

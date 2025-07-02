@@ -30,32 +30,46 @@ class TestCompositionRoot:
 
     def test_configure_database_layer(self) -> None:
         """Should configure database and infrastructure layer correctly."""
-        # Arrange
-        # container = CompositionRoot.configure()
+        from sqlalchemy.engine import Engine
 
-        # Act
-        # db_connection = container.resolve(DatabaseConnection)
-        # unit_of_work = container.resolve(IUnitOfWork)
-        # stock_repo = container.resolve(IStockRepository)
+        from src.domain.repositories.interfaces import IStockBookUnitOfWork
+        from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
 
-        # Assert
-        # assert isinstance(db_connection, DatabaseConnection)
-        # assert isinstance(unit_of_work, SqliteUnitOfWork)
-        # assert isinstance(stock_repo, SqliteStockRepository)
-        pass
+        # Arrange & Act
+        container = CompositionRoot.configure(database_path=":memory:")
+
+        # Assert - Engine should be registered
+        assert container.is_registered(Engine)
+        engine = container.resolve(Engine)
+        assert isinstance(engine, Engine)
+        assert ":memory:" in str(engine.url)
+
+        # Assert - Unit of Work should be registered
+        assert container.is_registered(IStockBookUnitOfWork)
+        unit_of_work = container.resolve(IStockBookUnitOfWork)
+        assert isinstance(unit_of_work, SqlAlchemyUnitOfWork)
 
     def test_configure_application_layer(self) -> None:
         """Should configure application services correctly."""
+        from src.application.services.stock_application_service import (
+            StockApplicationService,
+        )
+        from src.domain.repositories.interfaces import IStockBookUnitOfWork
+
         # Arrange
-        # container = CompositionRoot.configure()
+        container = CompositionRoot.configure(database_path=":memory:")
 
         # Act
-        # stock_service = container.resolve(StockApplicationService)
+        stock_service = container.resolve(StockApplicationService)
 
         # Assert
-        # assert isinstance(stock_service, StockApplicationService)
-        # assert isinstance(stock_service._unit_of_work, SqliteUnitOfWork)
-        pass
+        assert isinstance(stock_service, StockApplicationService)
+        # Verify it has a unit of work injected
+        assert hasattr(stock_service, "_unit_of_work")
+        assert isinstance(
+            getattr(stock_service, "_unit_of_work"),
+            IStockBookUnitOfWork,
+        )
 
     def test_configure_presentation_layer(self) -> None:
         """Should configure presentation layer components correctly."""
@@ -86,37 +100,37 @@ class TestCompositionRoot:
 
     def test_singleton_configuration(self) -> None:
         """Should configure singleton lifetimes correctly."""
+        from sqlalchemy.engine import Engine
+
         # Arrange
-        # container = CompositionRoot.configure()
+        container = CompositionRoot.configure(database_path=":memory:")
 
         # Act
-        # db_conn1 = container.resolve(DatabaseConnection)
-        # db_conn2 = container.resolve(DatabaseConnection)
-        # uow1 = container.resolve(IUnitOfWork)
-        # uow2 = container.resolve(IUnitOfWork)
+        engine1 = container.resolve(Engine)
+        engine2 = container.resolve(Engine)
 
-        # Assert - database and UoW should be singletons
-        # assert db_conn1 is db_conn2
-        # assert uow1 is uow2
-        pass
+        # Assert - Engine should be singleton
+        assert engine1 is engine2
 
     def test_transient_configuration(self) -> None:
         """Should configure transient lifetimes correctly."""
+        from src.application.services.stock_application_service import (
+            StockApplicationService,
+        )
+        from src.domain.repositories.interfaces import IStockBookUnitOfWork
+
         # Arrange
-        # container = CompositionRoot.configure()
+        container = CompositionRoot.configure(database_path=":memory:")
 
         # Act
-        # controller1 = container.resolve(StockController)
-        # controller2 = container.resolve(StockController)
-        # service1 = container.resolve(StockApplicationService)
-        # service2 = container.resolve(StockApplicationService)
+        service1 = container.resolve(StockApplicationService)
+        service2 = container.resolve(StockApplicationService)
+        uow1 = container.resolve(IStockBookUnitOfWork)
+        uow2 = container.resolve(IStockBookUnitOfWork)
 
-        # Assert - controllers and services should be transient
-        # assert controller1 is not controller2
-        # assert service1 is not service2
-        # But they should share same underlying infrastructure
-        # assert controller1.stock_service._unit_of_work is controller2.stock_service._unit_of_work
-        pass
+        # Assert - services and UoW should be transient
+        assert service1 is not service2
+        assert uow1 is not uow2
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
