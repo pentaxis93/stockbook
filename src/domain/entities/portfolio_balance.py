@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import IndexChange, Money
@@ -107,19 +107,7 @@ class PortfolioBalance(Entity):
         else:
             self._index_change = index_change
 
-    # Equality and representation
-    def __eq__(self, other: Any) -> bool:
-        """Check equality based on business identity (portfolio_id, balance_date)."""
-        if not isinstance(other, PortfolioBalance):
-            return False
-        return (
-            self._portfolio_id == other._portfolio_id
-            and self._balance_date == other._balance_date
-        )
-
-    def __hash__(self) -> int:
-        """Hash for use in collections based on business identity."""
-        return hash((self._portfolio_id, self._balance_date))
+    # Representation
 
     def __str__(self) -> str:
         """String representation."""

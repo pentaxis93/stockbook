@@ -163,7 +163,7 @@ class TestStock:
             _ = Notes(long_notes)  # Error happens at Notes construction
 
     def test_stock_equality(self) -> None:
-        """Should compare stocks based on symbol (business key)."""
+        """Should compare stocks based on ID."""
         symbol1 = StockSymbol("AAPL")
         symbol2 = StockSymbol("AAPL")
         symbol3 = StockSymbol("MSFT")
@@ -172,15 +172,21 @@ class TestStock:
         name2 = CompanyName("Apple Inc.")
         name3 = CompanyName("Microsoft")
 
+        # Different instances with same symbol but different IDs are NOT equal
         stock1 = Stock(symbol=symbol1, company_name=name1)
-        stock2 = Stock(symbol=symbol2, company_name=name2)  # Same symbol
+        stock2 = Stock(symbol=symbol2, company_name=name2)  # Same symbol, different ID
         stock3 = Stock(symbol=symbol3, company_name=name3)  # Different symbol
 
-        assert stock1 == stock2  # Same symbol
-        assert stock1 != stock3  # Different symbol
+        assert stock1 != stock2  # Different IDs
+        assert stock1 != stock3  # Different IDs
+
+        # Same ID means equal
+        stock4 = Stock(symbol=symbol1, company_name=name1, id="same-id")
+        stock5 = Stock(symbol=symbol2, company_name=name2, id="same-id")
+        assert stock4 == stock5  # Same ID, even with different symbols
 
     def test_stock_hash(self) -> None:
-        """Should be hashable based on symbol."""
+        """Should be hashable based on ID."""
         symbol1 = StockSymbol("AAPL")
         symbol2 = StockSymbol("AAPL")
         symbol3 = StockSymbol("MSFT")
@@ -193,12 +199,17 @@ class TestStock:
         stock2 = Stock(symbol=symbol2, company_name=name2)
         stock3 = Stock(symbol=symbol3, company_name=name3)
 
-        # Same symbol should have same hash
-        assert hash(stock1) == hash(stock2)
+        # Different IDs should have different hashes (likely but not guaranteed)
+        assert hash(stock1) != hash(stock2)
 
-        # Can be used in set
+        # Can be used in set - all have different IDs
         stock_set = {stock1, stock2, stock3}
-        assert len(stock_set) == 2  # AAPL appears only once
+        assert len(stock_set) == 3  # All stocks are different due to unique IDs
+
+        # Same ID should have same hash
+        stock4 = Stock(symbol=symbol1, company_name=name1, id="same-id")
+        stock5 = Stock(symbol=symbol2, company_name=name2, id="same-id")
+        assert hash(stock4) == hash(stock5)
 
     def test_stock_string_representation(self) -> None:
         """Should have meaningful string representation."""
@@ -747,8 +758,8 @@ class TestStockDomainInvariants:
 
     def test_symbol_uniqueness_invariant(self) -> None:
         """Should enforce symbol uniqueness business rule conceptually."""
-        # Note: This tests the entity design, actual uniqueness enforcement
-        # would be at repository level
+        # Note: With ID-based equality, symbol uniqueness must be enforced
+        # at the repository level, not through entity equality
 
         symbol = StockSymbol("AAPL")
         name1 = CompanyName("Apple Inc.")
@@ -757,13 +768,15 @@ class TestStockDomainInvariants:
         stock1 = Stock(symbol=symbol, company_name=name1)
         stock2 = Stock(symbol=symbol, company_name=name2)
 
-        # Both stocks have same symbol, so they should be equal by business key
-        assert stock1 == stock2
-        assert hash(stock1) == hash(stock2)
+        # With ID-based equality, stocks with same symbol but different IDs are NOT equal
+        assert stock1 != stock2
+        assert hash(stock1) != hash(stock2)
 
         # This demonstrates why repository must enforce uniqueness
         stock_set = {stock1, stock2}
-        assert len(stock_set) == 1  # Only one stock per symbol
+        assert len(stock_set) == 2  # Both stocks are in the set due to different IDs
+
+        # Repository would need to check for symbol uniqueness before allowing insert/update
 
     def test_sector_industry_consistency_invariant(self) -> None:
         """Should enforce sector-industry group consistency at all times."""
@@ -983,8 +996,8 @@ class TestStockConcurrencyScenarios:
         assert stock.notes.value == original_notes
 
     def test_stock_entity_collection_operations(self) -> None:
-        """Should work properly in collections (sets, dicts) for business operations."""
-        # Create stocks that should be considered equal and different
+        """Should work properly in collections (sets, dicts) with ID-based equality."""
+        # Create stocks with unique IDs
         aapl1 = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -994,22 +1007,24 @@ class TestStockConcurrencyScenarios:
         aapl2 = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
-            grade=Grade("B"),  # Different grade, same symbol
+            grade=Grade("B"),  # Different grade, same symbol, different ID
         )
 
         msft = Stock(
             symbol=StockSymbol("MSFT"), company_name=CompanyName("Microsoft Corp")
         )
 
-        # Test set operations (should deduplicate by symbol)
+        # Test set operations (no deduplication by symbol anymore)
         stock_set = {aapl1, aapl2, msft}
-        assert len(stock_set) == 2  # AAPL appears once, MSFT once
+        assert len(stock_set) == 3  # All stocks have different IDs
 
         # Test dictionary operations (stock as key)
         portfolio_weights = {aapl1: 0.6, msft: 0.4}
 
-        # Should be able to retrieve using different AAPL instance with same symbol
-        assert portfolio_weights[aapl2] == 0.6  # aapl2 should map to same key as aapl1
+        # With ID-based equality, aapl2 is a different key than aapl1
+        assert aapl1 in portfolio_weights
+        assert aapl2 not in portfolio_weights  # Different ID means different key
+        assert portfolio_weights[aapl1] == 0.6
         assert portfolio_weights[msft] == 0.4
 
     def test_stock_equality_with_non_stock_object(self) -> None:

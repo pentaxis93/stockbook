@@ -153,7 +153,7 @@ class TestTransaction:
             )
 
     def test_transaction_equality(self) -> None:
-        """Should compare transactions based on business identity."""
+        """Should compare transactions based on ID."""
         transaction1 = Transaction(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -181,9 +181,30 @@ class TestTransaction:
             transaction_date=date(2024, 1, 1),
         )
 
-        # Transactions with same attributes should be equal
-        assert transaction1 == transaction2
-        assert transaction1 != transaction3
+        # Different instances with same attributes but different IDs are NOT equal
+        assert transaction1 != transaction2  # Different IDs
+        assert transaction1 != transaction3  # Different IDs
+
+        # Same ID means equal
+        transaction4 = Transaction(
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            transaction_type=TransactionType("buy"),
+            quantity=Quantity(100),
+            price=Money(Decimal("100.00")),
+            transaction_date=date(2024, 1, 1),
+            id="same-id",
+        )
+        transaction5 = Transaction(
+            portfolio_id="portfolio-id-2",  # Different attributes
+            stock_id="stock-id-2",
+            transaction_type=TransactionType("sell"),
+            quantity=Quantity(200),
+            price=Money(Decimal("200.00")),
+            transaction_date=date(2024, 2, 1),
+            id="same-id",
+        )
+        assert transaction4 == transaction5  # Same ID, even with different attributes
 
     def test_transaction_string_representation(self) -> None:
         """Should have meaningful string representation."""
@@ -397,7 +418,7 @@ class TestTransactionType:
         transaction_hash = hash(transaction)
         assert isinstance(transaction_hash, int)
 
-        # Test that equal transactions have equal hashes
+        # Test that transactions with different IDs have different hashes (likely but not guaranteed)
         same_transaction = Transaction(
             portfolio_id="portfolio-1",
             stock_id="stock-1",
@@ -406,4 +427,27 @@ class TestTransactionType:
             price=Money(Decimal("100.00")),
             quantity=Quantity(10),
         )
-        assert hash(transaction) == hash(same_transaction)
+        assert hash(transaction) != hash(same_transaction)  # Different IDs
+
+        # Test that transactions with same ID have same hash
+        transaction_with_id1 = Transaction(
+            portfolio_id="portfolio-1",
+            stock_id="stock-1",
+            transaction_date=date(2024, 1, 15),
+            transaction_type=TransactionType("buy"),
+            price=Money(Decimal("100.00")),
+            quantity=Quantity(10),
+            id="same-id",
+        )
+        transaction_with_id2 = Transaction(
+            portfolio_id="portfolio-2",  # Different attributes
+            stock_id="stock-2",
+            transaction_date=date(2024, 2, 20),
+            transaction_type=TransactionType("sell"),
+            price=Money(Decimal("200.00")),
+            quantity=Quantity(20),
+            id="same-id",
+        )
+        assert hash(transaction_with_id1) == hash(
+            transaction_with_id2
+        )  # Same ID, same hash

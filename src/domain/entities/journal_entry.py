@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import JournalContent
@@ -96,16 +96,7 @@ class JournalEntry(Entity):
         else:
             self._content = content
 
-    # Equality and representation
-    def __eq__(self, other: Any) -> bool:
-        """Check equality based on business identity (entry_date, content)."""
-        if not isinstance(other, JournalEntry):
-            return False
-        return self._entry_date == other._entry_date and self._content == other._content
-
-    def __hash__(self) -> int:
-        """Hash for use in collections based on business identity."""
-        return hash((self._entry_date, self._content))
+    # Representation
 
     def __str__(self) -> str:
         """String representation."""

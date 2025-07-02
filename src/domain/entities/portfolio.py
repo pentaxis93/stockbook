@@ -6,7 +6,7 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import Notes, PortfolioName
@@ -87,16 +87,7 @@ class Portfolio(Entity):
             raise ValueError("Created date is already set and cannot be changed")
         self._created_date = created_date
 
-    # Equality and representation
-    def __eq__(self, other: Any) -> bool:
-        """Check equality based on business identity (name)."""
-        if not isinstance(other, Portfolio):
-            return False
-        return self._name == other._name
-
-    def __hash__(self) -> int:
-        """Hash for use in collections based on name."""
-        return hash(self._name)
+    # Representation
 
     def __str__(self) -> str:
         """String representation."""

@@ -101,7 +101,7 @@ class TestTarget:
             )  # Error happens at TargetStatus construction
 
     def test_target_equality(self) -> None:
-        """Should compare targets based on business identity (portfolio_id, stock_id)."""
+        """Should compare targets based on ID."""
         target1 = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -129,11 +129,33 @@ class TestTarget:
             created_date=date.today(),
         )
 
-        assert target1 == target2  # Same portfolio and stock
-        assert target1 != target3  # Different portfolio
+        # Different instances with same attributes but different IDs are NOT equal
+        assert target1 != target2  # Different IDs
+        assert target1 != target3  # Different IDs
+
+        # Same ID means equal
+        target4 = Target(
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("80.00")),
+            status=TargetStatus("active"),
+            created_date=date.today(),
+            id="same-id",
+        )
+        target5 = Target(
+            portfolio_id="portfolio-id-2",  # Different attributes
+            stock_id="stock-id-2",
+            pivot_price=Money(Decimal("200.00")),
+            failure_price=Money(Decimal("150.00")),
+            status=TargetStatus("hit"),
+            created_date=date(2024, 2, 1),
+            id="same-id",
+        )
+        assert target4 == target5  # Same ID, even with different attributes
 
     def test_target_hash(self) -> None:
-        """Should hash consistently based on business identity."""
+        """Should hash consistently based on ID."""
         target1 = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -152,7 +174,29 @@ class TestTarget:
             created_date=date.today(),
         )
 
-        assert hash(target1) == hash(target2)  # Same portfolio and stock
+        # Different IDs should have different hashes (likely but not guaranteed)
+        assert hash(target1) != hash(target2)  # Different IDs
+
+        # Same ID should have same hash
+        target3 = Target(
+            portfolio_id="portfolio-id-1",
+            stock_id="stock-id-1",
+            pivot_price=Money(Decimal("100.00")),
+            failure_price=Money(Decimal("80.00")),
+            status=TargetStatus("active"),
+            created_date=date.today(),
+            id="same-id",
+        )
+        target4 = Target(
+            portfolio_id="portfolio-id-2",  # Different attributes
+            stock_id="stock-id-2",
+            pivot_price=Money(Decimal("200.00")),
+            failure_price=Money(Decimal("150.00")),
+            status=TargetStatus("cancelled"),
+            created_date=date(2024, 3, 1),
+            id="same-id",
+        )
+        assert hash(target3) == hash(target4)  # Same ID, same hash
 
     def test_target_string_representation(self) -> None:
         """Should have informative string representation."""

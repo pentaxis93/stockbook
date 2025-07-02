@@ -89,7 +89,7 @@ class TestPortfolioBalance:
             )  # Error happens at IndexChange construction (over 100%)
 
     def test_portfolio_balance_equality(self) -> None:
-        """Should compare portfolio balances based on business identity (portfolio_id, date)."""
+        """Should compare portfolio balances based on ID."""
         balance1 = PortfolioBalance(
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
@@ -108,11 +108,30 @@ class TestPortfolioBalance:
             final_balance=Money(Decimal("10000.00")),
         )
 
-        assert balance1 == balance2  # Same portfolio and date
-        assert balance1 != balance3  # Different portfolio
+        # Different instances with same attributes but different IDs are NOT equal
+        assert balance1 != balance2  # Different IDs
+        assert balance1 != balance3  # Different IDs
+
+        # Same ID means equal
+        balance4 = PortfolioBalance(
+            portfolio_id="portfolio-id-1",
+            balance_date=date(2024, 1, 15),
+            final_balance=Money(Decimal("10000.00")),
+            id="same-id",
+        )
+        balance5 = PortfolioBalance(
+            portfolio_id="portfolio-id-2",  # Different attributes
+            balance_date=date(2024, 2, 20),
+            final_balance=Money(Decimal("20000.00")),
+            withdrawals=Money(Decimal("1000.00")),
+            deposits=Money(Decimal("2000.00")),
+            index_change=IndexChange(5.5),
+            id="same-id",
+        )
+        assert balance4 == balance5  # Same ID, even with different attributes
 
     def test_portfolio_balance_hash(self) -> None:
-        """Should hash consistently based on business identity."""
+        """Should hash consistently based on ID."""
         balance1 = PortfolioBalance(
             portfolio_id="portfolio-id-1",
             balance_date=date(2024, 1, 15),
@@ -125,7 +144,26 @@ class TestPortfolioBalance:
             final_balance=Money(Decimal("20000.00")),  # Different amount
         )
 
-        assert hash(balance1) == hash(balance2)  # Same portfolio and date
+        # Different IDs should have different hashes (likely but not guaranteed)
+        assert hash(balance1) != hash(balance2)  # Different IDs
+
+        # Same ID should have same hash
+        balance3 = PortfolioBalance(
+            portfolio_id="portfolio-id-1",
+            balance_date=date(2024, 1, 15),
+            final_balance=Money(Decimal("10000.00")),
+            id="same-id",
+        )
+        balance4 = PortfolioBalance(
+            portfolio_id="portfolio-id-2",  # Different attributes
+            balance_date=date(2024, 3, 30),
+            final_balance=Money(Decimal("30000.00")),
+            withdrawals=Money(Decimal("5000.00")),
+            deposits=Money(Decimal("10000.00")),
+            index_change=IndexChange(-2.5),
+            id="same-id",
+        )
+        assert hash(balance3) == hash(balance4)  # Same ID, same hash
 
     def test_portfolio_balance_string_representation(self) -> None:
         """Should have informative string representation."""

@@ -87,7 +87,7 @@ class TestJournalEntry:
             _ = JournalContent("")  # Error happens at JournalContent construction
 
     def test_journal_entry_equality(self) -> None:
-        """Should compare journal entries based on business identity (entry_date, content hash)."""
+        """Should compare journal entries based on ID."""
         entry1 = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation about trends."),
@@ -104,11 +104,27 @@ class TestJournalEntry:
             content=JournalContent("Market observation about trends."),
         )
 
-        assert entry1 == entry2  # Same date and content
-        assert entry1 != entry3  # Different date
+        # Different instances with same attributes but different IDs are NOT equal
+        assert entry1 != entry2  # Different IDs
+        assert entry1 != entry3  # Different IDs
+
+        # Same ID means equal
+        entry4 = JournalEntry(
+            entry_date=date(2024, 1, 15),
+            content=JournalContent("Market observation about trends."),
+            id="same-id",
+        )
+        entry5 = JournalEntry(
+            entry_date=date(2024, 2, 20),  # Different date
+            content=JournalContent("Completely different content."),
+            portfolio_id="portfolio-id-2",
+            stock_id="stock-id-2",
+            id="same-id",
+        )
+        assert entry4 == entry5  # Same ID, even with different attributes
 
     def test_journal_entry_hash(self) -> None:
-        """Should hash consistently based on business identity."""
+        """Should hash consistently based on ID."""
         entry1 = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation."),
@@ -120,7 +136,22 @@ class TestJournalEntry:
             portfolio_id="portfolio-id-1",  # Different metadata
         )
 
-        assert hash(entry1) == hash(entry2)  # Same date and content
+        # Different IDs should have different hashes (likely but not guaranteed)
+        assert hash(entry1) != hash(entry2)  # Different IDs
+
+        # Same ID should have same hash
+        entry3 = JournalEntry(
+            entry_date=date(2024, 1, 15),
+            content=JournalContent("Market observation."),
+            id="same-id",
+        )
+        entry4 = JournalEntry(
+            entry_date=date(2024, 2, 20),
+            content=JournalContent("Different content."),
+            portfolio_id="portfolio-id-2",
+            id="same-id",
+        )
+        assert hash(entry3) == hash(entry4)  # Same ID, same hash
 
     def test_journal_entry_string_representation(self) -> None:
         """Should have informative string representation."""

@@ -86,17 +86,26 @@ class TestEntity:
         assert entity != "not an entity"
         assert entity != "test-id-1"
 
-    def test_entities_not_hashable(self) -> None:
-        """Should not be hashable after removing __hash__ method."""
-        entity = ConcreteEntity(id="test-id-1")
+    def test_entities_are_hashable(self) -> None:
+        """Entities should be hashable based on their ID."""
+        entity1 = ConcreteEntity(id="test-id-1")
+        entity2 = ConcreteEntity(id="test-id-2")
+        entity3 = ConcreteEntity(id="test-id-1")
 
-        # Entities should not be usable as dict keys
-        with pytest.raises(TypeError, match="unhashable type"):
-            {entity: "value"}  # type: ignore[misc]
+        # Entities can be used as dict keys
+        d = {entity1: "value1", entity2: "value2"}
+        assert d[entity1] == "value1"
+        assert d[entity2] == "value2"
 
-        # Entities should not be usable in sets
-        with pytest.raises(TypeError, match="unhashable type"):
-            {entity}  # type: ignore[misc]
+        # Entities with same ID have same hash
+        assert hash(entity1) == hash(entity3)
+
+        # Entities with different IDs have different hashes (likely but not guaranteed)
+        assert hash(entity1) != hash(entity2)
+
+        # Entities can be used in sets
+        s = {entity1, entity2, entity3}
+        assert len(s) == 2  # entity1 and entity3 are considered the same
 
     def test_str_representation_with_id(self) -> None:
         """Should display class name and ID in string representation."""
@@ -181,49 +190,54 @@ class TestEntityArchitecturalConcerns:
         # All IDs should be non-empty strings
         assert all(isinstance(id, str) and len(id) > 0 for id in ids)
 
-    def test_hash_removal_prevents_misuse(self) -> None:
+    def test_hash_based_on_id(self) -> None:
         """
-        DESIGN IMPROVEMENT: Removing __hash__() prevents misuse.
+        DESIGN DECISION: Hash based on immutable ID.
 
-        By removing __hash__(), we prevent mutable entities from being
-        used as dictionary keys or in sets, which violates Python's
-        hash contract for mutable objects.
+        Entities are hashed based on their ID, which is immutable.
+        This allows entities to be used in sets and as dict keys
+        safely, as the hash value will not change during the entity's lifetime.
         """
         entity = ConcreteEntity("test", id="test-id-1")
 
-        # Entities can no longer be misused as dict keys
-        with pytest.raises(TypeError, match="unhashable type"):
-            {entity: "value"}  # type: ignore[misc]
+        # Entities can be used as dict keys
+        d = {entity: "value"}
+        assert d[entity] == "value"
 
-        # Entities can no longer be misused in sets
-        with pytest.raises(TypeError, match="unhashable type"):
-            {entity}  # type: ignore[misc]
+        # Entities can be used in sets
+        s = {entity}
+        assert entity in s
 
-        # But equality still works fine for proper comparisons
+        # Equality still works based on ID
         other_entity = ConcreteEntity("other", id="test-id-1")
         assert entity == other_entity
+        assert hash(entity) == hash(other_entity)
 
-    def test_entity_collections_work_properly_without_hash(self) -> None:
+    def test_entity_collections_work_properly_with_hash(self) -> None:
         """
-        Test how entities work in collections without __hash__().
+        Test how entities work in collections with ID-based __hash__().
 
-        Shows that entities can still be compared for equality and used in lists,
-        but are prevented from being misused in hash-based collections.
+        Shows that entities can be used in all collection types with proper
+        ID-based equality and hashing behavior.
         """
         test_id = "collection-test-id"
         entity1 = ConcreteEntity(id=test_id)
         entity2 = ConcreteEntity(id=test_id)
+        entity3 = ConcreteEntity(id="different-id")
 
-        # Equality works fine without hash
+        # Equality works based on ID
         assert entity1 == entity2
+        assert entity1 != entity3
 
-        # Lists work fine without hash
-        entity_list = [entity1, entity2]
-        assert len(entity_list) == 2
+        # Lists work normally
+        entity_list = [entity1, entity2, entity3]
+        assert len(entity_list) == 3
 
-        # Sets and dict keys are prevented (which is good for mutable entities)
-        with pytest.raises(TypeError, match="unhashable type"):
-            {entity1, entity2}  # type: ignore[misc]
+        # Sets deduplicate based on ID
+        entity_set = {entity1, entity2, entity3}
+        assert len(entity_set) == 2  # entity1 and entity2 are considered the same
 
-        with pytest.raises(TypeError, match="unhashable type"):
-            {entity1: "value"}  # type: ignore[misc]
+        # Entities can be used as dict keys
+        entity_dict = {entity1: "value1", entity3: "value3"}
+        assert entity_dict[entity2] == "value1"  # entity2 is same as entity1
+        assert len(entity_dict) == 2

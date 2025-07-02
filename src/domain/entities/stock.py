@@ -110,21 +110,6 @@ class Stock(Entity):
         """Get the notes value object."""
         return self._notes
 
-    def __eq__(self, other: Any) -> bool:
-        """
-        Check equality based on business key (symbol).
-
-        Two stocks are considered equal if they have the same symbol,
-        regardless of other attributes or database ID.
-        """
-        if not isinstance(other, Stock):
-            return False
-        return self.symbol == other.symbol
-
-    def __hash__(self) -> int:
-        """Hash based on business key (symbol)."""
-        return hash(self.symbol)
-
     def __str__(self) -> str:
         """String representation for display."""
         return f"{self.symbol} - {self.company_name.value}"

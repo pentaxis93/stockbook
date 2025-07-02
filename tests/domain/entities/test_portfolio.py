@@ -85,20 +85,25 @@ class TestPortfolio:
             _ = PortfolioName("")  # Error happens at PortfolioName construction
 
     def test_portfolio_equality(self) -> None:
-        """Should compare portfolios based on business identity (name)."""
+        """Should compare portfolios based on ID."""
         name1 = PortfolioName("Growth Portfolio")
         name2 = PortfolioName("Growth Portfolio")
         name3 = PortfolioName("Value Portfolio")
 
         portfolio1 = Portfolio(name=name1)
-        portfolio2 = Portfolio(name=name2)  # Same name
+        portfolio2 = Portfolio(name=name2)  # Same name, different ID
         portfolio3 = Portfolio(name=name3)  # Different name
 
-        assert portfolio1 == portfolio2  # Same name
-        assert portfolio1 != portfolio3  # Different name
+        assert portfolio1 != portfolio2  # Different IDs
+        assert portfolio1 != portfolio3  # Different IDs
+
+        # Same ID means equal
+        portfolio4 = Portfolio(name=name1, id="same-id")
+        portfolio5 = Portfolio(name=name3, id="same-id")  # Different name, same ID
+        assert portfolio4 == portfolio5
 
     def test_portfolio_hash(self) -> None:
-        """Should be hashable based on name."""
+        """Should be hashable based on ID."""
         name1 = PortfolioName("Growth Portfolio")
         name2 = PortfolioName("Growth Portfolio")
         name3 = PortfolioName("Value Portfolio")
@@ -107,12 +112,17 @@ class TestPortfolio:
         portfolio2 = Portfolio(name=name2)
         portfolio3 = Portfolio(name=name3)
 
-        # Same name should have same hash
-        assert hash(portfolio1) == hash(portfolio2)
+        # Different IDs should have different hashes (likely but not guaranteed)
+        assert hash(portfolio1) != hash(portfolio2)
 
-        # Can be used in set
+        # Can be used in set - all have different IDs
         portfolio_set = {portfolio1, portfolio2, portfolio3}
-        assert len(portfolio_set) == 2  # Growth Portfolio appears only once
+        assert len(portfolio_set) == 3  # All portfolios are different due to unique IDs
+
+        # Same ID should have same hash
+        portfolio4 = Portfolio(name=name1, id="same-id")
+        portfolio5 = Portfolio(name=name2, id="same-id")
+        assert hash(portfolio4) == hash(portfolio5)
 
     def test_portfolio_string_representation(self) -> None:
         """Should have meaningful string representation."""

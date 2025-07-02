@@ -34,6 +34,10 @@ class Entity:
             return False
         return self._id == other._id
 
+    def __hash__(self) -> int:
+        """Hash based on entity ID for use in collections."""
+        return hash(self._id)
+
     def __str__(self) -> str:
         """String representation of entity."""
         class_name = self.__class__.__name__
