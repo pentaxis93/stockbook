@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.value_objects import Money, Quantity
 
 from .exceptions import CalculationError
@@ -49,7 +49,7 @@ class PortfolioCalculationService:
         self.config = config or PortfolioCalculationConfig()
 
     def calculate_total_value(
-        self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]
+        self, portfolio: List[Tuple[Stock, Quantity]], prices: Dict[str, Money]
     ) -> Money:
         """Calculate total portfolio market value."""
         if not portfolio:
@@ -72,13 +72,13 @@ class PortfolioCalculationService:
         return Money(total_amount)
 
     def calculate_position_value(
-        self, _stock: StockEntity, quantity: Quantity, current_price: Money
+        self, _stock: Stock, quantity: Quantity, current_price: Money
     ) -> Money:
         """Calculate individual position value."""
         return Money(current_price.amount * Decimal(str(quantity.value)))
 
     def calculate_position_allocations(
-        self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]
+        self, portfolio: List[Tuple[Stock, Quantity]], prices: Dict[str, Money]
     ) -> List[PositionAllocation]:
         """Calculate allocation percentage for each position."""
         if not portfolio:
@@ -108,7 +108,7 @@ class PortfolioCalculationService:
         return allocations
 
     def calculate_industry_allocations(
-        self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]
+        self, portfolio: List[Tuple[Stock, Quantity]], prices: Dict[str, Money]
     ) -> PortfolioAllocation:
         """Calculate allocation by industry sectors."""
         if not portfolio:
@@ -123,7 +123,7 @@ class PortfolioCalculationService:
         return PortfolioAllocation(industry_percentages, total_value)
 
     def _calculate_industry_values(
-        self, portfolio: List[Tuple[StockEntity, Quantity]], prices: Dict[str, Money]
+        self, portfolio: List[Tuple[Stock, Quantity]], prices: Dict[str, Money]
     ) -> Dict[str, Decimal]:
         """Calculate total values by industry."""
         industry_values: Dict[str, Decimal] = {}

@@ -1,5 +1,5 @@
 """
-Tests for TargetEntity domain entity.
+Tests for Target domain entity.
 
 Following TDD approach with focus on value object purity and business logic.
 Tests define expected behavior before implementation.
@@ -10,16 +10,16 @@ from decimal import Decimal
 
 import pytest
 
-from src.domain.entities.target_entity import TargetEntity
+from src.domain.entities.target import Target
 from src.domain.value_objects import Money, Notes, TargetStatus
 
 
-class TestTargetEntity:
-    """Test TargetEntity domain entity with value objects and business logic."""
+class TestTarget:
+    """Test Target domain entity with value objects and business logic."""
 
     def test_create_target_with_value_objects(self) -> None:
         """Test creating a target with all value objects."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -39,7 +39,7 @@ class TestTargetEntity:
 
     def test_create_target_with_minimal_data(self) -> None:
         """Test creating target with only required fields."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("150.00")),
@@ -57,7 +57,7 @@ class TestTargetEntity:
 
     def test_create_target_with_none_notes_allowed(self) -> None:
         """Should allow creating target with None for notes."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -72,7 +72,7 @@ class TestTargetEntity:
     def test_create_target_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = TargetEntity(
+            _ = Target(
                 portfolio_id="",  # Invalid empty string
                 stock_id="stock-id-1",
                 pivot_price=Money(Decimal("100.00")),
@@ -84,7 +84,7 @@ class TestTargetEntity:
     def test_create_target_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = TargetEntity(
+            _ = Target(
                 portfolio_id="portfolio-id-1",
                 stock_id="",  # Invalid empty string
                 pivot_price=Money(Decimal("100.00")),
@@ -102,7 +102,7 @@ class TestTargetEntity:
 
     def test_target_equality(self) -> None:
         """Should compare targets based on business identity (portfolio_id, stock_id)."""
-        target1 = TargetEntity(
+        target1 = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -111,7 +111,7 @@ class TestTargetEntity:
             created_date=date.today(),
         )
 
-        target2 = TargetEntity(
+        target2 = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("110.00")),  # Different price
@@ -120,7 +120,7 @@ class TestTargetEntity:
             created_date=date.today(),
         )
 
-        target3 = TargetEntity(
+        target3 = Target(
             portfolio_id="portfolio-id-2",  # Different portfolio
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -134,7 +134,7 @@ class TestTargetEntity:
 
     def test_target_hash(self) -> None:
         """Should hash consistently based on business identity."""
-        target1 = TargetEntity(
+        target1 = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -143,7 +143,7 @@ class TestTargetEntity:
             created_date=date.today(),
         )
 
-        target2 = TargetEntity(
+        target2 = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("150.00")),  # Different price
@@ -156,7 +156,7 @@ class TestTargetEntity:
 
     def test_target_string_representation(self) -> None:
         """Should have informative string representation."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -171,7 +171,7 @@ class TestTargetEntity:
 
     def test_target_repr(self) -> None:
         """Should have detailed repr representation."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -180,13 +180,15 @@ class TestTargetEntity:
             created_date=date.today(),
         )
 
-        expected = "TargetEntity(portfolio_id=portfolio-id-1, stock_id=stock-id-1, status='active')"
+        expected = (
+            "Target(portfolio_id=portfolio-id-1, stock_id=stock-id-1, status='active')"
+        )
         assert repr(target) == expected
 
     # Business behavior tests
     def test_target_activate(self) -> None:
         """Should be able to activate target."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -200,7 +202,7 @@ class TestTargetEntity:
 
     def test_target_mark_as_hit(self) -> None:
         """Should be able to mark target as hit."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -214,7 +216,7 @@ class TestTargetEntity:
 
     def test_target_mark_as_failed(self) -> None:
         """Should be able to mark target as failed."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -228,7 +230,7 @@ class TestTargetEntity:
 
     def test_target_cancel(self) -> None:
         """Should be able to cancel target."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -242,7 +244,7 @@ class TestTargetEntity:
 
     def test_target_is_active(self) -> None:
         """Should check if target is active."""
-        active_target = TargetEntity(
+        active_target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -251,7 +253,7 @@ class TestTargetEntity:
             created_date=date.today(),
         )
 
-        hit_target = TargetEntity(
+        hit_target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -265,7 +267,7 @@ class TestTargetEntity:
 
     def test_target_is_hit(self) -> None:
         """Should check if target is hit."""
-        hit_target = TargetEntity(
+        hit_target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -274,7 +276,7 @@ class TestTargetEntity:
             created_date=date.today(),
         )
 
-        active_target = TargetEntity(
+        active_target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -288,7 +290,7 @@ class TestTargetEntity:
 
     def test_target_has_notes(self) -> None:
         """Should check if target has notes."""
-        target_with_notes = TargetEntity(
+        target_with_notes = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -298,7 +300,7 @@ class TestTargetEntity:
             notes=Notes("Important target"),
         )
 
-        target_without_notes = TargetEntity(
+        target_without_notes = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -312,7 +314,7 @@ class TestTargetEntity:
 
     def test_target_update_notes(self) -> None:
         """Should be able to update target notes."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -332,7 +334,7 @@ class TestTargetEntity:
     def test_target_create_with_id(self) -> None:
         """Should create target with provided ID."""
         test_id = "target-id-123"
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -346,7 +348,7 @@ class TestTargetEntity:
 
     def test_target_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -363,7 +365,7 @@ class TestTargetEntity:
     def test_target_from_persistence(self) -> None:
         """Should create target from persistence with existing ID."""
         test_id = "persistence-id-456"
-        target = TargetEntity.from_persistence(
+        target = Target.from_persistence(
             test_id,
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
@@ -409,7 +411,7 @@ class TestTargetStatus:
         """Test that target status property methods work correctly."""
 
         # Test failed status (covers line 115)
-        failed_target = TargetEntity(
+        failed_target = Target(
             portfolio_id="portfolio-1",
             stock_id="stock-1",
             failure_price=Money(Decimal("90.00")),
@@ -421,7 +423,7 @@ class TestTargetStatus:
         assert not failed_target.is_cancelled()
 
         # Test cancelled status (covers line 119)
-        cancelled_target = TargetEntity(
+        cancelled_target = Target(
             portfolio_id="portfolio-1",
             stock_id="stock-2",
             failure_price=Money(Decimal("90.00")),
@@ -433,9 +435,9 @@ class TestTargetStatus:
         assert not cancelled_target.is_failed()
 
     def test_target_equality_with_non_target_object(self) -> None:
-        """Test that target equality returns False for non-TargetEntity objects."""
+        """Test that target equality returns False for non-Target objects."""
 
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-1",
             stock_id="stock-1",
             failure_price=Money(Decimal("90.00")),

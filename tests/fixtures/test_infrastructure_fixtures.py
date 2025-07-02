@@ -11,7 +11,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.domain.entities import StockEntity
+from src.domain.entities import Stock
 from src.domain.repositories.interfaces import (
     IStockBookUnitOfWork,
     IStockRepository,
@@ -19,7 +19,7 @@ from src.domain.repositories.interfaces import (
 from src.domain.value_objects import StockSymbol
 
 from .infrastructure import (
-    StockEntityBuilder,
+    StockBuilder,
     db_transaction,
     seed_test_portfolio,
     seed_test_stocks,
@@ -141,7 +141,7 @@ class TestMockRepositoryFixtures:
         mock = cast(IStockRepository, mock_stock_repository)
 
         # Test default return values
-        assert mock.create(Mock(spec=StockEntity)) == "stock-123"
+        assert mock.create(Mock(spec=Stock)) == "stock-123"
         assert mock.get_by_id("any-id") is None
         assert mock.get_all() == []
         assert mock.update("id", Mock()) is True
@@ -179,7 +179,7 @@ class TestMockRepositoryFixtures:
     ) -> None:
         """Should allow configuring mock behavior."""
         # Configure custom behavior
-        test_stock = StockEntityBuilder.tech_stock()
+        test_stock = StockBuilder.tech_stock()
         mock_stock_repository.get_by_symbol.return_value = test_stock
 
         # Verify custom behavior
@@ -187,12 +187,12 @@ class TestMockRepositoryFixtures:
         assert result == test_stock
 
 
-class TestStockEntityBuilder:
-    """Test the StockEntityBuilder class."""
+class TestStockBuilder:
+    """Test the StockBuilder class."""
 
     def test_builder_creates_valid_entity(self) -> None:
         """Should create valid stock entity with defaults."""
-        stock = StockEntityBuilder().build()
+        stock = StockBuilder().build()
 
         assert stock.symbol.value == "AAPL"
         assert stock.company_name.value == "Apple Inc."
@@ -204,7 +204,7 @@ class TestStockEntityBuilder:
     def test_builder_fluent_interface(self) -> None:
         """Should support method chaining."""
         stock = (
-            StockEntityBuilder()
+            StockBuilder()
             .with_symbol("GOOGL")
             .with_company_name("Alphabet Inc.")
             .with_sector("Technology")
@@ -219,25 +219,25 @@ class TestStockEntityBuilder:
 
     def test_builder_with_id(self) -> None:
         """Should create entity with specific ID."""
-        stock = StockEntityBuilder().with_id("custom-123").build()
+        stock = StockBuilder().with_id("custom-123").build()
         assert stock.id == "custom-123"
 
     def test_factory_methods(self) -> None:
         """Should provide convenient factory methods."""
         # Test tech stock factory
-        tech = StockEntityBuilder.tech_stock()
+        tech = StockBuilder.tech_stock()
         assert tech.symbol.value == "MSFT"
         assert tech.sector is not None
         assert tech.sector.value == "Technology"
 
         # Test financial stock factory
-        financial = StockEntityBuilder.financial_stock()
+        financial = StockBuilder.financial_stock()
         assert financial.symbol.value == "JPM"
         assert financial.sector is not None
         assert financial.sector.value == "Financial Services"
 
         # Test minimal stock factory
-        minimal = StockEntityBuilder.minimal_stock()
+        minimal = StockBuilder.minimal_stock()
         assert minimal.symbol.value == "TEST"
         assert minimal.sector is None
         assert minimal.industry_group is None
@@ -246,7 +246,7 @@ class TestStockEntityBuilder:
     def test_builder_handles_optional_fields(self) -> None:
         """Should handle None values for optional fields."""
         stock = (
-            StockEntityBuilder()
+            StockBuilder()
             .with_sector(None)
             .with_industry_group(None)
             .with_grade(None)
@@ -262,7 +262,7 @@ class TestSampleStocksFixture:
     """Test the sample stocks fixture."""
 
     def test_sample_stocks_provides_diverse_data(
-        self, sample_stocks: List[StockEntity]
+        self, sample_stocks: List[Stock]
     ) -> None:
         """Should provide diverse test stock data."""
         assert len(sample_stocks) == 4
@@ -310,7 +310,7 @@ class TestDatabaseHelpers:
                 )
 
     def test_seed_test_stocks(
-        self, in_memory_db: sqlite3.Connection, sample_stocks: List[StockEntity]
+        self, in_memory_db: sqlite3.Connection, sample_stocks: List[Stock]
     ) -> None:
         """Should seed database with stock entities."""
         seed_test_stocks(in_memory_db, sample_stocks)

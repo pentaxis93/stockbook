@@ -1,5 +1,5 @@
 """
-Tests for JournalEntryEntity domain entity.
+Tests for JournalEntry domain entity.
 
 Following TDD approach with focus on value object purity and business logic.
 Tests define expected behavior before implementation.
@@ -9,16 +9,16 @@ from datetime import date
 
 import pytest
 
-from src.domain.entities.journal_entry_entity import JournalEntryEntity
+from src.domain.entities.journal_entry import JournalEntry
 from src.domain.value_objects import JournalContent
 
 
-class TestJournalEntryEntity:
-    """Test JournalEntryEntity domain entity with value objects and business logic."""
+class TestJournalEntry:
+    """Test JournalEntry domain entity with value objects and business logic."""
 
     def test_create_journal_entry_with_value_objects(self) -> None:
         """Test creating a journal entry with all value objects."""
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent(
                 "This is an important market observation about the current trends."
@@ -39,7 +39,7 @@ class TestJournalEntryEntity:
 
     def test_create_journal_entry_with_minimal_data(self) -> None:
         """Test creating journal entry with only required fields."""
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Simple entry content."),
         )
@@ -53,7 +53,7 @@ class TestJournalEntryEntity:
     def test_create_journal_entry_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = JournalEntryEntity(
+            _ = JournalEntry(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
                 portfolio_id="",  # Invalid empty string
@@ -62,7 +62,7 @@ class TestJournalEntryEntity:
     def test_create_journal_entry_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = JournalEntryEntity(
+            _ = JournalEntry(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
                 stock_id="",  # Invalid empty string
@@ -75,7 +75,7 @@ class TestJournalEntryEntity:
         with pytest.raises(
             ValueError, match="Transaction ID must be a non-empty string"
         ):
-            _ = JournalEntryEntity(
+            _ = JournalEntry(
                 entry_date=date(2024, 1, 15),
                 content=JournalContent("Test content."),
                 transaction_id="",  # Invalid empty string
@@ -88,18 +88,18 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_equality(self) -> None:
         """Should compare journal entries based on business identity (entry_date, content hash)."""
-        entry1 = JournalEntryEntity(
+        entry1 = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation about trends."),
         )
 
-        entry2 = JournalEntryEntity(
+        entry2 = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation about trends."),
             portfolio_id="portfolio-id-1",  # Different metadata
         )
 
-        entry3 = JournalEntryEntity(
+        entry3 = JournalEntry(
             entry_date=date(2024, 1, 16),  # Different date
             content=JournalContent("Market observation about trends."),
         )
@@ -109,12 +109,12 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_hash(self) -> None:
         """Should hash consistently based on business identity."""
-        entry1 = JournalEntryEntity(
+        entry1 = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation."),
         )
 
-        entry2 = JournalEntryEntity(
+        entry2 = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Market observation."),
             portfolio_id="portfolio-id-1",  # Different metadata
@@ -124,7 +124,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_string_representation(self) -> None:
         """Should have informative string representation."""
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent(
                 "This is a longer journal entry with significant market observations and analysis."
@@ -137,24 +137,24 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_repr(self) -> None:
         """Should have detailed repr representation."""
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content."),
         )
 
-        expected = "JournalEntryEntity(date=2024-01-15)"
+        expected = "JournalEntry(date=2024-01-15)"
         assert repr(entry) == expected
 
     # Business behavior tests
     def test_journal_entry_is_related_to_portfolio(self) -> None:
         """Should check if entry is related to a portfolio."""
-        portfolio_entry = JournalEntryEntity(
+        portfolio_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Portfolio analysis."),
             portfolio_id="portfolio-id-1",
         )
 
-        general_entry = JournalEntryEntity(
+        general_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("General market thoughts."),
         )
@@ -164,13 +164,13 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_is_related_to_stock(self) -> None:
         """Should check if entry is related to a stock."""
-        stock_entry = JournalEntryEntity(
+        stock_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Stock analysis."),
             stock_id="stock-id-1",
         )
 
-        general_entry = JournalEntryEntity(
+        general_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("General market thoughts."),
         )
@@ -180,13 +180,13 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_is_related_to_transaction(self) -> None:
         """Should check if entry is related to a transaction."""
-        transaction_entry = JournalEntryEntity(
+        transaction_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Transaction analysis."),
             transaction_id="transaction-id-1",
         )
 
-        general_entry = JournalEntryEntity(
+        general_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("General market thoughts."),
         )
@@ -196,12 +196,12 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_get_content_preview(self) -> None:
         """Should provide content preview for display."""
-        short_entry = JournalEntryEntity(
+        short_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Short content."),
         )
 
-        long_entry = JournalEntryEntity(
+        long_entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent(
                 "This is a very long journal entry that contains extensive market analysis and observations that should be truncated for preview purposes."
@@ -215,7 +215,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_update_content(self) -> None:
         """Should be able to update entry content."""
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Original content."),
         )
@@ -231,7 +231,7 @@ class TestJournalEntryEntity:
     def test_journal_entry_create_with_id(self) -> None:
         """Should create journal entry with provided ID."""
         test_id = "journal-entry-id-123"
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content."),
             id=test_id,
@@ -241,7 +241,7 @@ class TestJournalEntryEntity:
 
     def test_journal_entry_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content."),
             id="test-id-1",
@@ -254,7 +254,7 @@ class TestJournalEntryEntity:
     def test_journal_entry_from_persistence(self) -> None:
         """Should create journal entry from persistence with existing ID."""
         test_id = "persistence-id-456"
-        entry = JournalEntryEntity.from_persistence(
+        entry = JournalEntry.from_persistence(
             test_id,
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content from database."),
@@ -307,8 +307,8 @@ class TestJournalContent:
         assert len(journal_content.value) == 10000
 
     def test_journal_entry_equality_with_non_journal_entry_object(self) -> None:
-        """Test that journal entry equality returns False for non-JournalEntryEntity objects."""
-        entry = JournalEntryEntity(
+        """Test that journal entry equality returns False for non-JournalEntry objects."""
+        entry = JournalEntry(
             entry_date=date(2024, 1, 15),
             content=JournalContent("Test content"),
             portfolio_id="portfolio-1",

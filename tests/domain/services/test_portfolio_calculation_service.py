@@ -10,7 +10,7 @@ from typing import Dict, List, Tuple
 
 import pytest
 
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.services.exceptions import CalculationError
 
 # These imports now exist after implementation
@@ -31,9 +31,9 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 # Test data helpers
 def create_test_stock(
     symbol: str = "AAPL", price: float = 100.00, quantity: int = 10, grade: str = "B"
-) -> Tuple[StockEntity, Quantity, Money]:
+) -> Tuple[Stock, Quantity, Money]:
     """Helper to create test stock with position."""
-    stock = StockEntity(
+    stock = Stock(
         symbol=StockSymbol(symbol),
         company_name=CompanyName(f"{symbol} Corp"),
         sector=Sector("Technology"),
@@ -43,9 +43,7 @@ def create_test_stock(
     return stock, Quantity(quantity), Money(Decimal(str(price)))
 
 
-def create_test_portfolio() -> (
-    Tuple[List[Tuple[StockEntity, Quantity]], Dict[str, Money]]
-):
+def create_test_portfolio() -> Tuple[List[Tuple[Stock, Quantity]], Dict[str, Money]]:
     """Helper to create a test portfolio with multiple positions."""
     positions = [
         create_test_stock("AAPL", 150.00, 10, "A"),  # $1,500
@@ -54,7 +52,7 @@ def create_test_portfolio() -> (
         create_test_stock("GME", 20.00, 50, "C"),  # $1,000
     ]
 
-    portfolio: List[Tuple[StockEntity, Quantity]] = []
+    portfolio: List[Tuple[Stock, Quantity]] = []
     prices: Dict[str, Money] = {}
 
     for stock, quantity, price in positions:
@@ -93,13 +91,13 @@ class TestPortfolioValueCalculations:
         """Should handle multi-currency portfolios."""
         # service = PortfolioCalculationService()
         #
-        # us_stock = StockEntity(
+        # us_stock = Stock(
         #     symbol=StockSymbol("AAPL"),
         #     name="Apple Inc",
         #     current_price=Money(Decimal("150.00"))
         # )
         #
-        # uk_stock = StockEntity(
+        # uk_stock = Stock(
         #     symbol=StockSymbol("BARC"),
         #     name="Barclays",
         #     current_price=Money(Decimal("200.00"), "GBP")
@@ -115,7 +113,7 @@ class TestPortfolioValueCalculations:
     def test_calculate_portfolio_value_with_zero_positions(self) -> None:
         """Should handle empty portfolio."""
         service = PortfolioCalculationService()
-        empty_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        empty_portfolio: List[Tuple[Stock, Quantity]] = []
         empty_prices: Dict[str, Money] = {}
 
         total_value = service.calculate_total_value(empty_portfolio, empty_prices)
@@ -180,7 +178,7 @@ class TestPortfolioCalculationEdgeCases:
         service = PortfolioCalculationService()
 
         # Create a large portfolio with many positions
-        large_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        large_portfolio: List[Tuple[Stock, Quantity]] = []
         prices: Dict[str, Money] = {}
 
         expected_total = Decimal("0")
@@ -191,7 +189,7 @@ class TestPortfolioCalculationEdgeCases:
             price_value = Decimal("100.00") + (i % 100)  # Prices from $100 to $199
             quantity_value = 10 + (i % 20)  # Quantities from 10 to 29
 
-            stock = StockEntity(
+            stock = Stock(
                 symbol=StockSymbol(symbol),
                 company_name=CompanyName(f"Test Company {i}"),
                 sector=Sector("Technology"),
@@ -214,7 +212,7 @@ class TestPortfolioCalculationEdgeCases:
     def test_calculate_position_allocations_empty_portfolio(self) -> None:
         """Should handle empty portfolio for position allocations."""
         service = PortfolioCalculationService()
-        empty_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        empty_portfolio: List[Tuple[Stock, Quantity]] = []
         empty_prices: Dict[str, Money] = {}
 
         allocations = service.calculate_position_allocations(
@@ -266,7 +264,7 @@ class TestPortfolioCalculationEdgeCases:
     def test_calculate_industry_allocations_empty_portfolio(self) -> None:
         """Should handle empty portfolio for industry allocations."""
         service = PortfolioCalculationService()
-        empty_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        empty_portfolio: List[Tuple[Stock, Quantity]] = []
         empty_prices: Dict[str, Money] = {}
 
         industry_allocations = service.calculate_industry_allocations(
@@ -281,7 +279,7 @@ class TestPortfolioCalculationEdgeCases:
         service = PortfolioCalculationService()
 
         # Create stock without industry group
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("UNKNW"),
             company_name=CompanyName("Unknown Industry Corp"),
             sector=Sector("Technology"),
@@ -302,14 +300,14 @@ class TestPortfolioCalculationEdgeCases:
         service = PortfolioCalculationService()
 
         # Create stocks in different industries
-        tech_stock = StockEntity(
+        tech_stock = Stock(
             symbol=StockSymbol("TECH"),
             company_name=CompanyName("Tech Corp"),
             sector=Sector("Technology"),
             industry_group=IndustryGroup("Software"),
         )
 
-        finance_stock = StockEntity(
+        finance_stock = Stock(
             symbol=StockSymbol("BANK"),
             company_name=CompanyName("Big Bank"),
             sector=Sector("Financial Services"),

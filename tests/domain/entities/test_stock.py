@@ -9,7 +9,7 @@ of the rich Stock entity with business logic.
 
 import pytest
 
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.value_objects import (
     CompanyName,
     Grade,
@@ -22,7 +22,7 @@ from src.domain.value_objects.sector import Sector
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 
-class TestStockEntity:
+class TestStock:
     """Test suite for Stock domain entity."""
 
     def test_create_stock_with_value_objects(self) -> None:
@@ -34,7 +34,7 @@ class TestStockEntity:
         grade = Grade("A")
         notes = Notes("Great company")
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=symbol,
             company_name=company_name,
             sector=sector,
@@ -56,7 +56,7 @@ class TestStockEntity:
         """Should create Stock with only required fields."""
         symbol = StockSymbol("MSFT")
         company_name = CompanyName("Microsoft Corp.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         assert stock.symbol == symbol
         assert stock.company_name == company_name
@@ -73,7 +73,7 @@ class TestStockEntity:
         industry_group = IndustryGroup("Software")
         notes = Notes("Great company")
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=symbol,
             company_name=company_name,
             sector=sector,
@@ -102,11 +102,11 @@ class TestStockEntity:
         empty_name = CompanyName("")
         whitespace_name = CompanyName("   ")
 
-        stock_empty_name = StockEntity(symbol=symbol, company_name=empty_name)
+        stock_empty_name = Stock(symbol=symbol, company_name=empty_name)
         assert stock_empty_name.symbol == symbol
         assert stock_empty_name.company_name.value == ""
 
-        stock_whitespace_name = StockEntity(symbol=symbol, company_name=whitespace_name)
+        stock_whitespace_name = Stock(symbol=symbol, company_name=whitespace_name)
         assert stock_whitespace_name.symbol == symbol
         assert stock_whitespace_name.company_name.value == ""  # Whitespace is stripped
 
@@ -115,7 +115,7 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=symbol,
             company_name=company_name,
             sector=None,
@@ -172,9 +172,9 @@ class TestStockEntity:
         name2 = CompanyName("Apple Inc.")
         name3 = CompanyName("Microsoft")
 
-        stock1 = StockEntity(symbol=symbol1, company_name=name1)
-        stock2 = StockEntity(symbol=symbol2, company_name=name2)  # Same symbol
-        stock3 = StockEntity(symbol=symbol3, company_name=name3)  # Different symbol
+        stock1 = Stock(symbol=symbol1, company_name=name1)
+        stock2 = Stock(symbol=symbol2, company_name=name2)  # Same symbol
+        stock3 = Stock(symbol=symbol3, company_name=name3)  # Different symbol
 
         assert stock1 == stock2  # Same symbol
         assert stock1 != stock3  # Different symbol
@@ -189,9 +189,9 @@ class TestStockEntity:
         name2 = CompanyName("Apple Inc.")
         name3 = CompanyName("Microsoft")
 
-        stock1 = StockEntity(symbol=symbol1, company_name=name1)
-        stock2 = StockEntity(symbol=symbol2, company_name=name2)
-        stock3 = StockEntity(symbol=symbol3, company_name=name3)
+        stock1 = Stock(symbol=symbol1, company_name=name1)
+        stock2 = Stock(symbol=symbol2, company_name=name2)
+        stock3 = Stock(symbol=symbol3, company_name=name3)
 
         # Same symbol should have same hash
         assert hash(stock1) == hash(stock2)
@@ -204,7 +204,7 @@ class TestStockEntity:
         """Should have meaningful string representation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         assert str(stock) == "AAPL - Apple Inc."
 
@@ -213,16 +213,16 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         grade = Grade("A")
-        stock = StockEntity(symbol=symbol, company_name=company_name, grade=grade)
+        stock = Stock(symbol=symbol, company_name=company_name, grade=grade)
 
-        expected = "StockEntity(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), grade=Grade('A'))"
+        expected = "Stock(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), grade=Grade('A'))"
         assert repr(stock) == expected
 
     def test_calculate_position_value(self) -> None:
         """Should calculate total position value."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         quantity = Quantity(100)
         price = Money("150.50")
@@ -236,7 +236,7 @@ class TestStockEntity:
         """Should handle zero quantity gracefully."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         # Zero quantities are allowed
         quantity = Quantity(0)
@@ -252,11 +252,9 @@ class TestStockEntity:
         notes = Notes("Great company")
         empty_notes = Notes("")
 
-        stock_with_notes = StockEntity(
-            symbol=symbol, company_name=company_name, notes=notes
-        )
-        stock_without_notes = StockEntity(symbol=symbol, company_name=company_name)
-        stock_empty_notes = StockEntity(
+        stock_with_notes = Stock(symbol=symbol, company_name=company_name, notes=notes)
+        stock_without_notes = Stock(symbol=symbol, company_name=company_name)
+        stock_empty_notes = Stock(
             symbol=symbol, company_name=company_name, notes=empty_notes
         )
 
@@ -269,7 +267,7 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         grade = Grade("B")
-        stock = StockEntity(symbol=symbol, company_name=company_name, grade=grade)
+        stock = Stock(symbol=symbol, company_name=company_name, grade=grade)
 
         # Update grade
         stock.update_fields(grade="A")
@@ -296,7 +294,7 @@ class TestStockEntity:
         """Should update multiple fields atomically."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         # Update multiple fields at once
         stock.update_fields(
@@ -322,7 +320,7 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         grade = Grade("B")
-        stock = StockEntity(symbol=symbol, company_name=company_name, grade=grade)
+        stock = Stock(symbol=symbol, company_name=company_name, grade=grade)
 
         # Try to update with invalid grade - should fail and rollback all
         with pytest.raises(ValueError, match="Grade must be one of"):
@@ -340,7 +338,7 @@ class TestStockEntity:
         """Should raise error for values that are too long."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         # Test name too long
         long_name = "A" * 201
@@ -366,7 +364,7 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         test_id = "stock-id-123"
-        stock = StockEntity(symbol=symbol, company_name=company_name, id=test_id)
+        stock = Stock(symbol=symbol, company_name=company_name, id=test_id)
 
         assert stock.id == test_id
 
@@ -374,7 +372,7 @@ class TestStockEntity:
         """Should not be able to change ID after creation."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name, id="test-id-1")
+        stock = Stock(symbol=symbol, company_name=company_name, id="test-id-1")
 
         # ID property should not have a setter
         with pytest.raises(AttributeError):
@@ -386,7 +384,7 @@ class TestStockEntity:
         company_name = CompanyName("Apple Inc.")
         test_id = "persistence-id-456"
 
-        stock = StockEntity.from_persistence(
+        stock = Stock.from_persistence(
             test_id,
             symbol=symbol,
             company_name=company_name,
@@ -408,7 +406,7 @@ class TestStockEntity:
         industry_group = IndustryGroup("Software")
         grade = Grade("A")
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=symbol,
             company_name=company_name,
             sector=sector,
@@ -434,7 +432,7 @@ class TestStockEntity:
         company_name = CompanyName("Microsoft Corp.")
         sector = Sector("Technology")
 
-        stock = StockEntity(symbol=symbol, company_name=company_name, sector=sector)
+        stock = Stock(symbol=symbol, company_name=company_name, sector=sector)
 
         assert stock.symbol == symbol
         assert stock.company_name.value == "Microsoft Corp."
@@ -459,7 +457,7 @@ class TestStockEntity:
             ValueError,
             match="Industry group 'Pharmaceuticals' is not valid for sector 'Technology'",
         ):
-            _ = StockEntity(
+            _ = Stock(
                 symbol=symbol,
                 company_name=company_name,
                 sector=sector,
@@ -475,7 +473,7 @@ class TestStockEntity:
         with pytest.raises(
             ValueError, match="Sector must be provided when industry_group is specified"
         ):
-            _ = StockEntity(
+            _ = Stock(
                 symbol=symbol,
                 company_name=company_name,
                 industry_group=industry_group,
@@ -497,7 +495,7 @@ class TestStockEntity:
         """Should update sector without industry_group."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         stock.update_fields(sector="Technology")
         assert stock.sector is not None
@@ -508,7 +506,7 @@ class TestStockEntity:
         """Should update both sector and industry_group when valid combination."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         stock.update_fields(sector="Technology", industry_group="Software")
         assert stock.sector is not None
@@ -524,7 +522,7 @@ class TestStockEntity:
         sector = Sector("Technology")
         industry_group = IndustryGroup("Software")
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=symbol,
             company_name=company_name,
             sector=sector,
@@ -556,7 +554,7 @@ class TestStockEntity:
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
         sector = Sector("Technology")
-        stock = StockEntity(symbol=symbol, company_name=company_name, sector=sector)
+        stock = Stock(symbol=symbol, company_name=company_name, sector=sector)
 
         assert stock.industry_group is None
 
@@ -576,7 +574,7 @@ class TestStockEntity:
         sector = Sector("Technology")
         industry_group = IndustryGroup("Software")
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=symbol,
             company_name=company_name,
             sector=sector,
@@ -593,7 +591,7 @@ class TestStockEntity:
         """Should raise error when trying to set industry_group without sector."""
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         with pytest.raises(
             ValueError, match="Sector must be provided when industry_group is specified"
@@ -601,7 +599,7 @@ class TestStockEntity:
             stock.update_fields(industry_group="Software")
 
 
-class TestStockEntityLifecycle:
+class TestStockLifecycle:
     """Test stock entity lifecycle management and state transitions."""
 
     def test_stock_creation_lifecycle(self) -> None:
@@ -609,7 +607,7 @@ class TestStockEntityLifecycle:
         # Step 1: Create with minimal required data
         symbol = StockSymbol("AAPL")
         company_name = CompanyName("Apple Inc.")
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         assert stock.symbol == symbol
         assert stock.company_name == company_name
@@ -634,7 +632,7 @@ class TestStockEntityLifecycle:
 
     def test_stock_data_evolution_over_time(self) -> None:
         """Should handle data changes that occur over time."""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("B"),
@@ -669,7 +667,7 @@ class TestStockEntityLifecycle:
     def test_stock_persistence_roundtrip(self) -> None:
         """Should maintain data integrity through persistence operations."""
         # Create stock with full data
-        original_stock = StockEntity(
+        original_stock = Stock(
             symbol=StockSymbol("MSFT"),
             company_name=CompanyName("Microsoft Corporation"),
             sector=Sector("Technology"),
@@ -698,7 +696,7 @@ class TestStockEntityLifecycle:
         assert persisted_data["id"] is not None
         assert persisted_data["symbol"] is not None
         assert persisted_data["company_name"] is not None
-        restored_stock = StockEntity.from_persistence(
+        restored_stock = Stock.from_persistence(
             persisted_data["id"],
             symbol=StockSymbol(persisted_data["symbol"]),
             company_name=CompanyName(persisted_data["company_name"]),
@@ -730,7 +728,7 @@ class TestStockEntityLifecycle:
         company_name = CompanyName("Alphabet Inc.")
         sector = Sector("Technology")
 
-        stock = StockEntity(symbol=symbol, company_name=company_name, sector=sector)
+        stock = Stock(symbol=symbol, company_name=company_name, sector=sector)
 
         # Verify that getting value objects returns the same instances
         retrieved_symbol = stock.symbol
@@ -744,7 +742,7 @@ class TestStockEntityLifecycle:
             retrieved_symbol.value = "CHANGED"  # type: ignore[misc]
 
 
-class TestStockEntityDomainInvariants:
+class TestStockDomainInvariants:
     """Test domain business rules and invariants enforcement."""
 
     def test_symbol_uniqueness_invariant(self) -> None:
@@ -756,8 +754,8 @@ class TestStockEntityDomainInvariants:
         name1 = CompanyName("Apple Inc.")
         name2 = CompanyName("Different Company")
 
-        stock1 = StockEntity(symbol=symbol, company_name=name1)
-        stock2 = StockEntity(symbol=symbol, company_name=name2)
+        stock1 = Stock(symbol=symbol, company_name=name1)
+        stock2 = Stock(symbol=symbol, company_name=name2)
 
         # Both stocks have same symbol, so they should be equal by business key
         assert stock1 == stock2
@@ -769,7 +767,7 @@ class TestStockEntityDomainInvariants:
 
     def test_sector_industry_consistency_invariant(self) -> None:
         """Should enforce sector-industry group consistency at all times."""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -796,7 +794,7 @@ class TestStockEntityDomainInvariants:
     def test_data_completeness_progression(self) -> None:
         """Should support progressive data enrichment without breaking invariants."""
         # Start with minimal data (valid state)
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("TSLA"), company_name=CompanyName("Tesla Inc.")
         )
         assert stock.sector is None
@@ -826,7 +824,7 @@ class TestStockEntityDomainInvariants:
         symbol = StockSymbol("TEST")
         company_name = CompanyName("Test Corp")
 
-        stock = StockEntity(symbol=symbol, company_name=company_name)
+        stock = Stock(symbol=symbol, company_name=company_name)
 
         # Test cascading validation failures
         validation_test_cases = [
@@ -851,12 +849,12 @@ class TestStockEntityDomainInvariants:
             assert stock.company_name == company_name
 
 
-class TestStockEntityBusinessOperations:
+class TestStockBusinessOperations:
     """Test business operations and calculations performed by stock entity."""
 
     def test_position_value_calculation_accuracy(self) -> None:
         """Should calculate position values with financial precision."""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("AAPL"), company_name=CompanyName("Apple Inc.")
         )
 
@@ -876,7 +874,7 @@ class TestStockEntityBusinessOperations:
 
     def test_position_value_calculation_edge_cases(self) -> None:
         """Should handle edge cases in position value calculations."""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("EDGE"), company_name=CompanyName("Edge Case Corp")
         )
 
@@ -897,7 +895,7 @@ class TestStockEntityBusinessOperations:
     def test_stock_business_logic_methods(self) -> None:
         """Should provide meaningful business logic methods."""
         # Stock with notes
-        stock_with_notes = StockEntity(
+        stock_with_notes = Stock(
             symbol=StockSymbol("NOTED"),
             company_name=CompanyName("Well Documented Corp"),
             notes=Notes("Has detailed analysis notes"),
@@ -905,13 +903,13 @@ class TestStockEntityBusinessOperations:
         assert stock_with_notes.has_notes() is True
 
         # Stock without notes
-        stock_without_notes = StockEntity(
+        stock_without_notes = Stock(
             symbol=StockSymbol("BARE"), company_name=CompanyName("Minimal Corp")
         )
         assert stock_without_notes.has_notes() is False
 
         # Stock with empty notes
-        stock_empty_notes = StockEntity(
+        stock_empty_notes = Stock(
             symbol=StockSymbol("EMPTY"),
             company_name=CompanyName("Empty Notes Corp"),
             notes=Notes(""),
@@ -919,12 +917,12 @@ class TestStockEntityBusinessOperations:
         assert stock_empty_notes.has_notes() is False
 
 
-class TestStockEntityConcurrencyScenarios:
+class TestStockConcurrencyScenarios:
     """Test scenarios that might occur in concurrent/multi-user environments."""
 
     def test_stock_update_idempotency(self) -> None:
         """Should handle repeated identical updates gracefully."""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("IDEM"),
             company_name=CompanyName("Idempotent Corp"),
             grade=Grade("B"),
@@ -945,7 +943,7 @@ class TestStockEntityConcurrencyScenarios:
 
     def test_stock_state_consistency_after_partial_failures(self) -> None:
         """Should maintain consistent state even after partial update failures."""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("ROBST"),
             company_name=CompanyName("Robust Corp"),
             sector=Sector("Technology"),
@@ -987,19 +985,19 @@ class TestStockEntityConcurrencyScenarios:
     def test_stock_entity_collection_operations(self) -> None:
         """Should work properly in collections (sets, dicts) for business operations."""
         # Create stocks that should be considered equal and different
-        aapl1 = StockEntity(
+        aapl1 = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("A"),
         )
 
-        aapl2 = StockEntity(
+        aapl2 = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             grade=Grade("B"),  # Different grade, same symbol
         )
 
-        msft = StockEntity(
+        msft = Stock(
             symbol=StockSymbol("MSFT"), company_name=CompanyName("Microsoft Corp")
         )
 
@@ -1015,8 +1013,8 @@ class TestStockEntityConcurrencyScenarios:
         assert portfolio_weights[msft] == 0.4
 
     def test_stock_equality_with_non_stock_object(self) -> None:
-        """Test that stock equality returns False for non-StockEntity objects."""
-        stock = StockEntity(
+        """Test that stock equality returns False for non-Stock objects."""
+        stock = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),

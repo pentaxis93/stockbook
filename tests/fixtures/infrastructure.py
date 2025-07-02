@@ -4,7 +4,7 @@ Comprehensive test fixtures for testing the infrastructure layer.
 This module provides:
 1. In-memory SQLite database fixture
 2. Mock repository fixtures
-3. Test data builder for StockEntity
+3. Test data builder for Stock
 4. Transaction rollback fixture for test isolation
 """
 
@@ -16,7 +16,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from src.domain.entities import StockEntity
+from src.domain.entities import Stock
 from src.domain.repositories.interfaces import (
     IJournalRepository,
     IPortfolioBalanceRepository,
@@ -341,13 +341,13 @@ def mock_unit_of_work(
 
 
 # =============================================================================
-# Test Data Builder for StockEntity
+# Test Data Builder for Stock
 # =============================================================================
 
 
-class StockEntityBuilder:
+class StockBuilder:
     """
-    Builder class for creating StockEntity instances with test data.
+    Builder class for creating Stock instances with test data.
 
     Provides a fluent interface for creating stock entities with
     customizable properties and sensible defaults.
@@ -363,49 +363,49 @@ class StockEntityBuilder:
         self._grade: Optional[str] = "A"
         self._notes: str = "Test stock entity"
 
-    def with_id(self, stock_id: str) -> "StockEntityBuilder":
+    def with_id(self, stock_id: str) -> "StockBuilder":
         """Set the stock ID."""
         self._id = stock_id
         return self
 
-    def with_symbol(self, symbol: str) -> "StockEntityBuilder":
+    def with_symbol(self, symbol: str) -> "StockBuilder":
         """Set the stock symbol."""
         self._symbol = symbol
         return self
 
-    def with_company_name(self, name: str) -> "StockEntityBuilder":
+    def with_company_name(self, name: str) -> "StockBuilder":
         """Set the company name."""
         self._company_name = name
         return self
 
-    def with_sector(self, sector: Optional[str]) -> "StockEntityBuilder":
+    def with_sector(self, sector: Optional[str]) -> "StockBuilder":
         """Set the sector."""
         self._sector = sector
         return self
 
-    def with_industry_group(self, industry: Optional[str]) -> "StockEntityBuilder":
+    def with_industry_group(self, industry: Optional[str]) -> "StockBuilder":
         """Set the industry group."""
         self._industry_group = industry
         return self
 
-    def with_grade(self, grade: Optional[str]) -> "StockEntityBuilder":
+    def with_grade(self, grade: Optional[str]) -> "StockBuilder":
         """Set the stock grade."""
         self._grade = grade
         return self
 
-    def with_notes(self, notes: str) -> "StockEntityBuilder":
+    def with_notes(self, notes: str) -> "StockBuilder":
         """Set the notes."""
         self._notes = notes
         return self
 
-    def build(self) -> StockEntity:
+    def build(self) -> Stock:
         """
-        Build the StockEntity with configured values.
+        Build the Stock with configured values.
 
         Returns:
-            StockEntity: Configured stock entity
+            Stock: Configured stock entity
         """
-        return StockEntity(
+        return Stock(
             id=self._id,
             symbol=StockSymbol(self._symbol),
             company_name=CompanyName(self._company_name),
@@ -420,7 +420,7 @@ class StockEntityBuilder:
     # Factory methods for common test scenarios
 
     @classmethod
-    def tech_stock(cls) -> StockEntity:
+    def tech_stock(cls) -> Stock:
         """Create a technology stock for testing."""
         return (
             cls()
@@ -434,7 +434,7 @@ class StockEntityBuilder:
         )
 
     @classmethod
-    def financial_stock(cls) -> StockEntity:
+    def financial_stock(cls) -> Stock:
         """Create a financial stock for testing."""
         return (
             cls()
@@ -448,7 +448,7 @@ class StockEntityBuilder:
         )
 
     @classmethod
-    def minimal_stock(cls) -> StockEntity:
+    def minimal_stock(cls) -> Stock:
         """Create a stock with minimal required fields."""
         return (
             cls()
@@ -462,7 +462,7 @@ class StockEntityBuilder:
         )
 
     @classmethod
-    def stock_with_id(cls, stock_id: str) -> StockEntity:
+    def stock_with_id(cls, stock_id: str) -> Stock:
         """Create a stock with a specific ID."""
         return cls().with_id(stock_id).build()
 
@@ -473,28 +473,28 @@ class StockEntityBuilder:
 
 
 @pytest.fixture
-def stock_builder() -> type[StockEntityBuilder]:
+def stock_builder() -> type[StockBuilder]:
     """
-    Provide StockEntityBuilder class for tests.
+    Provide StockBuilder class for tests.
 
     Returns:
-        type[StockEntityBuilder]: The builder class
+        type[StockBuilder]: The builder class
     """
-    return StockEntityBuilder
+    return StockBuilder
 
 
 @pytest.fixture
-def sample_stocks() -> List[StockEntity]:
+def sample_stocks() -> List[Stock]:
     """
     Create a list of sample stock entities for testing.
 
     Returns:
-        List[StockEntity]: List of diverse stock entities
+        List[Stock]: List of diverse stock entities
     """
     return [
-        StockEntityBuilder.tech_stock(),
-        StockEntityBuilder.financial_stock(),
-        StockEntityBuilder()
+        StockBuilder.tech_stock(),
+        StockBuilder.financial_stock(),
+        StockBuilder()
         .with_symbol("AMZN")
         .with_company_name("Amazon.com Inc.")
         .with_sector("Consumer Goods")
@@ -502,7 +502,7 @@ def sample_stocks() -> List[StockEntity]:
         .with_grade("A")
         .with_notes("E-commerce and cloud leader")
         .build(),
-        StockEntityBuilder()
+        StockBuilder()
         .with_symbol("JNJ")
         .with_company_name("Johnson & Johnson")
         .with_sector("Healthcare")
@@ -545,7 +545,7 @@ def db_transaction(conn: sqlite3.Connection) -> Generator[sqlite3.Cursor, None, 
 # =============================================================================
 
 
-def seed_test_stocks(conn: sqlite3.Connection, stocks: List[StockEntity]) -> None:
+def seed_test_stocks(conn: sqlite3.Connection, stocks: List[Stock]) -> None:
     """
     Seed the test database with stock entities.
 

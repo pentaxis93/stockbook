@@ -51,7 +51,7 @@ class TestCleanArchitectureWiring:
         # They should not depend on infrastructure or presentation
 
         # symbol = StockSymbol("AAPL")
-        # entity = StockEntity(symbol=symbol, name="Apple Inc.")
+        # entity = Stock(symbol=symbol, name="Apple Inc.")
 
         # Domain entities work independently
         # assert entity.symbol.value == "AAPL"

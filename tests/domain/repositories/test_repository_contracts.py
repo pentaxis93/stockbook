@@ -10,8 +10,8 @@ from typing import Any, Dict, List, Optional
 
 import pytest
 
-from src.domain.entities.portfolio_entity import PortfolioEntity
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.portfolio import Portfolio
+from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import (
     IJournalRepository,
     IPortfolioBalanceRepository,
@@ -35,28 +35,28 @@ class MockStockRepository(IStockRepository):
     """Mock implementation of IStockRepository for contract testing."""
 
     def __init__(self):
-        self.stocks: Dict[str, StockEntity] = {}
+        self.stocks: Dict[str, Stock] = {}
         self.next_id = 1
 
-    def create(self, stock: StockEntity) -> str:
+    def create(self, stock: Stock) -> str:
         stock_id = f"stock-{self.next_id}"
         self.next_id += 1
         self.stocks[stock_id] = stock
         return stock_id
 
-    def get_by_id(self, stock_id: str) -> Optional[StockEntity]:
+    def get_by_id(self, stock_id: str) -> Optional[Stock]:
         return self.stocks.get(stock_id)
 
-    def get_by_symbol(self, symbol: StockSymbol) -> Optional[StockEntity]:
+    def get_by_symbol(self, symbol: StockSymbol) -> Optional[Stock]:
         for stock in self.stocks.values():
             if stock.symbol == symbol:
                 return stock
         return None
 
-    def get_all(self) -> List[StockEntity]:
+    def get_all(self) -> List[Stock]:
         return list(self.stocks.values())
 
-    def update(self, stock_id: str, stock: StockEntity) -> bool:
+    def update(self, stock_id: str, stock: Stock) -> bool:
         if stock_id in self.stocks:
             self.stocks[stock_id] = stock
             return True
@@ -78,7 +78,7 @@ class MockStockRepository(IStockRepository):
         sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
         grade_filter: Optional[str] = None,
-    ) -> List[StockEntity]:
+    ) -> List[Stock]:
         results = list(self.stocks.values())
 
         if symbol_filter:
@@ -114,25 +114,25 @@ class MockPortfolioRepository(IPortfolioRepository):
     """Mock implementation of IPortfolioRepository for contract testing."""
 
     def __init__(self):
-        self.portfolios: Dict[str, PortfolioEntity] = {}
+        self.portfolios: Dict[str, Portfolio] = {}
         self.next_id = 1
 
-    def create(self, portfolio: PortfolioEntity) -> str:
+    def create(self, portfolio: Portfolio) -> str:
         portfolio_id = f"portfolio-{self.next_id}"
         self.next_id += 1
         self.portfolios[portfolio_id] = portfolio
         return portfolio_id
 
-    def get_by_id(self, portfolio_id: str) -> Optional[PortfolioEntity]:
+    def get_by_id(self, portfolio_id: str) -> Optional[Portfolio]:
         return self.portfolios.get(portfolio_id)
 
-    def get_all_active(self) -> List[PortfolioEntity]:
+    def get_all_active(self) -> List[Portfolio]:
         return [p for p in self.portfolios.values() if p.is_active]
 
-    def get_all(self) -> List[PortfolioEntity]:
+    def get_all(self) -> List[Portfolio]:
         return list(self.portfolios.values())
 
-    def update(self, portfolio_id: str, portfolio: PortfolioEntity) -> bool:
+    def update(self, portfolio_id: str, portfolio: Portfolio) -> bool:
         if portfolio_id in self.portfolios:
             self.portfolios[portfolio_id] = portfolio
             return True
@@ -168,9 +168,9 @@ class MockUnitOfWork(IUnitOfWork):
         self.rolled_back = True
 
 
-def create_test_stock(symbol: str = "AAPL", grade: str = "A") -> StockEntity:
+def create_test_stock(symbol: str = "AAPL", grade: str = "A") -> Stock:
     """Helper to create test stock entity."""
-    return StockEntity(
+    return Stock(
         symbol=StockSymbol(symbol),
         company_name=CompanyName(f"{symbol} Corporation"),
         sector=Sector("Technology"),
@@ -180,9 +180,9 @@ def create_test_stock(symbol: str = "AAPL", grade: str = "A") -> StockEntity:
     )
 
 
-def create_test_portfolio(name: str = "Test Portfolio") -> PortfolioEntity:
+def create_test_portfolio(name: str = "Test Portfolio") -> Portfolio:
     """Helper to create test portfolio entity."""
-    return PortfolioEntity(
+    return Portfolio(
         name=PortfolioName(name),
         is_active=True,
         id=f"portfolio-{name.lower().replace(' ', '-')}-test",
@@ -616,7 +616,7 @@ class TestRepositoryContractPerformance:
         repository = MockStockRepository()
 
         # Create many stocks
-        stocks: List[StockEntity] = []
+        stocks: List[Stock] = []
         for i in range(100):
             # Create valid 5-char symbols using letters only
             symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}"
@@ -701,7 +701,7 @@ class TestRepositoryContractCompliance:
         stock_id = repository.create(stock)
 
         retrieved = repository.get_by_id(stock_id)
-        assert isinstance(retrieved, StockEntity)
+        assert isinstance(retrieved, Stock)
 
     def test_repository_abstraction_compliance(self) -> None:
         """Should comply with abstraction principles."""

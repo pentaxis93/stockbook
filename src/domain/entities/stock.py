@@ -7,7 +7,7 @@ and validation rules encapsulated within the entity.
 
 from typing import Any, Dict, Optional
 
-from src.domain.entities.base import BaseEntity
+from src.domain.entities.entity import Entity
 from src.domain.value_objects import (
     CompanyName,
     Grade,
@@ -20,7 +20,7 @@ from src.domain.value_objects import (
 )
 
 
-class StockEntity(BaseEntity):
+class Stock(Entity):
     """
     Rich domain entity representing a stock/security.
 
@@ -117,7 +117,7 @@ class StockEntity(BaseEntity):
         Two stocks are considered equal if they have the same symbol,
         regardless of other attributes or database ID.
         """
-        if not isinstance(other, StockEntity):
+        if not isinstance(other, Stock):
             return False
         return self.symbol == other.symbol
 
@@ -132,7 +132,7 @@ class StockEntity(BaseEntity):
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"StockEntity(symbol={self.symbol!r}, company_name={self.company_name!r}, "
+            f"Stock(symbol={self.symbol!r}, company_name={self.company_name!r}, "
             f"grade={self.grade!r})"
         )
 

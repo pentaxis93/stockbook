@@ -5,20 +5,20 @@ Entities are objects with identity and business behavior,
 representing the core concepts of the trading domain.
 """
 
-from .base import BaseEntity
-from .journal_entry_entity import JournalEntryEntity
-from .portfolio_balance_entity import PortfolioBalanceEntity
-from .portfolio_entity import PortfolioEntity
-from .stock_entity import StockEntity
-from .target_entity import TargetEntity
-from .transaction_entity import TransactionEntity
+from .entity import Entity
+from .journal_entry import JournalEntry
+from .portfolio import Portfolio
+from .portfolio_balance import PortfolioBalance
+from .stock import Stock
+from .target import Target
+from .transaction import Transaction
 
 __all__ = [
-    "BaseEntity",
-    "StockEntity",
-    "PortfolioEntity",
-    "TransactionEntity",
-    "TargetEntity",
-    "PortfolioBalanceEntity",
-    "JournalEntryEntity",
+    "Entity",
+    "Stock",
+    "Portfolio",
+    "Transaction",
+    "Target",
+    "PortfolioBalance",
+    "JournalEntry",
 ]

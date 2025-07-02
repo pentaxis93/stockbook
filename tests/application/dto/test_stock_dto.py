@@ -63,12 +63,12 @@ class TestStockDto:
             _ = StockDto(id="", symbol="TEST", name="Test Company")
 
     def test_stock_dto_from_entity_with_valid_entity(self) -> None:
-        """Should create DTO from valid StockEntity."""
+        """Should create DTO from valid Stock."""
         # Import here to avoid circular dependency issues in test
-        from src.domain.entities.stock_entity import StockEntity
+        from src.domain.entities.stock import Stock
 
-        # Create mock StockEntity with spec to make isinstance check pass
-        mock_entity = Mock(spec=StockEntity)
+        # Create mock Stock with spec to make isinstance check pass
+        mock_entity = Mock(spec=Stock)
         mock_entity.id = "stock-1"
         mock_entity.symbol.value = "AAPL"
         mock_entity.company_name.value = "Apple Inc."
@@ -101,10 +101,10 @@ class TestStockDto:
     def test_stock_dto_from_entity_with_none_optional_fields(self) -> None:
         """Should create DTO from entity with None optional fields."""
         # Import here to avoid circular dependency issues in test
-        from src.domain.entities.stock_entity import StockEntity
+        from src.domain.entities.stock import Stock
 
-        # Create mock StockEntity with None optional fields
-        mock_entity = Mock(spec=StockEntity)
+        # Create mock Stock with None optional fields
+        mock_entity = Mock(spec=Stock)
         mock_entity.id = "stock-1"
         mock_entity.symbol.value = "AAPL"
         mock_entity.company_name.value = "Apple Inc."
@@ -127,10 +127,10 @@ class TestStockDto:
         assert dto.notes == "Test notes"
 
     def test_stock_dto_from_entity_with_invalid_type_raises_error(self) -> None:
-        """Should raise TypeError for non-StockEntity object."""
+        """Should raise TypeError for non-Stock object."""
         invalid_entity = {"id": "test", "symbol": "TEST"}
 
-        with pytest.raises(TypeError, match="Expected StockEntity instance"):
+        with pytest.raises(TypeError, match="Expected Stock instance"):
             _ = StockDto.from_entity(invalid_entity)
 
     def test_stock_dto_equality_with_same_data(self) -> None:
@@ -222,10 +222,10 @@ class TestStockDto:
     def test_stock_dto_from_entity_with_entity_having_empty_notes(self) -> None:
         """Should handle entity with empty notes value."""
         # Import here to avoid circular dependency issues in test
-        from src.domain.entities.stock_entity import StockEntity
+        from src.domain.entities.stock import Stock
 
-        # Create mock StockEntity with empty notes
-        mock_entity = Mock(spec=StockEntity)
+        # Create mock Stock with empty notes
+        mock_entity = Mock(spec=Stock)
         mock_entity.id = "stock-1"
         mock_entity.symbol.value = "AAPL"
         mock_entity.company_name.value = "Apple Inc."
@@ -244,10 +244,10 @@ class TestStockDto:
     def test_stock_dto_from_entity_edge_case_all_optional_fields_present(self) -> None:
         """Should handle entity with all optional fields present."""
         # Import here to avoid circular dependency issues in test
-        from src.domain.entities.stock_entity import StockEntity
+        from src.domain.entities.stock import Stock
 
-        # Create mock StockEntity with all optional fields
-        mock_entity = Mock(spec=StockEntity)
+        # Create mock Stock with all optional fields
+        mock_entity = Mock(spec=Stock)
         mock_entity.id = "stock-1"
         mock_entity.symbol.value = "AAPL"
         mock_entity.company_name.value = "Apple Inc."
@@ -280,7 +280,7 @@ class TestStockDto:
         invalid_mock = Mock()
 
         # This should fail the isinstance check and raise TypeError
-        with pytest.raises(TypeError, match="Expected StockEntity instance"):
+        with pytest.raises(TypeError, match="Expected Stock instance"):
             _ = StockDto.from_entity(invalid_mock)
 
     def test_stock_dto_dataclass_field_defaults(self) -> None:

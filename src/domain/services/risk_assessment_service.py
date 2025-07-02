@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from typing import Dict, List, Optional, Tuple
 
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.value_objects import Money, Quantity
 
 from .exceptions import InsufficientDataError
@@ -49,7 +49,7 @@ class RiskAssessmentService:
         """
         self.config = config or RiskAssessmentConfig()
 
-    def assess_stock_risk(self, stock: StockEntity) -> RiskAssessment:
+    def assess_stock_risk(self, stock: Stock) -> RiskAssessment:
         """Calculate overall risk level for individual stocks."""
         # TODO: Implement comprehensive risk assessment logic
         risk_factors: List[str] = []
@@ -64,7 +64,7 @@ class RiskAssessmentService:
 
     def assess_portfolio_risk(
         self,
-        portfolio: List[Tuple[StockEntity, Quantity]],
+        portfolio: List[Tuple[Stock, Quantity]],
         prices: Dict[str, Money],  # pylint: disable=unused-argument
     ) -> RiskAssessment:
         """Calculate overall portfolio risk level."""

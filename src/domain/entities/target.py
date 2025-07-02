@@ -8,11 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Any, Optional, Union
 
-from src.domain.entities.base import BaseEntity
+from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, TargetStatus
 
 
-class TargetEntity(BaseEntity):
+class Target(Entity):
     """
     Target aggregate root representing investment price targets.
 
@@ -132,7 +132,7 @@ class TargetEntity(BaseEntity):
     # Equality and representation
     def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity (portfolio_id, stock_id)."""
-        if not isinstance(other, TargetEntity):
+        if not isinstance(other, Target):
             return False
         return (
             self._portfolio_id == other._portfolio_id
@@ -149,4 +149,4 @@ class TargetEntity(BaseEntity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"TargetEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, status={self._status.value!r})"
+        return f"Target(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, status={self._status.value!r})"

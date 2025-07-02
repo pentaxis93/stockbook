@@ -8,7 +8,7 @@ and portfolios, including various risk metrics and risk management strategies.
 from decimal import Decimal
 from typing import Dict, List, Tuple
 
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.services.portfolio_calculation_service import (
     PortfolioCalculationService,
 )
@@ -37,7 +37,7 @@ def create_test_stock(
     industry: str = "Technology",
     volatility: float = 0.2,
     beta: float = 1.0,
-) -> StockEntity:
+) -> Stock:
     """Helper to create test stock with risk attributes."""
     # Map industries to sector + industry_group combinations
     industry_mapping = {
@@ -51,7 +51,7 @@ def create_test_stock(
 
     sector, industry_group = industry_mapping.get(industry, ("Technology", "Software"))
 
-    stock = StockEntity(
+    stock = Stock(
         symbol=StockSymbol(symbol),
         company_name=CompanyName(f"{symbol} Corp"),
         sector=Sector(sector) if sector else None,
@@ -62,7 +62,7 @@ def create_test_stock(
     return stock
 
 
-def create_conservative_portfolio() -> list[tuple[StockEntity, Quantity]]:
+def create_conservative_portfolio() -> list[tuple[Stock, Quantity]]:
     """Helper to create a conservative risk portfolio."""
     return [
         (
@@ -81,7 +81,7 @@ def create_conservative_portfolio() -> list[tuple[StockEntity, Quantity]]:
     ]
 
 
-def create_aggressive_portfolio() -> list[tuple[StockEntity, Quantity]]:
+def create_aggressive_portfolio() -> list[tuple[Stock, Quantity]]:
     """Helper to create a high-risk aggressive portfolio."""
     return [
         (create_test_stock("TSLA", 200.00, "B", "Technology", 0.65, 2.1), Quantity(10)),
@@ -94,7 +94,7 @@ def create_aggressive_portfolio() -> list[tuple[StockEntity, Quantity]]:
     ]
 
 
-def create_concentrated_portfolio() -> list[tuple[StockEntity, Quantity]]:
+def create_concentrated_portfolio() -> list[tuple[Stock, Quantity]]:
     """Helper to create a portfolio with concentration risk."""
     return [
         (
@@ -113,7 +113,7 @@ def create_concentrated_portfolio() -> list[tuple[StockEntity, Quantity]]:
 
 
 def create_test_prices(
-    portfolio: List[Tuple[StockEntity, Quantity]],
+    portfolio: List[Tuple[Stock, Quantity]],
 ) -> Dict[str, Money]:
     """Helper to create price dictionary from portfolio."""
     prices: Dict[str, Money] = {}
@@ -206,7 +206,7 @@ class TestRiskAssessmentEdgeCases:
         from src.domain.services.exceptions import InsufficientDataError
 
         service = RiskAssessmentService()
-        empty_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        empty_portfolio: List[Tuple[Stock, Quantity]] = []
         empty_prices: Dict[str, Money] = {}
 
         with pytest.raises(
@@ -345,7 +345,7 @@ class TestRiskAssessmentIntegration:
         service = RiskAssessmentService()
 
         # Create large portfolio with diverse holdings
-        large_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        large_portfolio: List[Tuple[Stock, Quantity]] = []
         prices: Dict[str, Money] = {}
 
         sectors = ["Technology", "Healthcare", "Financial", "Industrial", "Consumer"]
@@ -428,14 +428,14 @@ class TestRiskAssessmentAlgorithms:
         # Create portfolios with different diversification levels
 
         # Undiversified: 2 stocks same sector
-        undiversified: List[Tuple[StockEntity, Quantity]] = []
+        undiversified: List[Tuple[Stock, Quantity]] = []
         tech_symbols = ["TECHA", "TECHB"]
         for i, symbol in enumerate(tech_symbols):
             stock = create_test_stock(symbol, 100.00, "A", "Technology")
             undiversified.append((stock, Quantity(50)))
 
         # Diversified: 5 stocks different sectors
-        diversified: List[Tuple[StockEntity, Quantity]] = []
+        diversified: List[Tuple[Stock, Quantity]] = []
         sectors = ["Technology", "Healthcare", "Financial", "Industrial", "Consumer"]
         div_symbols = ["DIVA", "DIVB", "DIVC", "DIVD", "DIVE"]
         for i, sector in enumerate(sectors):
@@ -462,8 +462,8 @@ class TestRiskAssessmentAlgorithms:
         service = RiskAssessmentService()
 
         # Create two portfolios: one balanced, one concentrated
-        balanced_portfolio: List[Tuple[StockEntity, Quantity]] = []
-        concentrated_portfolio: List[Tuple[StockEntity, Quantity]] = []
+        balanced_portfolio: List[Tuple[Stock, Quantity]] = []
+        concentrated_portfolio: List[Tuple[Stock, Quantity]] = []
 
         # Balanced: equal positions
         bal_symbols = ["BALA", "BALB", "BALC", "BALD"]

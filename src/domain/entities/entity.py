@@ -8,10 +8,10 @@ from typing import Any, Optional, TypeVar
 
 import nanoid
 
-T = TypeVar("T", bound="BaseEntity")
+T = TypeVar("T", bound="Entity")
 
 
-class BaseEntity:
+class Entity:
     """Base class for all domain entities with immutable string IDs."""
 
     def __init__(self, id: Optional[str] = None) -> None:

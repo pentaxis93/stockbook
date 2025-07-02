@@ -8,11 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Any, Optional
 
-from src.domain.entities.base import BaseEntity
+from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
 
 
-class TransactionEntity(BaseEntity):
+class Transaction(Entity):
     """
     Transaction aggregate root representing a stock trade.
 
@@ -105,7 +105,7 @@ class TransactionEntity(BaseEntity):
     # Equality and representation
     def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity."""
-        if not isinstance(other, TransactionEntity):
+        if not isinstance(other, Transaction):
             return False
         return (
             self._portfolio_id == other._portfolio_id
@@ -135,4 +135,4 @@ class TransactionEntity(BaseEntity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"TransactionEntity(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, type={self._transaction_type.value!r}, quantity={self._quantity.value}, price={self._price})"
+        return f"Transaction(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, type={self._transaction_type.value!r}, quantity={self._quantity.value}, price={self._price})"

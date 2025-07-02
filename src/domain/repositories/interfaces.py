@@ -11,12 +11,12 @@ from typing import Any, List, Optional
 
 # Import domain entities and value objects
 from src.domain.entities import (
-    JournalEntryEntity,
-    PortfolioBalanceEntity,
-    PortfolioEntity,
-    StockEntity,
-    TargetEntity,
-    TransactionEntity,
+    JournalEntry,
+    Portfolio,
+    PortfolioBalance,
+    Stock,
+    Target,
+    Transaction,
 )
 from src.domain.value_objects.stock_symbol import StockSymbol
 
@@ -25,12 +25,12 @@ class IStockRepository(ABC):
     """Abstract interface for stock data operations."""
 
     @abstractmethod
-    def create(self, stock: StockEntity) -> str:
+    def create(self, stock: Stock) -> str:
         """
         Create a new stock record.
 
         Args:
-            stock: StockEntity domain model
+            stock: Stock domain model
 
         Returns:
             ID of the created stock
@@ -42,7 +42,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, stock_id: str) -> Optional[StockEntity]:
+    def get_by_id(self, stock_id: str) -> Optional[Stock]:
         """
         Retrieve stock by ID.
 
@@ -50,12 +50,12 @@ class IStockRepository(ABC):
             stock_id: Stock identifier
 
         Returns:
-            StockEntity domain model or None if not found
+            Stock domain model or None if not found
         """
         pass
 
     @abstractmethod
-    def get_by_symbol(self, symbol: StockSymbol) -> Optional[StockEntity]:
+    def get_by_symbol(self, symbol: StockSymbol) -> Optional[Stock]:
         """
         Retrieve stock by symbol.
 
@@ -63,28 +63,28 @@ class IStockRepository(ABC):
             symbol: Stock symbol value object
 
         Returns:
-            StockEntity domain model or None if not found
+            Stock domain model or None if not found
         """
         pass
 
     @abstractmethod
-    def get_all(self) -> List[StockEntity]:
+    def get_all(self) -> List[Stock]:
         """
         Retrieve all stocks.
 
         Returns:
-            List of StockEntity domain models
+            List of Stock domain models
         """
         pass
 
     @abstractmethod
-    def update(self, stock_id: str, stock: StockEntity) -> bool:
+    def update(self, stock_id: str, stock: Stock) -> bool:
         """
         Update existing stock.
 
         Args:
             stock_id: Stock identifier
-            stock: Updated StockEntity domain model
+            stock: Updated Stock domain model
 
         Returns:
             True if update successful, False otherwise
@@ -133,7 +133,7 @@ class IStockRepository(ABC):
         sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
         grade_filter: Optional[str] = None,
-    ) -> List[StockEntity]:
+    ) -> List[Stock]:
         """
         Search stocks with multiple filter criteria.
 
@@ -145,7 +145,7 @@ class IStockRepository(ABC):
             grade_filter: Filter by exact grade match (A, B, or C)
 
         Returns:
-            List of StockEntity domain models matching the criteria
+            List of Stock domain models matching the criteria
         """
         pass
 
@@ -154,7 +154,7 @@ class IPortfolioRepository(ABC):
     """Abstract interface for portfolio data operations."""
 
     @abstractmethod
-    def create(self, portfolio: PortfolioEntity) -> str:
+    def create(self, portfolio: Portfolio) -> str:
         """
         Create a new portfolio.
 
@@ -171,7 +171,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, portfolio_id: str) -> Optional[PortfolioEntity]:
+    def get_by_id(self, portfolio_id: str) -> Optional[Portfolio]:
         """
         Retrieve portfolio by ID.
 
@@ -184,7 +184,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_active(self) -> List[PortfolioEntity]:
+    def get_all_active(self) -> List[Portfolio]:
         """
         Retrieve all active portfolios.
 
@@ -194,7 +194,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> List[PortfolioEntity]:
+    def get_all(self) -> List[Portfolio]:
         """
         Retrieve all portfolios (active and inactive).
 
@@ -204,7 +204,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, portfolio_id: str, portfolio: PortfolioEntity) -> bool:
+    def update(self, portfolio_id: str, portfolio: Portfolio) -> bool:
         """
         Update existing portfolio.
 
@@ -239,12 +239,12 @@ class ITransactionRepository(ABC):
     """Abstract interface for transaction data operations."""
 
     @abstractmethod
-    def create(self, transaction: TransactionEntity) -> str:
+    def create(self, transaction: Transaction) -> str:
         """
         Create a new transaction.
 
         Args:
-            transaction: TransactionEntity domain model
+            transaction: Transaction domain model
 
         Returns:
             ID of the created transaction
@@ -257,7 +257,7 @@ class ITransactionRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, transaction_id: str) -> Optional[TransactionEntity]:
+    def get_by_id(self, transaction_id: str) -> Optional[Transaction]:
         """
         Retrieve transaction by ID.
 
@@ -272,7 +272,7 @@ class ITransactionRepository(ABC):
     @abstractmethod
     def get_by_portfolio(
         self, portfolio_id: str, limit: Optional[int] = None
-    ) -> List[TransactionEntity]:
+    ) -> List[Transaction]:
         """
         Retrieve transactions for a specific portfolio.
 
@@ -288,7 +288,7 @@ class ITransactionRepository(ABC):
     @abstractmethod
     def get_by_stock(
         self, stock_id: str, portfolio_id: Optional[str] = None
-    ) -> List[TransactionEntity]:
+    ) -> List[Transaction]:
         """
         Retrieve transactions for a specific stock.
 
@@ -304,7 +304,7 @@ class ITransactionRepository(ABC):
     @abstractmethod
     def get_by_date_range(
         self, start_date: date, end_date: date, portfolio_id: Optional[str] = None
-    ) -> List[TransactionEntity]:
+    ) -> List[Transaction]:
         """
         Retrieve transactions within a date range.
 
@@ -319,7 +319,7 @@ class ITransactionRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, transaction_id: str, transaction: TransactionEntity) -> bool:
+    def update(self, transaction_id: str, transaction: Transaction) -> bool:
         """
         Update existing transaction.
 
@@ -358,12 +358,12 @@ class ITargetRepository(ABC):
     """Abstract interface for target data operations."""
 
     @abstractmethod
-    def create(self, target: TargetEntity) -> str:
+    def create(self, target: Target) -> str:
         """
         Create a new target.
 
         Args:
-            target: TargetEntity domain model
+            target: Target domain model
 
         Returns:
             ID of the created target
@@ -375,7 +375,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, target_id: str) -> Optional[TargetEntity]:
+    def get_by_id(self, target_id: str) -> Optional[Target]:
         """
         Retrieve target by ID.
 
@@ -388,7 +388,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_active_by_portfolio(self, portfolio_id: str) -> List[TargetEntity]:
+    def get_active_by_portfolio(self, portfolio_id: str) -> List[Target]:
         """
         Retrieve active targets for a portfolio.
 
@@ -401,7 +401,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_active_by_stock(self, stock_id: str) -> List[TargetEntity]:
+    def get_active_by_stock(self, stock_id: str) -> List[Target]:
         """
         Retrieve active targets for a stock.
 
@@ -414,7 +414,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_active(self) -> List[TargetEntity]:
+    def get_all_active(self) -> List[Target]:
         """
         Retrieve all active targets.
 
@@ -424,7 +424,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, target_id: str, target: TargetEntity) -> bool:
+    def update(self, target_id: str, target: Target) -> bool:
         """
         Update existing target.
 
@@ -460,12 +460,12 @@ class IPortfolioBalanceRepository(ABC):
     """Abstract interface for portfolio balance data operations."""
 
     @abstractmethod
-    def create(self, balance: PortfolioBalanceEntity) -> str:
+    def create(self, balance: PortfolioBalance) -> str:
         """
         Create or update portfolio balance for a date.
 
         Args:
-            balance: PortfolioBalanceEntity domain model
+            balance: PortfolioBalance domain model
 
         Returns:
             ID of the created/updated balance record
@@ -477,7 +477,7 @@ class IPortfolioBalanceRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, balance_id: str) -> Optional[PortfolioBalanceEntity]:
+    def get_by_id(self, balance_id: str) -> Optional[PortfolioBalance]:
         """
         Retrieve portfolio balance by ID.
 
@@ -492,7 +492,7 @@ class IPortfolioBalanceRepository(ABC):
     @abstractmethod
     def get_by_portfolio_and_date(
         self, portfolio_id: str, balance_date: date
-    ) -> Optional[PortfolioBalanceEntity]:
+    ) -> Optional[PortfolioBalance]:
         """
         Retrieve portfolio balance for a specific date.
 
@@ -508,7 +508,7 @@ class IPortfolioBalanceRepository(ABC):
     @abstractmethod
     def get_history(
         self, portfolio_id: str, limit: Optional[int] = None
-    ) -> List[PortfolioBalanceEntity]:
+    ) -> List[PortfolioBalance]:
         """
         Retrieve balance history for a portfolio.
 
@@ -522,7 +522,7 @@ class IPortfolioBalanceRepository(ABC):
         pass
 
     @abstractmethod
-    def get_latest_balance(self, portfolio_id: str) -> Optional[PortfolioBalanceEntity]:
+    def get_latest_balance(self, portfolio_id: str) -> Optional[PortfolioBalance]:
         """
         Retrieve the most recent balance for a portfolio.
 
@@ -539,12 +539,12 @@ class IJournalRepository(ABC):
     """Abstract interface for journal entry data operations."""
 
     @abstractmethod
-    def create(self, entry: JournalEntryEntity) -> str:
+    def create(self, entry: JournalEntry) -> str:
         """
         Create a new journal entry.
 
         Args:
-            entry: JournalEntryEntity domain model
+            entry: JournalEntry domain model
 
         Returns:
             ID of the created entry
@@ -556,7 +556,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, entry_id: str) -> Optional[JournalEntryEntity]:
+    def get_by_id(self, entry_id: str) -> Optional[JournalEntry]:
         """
         Retrieve journal entry by ID.
 
@@ -569,7 +569,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_recent(self, limit: Optional[int] = None) -> List[JournalEntryEntity]:
+    def get_recent(self, limit: Optional[int] = None) -> List[JournalEntry]:
         """
         Retrieve recent journal entries.
 
@@ -584,7 +584,7 @@ class IJournalRepository(ABC):
     @abstractmethod
     def get_by_portfolio(
         self, portfolio_id: str, limit: Optional[int] = None
-    ) -> List[JournalEntryEntity]:
+    ) -> List[JournalEntry]:
         """
         Retrieve journal entries for a specific portfolio.
 
@@ -600,7 +600,7 @@ class IJournalRepository(ABC):
     @abstractmethod
     def get_by_stock(
         self, stock_id: str, limit: Optional[int] = None
-    ) -> List[JournalEntryEntity]:
+    ) -> List[JournalEntry]:
         """
         Retrieve journal entries for a specific stock.
 
@@ -614,7 +614,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_transaction(self, transaction_id: str) -> List[JournalEntryEntity]:
+    def get_by_transaction(self, transaction_id: str) -> List[JournalEntry]:
         """
         Retrieve journal entries for a specific transaction.
 
@@ -627,9 +627,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_date_range(
-        self, start_date: date, end_date: date
-    ) -> List[JournalEntryEntity]:
+    def get_by_date_range(self, start_date: date, end_date: date) -> List[JournalEntry]:
         """
         Retrieve journal entries within a date range.
 
@@ -643,7 +641,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, entry_id: str, entry: JournalEntryEntity) -> bool:
+    def update(self, entry_id: str, entry: JournalEntry) -> bool:
         """
         Update existing journal entry.
 

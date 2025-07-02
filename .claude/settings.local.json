@@ -227,7 +227,8 @@
       "Bash(make:*)",
       "Bash(pip search:*)",
       "Bash(git restore:*)",
-      "Bash(source:*)"
+      "Bash(source:*)",
+      "Bash(git mv:*)"
     ],
     "deny": []
   }

@@ -43,16 +43,16 @@ class StockDto:
         Create DTO from domain entity.
 
         Args:
-            entity: StockEntity instance
+            entity: Stock instance
 
         Returns:
             StockDto instance
         """
         # Import here to avoid circular dependency
-        from src.domain.entities.stock_entity import StockEntity
+        from src.domain.entities.stock import Stock
 
-        if not isinstance(entity, StockEntity):
-            raise TypeError("Expected StockEntity instance")
+        if not isinstance(entity, Stock):
+            raise TypeError("Expected Stock instance")
 
         return cls(
             id=entity.id,

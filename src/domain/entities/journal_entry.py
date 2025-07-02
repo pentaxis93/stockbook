@@ -8,11 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Any, Optional, Union
 
-from src.domain.entities.base import BaseEntity
+from src.domain.entities.entity import Entity
 from src.domain.value_objects import JournalContent
 
 
-class JournalEntryEntity(BaseEntity):
+class JournalEntry(Entity):
     """
     Journal Entry entity representing notes and observations about investments.
 
@@ -99,7 +99,7 @@ class JournalEntryEntity(BaseEntity):
     # Equality and representation
     def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity (entry_date, content)."""
-        if not isinstance(other, JournalEntryEntity):
+        if not isinstance(other, JournalEntry):
             return False
         return self._entry_date == other._entry_date and self._content == other._content
 
@@ -114,4 +114,4 @@ class JournalEntryEntity(BaseEntity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"JournalEntryEntity(date={self._entry_date})"
+        return f"JournalEntry(date={self._entry_date})"

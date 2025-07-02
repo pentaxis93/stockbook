@@ -9,26 +9,26 @@ from decimal import Decimal
 import pytest
 
 from src.domain.entities import (
-    JournalEntryEntity,
-    PortfolioBalanceEntity,
-    PortfolioEntity,
-    StockEntity,
-    TargetEntity,
-    TransactionEntity,
+    JournalEntry,
+    Portfolio,
+    PortfolioBalance,
+    Stock,
+    Target,
+    Transaction,
 )
 from src.domain.value_objects import CompanyName, Grade, Money, Quantity
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 
-class TestStockEntity:
-    """Test StockEntity domain entity with symbol validation and business logic"""
+class TestStock:
+    """Test Stock domain entity with symbol validation and business logic"""
 
     def test_valid_stock_creation(self) -> None:
         """Test creating a valid stock with all fields"""
         from src.domain.value_objects import IndustryGroup, Notes
         from src.domain.value_objects.sector import Sector
 
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -48,7 +48,7 @@ class TestStockEntity:
 
     def test_minimal_stock_creation(self) -> None:
         """Test creating stock with only required fields"""
-        stock = StockEntity(
+        stock = Stock(
             symbol=StockSymbol("MSFT"),
             company_name=CompanyName("Microsoft Corporation"),
         )
@@ -67,7 +67,7 @@ class TestStockEntity:
         """Test that valid grades A, B, C, D, F are accepted"""
         for grade_str in ["A", "B", "C", "D", "F"]:
             grade = Grade(grade_str)
-            stock = StockEntity(
+            stock = Stock(
                 symbol=StockSymbol("TEST"),
                 company_name=CompanyName("Test Stock"),
                 grade=grade,
@@ -78,7 +78,7 @@ class TestStockEntity:
 
     def test_empty_name_allowed(self) -> None:
         """Test that empty name is now allowed (users can create stock with only symbol)"""
-        stock = StockEntity(symbol=StockSymbol("TEST"), company_name=CompanyName(""))
+        stock = Stock(symbol=StockSymbol("TEST"), company_name=CompanyName(""))
         assert stock.company_name.value == ""
         assert stock.symbol.value == "TEST"
 
@@ -91,14 +91,14 @@ class TestStockEntity:
                 _ = StockSymbol(symbol)
 
 
-class TestPortfolioEntity:
-    """Test PortfolioEntity domain entity with business validation"""
+class TestPortfolio:
+    """Test Portfolio domain entity with business validation"""
 
     def test_valid_portfolio_creation(self) -> None:
         """Test creating a valid portfolio"""
         from src.domain.value_objects import Notes, PortfolioName
 
-        portfolio = PortfolioEntity(
+        portfolio = Portfolio(
             name=PortfolioName("My Portfolio"),
             description=Notes("Test portfolio"),
             is_active=True,
@@ -111,7 +111,7 @@ class TestPortfolioEntity:
         """Test creating portfolio with only required fields"""
         from src.domain.value_objects import PortfolioName
 
-        portfolio = PortfolioEntity(name=PortfolioName("Test Portfolio"))
+        portfolio = Portfolio(name=PortfolioName("Test Portfolio"))
         assert portfolio.name.value == "Test Portfolio"
         assert portfolio.is_active is True
 
@@ -133,14 +133,14 @@ class TestPortfolioEntity:
             _ = PortfolioName(long_name)  # Error happens at value object level
 
 
-class TestTransactionEntity:
-    """Test TransactionEntity domain entity with business validation"""
+class TestTransaction:
+    """Test Transaction domain entity with business validation"""
 
     def test_valid_buy_transaction(self) -> None:
         """Test creating a valid buy transaction"""
         from src.domain.value_objects import Notes, TransactionType
 
-        transaction = TransactionEntity(
+        transaction = Transaction(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             transaction_type=TransactionType("buy"),
@@ -158,7 +158,7 @@ class TestTransactionEntity:
         """Test creating a valid sell transaction"""
         from src.domain.value_objects import TransactionType
 
-        transaction = TransactionEntity(
+        transaction = Transaction(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             transaction_type=TransactionType("sell"),
@@ -184,7 +184,7 @@ class TestTransactionEntity:
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = TransactionEntity(
+            _ = Transaction(
                 portfolio_id="",
                 stock_id="stock-id-1",
                 transaction_type=TransactionType("buy"),
@@ -198,7 +198,7 @@ class TestTransactionEntity:
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = TransactionEntity(
+            _ = Transaction(
                 portfolio_id="portfolio-id-1",
                 stock_id="",
                 transaction_type=TransactionType("buy"),
@@ -208,14 +208,14 @@ class TestTransactionEntity:
             )
 
 
-class TestTargetEntity:
-    """Test TargetEntity domain entity with value objects"""
+class TestTarget:
+    """Test Target domain entity with value objects"""
 
     def test_target_entity_creation_with_value_objects(self) -> None:
-        """Test that TargetEntity can be instantiated with value objects"""
+        """Test that Target can be instantiated with value objects"""
         from src.domain.value_objects import TargetStatus
 
-        target = TargetEntity(
+        target = Target(
             portfolio_id="portfolio-id-1",
             stock_id="stock-id-1",
             pivot_price=Money(Decimal("100.00")),
@@ -230,14 +230,14 @@ class TestTargetEntity:
         assert target.status.value == "active"
 
 
-class TestPortfolioBalanceEntity:
-    """Test PortfolioBalanceEntity domain entity with value objects"""
+class TestPortfolioBalance:
+    """Test PortfolioBalance domain entity with value objects"""
 
     def test_portfolio_balance_entity_creation_with_value_objects(self) -> None:
-        """Test that PortfolioBalanceEntity can be instantiated with value objects"""
+        """Test that PortfolioBalance can be instantiated with value objects"""
         from src.domain.value_objects import IndexChange
 
-        balance = PortfolioBalanceEntity(
+        balance = PortfolioBalance(
             portfolio_id="portfolio-id-1",
             balance_date=date.today(),
             final_balance=Money(Decimal("10000.00")),
@@ -253,14 +253,14 @@ class TestPortfolioBalanceEntity:
         assert balance.index_change.value == 5.25
 
 
-class TestJournalEntryEntity:
-    """Test JournalEntryEntity domain entity with value objects"""
+class TestJournalEntry:
+    """Test JournalEntry domain entity with value objects"""
 
     def test_journal_entry_entity_creation_with_value_objects(self) -> None:
-        """Test that JournalEntryEntity can be instantiated with value objects"""
+        """Test that JournalEntry can be instantiated with value objects"""
         from src.domain.value_objects import JournalContent
 
-        entry = JournalEntryEntity(
+        entry = JournalEntry(
             entry_date=date.today(),
             content=JournalContent(
                 "This is a detailed market analysis and observations."

@@ -15,7 +15,7 @@ from src.application.commands.stock_commands import (
 )
 from src.application.dto.stock_dto import StockDto
 from src.application.services.stock_application_service import StockApplicationService
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
 from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
 from src.domain.value_objects.sector import Sector
@@ -74,7 +74,7 @@ class TestStockApplicationService:
 
         # Verify the entity passed to repository
         create_call = self.mock_stock_repository.create.call_args[0][0]
-        assert isinstance(create_call, StockEntity)
+        assert isinstance(create_call, Stock)
         assert str(create_call.symbol) == "AAPL"
         assert create_call.company_name.value == "Apple Inc."
 
@@ -84,7 +84,7 @@ class TestStockApplicationService:
         command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
 
         # Mock repository to return existing stock
-        existing_stock = StockEntity(
+        existing_stock = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Existing Apple Inc."),
             id="stock-id-456",
@@ -118,7 +118,7 @@ class TestStockApplicationService:
         """Should retrieve stock by symbol successfully."""
         # Arrange
         symbol = "AAPL"
-        stock_entity = StockEntity(
+        stock_entity = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             sector=Sector("Technology"),
@@ -167,12 +167,12 @@ class TestStockApplicationService:
     def test_get_all_stocks_success(self) -> None:
         """Should retrieve all stocks successfully."""
         # Arrange
-        stock1 = StockEntity(
+        stock1 = Stock(
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
             id="stock-1",
         )
-        stock2 = StockEntity(
+        stock2 = Stock(
             symbol=StockSymbol("MSFT"),
             company_name=CompanyName("Microsoft Corp."),
             id="stock-2",
@@ -249,7 +249,7 @@ class TestStockApplicationService:
         grade_filter = "A"
 
         mock_entities = [
-            StockEntity(
+            Stock(
                 id="stock-1",
                 symbol=StockSymbol("AAPL"),
                 company_name=CompanyName("Apple Inc."),
@@ -286,7 +286,7 @@ class TestStockApplicationService:
         """Should search stocks without any filters."""
         # Arrange
         mock_entities = [
-            StockEntity(
+            Stock(
                 id="stock-1",
                 symbol=StockSymbol("AAPL"),
                 company_name=CompanyName("Apple Inc."),
@@ -295,7 +295,7 @@ class TestStockApplicationService:
                 grade=Grade("A"),
                 notes=Notes(""),
             ),
-            StockEntity(
+            Stock(
                 id="stock-2",
                 symbol=StockSymbol("GOOGL"),
                 company_name=CompanyName("Alphabet Inc."),
@@ -353,7 +353,7 @@ class TestStockApplicationService:
             notes="Updated notes",
         )
 
-        existing_stock = StockEntity(
+        existing_stock = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -392,7 +392,7 @@ class TestStockApplicationService:
             grade="A",  # Only updating grade
         )
 
-        existing_stock = StockEntity(
+        existing_stock = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -445,7 +445,7 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
-        existing_stock = StockEntity(
+        existing_stock = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -467,7 +467,7 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
-        existing_stock = StockEntity(
+        existing_stock = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -524,7 +524,7 @@ class TestStockApplicationService:
         """Should validate command and return stock entity successfully."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Apple Inc.")
-        stock_entity = StockEntity(
+        stock_entity = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -562,7 +562,7 @@ class TestStockApplicationService:
         """Should apply updates and save successfully."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = StockEntity(
+        stock_entity = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -586,7 +586,7 @@ class TestStockApplicationService:
         """Should raise error when repository update fails."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = StockEntity(
+        stock_entity = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),
@@ -665,7 +665,7 @@ class TestStockApplicationService:
         """Should handle commit failure in update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = StockEntity(
+        stock_entity = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
             company_name=CompanyName("Apple Inc."),

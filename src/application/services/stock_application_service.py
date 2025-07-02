@@ -12,7 +12,7 @@ from src.application.commands.stock_commands import (
     UpdateStockCommand,
 )
 from src.application.dto.stock_dto import StockDto
-from src.domain.entities.stock_entity import StockEntity
+from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import IStockBookUnitOfWork
 from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
 from src.domain.value_objects.sector import Sector
@@ -61,7 +61,7 @@ class StockApplicationService:
                     )
 
                 # Create domain entity
-                stock_entity = StockEntity(
+                stock_entity = Stock(
                     symbol=symbol_vo,
                     company_name=CompanyName(command.name),
                     sector=Sector(command.sector) if command.sector else None,
@@ -186,7 +186,7 @@ class StockApplicationService:
 
     def _validate_update_command_and_get_stock(
         self, command: UpdateStockCommand
-    ) -> StockEntity:
+    ) -> Stock:
         """Validate update command and retrieve stock entity."""
         # Check if stock exists
         stock_entity = self._unit_of_work.stocks.get_by_id(command.stock_id)
@@ -201,7 +201,7 @@ class StockApplicationService:
         return stock_entity
 
     def _apply_updates_and_save(
-        self, command: UpdateStockCommand, stock_entity: StockEntity
+        self, command: UpdateStockCommand, stock_entity: Stock
     ) -> None:
         """Apply updates to stock entity and save to repository."""
         # Get the fields to update and apply them to the entity

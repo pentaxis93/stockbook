@@ -1,27 +1,27 @@
 """
-Tests for BaseEntity domain entity.
+Tests for Entity domain entity.
 
 Following TDD approach - these tests define the expected behavior
-of the BaseEntity with focus on ID management and equality behavior.
+of the Entity with focus on ID management and equality behavior.
 """
 
 from typing import Optional
 
 import pytest
 
-from src.domain.entities.base import BaseEntity
+from src.domain.entities.entity import Entity
 
 
-class ConcreteEntity(BaseEntity):
-    """Concrete implementation of BaseEntity for testing."""
+class ConcreteEntity(Entity):
+    """Concrete implementation of Entity for testing."""
 
     def __init__(self, name: str = "test", id: Optional[str] = None) -> None:
         super().__init__(id=id)
         self.name = name
 
 
-class TestBaseEntity:
-    """Test suite for BaseEntity domain entity."""
+class TestEntity:
+    """Test suite for Entity domain entity."""
 
     def test_create_entity_without_id(self) -> None:
         """Should create entity with generated nanoid by default."""
@@ -72,7 +72,7 @@ class TestBaseEntity:
     def test_equality_with_different_types(self) -> None:
         """Should not be equal when different types."""
 
-        class AnotherEntity(BaseEntity):
+        class AnotherEntity(Entity):
             pass
 
         test_id = "same-id-123"
@@ -110,9 +110,9 @@ class TestBaseEntity:
         assert repr(entity) == str(entity)
 
 
-class TestBaseEntityArchitecturalConcerns:
+class TestEntityArchitecturalConcerns:
     """
-    Test suite focusing on architectural concerns about BaseEntity design.
+    Test suite focusing on architectural concerns about Entity design.
 
     These tests highlight design decisions:
     1. String IDs with nanoid provide immutable, unique identifiers

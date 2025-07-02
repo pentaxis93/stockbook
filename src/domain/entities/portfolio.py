@@ -8,11 +8,11 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 from datetime import date
 from typing import Any, Optional, Union
 
-from src.domain.entities.base import BaseEntity
+from src.domain.entities.entity import Entity
 from src.domain.value_objects import Notes, PortfolioName
 
 
-class PortfolioEntity(BaseEntity):
+class Portfolio(Entity):
     """
     Portfolio aggregate root representing a collection of investments.
 
@@ -90,7 +90,7 @@ class PortfolioEntity(BaseEntity):
     # Equality and representation
     def __eq__(self, other: Any) -> bool:
         """Check equality based on business identity (name)."""
-        if not isinstance(other, PortfolioEntity):
+        if not isinstance(other, Portfolio):
             return False
         return self._name == other._name
 
@@ -104,4 +104,4 @@ class PortfolioEntity(BaseEntity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"PortfolioEntity(name={self._name!r}, active={self._is_active})"
+        return f"Portfolio(name={self._name!r}, active={self._is_active})"
