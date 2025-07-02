@@ -228,7 +228,8 @@
       "Bash(pip search:*)",
       "Bash(git restore:*)",
       "Bash(source:*)",
-      "Bash(git mv:*)"
+      "Bash(git mv:*)",
+      "Bash(touch:*)"
     ],
     "deny": []
   }
