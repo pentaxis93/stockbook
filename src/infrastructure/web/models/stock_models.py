@@ -139,7 +139,7 @@ class StockRequest(BaseModel):
             raise ValueError("Sector must be provided when industry_group is specified")
         return self
 
-    def to_create_command(self) -> CreateStockCommand:
+    def to_command(self) -> CreateStockCommand:
         """
         Convert request to CreateStockCommand.
 

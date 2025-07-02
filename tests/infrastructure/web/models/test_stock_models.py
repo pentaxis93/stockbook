@@ -185,7 +185,7 @@ class TestStockRequest:
             errors[0]["msg"]
         )
 
-    def test_stock_request_to_create_command_conversion(self) -> None:
+    def test_stock_request_to_command_conversion(self) -> None:
         """Should convert to CreateStockCommand correctly."""
         request = StockRequest(
             symbol="AAPL",
@@ -196,7 +196,7 @@ class TestStockRequest:
             notes="Test notes",
         )
 
-        command = request.to_create_command()
+        command = request.to_command()
 
         assert isinstance(command, CreateStockCommand)
         assert command.symbol == "AAPL"
@@ -206,11 +206,11 @@ class TestStockRequest:
         assert command.grade == "A"
         assert command.notes == "Test notes"
 
-    def test_stock_request_to_create_command_with_minimal_fields(self) -> None:
+    def test_stock_request_to_command_with_minimal_fields(self) -> None:
         """Should convert minimal request to command correctly."""
         request = StockRequest(symbol="AAPL")
 
-        command = request.to_create_command()
+        command = request.to_command()
 
         assert isinstance(command, CreateStockCommand)
         assert command.symbol == "AAPL"
@@ -544,7 +544,7 @@ class TestStockModelsIntegration:
         )
 
         # Convert to command
-        command = request.to_create_command()
+        command = request.to_command()
         assert command.symbol == "AAPL"
         assert command.name == "Apple Inc."
         assert command.grade == "A"
@@ -586,7 +586,7 @@ class TestStockModelsIntegration:
         assert request.grade == "B"  # Normalized
 
         # Convert to command and simulate service processing
-        command = request.to_create_command()
+        command = request.to_command()
 
         # Simulate DTO from service
         dto = StockDto(
