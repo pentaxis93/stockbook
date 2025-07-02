@@ -5,7 +5,7 @@ This module defines the stock table structure using SQLAlchemy's Core
 Table construct (not ORM) to maintain clean architecture separation.
 """
 
-from sqlalchemy import Column, DateTime, Index, MetaData, String, Table, text
+from sqlalchemy import Column, DateTime, MetaData, String, Table, text
 
 # Create metadata instance for all tables
 metadata: MetaData = MetaData()
@@ -33,11 +33,4 @@ stock_table: Table = Table(
         nullable=False,
         server_default=text("CURRENT_TIMESTAMP"),
     ),
-)
-
-# Add indexes for commonly queried fields
-_ = Index("idx_stocks_sector", stock_table.c.sector)
-_ = Index("idx_stocks_grade", stock_table.c.grade)
-_ = Index(
-    "idx_stocks_sector_industry", stock_table.c.sector, stock_table.c.industry_group
 )
