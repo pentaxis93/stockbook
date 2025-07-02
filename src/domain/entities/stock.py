@@ -153,22 +153,22 @@ class Stock(Entity):
         temp_values: Dict[str, Any] = {}
 
         # Create value objects in separate methods to reduce complexity
-        self._create_company_name_vo(kwargs, temp_values)
-        self._create_sector_vo(kwargs, temp_values)
-        self._create_industry_group_vo(kwargs, temp_values)
-        self._create_grade_vo(kwargs, temp_values)
-        self._create_notes_vo(kwargs, temp_values)
+        self._create_company_name(kwargs, temp_values)
+        self._create_sector(kwargs, temp_values)
+        self._create_industry_group(kwargs, temp_values)
+        self._create_grade(kwargs, temp_values)
+        self._create_notes(kwargs, temp_values)
 
         return temp_values
 
-    def _create_company_name_vo(
+    def _create_company_name(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
     ) -> None:
         """Create company name value object if present."""
         if "name" in kwargs:
             temp_values["company_name"] = CompanyName(kwargs["name"])
 
-    def _create_sector_vo(
+    def _create_sector(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
     ) -> None:
         """Create sector value object if present."""
@@ -176,7 +176,7 @@ class Stock(Entity):
             sector = kwargs["sector"]
             temp_values["sector"] = Sector(sector) if sector is not None else None
 
-    def _create_industry_group_vo(
+    def _create_industry_group(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
     ) -> None:
         """Create industry group value object if present."""
@@ -186,7 +186,7 @@ class Stock(Entity):
                 IndustryGroup(industry_group) if industry_group else None
             )
 
-    def _create_grade_vo(
+    def _create_grade(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
     ) -> None:
         """Create grade value object if present."""
@@ -196,7 +196,7 @@ class Stock(Entity):
                 Grade(grade_value) if grade_value is not None else None
             )
 
-    def _create_notes_vo(
+    def _create_notes(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
     ) -> None:
         """Create notes value object if present."""
