@@ -340,6 +340,8 @@ typeCheckingMode = "strict"
 
 # Set python path to include project root for import resolution
 pythonPath = ["."]
+venvPath = "."
+venv = ".venv"
 
 # Strict type checking options
 reportUnknownParameterType = true
@@ -406,10 +408,11 @@ modules = ["src.domain"]
 name = "Layered architecture"
 type = "layers"
 layers = [
+    "src.infrastructure",
     "src.application", 
     "src.domain"
 ]
-# Infrastructure and presentation layers removed - will be rebuilt later
+# Infrastructure layer now added
 
 [tool.pydocstyle]
 convention = "google"

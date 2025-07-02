@@ -224,7 +224,10 @@
       "Bash(git rm:*)",
       "Bash(PYTHONPATH=. pyright src/presentation/ --pythonpath . --typechecking strict)",
       "Bash(pip freeze)",
-      "Bash(make:*)"
+      "Bash(make:*)",
+      "Bash(pip search:*)",
+      "Bash(git restore:*)",
+      "Bash(source:*)"
     ],
     "deny": []
   }
