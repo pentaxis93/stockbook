@@ -24,7 +24,7 @@ class TestEntity:
     """Test suite for Entity domain entity."""
 
     def test_create_entity_without_id(self) -> None:
-        """Should create entity with generated nanoid by default."""
+        """Should create entity with generated UUID by default."""
         entity = ConcreteEntity()
         assert entity.id is not None
         assert isinstance(entity.id, str)
@@ -115,7 +115,7 @@ class TestEntityArchitecturalConcerns:
     Test suite focusing on architectural concerns about Entity design.
 
     These tests highlight design decisions:
-    1. String IDs with nanoid provide immutable, unique identifiers
+    1. String IDs with UUID provide immutable, unique identifiers
     2. from_persistence() method handles entity reconstruction from database
     3. __hash__() method removal prevents misuse of mutable entities
     """
@@ -165,11 +165,11 @@ class TestEntityArchitecturalConcerns:
         other_entity = ConcreteEntity("other", id=db_id)
         assert entity == other_entity
 
-    def test_nanoid_provides_unique_identifiers(self) -> None:
+    def test_uuid_provides_unique_identifiers(self) -> None:
         """
-        DESIGN DECISION: nanoid generates unique string identifiers.
+        DESIGN DECISION: UUID generates unique string identifiers.
 
-        Using nanoid eliminates the need for database-generated integer IDs
+        Using UUID eliminates the need for database-generated integer IDs
         in many scenarios, allowing entities to have IDs before persistence.
         """
         entities = [ConcreteEntity() for _ in range(100)]

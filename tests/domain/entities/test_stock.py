@@ -49,7 +49,7 @@ class TestStock:
         assert stock.industry_group == industry_group
         assert stock.grade == grade
         assert stock.notes == notes
-        assert stock.id is not None  # Generated nanoid
+        assert stock.id is not None  # Generated UUID
         assert isinstance(stock.id, str)
 
     def test_create_stock_with_minimal_data(self) -> None:

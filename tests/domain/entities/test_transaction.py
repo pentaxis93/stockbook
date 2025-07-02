@@ -45,7 +45,7 @@ class TestTransaction:
         assert transaction.price == price
         assert transaction.transaction_date == transaction_date
         assert transaction.notes == notes
-        assert transaction.id is not None  # Generated nanoid
+        assert transaction.id is not None  # Generated UUID
         assert isinstance(transaction.id, str)
 
     def test_create_transaction_with_minimal_data(self) -> None:

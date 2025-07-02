@@ -34,7 +34,7 @@ class TestPortfolio:
         assert portfolio.description == description
         assert portfolio.created_date == created_date
         assert portfolio.is_active is True
-        assert portfolio.id is not None  # Generated nanoid
+        assert portfolio.id is not None  # Generated UUID
         assert isinstance(portfolio.id, str)
 
     def test_create_portfolio_with_minimal_data(self) -> None:
@@ -47,7 +47,7 @@ class TestPortfolio:
         assert portfolio.description.value == ""  # Description defaults to empty
         assert portfolio.created_date is None  # Optional
         assert portfolio.is_active is True  # Defaults to True
-        assert portfolio.id is not None  # Generated nanoid
+        assert portfolio.id is not None  # Generated UUID
         assert isinstance(portfolio.id, str)
 
     def test_portfolio_stores_value_objects(self) -> None:

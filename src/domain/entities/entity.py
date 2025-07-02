@@ -4,9 +4,8 @@ Base entity class for domain entities.
 Provides common functionality for all domain entities following DDD principles.
 """
 
+import uuid
 from typing import Any, Optional, TypeVar
-
-import nanoid
 
 T = TypeVar("T", bound="Entity")
 
@@ -15,8 +14,8 @@ class Entity:
     """Base class for all domain entities with immutable string IDs."""
 
     def __init__(self, id: Optional[str] = None) -> None:
-        """Initialize entity with either provided ID or generate new nanoid."""
-        self._id: str = id if id is not None else nanoid.generate()
+        """Initialize entity with either provided ID or generate new UUID."""
+        self._id: str = id if id is not None else str(uuid.uuid4())
 
     @property
     def id(self) -> str:
