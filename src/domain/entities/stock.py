@@ -12,9 +12,7 @@ from src.domain.value_objects import (
     CompanyName,
     Grade,
     IndustryGroup,
-    Money,
     Notes,
-    Quantity,
     Sector,
     StockSymbol,
 )
@@ -120,19 +118,6 @@ class Stock(Entity):
             f"Stock(symbol={self.symbol!r}, company_name={self.company_name!r}, "
             f"grade={self.grade!r})"
         )
-
-    def calculate_position_value(self, quantity: Quantity, price: Money) -> Money:
-        """
-        Calculate total value of a position in this stock.
-
-        Args:
-            quantity: Number of shares
-            price: Price per share
-
-        Returns:
-            Total position value
-        """
-        return price * quantity.value
 
     def has_notes(self) -> bool:
         """

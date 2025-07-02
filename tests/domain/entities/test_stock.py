@@ -14,9 +14,7 @@ from src.domain.value_objects import (
     CompanyName,
     Grade,
     IndustryGroup,
-    Money,
     Notes,
-    Quantity,
 )
 from src.domain.value_objects.sector import Sector
 from src.domain.value_objects.stock_symbol import StockSymbol
@@ -228,33 +226,6 @@ class TestStock:
 
         expected = "Stock(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), grade=Grade('A'))"
         assert repr(stock) == expected
-
-    def test_calculate_position_value(self) -> None:
-        """Should calculate total position value."""
-        symbol = StockSymbol("AAPL")
-        company_name = CompanyName("Apple Inc.")
-        stock = Stock(symbol=symbol, company_name=company_name)
-
-        quantity = Quantity(100)
-        price = Money("150.50")
-
-        total_value = stock.calculate_position_value(quantity, price)
-
-        assert total_value == Money("15050.00")
-        assert isinstance(total_value, Money)
-
-    def test_calculate_position_value_with_zero_quantity(self) -> None:
-        """Should handle zero quantity gracefully."""
-        symbol = StockSymbol("AAPL")
-        company_name = CompanyName("Apple Inc.")
-        stock = Stock(symbol=symbol, company_name=company_name)
-
-        # Zero quantities are allowed
-        quantity = Quantity(0)
-        price = Money("150.50")
-
-        total_value = stock.calculate_position_value(quantity, price)
-        assert total_value == Money("0.00")
 
     def test_has_notes(self) -> None:
         """Should check if stock has notes."""
@@ -864,46 +835,6 @@ class TestStockDomainInvariants:
 
 class TestStockBusinessOperations:
     """Test business operations and calculations performed by stock entity."""
-
-    def test_position_value_calculation_accuracy(self) -> None:
-        """Should calculate position values with financial precision."""
-        stock = Stock(
-            symbol=StockSymbol("AAPL"), company_name=CompanyName("Apple Inc.")
-        )
-
-        # Test various quantity and price combinations
-        test_cases = [
-            (Quantity(100), Money("150.50"), Money("15050.00")),
-            (Quantity(33), Money("99.99"), Money("3299.67")),
-            (Quantity(1000), Money("0.01"), Money("10.00")),  # Penny stock
-            (Quantity(1), Money("9999.99"), Money("9999.99")),  # Expensive stock
-            (Quantity(0), Money("150.50"), Money("0.00")),  # Zero quantity
-        ]
-
-        for quantity, price, expected_value in test_cases:
-            calculated_value = stock.calculate_position_value(quantity, price)
-            assert calculated_value == expected_value
-            assert isinstance(calculated_value, Money)
-
-    def test_position_value_calculation_edge_cases(self) -> None:
-        """Should handle edge cases in position value calculations."""
-        stock = Stock(
-            symbol=StockSymbol("EDGE"), company_name=CompanyName("Edge Case Corp")
-        )
-
-        # Very small quantities (fractional shares)
-        fractional_value = stock.calculate_position_value(
-            Quantity(0.1), Money("1000.00")
-        )
-        assert fractional_value == Money("100.00")
-
-        # Very large quantities
-        large_value = stock.calculate_position_value(Quantity(1000000), Money("0.01"))
-        assert large_value == Money("10000.00")
-
-        # Very precise prices
-        precise_value = stock.calculate_position_value(Quantity(3), Money("33.333333"))
-        assert precise_value == Money("99.99")  # 33.333333 * 3 = 99.999999 -> 99.99
 
     def test_stock_business_logic_methods(self) -> None:
         """Should provide meaningful business logic methods."""
