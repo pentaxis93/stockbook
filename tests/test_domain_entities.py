@@ -37,6 +37,7 @@ class TestStock:
             notes=Notes("Great company"),
         )
         assert stock.symbol.value == "AAPL"
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc."
         assert stock.sector is not None
         assert stock.sector.value == "Technology"
@@ -53,6 +54,7 @@ class TestStock:
             company_name=CompanyName("Microsoft Corporation"),
         )
         assert stock.symbol.value == "MSFT"
+        assert stock.company_name is not None
         assert stock.company_name.value == "Microsoft Corporation"
         assert stock.industry_group is None
         assert stock.grade is None
@@ -79,6 +81,7 @@ class TestStock:
     def test_empty_name_allowed(self) -> None:
         """Test that empty name is now allowed (users can create stock with only symbol)"""
         stock = Stock(symbol=StockSymbol("TEST"), company_name=CompanyName(""))
+        assert stock.company_name is not None
         assert stock.company_name.value == ""
         assert stock.symbol.value == "TEST"
 

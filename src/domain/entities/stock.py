@@ -28,7 +28,7 @@ class Stock(Entity):
 
     # Type annotations for instance variables
     _symbol: StockSymbol
-    _company_name: CompanyName
+    _company_name: Optional[CompanyName]
     _sector: Optional[Sector]
     _industry_group: Optional[IndustryGroup]
     _grade: Optional[Grade]
@@ -37,7 +37,7 @@ class Stock(Entity):
     def __init__(
         self,
         symbol: StockSymbol,
-        company_name: CompanyName,
+        company_name: Optional[CompanyName] = None,
         sector: Optional[Sector] = None,
         industry_group: Optional[IndustryGroup] = None,
         grade: Optional[Grade] = None,
@@ -49,7 +49,7 @@ class Stock(Entity):
 
         Args:
             symbol: Stock symbol (value object)
-            company_name: Company name value object
+            company_name: Company name value object (optional)
             sector: Sector classification value object
             industry_group: Industry classification value object (must belong to sector if provided)
             grade: Stock grade value object (A/B/C/D/F or None)
@@ -84,7 +84,7 @@ class Stock(Entity):
         return self._symbol
 
     @property
-    def company_name(self) -> CompanyName:
+    def company_name(self) -> Optional[CompanyName]:
         """Get the company name value object."""
         return self._company_name
 
@@ -110,12 +110,15 @@ class Stock(Entity):
 
     def __str__(self) -> str:
         """String representation for display."""
-        return f"{self.symbol} - {self.company_name.value}"
+        if self.company_name:
+            return f"{self.symbol} - {self.company_name.value}"
+        return str(self.symbol)
 
     def __repr__(self) -> str:
         """Developer representation."""
+        company_repr = repr(self.company_name) if self.company_name else None
         return (
-            f"Stock(symbol={self.symbol!r}, company_name={self.company_name!r}, "
+            f"Stock(symbol={self.symbol!r}, company_name={company_repr}, "
             f"grade={self.grade!r})"
         )
 
@@ -166,7 +169,8 @@ class Stock(Entity):
     ) -> None:
         """Create company name value object if present."""
         if "name" in kwargs:
-            temp_values["company_name"] = CompanyName(kwargs["name"])
+            name = kwargs["name"]
+            temp_values["company_name"] = CompanyName(name) if name else None
 
     def _create_sector(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]

@@ -36,6 +36,16 @@ class TestCreateStockCommand:
 
     def test_create_stock_command_with_minimal_data(self) -> None:
         """Should create command with only required fields."""
+        command = CreateStockCommand(symbol="MSFT")
+
+        assert command.symbol == "MSFT"
+        assert command.name is None
+        assert command.industry_group is None
+        assert command.grade is None
+        assert command.notes == ""
+
+    def test_create_stock_command_with_name(self) -> None:
+        """Should create command with symbol and name."""
         command = CreateStockCommand(symbol="MSFT", name="Microsoft Corp.")
 
         assert command.symbol == "MSFT"
@@ -71,10 +81,10 @@ class TestCreateStockCommand:
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
             _ = CreateStockCommand(symbol="", name="Apple Inc.")
 
-    def test_create_stock_command_with_empty_name_raises_error(self) -> None:
-        """Should raise error for empty name."""
-        with pytest.raises(ValueError, match="Name cannot be empty"):
-            _ = CreateStockCommand(symbol="AAPL", name="")
+    def test_create_stock_command_with_empty_name_allowed(self) -> None:
+        """Should allow empty name as it's optional."""
+        command = CreateStockCommand(symbol="AAPL", name="")
+        assert command.name is None  # Empty string normalized to None
 
     def test_create_stock_command_with_invalid_symbol_raises_error(self) -> None:
         """Should raise error for invalid symbol format."""
@@ -303,13 +313,13 @@ class TestUpdateStockCommand:
         with pytest.raises(ValueError, match="Invalid grade"):
             _ = UpdateStockCommand(stock_id="test-stock-1", grade="Z")
 
-    def test_update_stock_command_with_empty_name_raises_error(self) -> None:
-        """Should raise error for empty name."""
-        with pytest.raises(ValueError, match="Name cannot be empty"):
-            _ = UpdateStockCommand(stock_id="test-stock-1", name="")
+    def test_update_stock_command_with_empty_name_allowed(self) -> None:
+        """Should allow empty name as it's optional."""
+        command = UpdateStockCommand(stock_id="test-stock-1", name="")
+        assert command.name is None  # Empty string normalized to None
 
-        with pytest.raises(ValueError, match="Name cannot be empty"):
-            _ = UpdateStockCommand(stock_id="test-stock-1", name="   ")
+        command2 = UpdateStockCommand(stock_id="test-stock-1", name="   ")
+        assert command2.name is None  # Whitespace normalized to None
 
     def test_update_stock_command_equality(self) -> None:
         """Should compare commands for equality."""
@@ -467,9 +477,9 @@ class TestUpdateStockCommand:
             _ = UpdateStockCommand(stock_id="   ")  # Whitespace-only
 
     def test_update_stock_command_whitespace_only_name_validation(self) -> None:
-        """Should validate name for whitespace-only strings."""
-        with pytest.raises(ValueError, match="Name cannot be empty"):
-            _ = UpdateStockCommand(stock_id="test-stock-1", name="   ")
+        """Should allow whitespace-only name as it's optional."""
+        command = UpdateStockCommand(stock_id="test-stock-1", name="   ")
+        assert command.name is None  # Whitespace normalized to None
 
     def test_update_stock_command_industry_group_empty_string_normalization(
         self,
@@ -544,3 +554,9 @@ class TestUpdateStockCommand:
             assert (
                 command.has_updates()
             ), f"Failed to detect update for field {field_name}"
+
+    def test_update_stock_command_with_explicit_none_name(self) -> None:
+        """Should handle explicitly passed None name."""
+        # This ensures coverage of None branch in _normalize_name
+        command = UpdateStockCommand(stock_id="test-stock-1", name=None)
+        assert command.name is None

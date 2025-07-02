@@ -63,6 +63,18 @@ class TestStock:
         assert stock.grade is None
         assert stock.notes.value == ""  # Notes defaults to empty
 
+    def test_create_stock_without_company_name(self) -> None:
+        """Should create Stock with only symbol (company name is optional)."""
+        symbol = StockSymbol("MSFT")
+        stock = Stock(symbol=symbol)
+
+        assert stock.symbol == symbol
+        assert stock.company_name is None
+        assert stock.sector is None
+        assert stock.industry_group is None
+        assert stock.grade is None
+        assert stock.notes.value == ""  # Notes defaults to empty
+
     def test_stock_stores_value_objects(self) -> None:
         """Should store and return value objects directly."""
         symbol = StockSymbol("AAPL")
@@ -86,6 +98,7 @@ class TestStock:
         assert stock.notes is notes
 
         # String access through value property
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc."
         assert stock.sector is not None
         assert stock.sector is not None
@@ -102,27 +115,28 @@ class TestStock:
 
         stock_empty_name = Stock(symbol=symbol, company_name=empty_name)
         assert stock_empty_name.symbol == symbol
+        assert stock_empty_name.company_name is not None
         assert stock_empty_name.company_name.value == ""
 
         stock_whitespace_name = Stock(symbol=symbol, company_name=whitespace_name)
         assert stock_whitespace_name.symbol == symbol
+        assert stock_whitespace_name.company_name is not None
         assert stock_whitespace_name.company_name.value == ""  # Whitespace is stripped
 
     def test_create_stock_with_optional_none_values(self) -> None:
         """Should allow creating stock with None for optional value objects."""
         symbol = StockSymbol("AAPL")
-        company_name = CompanyName("Apple Inc.")
 
         stock = Stock(
             symbol=symbol,
-            company_name=company_name,
+            company_name=None,
             sector=None,
             industry_group=None,
             grade=None,
             notes=None,
         )
         assert stock.symbol == symbol
-        assert stock.company_name == company_name
+        assert stock.company_name is None
         assert stock.sector is None
         assert stock.industry_group is None
         assert stock.grade is None
@@ -217,6 +231,10 @@ class TestStock:
 
         assert str(stock) == "AAPL - Apple Inc."
 
+        # Test with no company name
+        stock_no_name = Stock(symbol=symbol)
+        assert str(stock_no_name) == "AAPL"
+
     def test_stock_repr(self) -> None:
         """Should have detailed repr representation."""
         symbol = StockSymbol("AAPL")
@@ -226,6 +244,13 @@ class TestStock:
 
         expected = "Stock(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), grade=Grade('A'))"
         assert repr(stock) == expected
+
+        # Test with no company name
+        stock_no_name = Stock(symbol=symbol, grade=grade)
+        expected_no_name = (
+            "Stock(symbol=StockSymbol('AAPL'), company_name=None, grade=Grade('A'))"
+        )
+        assert repr(stock_no_name) == expected_no_name
 
     def test_has_notes(self) -> None:
         """Should check if stock has notes."""
@@ -258,6 +283,7 @@ class TestStock:
 
         # Update name
         stock.update_fields(name="Apple Inc. Updated")
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc. Updated"
 
         # Update sector and industry_group
@@ -271,6 +297,21 @@ class TestStock:
         # Update notes
         stock.update_fields(notes="Great company")
         assert stock.notes.value == "Great company"
+
+    def test_update_company_name_to_none(self) -> None:
+        """Should allow updating company name to None."""
+        symbol = StockSymbol("AAPL")
+        company_name = CompanyName("Apple Inc.")
+        stock = Stock(symbol=symbol, company_name=company_name)
+
+        # Update name to None
+        stock.update_fields(name=None)
+        assert stock.company_name is None
+
+        # Update from None to a value
+        stock.update_fields(name="Apple Corporation")
+        assert stock.company_name is not None
+        assert stock.company_name.value == "Apple Corporation"
 
     def test_update_fields_multiple_fields_atomic(self) -> None:
         """Should update multiple fields atomically."""
@@ -287,6 +328,7 @@ class TestStock:
             notes="Excellent company",
         )
 
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc. Updated"
         assert stock.grade is not None
         assert stock.grade.value == "A"
@@ -311,6 +353,7 @@ class TestStock:
             )
 
         # Original values should be unchanged
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc."
         assert stock.grade is not None
         assert stock.grade.value == "B"
@@ -397,6 +440,7 @@ class TestStock:
         )
 
         assert stock.symbol == symbol
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc."
         assert stock.sector is not None
         assert stock.sector is not None
@@ -417,6 +461,7 @@ class TestStock:
         stock = Stock(symbol=symbol, company_name=company_name, sector=sector)
 
         assert stock.symbol == symbol
+        assert stock.company_name is not None
         assert stock.company_name.value == "Microsoft Corp."
         assert stock.sector is not None
         assert stock.sector.value == "Technology"
@@ -523,6 +568,7 @@ class TestStock:
             )
 
         # Original values should be unchanged
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc."
         assert stock.sector is not None
         assert stock.sector is not None
@@ -644,6 +690,7 @@ class TestStockLifecycle:
             name="Apple Inc. (Updated)",
             notes="Company name updated after corporate restructuring",
         )
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc. (Updated)"
 
     def test_stock_persistence_roundtrip(self) -> None:
@@ -663,7 +710,11 @@ class TestStockLifecycle:
         persisted_data = {
             "id": original_stock.id,
             "symbol": original_stock.symbol.value,
-            "company_name": original_stock.company_name.value,
+            "company_name": (
+                original_stock.company_name.value
+                if original_stock.company_name
+                else None
+            ),
             "sector": original_stock.sector.value if original_stock.sector else None,
             "industry_group": (
                 original_stock.industry_group.value
@@ -897,6 +948,7 @@ class TestStockConcurrencyScenarios:
         )
 
         # Capture original state
+        assert stock.company_name is not None
         original_name = stock.company_name.value
         assert stock.sector is not None
         original_sector = stock.sector.value
@@ -917,6 +969,7 @@ class TestStockConcurrencyScenarios:
             )
 
         # Verify all original values are preserved (atomic update failure)
+        assert stock.company_name is not None
         assert stock.company_name.value == original_name
         assert stock.sector is not None
         assert stock.sector.value == original_sector

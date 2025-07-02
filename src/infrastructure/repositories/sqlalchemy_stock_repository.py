@@ -115,7 +115,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         return {
             "id": stock.id,
             "symbol": stock.symbol.value,
-            "company_name": stock.company_name.value,
+            "company_name": stock.company_name.value if stock.company_name else None,
             "sector": stock.sector.value if stock.sector else None,
             "industry_group": (
                 stock.industry_group.value if stock.industry_group else None
@@ -139,7 +139,9 @@ class SqlAlchemyStockRepository(IStockRepository):
         return Stock(
             id=row["id"],
             symbol=StockSymbol(row["symbol"]),
-            company_name=CompanyName(row["company_name"]),
+            company_name=(
+                CompanyName(row["company_name"]) if row["company_name"] else None
+            ),
             sector=Sector(row["sector"]) if row["sector"] else None,
             industry_group=(
                 IndustryGroup(row["industry_group"]) if row["industry_group"] else None

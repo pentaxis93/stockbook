@@ -37,6 +37,18 @@ class TestStockDto:
 
     def test_create_stock_dto_with_minimal_data(self) -> None:
         """Should create DTO with only required fields."""
+        dto = StockDto(id=None, symbol="MSFT")
+
+        assert dto.id is None
+        assert dto.symbol == "MSFT"
+        assert dto.name is None
+        assert dto.sector is None
+        assert dto.industry_group is None
+        assert dto.grade is None
+        assert dto.notes == ""
+
+    def test_create_stock_dto_with_name(self) -> None:
+        """Should create DTO with symbol and name."""
         dto = StockDto(id=None, symbol="MSFT", name="Microsoft Corp.")
 
         assert dto.id is None
@@ -52,10 +64,13 @@ class TestStockDto:
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
             _ = StockDto(id=None, symbol="", name="Test Company")
 
-    def test_stock_dto_validation_empty_name_raises_error(self) -> None:
-        """Should raise ValueError for empty name."""
-        with pytest.raises(ValueError, match="Name cannot be empty"):
-            _ = StockDto(id=None, symbol="TEST", name="")
+    def test_stock_dto_validation_empty_name_allowed(self) -> None:
+        """Should allow empty name as it's optional."""
+        dto = StockDto(id=None, symbol="TEST", name="")
+        assert dto.name == ""  # Empty string is allowed
+
+        dto2 = StockDto(id=None, symbol="TEST", name=None)
+        assert dto2.name is None  # None is also allowed
 
     def test_stock_dto_validation_empty_id_raises_error(self) -> None:
         """Should raise ValueError for empty string ID."""
@@ -125,6 +140,34 @@ class TestStockDto:
         assert dto.industry_group is None
         assert dto.grade is None
         assert dto.notes == "Test notes"
+
+    def test_stock_dto_from_entity_with_none_company_name(self) -> None:
+        """Should create DTO from entity with None company name."""
+        # Import here to avoid circular dependency issues in test
+        from src.domain.entities.stock import Stock
+
+        # Create mock Stock with None company name
+        mock_entity = Mock(spec=Stock)
+        mock_entity.id = "stock-1"
+        mock_entity.symbol.value = "AAPL"
+        mock_entity.company_name = None  # No company name
+        mock_entity.sector = None
+        mock_entity.industry_group = None
+        mock_entity.grade = None
+        mock_entity.notes.value = ""
+
+        # Mock the str() call on symbol
+        mock_entity.symbol.__str__ = Mock(return_value="AAPL")
+
+        dto = StockDto.from_entity(mock_entity)
+
+        assert dto.id == "stock-1"
+        assert dto.symbol == "AAPL"
+        assert dto.name is None
+        assert dto.sector is None
+        assert dto.industry_group is None
+        assert dto.grade is None
+        assert dto.notes == ""
 
     def test_stock_dto_from_entity_with_invalid_type_raises_error(self) -> None:
         """Should raise TypeError for non-Stock object."""

@@ -563,7 +563,7 @@ def seed_test_stocks(conn: sqlite3.Connection, stocks: List[Stock]) -> None:
                 (
                     stock.id,
                     stock.symbol.value,
-                    stock.company_name.value,
+                    stock.company_name.value if stock.company_name else None,
                     stock.sector.value if stock.sector else None,
                     stock.industry_group.value if stock.industry_group else None,
                     stock.grade.value if stock.grade else None,

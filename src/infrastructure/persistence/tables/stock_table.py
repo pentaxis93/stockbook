@@ -16,7 +16,7 @@ stock_table: Table = Table(
     metadata,
     Column("id", String, primary_key=True, nullable=False),
     Column("symbol", String, nullable=False, unique=True),
-    Column("company_name", String, nullable=False),
+    Column("company_name", String, nullable=True),
     Column("sector", String, nullable=True),
     Column("industry_group", String, nullable=True),
     Column("grade", String, nullable=True),

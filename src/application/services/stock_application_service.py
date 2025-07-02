@@ -63,7 +63,7 @@ class StockApplicationService:
                 # Create domain entity
                 stock_entity = Stock(
                     symbol=symbol_vo,
-                    company_name=CompanyName(command.name),
+                    company_name=CompanyName(command.name) if command.name else None,
                     sector=Sector(command.sector) if command.sector else None,
                     industry_group=(
                         IndustryGroup(command.industry_group)

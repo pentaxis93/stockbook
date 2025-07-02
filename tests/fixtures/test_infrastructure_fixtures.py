@@ -195,6 +195,7 @@ class TestStockBuilder:
         stock = StockBuilder().build()
 
         assert stock.symbol.value == "AAPL"
+        assert stock.company_name is not None
         assert stock.company_name.value == "Apple Inc."
         assert stock.sector is not None
         assert stock.sector.value == "Technology"
@@ -214,6 +215,7 @@ class TestStockBuilder:
         )
 
         assert stock.symbol.value == "GOOGL"
+        assert stock.company_name is not None
         assert stock.company_name.value == "Alphabet Inc."
         assert stock.notes.value == "Search giant"
 

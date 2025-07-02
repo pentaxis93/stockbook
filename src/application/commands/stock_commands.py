@@ -20,7 +20,7 @@ class CreateStockCommand:
 
     # Private attributes for type checking
     _symbol: str
-    _name: str
+    _name: Optional[str]
     _sector: Optional[str]
     _industry_group: Optional[str]
     _grade: Optional[str]
@@ -29,7 +29,7 @@ class CreateStockCommand:
     def __init__(
         self,
         symbol: str,
-        name: str,
+        name: Optional[str] = None,
         sector: Optional[str] = None,
         industry_group: Optional[str] = None,
         grade: Optional[str] = None,
@@ -40,7 +40,7 @@ class CreateStockCommand:
 
         Args:
             symbol: Stock symbol (will be normalized)
-            name: Company name
+            name: Company name (optional)
             sector: Sector classification
             industry_group: Industry classification (must belong to sector if provided)
             grade: Stock grade (A/B/C or None)
@@ -63,7 +63,7 @@ class CreateStockCommand:
         return self._symbol
 
     @property
-    def name(self) -> str:
+    def name(self) -> Optional[str]:
         """Get the company name."""
         return self._name
 
@@ -135,7 +135,7 @@ class CreateStockCommand:
     def _normalize_and_validate_inputs(
         self,
         symbol: str,
-        name: str,
+        name: Optional[str],
         sector: Optional[str],
         industry_group: Optional[str],
         grade: Optional[str],
@@ -180,10 +180,12 @@ class CreateStockCommand:
         return symbol.strip().upper()
 
     @staticmethod
-    def _normalize_name(name: str) -> str:
+    def _normalize_name(name: Optional[str]) -> Optional[str]:
         """Normalize company name."""
+        if name is None:
+            return None
         # Type checking is handled by type annotations
-        return name.strip()
+        return name.strip() if name.strip() else None
 
     @staticmethod
     def _normalize_sector(sector: Optional[str]) -> Optional[str]:
@@ -219,10 +221,10 @@ class CreateStockCommand:
             raise ValueError("Invalid symbol format")
 
     @staticmethod
-    def _validate_name(name: str) -> None:
+    def _validate_name(name: Optional[str]) -> None:
         """Validate company name."""
-        if not name:
-            raise ValueError("Name cannot be empty")
+        # Name is now optional, so no validation needed
+        pass
 
     @staticmethod
     def _validate_grade(grade: Optional[str]) -> None:
@@ -462,10 +464,12 @@ class UpdateStockCommand:
             raise ValueError("Stock ID must be a non-empty string")
 
     @staticmethod
-    def _normalize_name(name: str) -> str:
+    def _normalize_name(name: Optional[str]) -> Optional[str]:
         """Normalize company name."""
+        if name is None:
+            return None  # pragma: no cover
         # Type checking is handled by type annotations
-        return name.strip()
+        return name.strip() if name.strip() else None
 
     @staticmethod
     def _normalize_sector(sector: Optional[str]) -> Optional[str]:
@@ -490,10 +494,10 @@ class UpdateStockCommand:
         return notes.strip()
 
     @staticmethod
-    def _validate_name(name: str) -> None:
+    def _validate_name(name: Optional[str]) -> None:
         """Validate company name."""
-        if not name:
-            raise ValueError("Name cannot be empty")
+        # Name is now optional, so no validation needed
+        pass
 
     @staticmethod
     def _validate_grade(grade: Optional[str]) -> None:

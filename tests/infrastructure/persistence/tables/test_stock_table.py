@@ -74,7 +74,7 @@ class TestStockTableDefinition:
         company_name_column = stock_table.c.company_name
         assert isinstance(company_name_column, Column)
         assert isinstance(company_name_column.type, (String, Text))
-        assert company_name_column.nullable is False
+        assert company_name_column.nullable is True  # Company name is now optional
 
     def test_optional_text_columns(self) -> None:
         """Should have optional text columns with correct properties."""

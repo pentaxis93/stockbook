@@ -20,7 +20,7 @@ class StockDto:
 
     id: Optional[str]
     symbol: str
-    name: str
+    name: Optional[str] = None
     sector: Optional[str] = None
     industry_group: Optional[str] = None
     grade: Optional[str] = None
@@ -30,9 +30,6 @@ class StockDto:
         """Validate DTO data after initialization."""
         if not self.symbol:
             raise ValueError("Symbol cannot be empty")
-
-        if not self.name:
-            raise ValueError("Name cannot be empty")
 
         if self.id is not None and not self.id:
             raise ValueError("ID must be a string")
@@ -57,7 +54,7 @@ class StockDto:
         return cls(
             id=entity.id,
             symbol=str(entity.symbol),
-            name=entity.company_name.value,
+            name=entity.company_name.value if entity.company_name else None,
             sector=entity.sector.value if entity.sector else None,
             industry_group=(
                 entity.industry_group.value if entity.industry_group else None

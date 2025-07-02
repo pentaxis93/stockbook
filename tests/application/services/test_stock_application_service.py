@@ -76,7 +76,37 @@ class TestStockApplicationService:
         create_call = self.mock_stock_repository.create.call_args[0][0]
         assert isinstance(create_call, Stock)
         assert str(create_call.symbol) == "AAPL"
+        assert create_call.company_name is not None
         assert create_call.company_name.value == "Apple Inc."
+
+    def test_create_stock_without_company_name(self) -> None:
+        """Should create stock successfully without company name."""
+        # Arrange
+        command = CreateStockCommand(
+            symbol="TSLA",
+            name=None,  # No company name
+            sector="Technology",
+            grade="B",
+        )
+
+        # Mock repository to return None (stock doesn't exist)
+        self.mock_stock_repository.get_by_symbol.return_value = None
+
+        # Act
+        result = self.service.create_stock(command)
+
+        # Assert
+        assert isinstance(result, StockDto)
+        assert result.symbol == "TSLA"
+        assert result.name is None
+        assert result.sector == "Technology"
+        assert result.grade == "B"
+
+        # Verify the entity passed to repository
+        create_call = self.mock_stock_repository.create.call_args[0][0]
+        assert isinstance(create_call, Stock)
+        assert str(create_call.symbol) == "TSLA"
+        assert create_call.company_name is None
 
     def test_create_stock_with_duplicate_symbol_raises_error(self) -> None:
         """Should raise error when trying to create stock with existing symbol."""

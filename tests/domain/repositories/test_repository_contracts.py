@@ -89,7 +89,8 @@ class MockStockRepository(IStockRepository):
             results = [
                 s
                 for s in results
-                if name_filter.lower() in s.company_name.value.lower()
+                if s.company_name
+                and name_filter.lower() in s.company_name.value.lower()
             ]
         if sector_filter:
             results = [
