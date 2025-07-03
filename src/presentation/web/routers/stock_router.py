@@ -11,7 +11,7 @@ from typing import Annotated, Callable, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from src.application.services.stock_application_service import StockApplicationService
-from src.infrastructure.web.models.stock_models import (
+from src.presentation.web.models.stock_models import (
     StockListResponse,
     StockRequest,
     StockResponse,

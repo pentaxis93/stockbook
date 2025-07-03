@@ -14,14 +14,14 @@ class TestMainApp:
     @pytest.fixture
     def mock_database_initializer(self) -> Iterator[Mock]:
         """Mock the database initializer to avoid actual database operations."""
-        with patch("src.infrastructure.web.main.initialize_database") as mock:
+        with patch("src.presentation.web.main.initialize_database") as mock:
             yield mock
 
     @pytest.fixture
     def client(self, mock_database_initializer: Mock) -> TestClient:
         """Create a test client for the FastAPI app."""
         # Import here to ensure mocks are in place
-        from src.infrastructure.web.main import app
+        from src.presentation.web.main import app
 
         return TestClient(app)
 
@@ -40,7 +40,7 @@ class TestMainApp:
     ) -> None:
         """Test that database is initialized during app startup."""
         # Import and trigger startup by creating the app
-        from src.infrastructure.web.main import app
+        from src.presentation.web.main import app
 
         # Manually trigger startup event
         with TestClient(app):
@@ -77,12 +77,12 @@ class TestMainApp:
 
     def test_database_initialization_error_handling(self) -> None:
         """Test that database initialization errors are logged but don't crash the app."""
-        with patch("src.infrastructure.web.main.initialize_database") as mock_init:
+        with patch("src.presentation.web.main.initialize_database") as mock_init:
             # Make the initializer raise an exception
             mock_init.side_effect = Exception("Database connection failed")
 
             # Import should still succeed
-            from src.infrastructure.web.main import app
+            from src.presentation.web.main import app
 
             # App should still be created
             with TestClient(app) as client:
@@ -127,7 +127,7 @@ class TestMainApp:
         """Test that stock service factory raises error when DI container is None."""
         from unittest.mock import Mock, patch
 
-        import src.infrastructure.web.main as main_module
+        import src.presentation.web.main as main_module
         from dependency_injection.di_container import DIContainer
         from src.application.services.stock_application_service import (
             StockApplicationService,
@@ -138,9 +138,9 @@ class TestMainApp:
 
         try:
             # Mock the initialization functions
-            with patch("src.infrastructure.web.main.initialize_database"):
+            with patch("src.presentation.web.main.initialize_database"):
                 with patch(
-                    "src.infrastructure.web.main.CompositionRoot.configure"
+                    "src.presentation.web.main.CompositionRoot.configure"
                 ) as mock_configure:
                     # Create a mock container
                     mock_container = Mock(spec=DIContainer)
@@ -149,8 +149,8 @@ class TestMainApp:
                     mock_configure.return_value = mock_container
 
                     # Import and create the app with test client
-                    from src.infrastructure.web.main import app
-                    from src.infrastructure.web.routers import stock_router
+                    from src.presentation.web.main import app
+                    from src.presentation.web.routers import stock_router
 
                     with TestClient(app):
                         # Get the factory that was set during startup
@@ -187,14 +187,14 @@ class TestMainApp:
         mock_container = Mock(spec=DIContainer)
         mock_container.resolve.return_value = mock_service
 
-        import src.infrastructure.web.main as main_module
+        import src.presentation.web.main as main_module
 
         # Temporarily replace the DI container
         original_container = main_module._di_container  # type: ignore[attr-defined]
         try:
             # Use the actual factory that's created during app startup
-            from src.infrastructure.web.main import app
-            from src.infrastructure.web.routers import stock_router
+            from src.presentation.web.main import app
+            from src.presentation.web.routers import stock_router
 
             with TestClient(app):
                 # Now set a valid mock container

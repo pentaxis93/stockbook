@@ -17,7 +17,7 @@ from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
 from src.application.services.stock_application_service import StockApplicationService
 from src.infrastructure.persistence.database_initializer import initialize_database
-from src.infrastructure.web.routers import stock_router
+from src.presentation.web.routers import stock_router
 
 logger = logging.getLogger(__name__)
 

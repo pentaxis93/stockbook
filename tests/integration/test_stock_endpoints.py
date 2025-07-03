@@ -30,8 +30,8 @@ class TestStockEndpoints:
     def client(self, mock_stock_service: Mock) -> Generator[TestClient, None, None]:
         """Create a test client for the FastAPI app with mocked dependencies."""
         # Import here to ensure clean state for each test
-        from src.infrastructure.web.main import app
-        from src.infrastructure.web.routers import stock_router
+        from src.presentation.web.main import app
+        from src.presentation.web.routers import stock_router
 
         # Override the dependency
         def mock_get_stock_service():

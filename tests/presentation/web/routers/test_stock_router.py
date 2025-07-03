@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 
 from src.application.dto.stock_dto import StockDto
 from src.application.services.stock_application_service import StockApplicationService
-from src.infrastructure.web.routers import stock_router
+from src.presentation.web.routers import stock_router
 
 
 class TestStockRouter:
@@ -47,7 +47,7 @@ class TestStockRouter:
             ),
         ]
 
-    @patch("src.infrastructure.web.routers.stock_router._service_factory", None)
+    @patch("src.presentation.web.routers.stock_router._service_factory", None)
     def test_get_stock_service_without_factory_raises_error(self) -> None:
         """Should raise RuntimeError when service factory is not configured."""
         with pytest.raises(RuntimeError) as exc_info:
@@ -299,7 +299,7 @@ class TestStockRouter:
         assert data["total"] == 0
         assert data["stocks"] == []
 
-    @patch("src.infrastructure.web.routers.stock_router.logger")
+    @patch("src.presentation.web.routers.stock_router.logger")
     def test_get_stocks_logs_errors(
         self, mock_logger: Mock, mock_service: Mock
     ) -> None:
@@ -757,7 +757,7 @@ class TestStockRouter:
         assert command.grade is None
         assert command.notes == ""  # Notes can be empty string
 
-    @patch("src.infrastructure.web.routers.stock_router.logger")
+    @patch("src.presentation.web.routers.stock_router.logger")
     def test_update_stock_logs_errors(
         self, mock_logger: Mock, mock_service: Mock
     ) -> None:

@@ -25,10 +25,10 @@ StockBook is built using Clean Architecture principles combined with Domain-Driv
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Presentation Layer                    │
-│                      (Not yet implemented)               │
+│                    Presentation Layer ✅                 │
 │  • REST API Controllers  • Request/Response Models      │
-│  • Authentication       • OpenAPI Documentation         │
+│  • FastAPI Application  • OpenAPI Documentation         │
+│  • HTTP Routing         • Dependency Injection          │
 ├─────────────────────────────────────────────────────────┤
 │                    Application Layer ✅                  │
 │  • Use Cases (Services) • Commands & Queries            │
@@ -39,10 +39,10 @@ StockBook is built using Clean Architecture principles combined with Domain-Driv
 │  • Domain Services     • Repository Interfaces          │
 │  • Domain Events       • Business Rules                 │
 ├─────────────────────────────────────────────────────────┤
-│                  Infrastructure Layer                    │
-│                   (Not yet implemented)                  │
+│                  Infrastructure Layer ✅                 │
 │  • Database Access     • External Services              │
 │  • Repositories        • Persistence                    │
+│  • SQLAlchemy Core     • Unit of Work                  │
 └─────────────────────────────────────────────────────────┘
 
 → Dependencies flow inward (outer layers depend on inner layers)
@@ -67,20 +67,23 @@ StockBook is built using Clean Architecture principles combined with Domain-Driv
   - DTOs: Data transfer between layers
 - **Dependencies**: Domain layer only
 
-#### Infrastructure Layer (External Concerns) - *Planned*
+#### Infrastructure Layer (External Concerns)
 - **Purpose**: Handles all external concerns
 - **Components**:
-  - Repository Implementations
-  - Database connections
+  - Repository Implementations (SQLAlchemy)
+  - Database connections and persistence
+  - Unit of Work pattern implementation
   - External service integrations
-- **Dependencies**: Domain and Application layers
+- **Dependencies**: Domain layer only (implements domain interfaces)
 
-#### Presentation Layer (User Interface) - *Planned*
+#### Presentation Layer (User Interface)
 - **Purpose**: Handles HTTP requests and responses
 - **Components**:
-  - REST API controllers
-  - Request/Response models
-  - Authentication/Authorization
+  - FastAPI application and middleware
+  - REST API routers (stock endpoints)
+  - Request/Response models (Pydantic)
+  - OpenAPI/Swagger documentation
+  - Authentication/Authorization (planned)
 - **Dependencies**: Application layer only
 
 ## Domain-Driven Design
@@ -266,10 +269,22 @@ tests/
 - Data transfer objects
 - Service orchestration
 
-**Infrastructure**
+**Infrastructure Layer**
+- SQLAlchemy Core integration
+- Repository implementations
+- Database persistence and tables
+- Unit of Work pattern
 - Dependency injection container
 - Composition root
 - Service lifetime management
+
+**Presentation Layer**
+- FastAPI web application
+- REST API endpoints (/stocks)
+- Request/Response models
+- OpenAPI documentation
+- CORS middleware
+- Health check endpoints
 
 **Development Tools**
 - Pre-commit hooks
@@ -279,21 +294,17 @@ tests/
 
 ### 🚧 In Progress
 
-Currently in Phase 1 of the development roadmap with focus on foundational infrastructure.
+Currently in Phase 2 of the development roadmap with all core layers implemented.
 
 ### 📋 Planned Components
 
-**Infrastructure Layer** (Phase 2)
-- SQLite/PostgreSQL repositories
-- Database connection management
-- Unit of Work pattern
-- Data migrations
-
-**Presentation Layer** (Phase 2)
-- FastAPI REST API
-- OpenAPI documentation
-- Request/Response models
-- Authentication middleware
+**Enhanced Features**
+- Authentication and authorization middleware
+- Advanced query filters and pagination
+- Data migrations system
+- External service integrations
+- Caching layer
+- Rate limiting
 
 ## Future Architecture
 

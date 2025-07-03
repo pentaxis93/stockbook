@@ -233,7 +233,8 @@
       "Bash(docker-compose:*)",
       "Bash(docker run:*)",
       "Bash(docker exec:*)",
-      "Bash(docker rmi:*)"
+      "Bash(docker rmi:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }
