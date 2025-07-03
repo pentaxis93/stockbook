@@ -1200,39 +1200,6 @@ class TestSqlAlchemyStockRepositorySearchStocks:
         assert result[0].industry_group is not None
         assert result[0].industry_group.value == "Hardware"
 
-    def test_search_stocks_filters_by_grade(self) -> None:
-        """Should filter stocks by exact grade match."""
-        # Arrange
-        mock_connection = Mock(spec=IDatabaseConnection)
-        mock_result = Mock()
-
-        mock_rows = [
-            {
-                "id": "stock-1",
-                "symbol": "AAPL",
-                "company_name": "Apple Inc.",
-                "sector": "Technology",
-                "industry_group": "Hardware",
-                "grade": "A",
-                "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
-            }
-        ]
-
-        mock_result.fetchall.return_value = mock_rows
-        mock_connection.execute.return_value = mock_result
-
-        repository = SqlAlchemyStockRepository(mock_connection)
-
-        # Act
-        result = repository.search_stocks(grade_filter="A")
-
-        # Assert
-        assert len(result) == 1
-        assert result[0].grade is not None
-        assert result[0].grade.value == "A"
-
     def test_search_stocks_combines_multiple_filters(self) -> None:
         """Should combine multiple filters with AND logic."""
         # Arrange
@@ -1260,7 +1227,7 @@ class TestSqlAlchemyStockRepositorySearchStocks:
 
         # Act
         result = repository.search_stocks(
-            symbol_filter="AA", sector_filter="Technology", grade_filter="A"
+            symbol_filter="AA", sector_filter="Technology"
         )
 
         # Assert

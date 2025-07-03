@@ -276,7 +276,6 @@ class TestStockApplicationService:
         symbol_filter = "APP"
         name_filter = "Apple"
         industry_filter = "Tech"
-        grade_filter = "A"
 
         mock_entities = [
             Stock(
@@ -296,7 +295,6 @@ class TestStockApplicationService:
             symbol_filter=symbol_filter,
             name_filter=name_filter,
             industry_filter=industry_filter,
-            grade_filter=grade_filter,
         )
 
         # Assert
@@ -309,7 +307,6 @@ class TestStockApplicationService:
             symbol_filter=symbol_filter,
             name_filter=name_filter,
             industry_filter=industry_filter,
-            grade_filter=grade_filter,
         )
 
     def test_search_stocks_no_filters(self) -> None:
@@ -348,7 +345,6 @@ class TestStockApplicationService:
             symbol_filter=None,
             name_filter=None,
             industry_filter=None,
-            grade_filter=None,
         )
 
     def test_search_stocks_empty_results(self) -> None:
@@ -368,7 +364,6 @@ class TestStockApplicationService:
             symbol_filter=symbol_filter,
             name_filter=None,
             industry_filter=None,
-            grade_filter=None,
         )
 
     def test_update_stock_with_valid_command(self) -> None:

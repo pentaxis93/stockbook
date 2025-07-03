@@ -55,9 +55,6 @@ async def get_stocks(
         Optional[str], Query(description="Filter by stock symbol (partial match)")
     ] = None,
     sector: Annotated[Optional[str], Query(description="Filter by sector")] = None,
-    grade: Annotated[
-        Optional[str], Query(description="Filter by grade (A, B, C, D, F)")
-    ] = None,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockListResponse:
     """
@@ -66,7 +63,6 @@ async def get_stocks(
     Query parameters:
     - symbol: Filter by stock symbol (partial match, case-insensitive)
     - sector: Filter by sector
-    - grade: Filter by grade (exact match)
 
     Returns:
         StockListResponse containing filtered stocks and total count
@@ -88,12 +84,6 @@ async def get_stocks(
         else:
             sector = None
 
-        if grade is not None and grade.strip():
-            grade = grade.strip()
-            has_filters = True
-        else:
-            grade = None
-
         # Use appropriate service method based on filters
         if has_filters:
             # Use search_stocks with filters
@@ -102,7 +92,6 @@ async def get_stocks(
                 symbol_filter=symbol,
                 name_filter=None,  # Not exposed in API
                 industry_filter=sector,  # Sector maps to industry_filter
-                grade_filter=grade,
             )
         else:
             # No filters - get all stocks

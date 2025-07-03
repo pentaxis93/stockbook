@@ -132,7 +132,6 @@ class IStockRepository(ABC):
         name_filter: Optional[str] = None,
         sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
-        grade_filter: Optional[str] = None,
     ) -> List[Stock]:
         """
         Search stocks with multiple filter criteria.
@@ -142,7 +141,6 @@ class IStockRepository(ABC):
             name_filter: Filter by names containing this string (case-insensitive)
             sector_filter: Filter by sector containing this string (case-insensitive)
             industry_filter: Filter by industry group containing this string (case-insensitive)
-            grade_filter: Filter by exact grade match (A, B, or C)
 
         Returns:
             List of Stock domain models matching the criteria

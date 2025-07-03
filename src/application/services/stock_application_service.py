@@ -149,7 +149,6 @@ class StockApplicationService:
         symbol_filter: Optional[str] = None,
         name_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
-        grade_filter: Optional[str] = None,
     ) -> List[StockDto]:
         """
         Search stocks with multiple filter criteria.
@@ -158,7 +157,6 @@ class StockApplicationService:
             symbol_filter: Filter by symbols containing this string (case-insensitive)
             name_filter: Filter by names containing this string (case-insensitive)
             industry_filter: Filter by industry group containing this string (case-insensitive)
-            grade_filter: Filter by exact grade match (A, B, or C)
 
         Returns:
             List of stock DTOs matching the criteria
@@ -167,7 +165,6 @@ class StockApplicationService:
             symbol_filter=symbol_filter,
             name_filter=name_filter,
             industry_filter=industry_filter,
-            grade_filter=grade_filter,
         )
         return [StockDto.from_entity(entity) for entity in stock_entities]
 

@@ -154,7 +154,6 @@ class TestStockEndpoints:
             symbol_filter="ap",
             name_filter=None,
             industry_filter=None,
-            grade_filter=None,
         )
 
     def test_get_stocks_filter_by_sector(
@@ -188,39 +187,6 @@ class TestStockEndpoints:
             symbol_filter=None,
             name_filter=None,
             industry_filter="Technology",
-            grade_filter=None,
-        )
-
-    def test_get_stocks_filter_by_grade(
-        self,
-        client: TestClient,
-        mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
-    ) -> None:
-        """Should filter stocks by grade."""
-        # Arrange
-        grade_a_stocks = [stock for stock in sample_stock_dtos if stock.grade == "A"]
-        mock_stock_service.search_stocks.return_value = grade_a_stocks
-
-        # Act
-        response = client.get("/stocks", params={"grade": "A"})
-
-        # Assert
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["total"] == 2
-        assert len(data["stocks"]) == 2
-
-        # Verify all returned stocks have grade A
-        for stock in data["stocks"]:
-            assert stock["grade"] == "A"
-
-        # Verify the service was called with correct filter
-        mock_stock_service.search_stocks.assert_called_once_with(
-            symbol_filter=None,
-            name_filter=None,
-            industry_filter=None,
-            grade_filter="A",
         )
 
     def test_get_stocks_combine_multiple_filters(
@@ -231,16 +197,14 @@ class TestStockEndpoints:
     ) -> None:
         """Should apply multiple filters simultaneously."""
         # Arrange
-        # Filter for Technology sector with grade A
+        # Filter for Technology sector
         filtered_stocks = [
-            stock
-            for stock in sample_stock_dtos
-            if stock.sector == "Technology" and stock.grade == "A"
+            stock for stock in sample_stock_dtos if stock.sector == "Technology"
         ]
         mock_stock_service.search_stocks.return_value = filtered_stocks
 
         # Act
-        response = client.get("/stocks", params={"sector": "Technology", "grade": "A"})
+        response = client.get("/stocks", params={"sector": "Technology"})
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
@@ -251,14 +215,12 @@ class TestStockEndpoints:
         # Verify all returned stocks match both criteria
         for stock in data["stocks"]:
             assert stock["sector"] == "Technology"
-            assert stock["grade"] == "A"
 
         # Verify the service was called with multiple filters
         mock_stock_service.search_stocks.assert_called_once_with(
             symbol_filter=None,
             name_filter=None,
             industry_filter="Technology",
-            grade_filter="A",
         )
 
     def test_get_stocks_invalid_query_parameter(
@@ -323,9 +285,7 @@ class TestStockEndpoints:
         mock_stock_service.get_all_stocks.return_value = sample_stock_dtos
 
         # Act - empty string parameters should be ignored
-        response = client.get(
-            "/stocks", params={"symbol": "", "sector": "", "grade": ""}
-        )
+        response = client.get("/stocks", params={"symbol": "", "sector": ""})
 
         # Assert
         assert response.status_code == status.HTTP_200_OK
@@ -388,7 +348,7 @@ class TestStockEndpoints:
 
         # Act
         response = client.get(
-            "/stocks", params={"symbol": "amz", "sector": "Technology", "grade": "A"}
+            "/stocks", params={"symbol": "amz", "sector": "Technology"}
         )
 
         # Assert
@@ -402,7 +362,6 @@ class TestStockEndpoints:
             symbol_filter="amz",
             name_filter=None,
             industry_filter="Technology",
-            grade_filter="A",
         )
 
     def test_get_stock_by_id_success(

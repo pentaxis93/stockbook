@@ -306,7 +306,6 @@ class SqlAlchemyStockRepository(IStockRepository):
         name_filter: Optional[str] = None,
         sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
-        grade_filter: Optional[str] = None,
     ) -> List[Stock]:
         """
         Search for stocks based on optional filters.
@@ -316,7 +315,6 @@ class SqlAlchemyStockRepository(IStockRepository):
             name_filter: Pattern to match against company names (case-insensitive)
             sector_filter: Exact sector to filter by
             industry_filter: Exact industry group to filter by
-            grade_filter: Exact grade to filter by
 
         Returns:
             List of Stock entities matching the filters
@@ -343,10 +341,6 @@ class SqlAlchemyStockRepository(IStockRepository):
         if industry_filter:
             # Exact match for industry group
             stmt = stmt.where(stock_table.c.industry_group == industry_filter)
-
-        if grade_filter:
-            # Exact match for grade
-            stmt = stmt.where(stock_table.c.grade == grade_filter)
 
         # Execute query
         result = self._connection.execute(stmt)
