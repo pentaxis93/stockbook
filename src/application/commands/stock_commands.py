@@ -267,6 +267,7 @@ class UpdateStockCommand:
 
     # Private attributes for type checking
     _stock_id: str
+    _symbol: Optional[str]
     _name: Optional[str]
     _sector: Optional[str]
     _industry_group: Optional[str]
@@ -276,6 +277,7 @@ class UpdateStockCommand:
     def __init__(
         self,
         stock_id: str,
+        symbol: Optional[str] = None,
         name: Optional[str] = None,
         sector: Optional[str] = None,
         industry_group: Optional[str] = None,
@@ -287,6 +289,7 @@ class UpdateStockCommand:
 
         Args:
             stock_id: ID of the stock to update
+            symbol: New stock symbol (None to keep unchanged)
             name: New company name (None to keep unchanged)
             sector: New sector classification (None to keep unchanged)
             industry_group: New industry classification (None to keep unchanged)
@@ -298,7 +301,7 @@ class UpdateStockCommand:
         """
         # Validate and normalize all inputs
         normalized_inputs = self._validate_and_normalize_inputs(
-            stock_id, name, sector, industry_group, grade, notes
+            stock_id, symbol, name, sector, industry_group, grade, notes
         )
 
         # Set all attributes using the normalized values
@@ -308,6 +311,11 @@ class UpdateStockCommand:
     def stock_id(self) -> str:
         """Get the stock ID."""
         return self._stock_id
+
+    @property
+    def symbol(self) -> Optional[str]:
+        """Get the stock symbol."""
+        return self._symbol
 
     @property
     def name(self) -> Optional[str]:
@@ -343,6 +351,7 @@ class UpdateStockCommand:
         """
         return any(
             [
+                self._symbol is not None,
                 self._name is not None,
                 self._sector is not None,
                 self._industry_group is not None,
@@ -359,6 +368,8 @@ class UpdateStockCommand:
             Dictionary with field names as keys and values as values
         """
         fields: Dict[str, Any] = {}
+        if self._symbol is not None:
+            fields["symbol"] = self._symbol
         if self._name is not None:
             fields["name"] = self._name
         if self._sector is not None:
@@ -384,7 +395,9 @@ class UpdateStockCommand:
 
         return (
             self.stock_id == other.stock_id
+            and self.symbol == other.symbol
             and self.name == other.name
+            and self.sector == other.sector
             and self.industry_group == other.industry_group
             and self.grade == other.grade
             and self.notes == other.notes
@@ -393,7 +406,15 @@ class UpdateStockCommand:
     def __hash__(self) -> int:
         """Hash based on all properties."""
         return hash(
-            (self.stock_id, self.name, self.industry_group, self.grade, self.notes)
+            (
+                self.stock_id,
+                self.symbol,
+                self.name,
+                self.sector,
+                self.industry_group,
+                self.grade,
+                self.notes,
+            )
         )
 
     def __str__(self) -> str:
@@ -404,14 +425,15 @@ class UpdateStockCommand:
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"UpdateStockCommand(stock_id={self.stock_id}, name={self.name!r}, "
-            f"industry_group={self.industry_group!r}, grade={self.grade!r}, "
+            f"UpdateStockCommand(stock_id={self.stock_id}, symbol={self.symbol!r}, name={self.name!r}, "
+            f"sector={self.sector!r}, industry_group={self.industry_group!r}, grade={self.grade!r}, "
             f"notes={self.notes!r})"
         )
 
     def _validate_and_normalize_inputs(
         self,
         stock_id: str,
+        symbol: Optional[str],
         name: Optional[str],
         sector: Optional[str],
         industry_group: Optional[str],
@@ -421,6 +443,11 @@ class UpdateStockCommand:
         """Validate and normalize all inputs, returning normalized values."""
         # Validate stock_id
         self._validate_stock_id(stock_id)
+
+        # Normalize and validate symbol
+        if symbol is not None:
+            symbol = self._normalize_symbol(symbol)
+            self._validate_symbol(symbol)
 
         # Normalize and validate inputs
         if name is not None:
@@ -441,6 +468,7 @@ class UpdateStockCommand:
 
         return {
             "stock_id": stock_id,
+            "symbol": symbol,
             "name": name,
             "sector": sector,
             "industry_group": industry_group,
@@ -451,6 +479,7 @@ class UpdateStockCommand:
     def _set_attributes(self, normalized_inputs: Dict[str, Any]) -> None:
         """Set all attributes using normalized inputs."""
         object.__setattr__(self, "_stock_id", normalized_inputs["stock_id"])
+        object.__setattr__(self, "_symbol", normalized_inputs["symbol"])
         object.__setattr__(self, "_name", normalized_inputs["name"])
         object.__setattr__(self, "_sector", normalized_inputs["sector"])
         object.__setattr__(self, "_industry_group", normalized_inputs["industry_group"])
@@ -462,6 +491,22 @@ class UpdateStockCommand:
         """Validate stock ID."""
         if not stock_id.strip():
             raise ValueError("Stock ID must be a non-empty string")
+
+    @staticmethod
+    def _normalize_symbol(symbol: str) -> str:
+        """Normalize symbol format."""
+        # Type checking is handled by type annotations
+        return symbol.strip().upper()
+
+    @staticmethod
+    def _validate_symbol(symbol: str) -> None:
+        """Validate symbol format."""
+        if not symbol:
+            raise ValueError("Symbol cannot be empty")
+
+        # Use StockSymbol validation
+        if not StockSymbol.is_valid(symbol):
+            raise ValueError("Invalid symbol format")
 
     @staticmethod
     def _normalize_name(name: Optional[str]) -> Optional[str]:

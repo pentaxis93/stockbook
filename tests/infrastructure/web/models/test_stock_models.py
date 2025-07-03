@@ -12,7 +12,12 @@ from pydantic import ValidationError
 
 from src.application.commands.stock_commands import CreateStockCommand
 from src.application.dto.stock_dto import StockDto
-from src.infrastructure.web.models.stock_models import StockRequest, StockResponse
+from src.infrastructure.web.models.stock_models import (
+    StockListResponse,
+    StockRequest,
+    StockResponse,
+    StockUpdateRequest,
+)
 
 
 class TestStockRequest:
@@ -642,8 +647,6 @@ class TestStockListResponse:
 
     def test_from_dto_list_empty_list(self) -> None:
         """Should handle empty list of DTOs."""
-        from src.infrastructure.web.models.stock_models import StockListResponse
-
         result = StockListResponse.from_dto_list([])
 
         assert result.stocks == []
@@ -803,3 +806,225 @@ class TestStockListResponse:
         assert len(json_data["stocks"]) == 2
         assert json_data["stocks"][0]["symbol"] == "AAPL"
         assert json_data["stocks"][1]["symbol"] == "MSFT"
+
+
+class TestStockUpdateRequest:
+    """Test suite for StockUpdateRequest validation and behavior."""
+
+    def test_stock_update_request_all_fields(self) -> None:
+        """Should accept all valid fields."""
+        request = StockUpdateRequest(
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group="Hardware",
+            grade="A",
+            notes="Updated notes",
+        )
+
+        assert request.symbol == "AAPL"
+        assert request.name == "Apple Inc."
+        assert request.sector == "Technology"
+        assert request.industry_group == "Hardware"
+        assert request.grade == "A"
+        assert request.notes == "Updated notes"
+
+    def test_stock_update_request_partial_fields(self) -> None:
+        """Should accept partial updates with only some fields."""
+        request = StockUpdateRequest(grade="B", notes="New notes")
+
+        assert request.symbol is None
+        assert request.name is None
+        assert request.sector is None
+        assert request.industry_group is None
+        assert request.grade == "B"
+        assert request.notes == "New notes"
+
+    def test_stock_update_request_empty_body(self) -> None:
+        """Should accept empty request body (all fields None)."""
+        request = StockUpdateRequest()
+
+        assert request.symbol is None
+        assert request.name is None
+        assert request.sector is None
+        assert request.industry_group is None
+        assert request.grade is None
+        assert request.notes == ""  # Notes default to empty string
+
+    def test_stock_update_request_symbol_validation(self) -> None:
+        """Should validate symbol format."""
+        # Valid symbol
+        request = StockUpdateRequest(symbol="AAPL")
+        assert request.symbol == "AAPL"
+
+        # Lowercase gets uppercased
+        request = StockUpdateRequest(symbol="aapl")
+        assert request.symbol == "AAPL"
+
+        # Invalid symbols
+        with pytest.raises(ValidationError) as exc_info:
+            _ = StockUpdateRequest(symbol="123ABC")
+        assert "must contain only uppercase letters" in str(exc_info.value)
+
+        with pytest.raises(ValidationError) as exc_info:
+            _ = StockUpdateRequest(symbol="TOOLONG")
+        assert "must be between 1 and 5 characters" in str(exc_info.value)
+
+    def test_stock_update_request_empty_symbol_becomes_none(self) -> None:
+        """Should treat empty symbol as None."""
+        request = StockUpdateRequest(symbol="")
+        assert request.symbol is None
+
+        request = StockUpdateRequest(symbol="   ")
+        assert request.symbol is None
+
+    def test_stock_update_request_grade_validation(self) -> None:
+        """Should validate grade values."""
+        # Valid grades
+        for grade in ["A", "B", "C", "D", "F"]:
+            request = StockUpdateRequest(grade=grade)
+            assert request.grade == grade
+
+        # Lowercase gets uppercased
+        request = StockUpdateRequest(grade="a")
+        assert request.grade == "A"
+
+        # Invalid grade
+        with pytest.raises(ValidationError) as exc_info:
+            _ = StockUpdateRequest(grade="Z")
+        assert "must be one of A, B, C, D, F" in str(exc_info.value)
+
+        # Empty grade becomes None
+        request = StockUpdateRequest(grade="")
+        assert request.grade is None
+
+    def test_stock_update_request_whitespace_trimming(self) -> None:
+        """Should trim whitespace from all fields."""
+        request = StockUpdateRequest(
+            symbol="  AAPL  ",
+            name="  Apple Inc.  ",
+            sector="  Technology  ",
+            industry_group="  Hardware  ",
+            notes="  Some notes  ",
+        )
+
+        assert request.symbol == "AAPL"
+        assert request.name == "Apple Inc."
+        assert request.sector == "Technology"
+        assert request.industry_group == "Hardware"
+        assert request.notes == "Some notes"
+
+    def test_stock_update_request_empty_strings_to_none(self) -> None:
+        """Should convert empty strings to None for optional fields."""
+        request = StockUpdateRequest(name="", sector="", industry_group="", grade="")
+
+        assert request.name is None
+        assert request.sector is None
+        assert request.industry_group is None
+        assert request.grade is None
+
+    def test_stock_update_request_sector_industry_validation(self) -> None:
+        """Should validate sector-industry relationship."""
+        # Valid combination
+        request = StockUpdateRequest(sector="Technology", industry_group="Software")
+        assert request.sector == "Technology"
+        assert request.industry_group == "Software"
+
+        # Industry without sector should fail
+        with pytest.raises(ValidationError) as exc_info:
+            _ = StockUpdateRequest(industry_group="Software")
+        assert "Sector must be provided when industry_group is specified" in str(
+            exc_info.value
+        )
+
+    def test_stock_update_request_to_command(self) -> None:
+        """Should convert to UpdateStockCommand."""
+        request = StockUpdateRequest(
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group="Hardware",
+            grade="A",
+            notes="Updated",
+        )
+
+        command = request.to_command("stock-123")
+
+        assert command.stock_id == "stock-123"
+        assert command.symbol == "AAPL"
+        assert command.name == "Apple Inc."
+        assert command.sector == "Technology"
+        assert command.industry_group == "Hardware"
+        assert command.grade == "A"
+        assert command.notes == "Updated"
+
+    def test_stock_update_request_to_command_with_none_fields(self) -> None:
+        """Should handle None fields in to_command."""
+        request = StockUpdateRequest()
+        command = request.to_command("stock-123")
+
+        assert command.stock_id == "stock-123"
+        assert command.symbol is None
+        assert command.name is None
+        assert command.sector is None
+        assert command.industry_group is None
+        assert command.grade is None
+        assert command.notes == ""
+
+    def test_stock_update_request_extra_fields_rejected(self) -> None:
+        """Should reject extra fields not in model."""
+        with pytest.raises(ValidationError) as exc_info:
+            _ = StockUpdateRequest(symbol="AAPL", unknown_field="value")  # type: ignore[call-arg]
+        assert "Extra inputs are not permitted" in str(exc_info.value)
+
+    def test_stock_request_grade_normalization_empty_string(self) -> None:
+        """Should treat empty grade string as None."""
+        request = StockRequest(symbol="AAPL", grade="")
+        assert request.grade is None
+
+    def test_stock_update_request_symbol_validation_empty_returns_none(self) -> None:
+        """Should return None for empty symbol after stripping."""
+        request = StockUpdateRequest(symbol="   ")
+        assert request.symbol is None
+
+    def test_stock_update_request_name_validation_empty_returns_none(self) -> None:
+        """Should return None for empty name after stripping."""
+        request = StockUpdateRequest(name="   ")
+        assert request.name is None
+
+    def test_stock_update_request_sector_validation_empty_returns_none(self) -> None:
+        """Should return None for empty sector after stripping."""
+        request = StockUpdateRequest(sector="   ")
+        assert request.sector is None
+
+    def test_stock_update_request_grade_normalization_empty_string(self) -> None:
+        """Should treat empty grade string as None."""
+        request = StockUpdateRequest(grade="")
+        assert request.grade is None
+
+    def test_stock_update_request_symbol_validation_none_returns_none(self) -> None:
+        """Should return None for None symbol."""
+        request = StockUpdateRequest(symbol=None)
+        assert request.symbol is None
+
+    def test_stock_update_request_name_validation_none_returns_none(self) -> None:
+        """Should return None for None name."""
+        request = StockUpdateRequest(name=None)
+        assert request.name is None
+
+    def test_stock_update_request_sector_validation_none_returns_none(self) -> None:
+        """Should return None for None sector."""
+        request = StockUpdateRequest(sector=None)
+        assert request.sector is None
+
+    def test_stock_update_request_industry_group_validation_none_returns_none(
+        self,
+    ) -> None:
+        """Should return None for None industry group."""
+        request = StockUpdateRequest(industry_group=None)
+        assert request.industry_group is None
+
+    def test_stock_update_request_grade_validation_none_returns_none(self) -> None:
+        """Should return None for None grade."""
+        request = StockUpdateRequest(grade=None)
+        assert request.grade is None

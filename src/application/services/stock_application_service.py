@@ -217,6 +217,13 @@ class StockApplicationService:
         if not command.has_updates():
             raise ValueError("No fields to update")
 
+        # Check for duplicate symbol if symbol is being changed
+        if command.symbol and command.symbol != stock_entity.symbol.value:
+            symbol_vo = StockSymbol(command.symbol)
+            existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
+            if existing_stock is not None and existing_stock.id != command.stock_id:
+                raise ValueError(f"Stock with symbol {command.symbol} already exists")
+
         return stock_entity
 
     def _apply_updates_and_save(

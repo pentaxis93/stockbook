@@ -324,3 +324,465 @@ class TestStockRouter:
         log_message = mock_logger.error.call_args[0][0]
         assert "Error retrieving stocks:" in log_message
         assert error_msg in log_message
+
+    def test_update_stock_partial_update_success(
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+    ) -> None:
+        """Should successfully update only specified fields."""
+        # Arrange
+        stock_id = "stock-001"
+        original_stock = sample_stock_dtos[0]  # AAPL
+
+        # Create an updated version with only grade and notes changed
+        updated_stock = StockDto(
+            id=original_stock.id,
+            symbol=original_stock.symbol,
+            name=original_stock.name,
+            sector=original_stock.sector,
+            industry_group=original_stock.industry_group,
+            grade="B",  # Changed from A
+            notes="Updated notes",  # Changed
+        )
+
+        mock_service.update_stock.return_value = updated_stock
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(
+                f"/stocks/{stock_id}", json={"grade": "B", "notes": "Updated notes"}
+            )
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == stock_id
+        assert data["symbol"] == "AAPL"  # Unchanged
+        assert data["name"] == "Apple Inc."  # Unchanged
+        assert data["grade"] == "B"  # Updated
+        assert data["notes"] == "Updated notes"  # Updated
+
+        # Verify service was called with correct command
+        mock_service.update_stock.assert_called_once()
+        command = mock_service.update_stock.call_args[0][0]
+        assert command.stock_id == stock_id
+        assert command.grade == "B"
+        assert command.notes == "Updated notes"
+
+    def test_update_stock_full_update_success(self, mock_service: Mock) -> None:
+        """Should successfully update all updatable fields including symbol."""
+        # Arrange
+        stock_id = "stock-001"
+
+        # Create an updated stock with all fields changed
+        updated_stock = StockDto(
+            id=stock_id,
+            symbol="APLE",  # Changed symbol
+            name="Apple Corporation",  # Changed name
+            sector="Consumer Electronics",  # Changed sector
+            industry_group="Devices",  # Changed industry group
+            grade="C",  # Changed grade
+            notes="Company rebranded",  # Changed notes
+        )
+
+        mock_service.update_stock.return_value = updated_stock
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        request_data = {
+            "symbol": "APLE",
+            "name": "Apple Corporation",
+            "sector": "Consumer Electronics",
+            "industry_group": "Devices",
+            "grade": "C",
+            "notes": "Company rebranded",
+        }
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json=request_data)
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == stock_id
+        assert data["symbol"] == "APLE"
+        assert data["name"] == "Apple Corporation"
+        assert data["sector"] == "Consumer Electronics"
+        assert data["industry_group"] == "Devices"
+        assert data["grade"] == "C"
+        assert data["notes"] == "Company rebranded"
+
+        # Verify service was called
+        mock_service.update_stock.assert_called_once()
+
+    def test_update_stock_symbol_change(
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+    ) -> None:
+        """Should successfully change stock symbol."""
+        # Arrange
+        stock_id = "stock-001"
+        original_stock = sample_stock_dtos[0]
+
+        # Update only the symbol
+        updated_stock = StockDto(
+            id=original_stock.id,
+            symbol="APPL",  # Changed from AAPL
+            name=original_stock.name,
+            sector=original_stock.sector,
+            industry_group=original_stock.industry_group,
+            grade=original_stock.grade,
+            notes=original_stock.notes,
+        )
+
+        mock_service.update_stock.return_value = updated_stock
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"symbol": "APPL"})
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["symbol"] == "APPL"
+
+    def test_update_stock_duplicate_symbol(self, mock_service: Mock) -> None:
+        """Should return 400 when changing to an existing symbol."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_service.update_stock.side_effect = ValueError(
+            "Stock with symbol MSFT already exists"
+        )
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"symbol": "MSFT"})
+
+        # Assert
+        assert response.status_code == 400
+        data = response.json()
+        assert "already exists" in data["detail"]
+
+    def test_update_stock_not_found(self, mock_service: Mock) -> None:
+        """Should return 404 when stock doesn't exist."""
+        # Arrange
+        stock_id = "non-existent-id"
+        mock_service.update_stock.side_effect = ValueError(
+            f"Stock with ID {stock_id} not found"
+        )
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
+
+        # Assert
+        assert response.status_code == 404
+        data = response.json()
+        assert "not found" in data["detail"]
+
+    def test_update_stock_empty_request_body(self, mock_service: Mock) -> None:
+        """Should return 422 for empty update request."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_service.update_stock.side_effect = ValueError("No fields to update")
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={})
+
+        # Assert
+        assert response.status_code == 422
+        data = response.json()
+        assert "No fields to update" in data["detail"]
+
+    def test_update_stock_invalid_grade(self, mock_service: Mock) -> None:
+        """Should return 422 for invalid grade values."""
+        # Arrange
+        stock_id = "stock-001"
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"grade": "Z"})
+
+        # Assert
+        assert response.status_code == 422
+        data = response.json()
+        assert "detail" in data
+        # Should be caught by Pydantic validation
+
+    def test_update_stock_invalid_symbol_format(self, mock_service: Mock) -> None:
+        """Should return 422 for invalid symbol format."""
+        # Arrange
+        stock_id = "stock-001"
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        test_cases = [
+            {"symbol": "123ABC"},  # Numbers
+            {"symbol": "AB-CD"},  # Hyphen
+            {"symbol": "AB.CD"},  # Dot
+            {"symbol": "TOOLONG"},  # Too long
+            {"symbol": ""},  # Empty
+        ]
+
+        # Act & Assert
+        with TestClient(app) as client:
+            for request_data in test_cases:
+                response = client.put(f"/stocks/{stock_id}", json=request_data)
+                assert response.status_code == 422
+
+    def test_update_stock_sector_industry_validation(self, mock_service: Mock) -> None:
+        """Should validate sector-industry relationship."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_service.update_stock.side_effect = ValueError(
+            "Industry group 'Banking' does not belong to sector 'Technology'"
+        )
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(
+                f"/stocks/{stock_id}",
+                json={"sector": "Technology", "industry_group": "Banking"},
+            )
+
+        # Assert
+        assert response.status_code == 422
+        data = response.json()
+        assert "does not belong to sector" in data["detail"]
+
+    def test_update_stock_clear_industry_when_sector_changes(
+        self, mock_service: Mock
+    ) -> None:
+        """Should handle domain logic for sector change clearing industry."""
+        # Arrange
+        stock_id = "stock-001"
+
+        # The service should handle clearing industry group internally
+        updated_stock = StockDto(
+            id=stock_id,
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Healthcare",  # Changed sector
+            industry_group=None,  # Industry cleared
+            grade="A",
+            notes="Sector change",
+        )
+
+        mock_service.update_stock.return_value = updated_stock
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act - only change sector
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"sector": "Healthcare"})
+
+        # Assert
+        assert response.status_code == 200
+        data = response.json()
+        assert data["sector"] == "Healthcare"
+        assert data["industry_group"] is None
+
+    def test_update_stock_service_error(self, mock_service: Mock) -> None:
+        """Should return 500 for unexpected service errors."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_service.update_stock.side_effect = RuntimeError("Database error")
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
+
+        # Assert
+        assert response.status_code == 500
+        data = response.json()
+        assert data["detail"] == "Failed to update stock"
+
+    def test_update_stock_whitespace_trimming(self, mock_service: Mock) -> None:
+        """Should trim whitespace from all string fields."""
+        # Arrange
+        stock_id = "stock-001"
+
+        updated_stock = StockDto(
+            id=stock_id,
+            symbol="TRIM",
+            name="Trimmed Company",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="Trimmed notes",
+        )
+
+        mock_service.update_stock.return_value = updated_stock
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        request_data = {
+            "symbol": "  TRIM  ",
+            "name": "  Trimmed Company  ",
+            "sector": "  Technology  ",
+            "industry_group": "  Software  ",
+            "notes": "  Trimmed notes  ",
+        }
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json=request_data)
+
+        # Assert
+        assert response.status_code == 200
+
+        # Verify service was called with trimmed values
+        mock_service.update_stock.assert_called_once()
+        command = mock_service.update_stock.call_args[0][0]
+        assert command.symbol == "TRIM"
+        assert command.name == "Trimmed Company"
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
+        assert command.notes == "Trimmed notes"
+
+    def test_update_stock_empty_strings_as_none(self, mock_service: Mock) -> None:
+        """Should treat empty strings as None for optional fields."""
+        # Arrange
+        stock_id = "stock-001"
+
+        updated_stock = StockDto(
+            id=stock_id,
+            symbol="EMPT",
+            name="Empty Fields Corp.",
+            sector=None,
+            industry_group=None,
+            grade=None,
+            notes="",
+        )
+
+        mock_service.update_stock.return_value = updated_stock
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        request_data = {
+            "name": "Empty Fields Corp.",
+            "sector": "",
+            "industry_group": "",
+            "grade": "",
+            "notes": "",
+        }
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json=request_data)
+
+        # Assert
+        assert response.status_code == 200
+
+        # Verify service was called with None for empty fields
+        mock_service.update_stock.assert_called_once()
+        command = mock_service.update_stock.call_args[0][0]
+        assert command.sector is None
+        assert command.industry_group is None
+        assert command.grade is None
+        assert command.notes == ""  # Notes can be empty string
+
+    @patch("src.infrastructure.web.routers.stock_router.logger")
+    def test_update_stock_logs_errors(
+        self, mock_logger: Mock, mock_service: Mock
+    ) -> None:
+        """Should log errors when exceptions occur."""
+        # Arrange
+        stock_id = "stock-001"
+        error_msg = "Test error"
+        mock_service.update_stock.side_effect = Exception(error_msg)
+
+        stock_router.set_service_factory(lambda: mock_service)
+
+        from fastapi import FastAPI
+
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Act
+        with TestClient(app) as client:
+            response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
+
+        # Assert
+        assert response.status_code == 500
+
+        # Verify error was logged
+        mock_logger.error.assert_called_once()
+        log_message = mock_logger.error.call_args[0][0]
+        assert "Error updating stock" in log_message
+        assert error_msg in log_message

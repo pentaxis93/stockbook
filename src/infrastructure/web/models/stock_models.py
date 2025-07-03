@@ -9,7 +9,10 @@ from typing import Any, List, Literal, Optional, Self, Union
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from src.application.commands.stock_commands import CreateStockCommand
+from src.application.commands.stock_commands import (
+    CreateStockCommand,
+    UpdateStockCommand,
+)
 from src.application.dto.stock_dto import StockDto
 
 
@@ -266,3 +269,171 @@ class StockListResponse(BaseModel):
         """
         stocks = [StockResponse.from_dto(dto) for dto in dtos]
         return cls(stocks=stocks, total=len(stocks))
+
+
+class StockUpdateRequest(BaseModel):
+    """
+    Request model for updating a stock.
+
+    All fields are optional to support partial updates.
+    Validates and normalizes input data from API requests before
+    passing to the application layer.
+    """
+
+    symbol: Optional[str] = None
+    name: Optional[str] = None
+    sector: Optional[str] = None
+    industry_group: Optional[str] = None
+    grade: Optional[Union[Literal["A", "B", "C", "D", "F"], str]] = None
+    notes: str = ""
+
+    model_config = ConfigDict(
+        str_strip_whitespace=True,  # Automatically strip whitespace
+        extra="forbid",  # Reject extra fields
+    )
+
+    @field_validator("symbol")
+    @classmethod
+    def validate_symbol(cls, value: Optional[str]) -> Optional[str]:
+        """
+        Validate and normalize stock symbol.
+
+        Args:
+            value: Raw symbol string or None
+
+        Returns:
+            Normalized uppercase symbol or None
+
+        Raises:
+            ValueError: If symbol is invalid
+        """
+        if value is None:
+            return None
+
+        # Strip and uppercase
+        normalized = value.strip().upper()
+
+        # Check not empty
+        if not normalized:
+            return None
+
+        # Check format (letters only) - do this first
+        if not normalized.isalpha():
+            raise ValueError("Stock symbol must contain only uppercase letters")
+        # Check length after format
+        if len(normalized) < 1 or len(normalized) > 5:
+            raise ValueError("Stock symbol must be between 1 and 5 characters")
+
+        return normalized
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: Optional[str]) -> Optional[str]:
+        """
+        Validate company name.
+
+        Args:
+            value: Raw name string or None
+
+        Returns:
+            Trimmed name or None
+        """
+        if value is None:
+            return None
+        trimmed = value.strip()
+        return trimmed if trimmed else None
+
+    @field_validator("sector", "industry_group")
+    @classmethod
+    def normalize_optional_strings(cls, value: Optional[str]) -> Optional[str]:
+        """
+        Normalize optional string fields.
+
+        Args:
+            value: Optional string value
+
+        Returns:
+            Normalized string or None
+        """
+        if value is None:
+            return None
+
+        trimmed = value.strip()
+        return trimmed if trimmed else None
+
+    @field_validator("grade", mode="before")
+    @classmethod
+    def normalize_grade(cls, value: Any) -> Optional[Literal["A", "B", "C", "D", "F"]]:
+        """
+        Normalize and validate grade.
+
+        Args:
+            value: Grade value
+
+        Returns:
+            Normalized uppercase grade
+
+        Raises:
+            ValueError: If grade is invalid
+        """
+        if value is None:
+            return None
+        # Handle string input
+        if isinstance(value, str):
+            normalized = value.strip().upper()
+            # Treat empty string as None
+            if not normalized:
+                return None
+            if normalized in ["A", "B", "C", "D", "F"]:
+                return normalized  # type: ignore[return-value]
+        # If we get here, it's an invalid grade
+        raise ValueError("Grade must be one of A, B, C, D, F or None")
+
+    @field_validator("notes")
+    @classmethod
+    def validate_notes(cls, value: str) -> str:
+        """
+        Validate notes field.
+
+        Args:
+            value: Notes string
+
+        Returns:
+            Trimmed notes
+        """
+        return value.strip()
+
+    @model_validator(mode="after")
+    def validate_sector_industry_relationship(self) -> Self:
+        """
+        Validate that industry_group requires sector.
+
+        Returns:
+            Self after validation
+
+        Raises:
+            ValueError: If industry_group provided without sector
+        """
+        if self.industry_group is not None and self.sector is None:
+            raise ValueError("Sector must be provided when industry_group is specified")
+        return self
+
+    def to_command(self, stock_id: str) -> UpdateStockCommand:
+        """
+        Convert request to UpdateStockCommand.
+
+        Args:
+            stock_id: ID of the stock to update
+
+        Returns:
+            UpdateStockCommand for application layer
+        """
+        return UpdateStockCommand(
+            stock_id=stock_id,
+            symbol=self.symbol,
+            name=self.name,
+            sector=self.sector,
+            industry_group=self.industry_group,
+            grade=self.grade,
+            notes=self.notes,
+        )

@@ -495,23 +495,23 @@ class TestUpdateStockCommand:
         command_dict = {command1: "value"}
         assert command_dict[command2] == "value"  # Same data should work as key
 
-    def test_update_stock_command_equality_missing_sector_field(self) -> None:
-        """Should test equality with sector field (currently missing from __eq__)."""
-        # This test reveals a potential bug - sector is missing from __eq__ method
+    def test_update_stock_command_equality_with_sector_field(self) -> None:
+        """Should test equality with sector field properly included in __eq__."""
+        # Test that sector field is properly compared in __eq__ method
         command1 = UpdateStockCommand(stock_id="test-stock-1", sector="Technology")
         command2 = UpdateStockCommand(stock_id="test-stock-1", sector="Healthcare")
 
         # These should NOT be equal because they have different sectors
-        # But due to the bug in __eq__, they might be considered equal
-        # This test documents the current behavior
-        result = command1 == command2
+        assert command1 != command2
 
-        # Document the expected behavior vs actual behavior
-        # The commands have different sectors so should not be equal
-        # If this test fails, it means the bug was fixed
-        assert (
-            result is True
-        ), "Bug: sector field is missing from __eq__ method comparison"
+        # Test with same sector - should be equal
+        command3 = UpdateStockCommand(stock_id="test-stock-1", sector="Technology")
+        assert command1 == command3
+
+        # Test with None sectors - should be equal
+        command4 = UpdateStockCommand(stock_id="test-stock-1", sector=None)
+        command5 = UpdateStockCommand(stock_id="test-stock-1", sector=None)
+        assert command4 == command5
 
     def test_update_stock_command_whitespace_only_stock_id_validation(self) -> None:
         """Should validate stock_id for whitespace-only strings."""
@@ -644,3 +644,58 @@ class TestUpdateStockCommand:
         assert command.industry_group == "Pharmaceuticals"
         assert command.grade == "B"
         assert command.notes == "Updated notes with more details"
+
+    def test_update_stock_command_with_symbol(self) -> None:
+        """Should handle symbol updates."""
+        command = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        assert command.symbol == "AAPL"
+        assert command.has_updates() is True
+        update_fields = command.get_update_fields()
+        assert "symbol" in update_fields
+        assert update_fields["symbol"] == "AAPL"
+
+    def test_update_stock_command_symbol_normalization(self) -> None:
+        """Should normalize symbol to uppercase."""
+        command = UpdateStockCommand(stock_id="test-stock-1", symbol="aapl")
+        assert command.symbol == "AAPL"
+
+    def test_update_stock_command_invalid_symbol(self) -> None:
+        """Should reject invalid symbols."""
+        with pytest.raises(ValueError, match="Invalid symbol format"):
+            _ = UpdateStockCommand(
+                stock_id="test-stock-1", symbol="123ABC"  # Contains numbers
+            )
+
+    def test_update_stock_command_empty_symbol(self) -> None:
+        """Should reject empty symbols."""
+        with pytest.raises(ValueError, match="Symbol cannot be empty"):
+            _ = UpdateStockCommand(stock_id="test-stock-1", symbol="")
+
+    def test_update_stock_command_symbol_in_equality(self) -> None:
+        """Should include symbol in equality comparison."""
+        command1 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        command2 = UpdateStockCommand(stock_id="test-stock-1", symbol="MSFT")
+        command3 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+
+        assert command1 != command2  # Different symbols
+        assert command1 == command3  # Same symbol
+
+    def test_update_stock_command_symbol_in_hash(self) -> None:
+        """Should include symbol in hash calculation."""
+        command1 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        command2 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+
+        # Same data should have same hash
+        assert hash(command1) == hash(command2)
+
+        # Can be used in sets
+        command_set = {command1, command2}
+        assert len(command_set) == 1
+
+    def test_update_stock_command_symbol_property(self) -> None:
+        """Should access symbol via property."""
+        command = UpdateStockCommand(stock_id="test-stock-1")
+        assert command.symbol is None
+
+        command2 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        assert command2.symbol == "AAPL"

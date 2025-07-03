@@ -509,6 +509,87 @@ class TestStockApplicationService:
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
 
+    def test_update_stock_with_duplicate_symbol_raises_error(self) -> None:
+        """Should raise error when changing to an existing symbol."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", symbol="MSFT")
+
+        existing_stock = Stock(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        # Another stock with the target symbol already exists
+        another_stock = Stock(
+            id="stock-2",
+            symbol=StockSymbol("MSFT"),
+            company_name=CompanyName("Microsoft Corporation"),
+        )
+
+        self.mock_stock_repository.get_by_id.return_value = existing_stock
+        self.mock_stock_repository.get_by_symbol.return_value = another_stock
+
+        # Act & Assert
+        with pytest.raises(ValueError, match="Stock with symbol MSFT already exists"):
+            _ = self.service.update_stock(command)
+
+        # Verify rollback was called
+        self.mock_unit_of_work.rollback.assert_called_once()
+
+    def test_update_stock_with_same_symbol_allowed(self) -> None:
+        """Should allow updating stock with same symbol (no change)."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", symbol="AAPL", grade="A")
+
+        existing_stock = Stock(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+            grade=Grade("B"),
+        )
+
+        self.mock_stock_repository.get_by_id.return_value = existing_stock
+        self.mock_stock_repository.update.return_value = True
+
+        # Act
+        result = self.service.update_stock(command)
+
+        # Assert
+        assert result.id == "stock-1"
+        assert result.symbol == "AAPL"
+        assert result.grade == "A"
+
+        # Verify get_by_symbol was NOT called since symbol didn't change
+        self.mock_stock_repository.get_by_symbol.assert_not_called()
+
+    def test_update_stock_changing_symbol_to_available_one(self) -> None:
+        """Should allow changing symbol when new symbol is available."""
+        # Arrange
+        command = UpdateStockCommand(stock_id="stock-1", symbol="APLE")
+
+        existing_stock = Stock(
+            id="stock-1",
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        self.mock_stock_repository.get_by_id.return_value = existing_stock
+        self.mock_stock_repository.get_by_symbol.return_value = (
+            None  # No existing stock with new symbol
+        )
+        self.mock_stock_repository.update.return_value = True
+
+        # Act
+        result = self.service.update_stock(command)
+
+        # Assert
+        assert result.id == "stock-1"
+        assert result.symbol == "APLE"
+
+        # Verify symbol check was performed
+        self.mock_stock_repository.get_by_symbol.assert_called_once()
+
     def test_create_stock_with_value_object_creation_error(self) -> None:
         """Should handle errors during value object creation."""
         # Arrange

@@ -15,6 +15,7 @@ from src.infrastructure.web.models.stock_models import (
     StockListResponse,
     StockRequest,
     StockResponse,
+    StockUpdateRequest,
 )
 
 logger = logging.getLogger(__name__)
@@ -203,4 +204,75 @@ async def create_stock(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create stock",
+        ) from e
+
+
+@router.put("/{stock_id}", response_model=StockResponse)
+async def update_stock(
+    stock_id: str,
+    stock_update: StockUpdateRequest,
+    service: StockApplicationService = Depends(get_stock_service),
+) -> StockResponse:
+    """
+    Update an existing stock.
+
+    Path parameters:
+    - stock_id: The unique identifier of the stock
+
+    Request body (all fields optional):
+    - symbol: New stock ticker symbol (1-5 letters)
+    - name: New company name (max 200 chars)
+    - sector: New business sector
+    - industry_group: New industry group (requires sector)
+    - grade: New stock grade (A/B/C/D/F)
+    - notes: New additional notes
+
+    Returns:
+        StockResponse with updated stock data
+
+    Raises:
+        HTTPException: 404 if stock not found, 400 for duplicate symbol,
+                      422 for validation errors, 500 for server errors
+    """
+    try:
+        # Convert request to command
+        command = stock_update.to_command(stock_id)
+
+        # Call application service
+        stock_dto = service.update_stock(command)
+
+        # Convert DTO to response
+        return StockResponse.from_dto(stock_dto)
+
+    except ValueError as e:
+        error_msg = str(e)
+
+        # Check if it's a not found error
+        if "not found" in error_msg.lower():
+            logger.warning(f"Stock with ID {stock_id} not found for update")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=error_msg,
+            ) from e
+
+        # Check if it's a duplicate symbol error
+        if "already exists" in error_msg.lower():
+            logger.warning(f"Attempted to change stock {stock_id} to duplicate symbol")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error_msg,
+            ) from e
+
+        # Other ValueError = validation error
+        logger.warning(f"Validation error updating stock {stock_id}: {error_msg}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=error_msg,
+        ) from e
+
+    except Exception as e:
+        logger.error(f"Error updating stock {stock_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update stock",
         ) from e

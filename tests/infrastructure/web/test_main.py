@@ -125,46 +125,53 @@ class TestMainApp:
 
     def test_stock_service_factory_error_when_di_container_none(self) -> None:
         """Test that stock service factory raises error when DI container is None."""
-        # Import the module to access the internal functions
+        from unittest.mock import Mock, patch
+
         import src.infrastructure.web.main as main_module
+        from dependency_injection.di_container import DIContainer
+        from src.application.services.stock_application_service import (
+            StockApplicationService,
+        )
 
-        # Temporarily set the DI container to None
-        original_container = main_module._di_container  # type: ignore[attr-defined]
+        # Store original container
+        original_container = getattr(main_module, "_di_container", None)
+
         try:
-            main_module._di_container = None  # type: ignore[attr-defined]
+            # Mock the initialization functions
+            with patch("src.infrastructure.web.main.initialize_database"):
+                with patch(
+                    "src.infrastructure.web.main.CompositionRoot.configure"
+                ) as mock_configure:
+                    # Create a mock container
+                    mock_container = Mock(spec=DIContainer)
+                    mock_service = Mock(spec=StockApplicationService)
+                    mock_container.resolve.return_value = mock_service
+                    mock_configure.return_value = mock_container
 
-            # Access the stock_service_factory function from within the lifespan context
-            # We need to simulate the scenario where the factory is called but container is None
-            with patch(
-                "src.infrastructure.web.main.CompositionRoot.configure"
-            ) as mock_configure:
-                mock_configure.return_value = None
-
-                # Import app to trigger lifespan
-                from src.infrastructure.web.main import app
-
-                # The factory is created during lifespan, we need to access it
-                # Since it's defined inside lifespan, we'll test it indirectly
-                with TestClient(app):
-                    # Force the DI container to be None after app startup
-                    main_module._di_container = None  # type: ignore[attr-defined]
-
-                    # Now when the stock router tries to use the factory, it should fail
-                    # This tests the RuntimeError in lines 60-62
+                    # Import and create the app with test client
+                    from src.infrastructure.web.main import app
                     from src.infrastructure.web.routers import stock_router
 
-                    # Get the factory that was set during startup
-                    if (
-                        hasattr(stock_router, "_service_factory")
-                        and stock_router._service_factory  # type: ignore[attr-defined]
-                    ):
+                    with TestClient(app):
+                        # Get the factory that was set during startup
+                        factory = getattr(stock_router, "_service_factory", None)
+
+                        assert (
+                            factory is not None
+                        ), "Factory should have been set during lifespan"
+
+                        # Now force the DI container to be None to test line 70
+                        main_module._di_container = None  # type: ignore[attr-defined]
+
+                        # Call the factory - it should raise RuntimeError
                         with pytest.raises(RuntimeError) as exc_info:
-                            stock_router._service_factory()  # type: ignore[attr-defined]
+                            factory()
 
                         assert str(exc_info.value) == "DI container not initialized"
         finally:
             # Restore the original container
-            main_module._di_container = original_container  # type: ignore[attr-defined]
+            if original_container is not None:
+                main_module._di_container = original_container  # type: ignore[attr-defined]
 
     def test_stock_service_factory_returns_service_when_container_exists(
         self, mock_database_initializer: Mock

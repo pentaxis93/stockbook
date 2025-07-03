@@ -918,3 +918,207 @@ class TestStockEndpoints:
         assert data["detail"] == "Failed to create stock"
         # Should not expose internal error details
         assert "Database connection failed" not in data["detail"]
+
+    def test_update_stock_partial_update_success(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+        sample_stock_dtos: List[StockDto],
+    ) -> None:
+        """Should successfully update only specified fields."""
+        # Arrange
+        stock_id = "stock-001"
+        original_stock = sample_stock_dtos[0]  # AAPL
+
+        # Create an updated version with only grade and notes changed
+        updated_stock = StockDto(
+            id=original_stock.id,
+            symbol=original_stock.symbol,
+            name=original_stock.name,
+            sector=original_stock.sector,
+            industry_group=original_stock.industry_group,
+            grade="B",  # Changed from A
+            notes="Updated notes",  # Changed
+        )
+
+        mock_stock_service.update_stock.return_value = updated_stock
+
+        # Act
+        response = client.put(
+            f"/stocks/{stock_id}", json={"grade": "B", "notes": "Updated notes"}
+        )
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["id"] == stock_id
+        assert data["symbol"] == "AAPL"  # Unchanged
+        assert data["name"] == "Apple Inc."  # Unchanged
+        assert data["grade"] == "B"  # Updated
+        assert data["notes"] == "Updated notes"  # Updated
+
+        # Verify service was called with correct command
+        mock_stock_service.update_stock.assert_called_once()
+        command = mock_stock_service.update_stock.call_args[0][0]
+        assert command.stock_id == stock_id
+        assert command.grade == "B"
+        assert command.notes == "Updated notes"
+
+    def test_update_stock_full_update_success(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should successfully update all updatable fields including symbol."""
+        # Arrange
+        stock_id = "stock-001"
+
+        # Create an updated stock with all fields changed
+        updated_stock = StockDto(
+            id=stock_id,
+            symbol="APLE",  # Changed symbol
+            name="Apple Corporation",  # Changed name
+            sector="Consumer Electronics",  # Changed sector
+            industry_group="Devices",  # Changed industry group
+            grade="C",  # Changed grade
+            notes="Company rebranded",  # Changed notes
+        )
+
+        mock_stock_service.update_stock.return_value = updated_stock
+
+        request_data = {
+            "symbol": "APLE",
+            "name": "Apple Corporation",
+            "sector": "Consumer Electronics",
+            "industry_group": "Devices",
+            "grade": "C",
+            "notes": "Company rebranded",
+        }
+
+        # Act
+        response = client.put(f"/stocks/{stock_id}", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["id"] == stock_id
+        assert data["symbol"] == "APLE"
+        assert data["name"] == "Apple Corporation"
+        assert data["sector"] == "Consumer Electronics"
+        assert data["industry_group"] == "Devices"
+        assert data["grade"] == "C"
+        assert data["notes"] == "Company rebranded"
+
+    def test_update_stock_not_found(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 404 when stock doesn't exist."""
+        # Arrange
+        stock_id = "non-existent-id"
+        mock_stock_service.update_stock.side_effect = ValueError(
+            f"Stock with ID {stock_id} not found"
+        )
+
+        # Act
+        response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        data = response.json()
+        assert "detail" in data
+        assert "not found" in data["detail"]
+
+    def test_update_stock_duplicate_symbol(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 400 when changing to an existing symbol."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_stock_service.update_stock.side_effect = ValueError(
+            "Stock with symbol MSFT already exists"
+        )
+
+        # Act
+        response = client.put(f"/stocks/{stock_id}", json={"symbol": "MSFT"})
+
+        # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        data = response.json()
+        assert "already exists" in data["detail"]
+
+    def test_update_stock_invalid_grade(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 for invalid grade values."""
+        # Arrange
+        stock_id = "stock-001"
+
+        # Act
+        response = client.put(f"/stocks/{stock_id}", json={"grade": "Z"})
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+
+    def test_update_stock_empty_request_body(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 for empty update request."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_stock_service.update_stock.side_effect = ValueError("No fields to update")
+
+        # Act
+        response = client.put(f"/stocks/{stock_id}", json={})
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "No fields to update" in data["detail"]
+
+    def test_update_stock_symbol_validation(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should validate symbol format."""
+        # Arrange
+        stock_id = "stock-001"
+
+        test_cases = [
+            {"symbol": "123ABC"},  # Numbers
+            {"symbol": "AB-CD"},  # Hyphen
+            {"symbol": "TOOLONG"},  # Too long
+        ]
+
+        # Act & Assert
+        for request_data in test_cases:
+            response = client.put(f"/stocks/{stock_id}", json=request_data)
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
+    def test_update_stock_service_error(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 500 for unexpected service errors."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_stock_service.update_stock.side_effect = RuntimeError("Database error")
+
+        # Act
+        response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
+
+        # Assert
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        data = response.json()
+        assert data["detail"] == "Failed to update stock"

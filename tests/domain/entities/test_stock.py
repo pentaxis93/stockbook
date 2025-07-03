@@ -626,6 +626,44 @@ class TestStock:
         ):
             stock.update_fields(industry_group="Software")
 
+    def test_update_fields_with_symbol(self) -> None:
+        """Should update symbol field."""
+        symbol = StockSymbol("AAPL")
+        company_name = CompanyName("Apple Inc.")
+        stock = Stock(symbol=symbol, company_name=company_name)
+
+        # Update to new symbol
+        stock.update_fields(symbol="APLE")
+
+        assert stock.symbol.value == "APLE"
+
+    def test_update_fields_with_invalid_symbol_raises_error(self) -> None:
+        """Should raise error for invalid symbol format."""
+        symbol = StockSymbol("AAPL")
+        company_name = CompanyName("Apple Inc.")
+        stock = Stock(symbol=symbol, company_name=company_name)
+
+        with pytest.raises(
+            ValueError,
+            match="Stock symbol must be between 1 and 5 characters|must contain only letters",
+        ):
+            stock.update_fields(symbol="123ABC")
+
+    def test_update_fields_symbol_with_other_fields(self) -> None:
+        """Should update symbol along with other fields."""
+        symbol = StockSymbol("AAPL")
+        company_name = CompanyName("Apple Inc.")
+        stock = Stock(symbol=symbol, company_name=company_name, grade=Grade("B"))
+
+        # Update multiple fields including symbol
+        stock.update_fields(symbol="APLE", name="Apple Corporation", grade="A")
+
+        assert stock.symbol.value == "APLE"
+        assert stock.company_name is not None
+        assert stock.company_name.value == "Apple Corporation"
+        assert stock.grade is not None
+        assert stock.grade.value == "A"
+
 
 class TestStockLifecycle:
     """Test stock entity lifecycle management and state transitions."""

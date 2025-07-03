@@ -137,7 +137,7 @@ class Stock(Entity):
 
         Args:
             **kwargs: Field names and values to update.
-                     Supported fields: name, sector, industry_group, grade, notes
+                     Supported fields: symbol, name, sector, industry_group, grade, notes
 
         Raises:
             ValueError: If any field is invalid
@@ -156,6 +156,7 @@ class Stock(Entity):
         temp_values: Dict[str, Any] = {}
 
         # Create value objects in separate methods to reduce complexity
+        self._create_symbol(kwargs, temp_values)
         self._create_company_name(kwargs, temp_values)
         self._create_sector(kwargs, temp_values)
         self._create_industry_group(kwargs, temp_values)
@@ -163,6 +164,14 @@ class Stock(Entity):
         self._create_notes(kwargs, temp_values)
 
         return temp_values
+
+    def _create_symbol(
+        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+    ) -> None:
+        """Create symbol value object if present."""
+        if "symbol" in kwargs:
+            symbol = kwargs["symbol"]
+            temp_values["symbol"] = StockSymbol(symbol)
 
     def _create_company_name(
         self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
@@ -242,6 +251,8 @@ class Stock(Entity):
 
     def _apply_field_updates(self, temp_values: Dict[str, Any]) -> None:
         """Apply validated field updates to the entity."""
+        if "symbol" in temp_values:
+            self._symbol = temp_values["symbol"]
         if "company_name" in temp_values:
             self._company_name = temp_values["company_name"]
         if "sector" in temp_values:
