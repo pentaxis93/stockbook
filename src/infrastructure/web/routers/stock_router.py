@@ -11,7 +11,11 @@ from typing import Annotated, Callable, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from src.application.services.stock_application_service import StockApplicationService
-from src.infrastructure.web.models.stock_models import StockListResponse, StockResponse
+from src.infrastructure.web.models.stock_models import (
+    StockListResponse,
+    StockRequest,
+    StockResponse,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -139,4 +143,64 @@ async def get_stock_by_id(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve stock",
+        ) from e
+
+
+@router.post("", response_model=StockResponse, status_code=status.HTTP_201_CREATED)
+async def create_stock(
+    stock_request: StockRequest,
+    service: StockApplicationService = Depends(get_stock_service),
+) -> StockResponse:
+    """
+    Create a new stock.
+
+    Request body:
+    - symbol: Stock ticker symbol (required, 1-5 letters)
+    - name: Company name (required, max 200 chars)
+    - sector: Business sector (optional)
+    - industry_group: Industry group (optional, requires sector)
+    - grade: Stock grade (optional, A/B/C/D/F)
+    - notes: Additional notes (optional)
+
+    Returns:
+        StockResponse with 201 Created status
+
+    Raises:
+        HTTPException: 422 for validation errors, 400 for duplicates, 500 for server errors
+    """
+    try:
+        # Convert request to command
+        command = stock_request.to_command()
+
+        # Call application service
+        stock_dto = service.create_stock(command)
+
+        # Convert DTO to response
+        return StockResponse.from_dto(stock_dto)
+
+    except ValueError as e:
+        error_msg = str(e)
+
+        # Check if it's a duplicate stock error
+        if "already exists" in error_msg.lower():
+            logger.warning(
+                f"Attempted to create duplicate stock: {stock_request.symbol}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error_msg,
+            ) from e
+
+        # Other ValueError = validation error
+        logger.warning(f"Validation error creating stock: {error_msg}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=error_msg,
+        ) from e
+
+    except Exception as e:
+        logger.error(f"Error creating stock: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to create stock",
         ) from e

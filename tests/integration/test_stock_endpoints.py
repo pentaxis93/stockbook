@@ -460,3 +460,461 @@ class TestStockEndpoints:
         assert isinstance(data["industry_group"], str)
         assert isinstance(data["grade"], str)
         assert isinstance(data["notes"], str)
+
+    def test_create_stock_with_complete_data(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should create stock successfully with all fields provided."""
+        # Arrange
+        request_data = {
+            "symbol": "GOOGL",
+            "name": "Alphabet Inc.",
+            "sector": "Technology",
+            "industry_group": "Internet Services",
+            "grade": "A",
+            "notes": "Parent company of Google",
+        }
+
+        # Expected response DTO
+        created_stock = StockDto(
+            id="stock-005",
+            symbol="GOOGL",
+            name="Alphabet Inc.",
+            sector="Technology",
+            industry_group="Internet Services",
+            grade="A",
+            notes="Parent company of Google",
+        )
+        mock_stock_service.create_stock.return_value = created_stock
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+        data = response.json()
+        assert data["id"] == "stock-005"
+        assert data["symbol"] == "GOOGL"
+        assert data["name"] == "Alphabet Inc."
+        assert data["sector"] == "Technology"
+        assert data["industry_group"] == "Internet Services"
+        assert data["grade"] == "A"
+        assert data["notes"] == "Parent company of Google"
+
+        # Verify service was called with correct command
+        mock_stock_service.create_stock.assert_called_once()
+        command = mock_stock_service.create_stock.call_args[0][0]
+        assert command.symbol == "GOOGL"
+        assert command.name == "Alphabet Inc."
+        assert command.sector == "Technology"
+        assert command.industry_group == "Internet Services"
+        assert command.grade == "A"
+        assert command.notes == "Parent company of Google"
+
+    def test_create_stock_with_minimal_data(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should create stock successfully with only required fields."""
+        # Arrange
+        request_data = {
+            "symbol": "NFLX",
+            "name": "Netflix Inc.",
+        }
+
+        # Expected response DTO
+        created_stock = StockDto(
+            id="stock-006",
+            symbol="NFLX",
+            name="Netflix Inc.",
+            sector=None,
+            industry_group=None,
+            grade=None,
+            notes="",
+        )
+        mock_stock_service.create_stock.return_value = created_stock
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+        data = response.json()
+        assert data["id"] == "stock-006"
+        assert data["symbol"] == "NFLX"
+        assert data["name"] == "Netflix Inc."
+        assert data["sector"] is None
+        assert data["industry_group"] is None
+        assert data["grade"] is None
+        assert data["notes"] == ""
+
+        # Verify service was called with correct command
+        mock_stock_service.create_stock.assert_called_once()
+        command = mock_stock_service.create_stock.call_args[0][0]
+        assert command.symbol == "NFLX"
+        assert command.name == "Netflix Inc."
+        assert command.sector is None
+        assert command.industry_group is None
+        assert command.grade is None
+        assert command.notes == ""
+
+    def test_create_stock_empty_symbol(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when symbol is empty."""
+        # Arrange
+        request_data = {
+            "symbol": "",
+            "name": "Empty Symbol Corp.",
+        }
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+        # Pydantic validation should catch this
+        assert any("symbol" in str(error.get("loc", [])) for error in data["detail"])
+
+    def test_create_stock_missing_symbol(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when symbol is missing."""
+        # Arrange
+        request_data = {
+            "name": "Missing Symbol Corp.",
+        }
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+
+    def test_create_stock_invalid_symbol_format(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when symbol contains non-alphabetic characters."""
+        # Arrange
+        test_cases = [
+            {"symbol": "123ABC", "name": "Invalid Symbol 1"},
+            {"symbol": "AB-CD", "name": "Invalid Symbol 2"},
+            {"symbol": "AB.CD", "name": "Invalid Symbol 3"},
+            {"symbol": "AB CD", "name": "Invalid Symbol 4"},
+        ]
+
+        for request_data in test_cases:
+            # Act
+            response = client.post("/stocks", json=request_data)
+
+            # Assert
+            assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+            data = response.json()
+            assert "detail" in data
+
+    def test_create_stock_symbol_too_long(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when symbol exceeds 5 characters."""
+        # Arrange
+        request_data = {
+            "symbol": "TOOLONG",
+            "name": "Too Long Symbol Corp.",
+        }
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+
+    def test_create_stock_empty_name(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when name is empty."""
+        # Arrange
+        request_data = {
+            "symbol": "EMPT",
+            "name": "",
+        }
+
+        # Mock service to raise ValueError (domain validation)
+        mock_stock_service.create_stock.side_effect = ValueError(
+            "Company name cannot be empty"
+        )
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+        assert "Company name cannot be empty" in data["detail"]
+
+    def test_create_stock_missing_name(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when name is missing."""
+        # Arrange
+        request_data = {
+            "symbol": "MISS",
+        }
+
+        # Mock service to raise ValueError (domain validation)
+        mock_stock_service.create_stock.side_effect = ValueError(
+            "Company name is required"
+        )
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+        assert "Company name is required" in data["detail"]
+
+    def test_create_stock_name_too_long(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when name exceeds 200 characters."""
+        # Arrange
+        long_name = "A" * 201
+        request_data = {
+            "symbol": "LONG",
+            "name": long_name,
+        }
+
+        # Mock service to raise ValueError (domain validation)
+        mock_stock_service.create_stock.side_effect = ValueError(
+            "Company name cannot exceed 200 characters"
+        )
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+        assert "Company name cannot exceed 200 characters" in data["detail"]
+
+    def test_create_stock_invalid_grade(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 422 when grade is not A, B, C, D, or F."""
+        # Arrange
+        request_data = {
+            "symbol": "INVG",
+            "name": "Invalid Grade Corp.",
+            "grade": "Z",
+        }
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+        data = response.json()
+        assert "detail" in data
+
+    def test_create_stock_duplicate(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 400 when stock with symbol already exists."""
+        # Arrange
+        request_data = {
+            "symbol": "AAPL",
+            "name": "Apple Inc.",
+        }
+
+        # Mock service to raise ValueError for duplicate
+        mock_stock_service.create_stock.side_effect = ValueError(
+            "Stock with symbol AAPL already exists"
+        )
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        data = response.json()
+        assert "detail" in data
+        assert "already exists" in data["detail"]
+
+    def test_create_stock_symbol_sanitization(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should uppercase symbol and trim whitespace."""
+        # Arrange
+        request_data = {
+            "symbol": "  aapl  ",
+            "name": "Apple Inc.",
+        }
+
+        # Expected response DTO
+        created_stock = StockDto(
+            id="stock-007",
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector=None,
+            industry_group=None,
+            grade=None,
+            notes="",
+        )
+        mock_stock_service.create_stock.return_value = created_stock
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+        data = response.json()
+        assert data["symbol"] == "AAPL"
+
+        # Verify service was called with normalized symbol
+        mock_stock_service.create_stock.assert_called_once()
+        command = mock_stock_service.create_stock.call_args[0][0]
+        assert command.symbol == "AAPL"
+
+    def test_create_stock_whitespace_trimming(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should trim whitespace from all string fields."""
+        # Arrange
+        request_data = {
+            "symbol": "  TRIM  ",
+            "name": "  Trimmed Company  ",
+            "sector": "  Technology  ",
+            "industry_group": "  Software  ",
+            "notes": "  Some notes  ",
+        }
+
+        # Expected response DTO
+        created_stock = StockDto(
+            id="stock-008",
+            symbol="TRIM",
+            name="Trimmed Company",
+            sector="Technology",
+            industry_group="Software",
+            grade=None,
+            notes="Some notes",
+        )
+        mock_stock_service.create_stock.return_value = created_stock
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+
+        # Verify service was called with trimmed values
+        mock_stock_service.create_stock.assert_called_once()
+        command = mock_stock_service.create_stock.call_args[0][0]
+        assert command.symbol == "TRIM"
+        assert command.name == "Trimmed Company"
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
+        assert command.notes == "Some notes"
+
+    def test_create_stock_empty_strings_as_none(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should treat empty strings as None for optional fields."""
+        # Arrange
+        request_data = {
+            "symbol": "EMPT",
+            "name": "Empty Fields Corp.",
+            "sector": "",
+            "industry_group": "",
+            "grade": "",
+            "notes": "",
+        }
+
+        # Expected response DTO
+        created_stock = StockDto(
+            id="stock-009",
+            symbol="EMPT",
+            name="Empty Fields Corp.",
+            sector=None,
+            industry_group=None,
+            grade=None,
+            notes="",
+        )
+        mock_stock_service.create_stock.return_value = created_stock
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_201_CREATED
+
+        # Verify service was called with None for empty optional fields
+        mock_stock_service.create_stock.assert_called_once()
+        command = mock_stock_service.create_stock.call_args[0][0]
+        assert command.sector is None
+        assert command.industry_group is None
+        assert command.grade is None
+        assert command.notes == ""  # Notes can be empty string
+
+    def test_create_stock_service_error(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 500 when service raises unexpected error."""
+        # Arrange
+        request_data = {
+            "symbol": "ERR",
+            "name": "Error Corp.",
+        }
+
+        # Mock service to raise unexpected error
+        mock_stock_service.create_stock.side_effect = RuntimeError(
+            "Database connection failed"
+        )
+
+        # Act
+        response = client.post("/stocks", json=request_data)
+
+        # Assert
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+        data = response.json()
+        assert "detail" in data
+        assert data["detail"] == "Failed to create stock"
+        # Should not expose internal error details
+        assert "Database connection failed" not in data["detail"]

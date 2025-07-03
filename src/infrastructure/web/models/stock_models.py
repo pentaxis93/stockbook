@@ -119,6 +119,9 @@ class StockRequest(BaseModel):
         # Handle string input
         if isinstance(value, str):
             normalized = value.strip().upper()
+            # Treat empty string as None
+            if not normalized:
+                return None
             if normalized in ["A", "B", "C", "D", "F"]:
                 return normalized  # type: ignore[return-value]
         # If we get here, it's an invalid grade
