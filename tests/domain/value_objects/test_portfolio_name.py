@@ -370,3 +370,15 @@ class TestPortfolioNameEdgeCases:
         # Test that normal initialization works (covers base class __setattr__)
         name = PortfolioName("Valid name")
         assert name.value == "Valid name"
+
+    def test_portfolio_name_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        name = object.__new__(PortfolioName)
+
+        # This exercises the super().__setattr__ branch (line 73)
+        setattr(name, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        PortfolioName.__init__(name, "My Portfolio")
+        assert name.value == "My Portfolio"

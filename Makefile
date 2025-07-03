@@ -17,7 +17,7 @@ PRESENTATION_PATTERN := $(SRC_DIR)/presentation
 CONFIG_PATTERN := pyproject.toml setup.py dependency_injection hooks
 
 # Coverage thresholds
-MIN_COVERAGE := 80
+MIN_COVERAGE := 100
 
 # Parallel execution for pytest
 PYTEST_WORKERS := auto
@@ -121,13 +121,13 @@ typecheck-mypy: ## Run mypy type checker with caching
 .PHONY: test
 test: ## Run pytest with coverage
 	@echo "$(BLUE)Running pytest with coverage...$(NC)"
-	$(PYTHON) -m pytest -n $(PYTEST_WORKERS) --lf --ff -v
+	$(PYTHON) -m pytest -n $(PYTEST_WORKERS) --lf --ff -v --cov-fail-under=$(MIN_COVERAGE)
 	@echo "$(GREEN)✓ Tests complete$(NC)"
 
 .PHONY: test-fast
 test-fast: ## Run pytest with minimal output (faster)
 	@echo "$(BLUE)Running pytest (fast mode)...$(NC)"
-	$(PYTHON) -m pytest -n $(PYTEST_WORKERS) --lf --ff -q --tb=short
+	$(PYTHON) -m pytest -n $(PYTEST_WORKERS) --lf --ff -q --tb=short --cov-fail-under=$(MIN_COVERAGE)
 	@echo "$(GREEN)✓ Tests complete$(NC)"
 
 .PHONY: test-watch
@@ -141,6 +141,12 @@ coverage-report: ## Generate detailed coverage reports
 	$(PYTHON) -m coverage report
 	$(PYTHON) -m coverage html
 	@echo "$(GREEN)✓ Coverage reports generated in htmlcov/$(NC)"
+
+.PHONY: layer-coverage
+layer-coverage: ## Check layer-specific coverage thresholds
+	@echo "$(BLUE)Checking layer-specific coverage...$(NC)"
+	$(PYTHON) hooks/check-layer-coverage.py
+	@echo "$(GREEN)✓ Layer coverage check complete$(NC)"
 
 # Security targets
 .PHONY: security
@@ -168,7 +174,7 @@ complexity: ## Check cognitive complexity with flake8
 .PHONY: imports
 imports: ## Check import architecture with import-linter
 	@echo "$(BLUE)Checking import architecture...$(NC)"
-	$(PYTHON) -m importlinter
+	lint-imports
 	@echo "$(GREEN)✓ Import architecture check complete$(NC)"
 
 .PHONY: docstrings
@@ -183,19 +189,50 @@ docstrings-style: ## Check docstring style with pydocstyle
 .PHONY: docstrings-coverage
 docstrings-coverage: ## Check docstring coverage
 	@echo "$(BLUE)Checking docstring coverage...$(NC)"
-	$(PYTHON) -m docstr_coverage src/ --fail-under 100.0 --skip-magic --percentage-only
+	docstr-coverage src/ --fail-under 100.0 --skip-magic --percentage-only
 	@echo "$(GREEN)✓ Docstring coverage check complete$(NC)"
 
 # Main quality target (matches pre-commit hook)
 .PHONY: quality
-quality: ## Run all quality checks (same as pre-commit hook)
-	@echo "$(YELLOW)Running all quality checks...$(NC)"
-	@echo "$(YELLOW)This runs the same checks as the pre-commit hook$(NC)"
-	@bash hooks/run-quality-checks.sh
+quality: quality-parallel ## Run all quality checks including tests and coverage (same as pre-commit hook)
+
+# Parallel quality checks target for maximum performance
+.PHONY: quality-parallel
+quality-parallel: ## Run all quality checks in parallel for faster execution
+	@echo "$(YELLOW)Running all quality checks in parallel...$(NC)"
+	@echo "$(BLUE)Starting parallel execution of quality checks...$(NC)"
+	@failed=0; \
+	{ $(MAKE) -s lint-core 2>&1 | sed 's/^/[LINT-CORE] /' & \
+	  $(MAKE) -s lint-presentation 2>&1 | sed 's/^/[LINT-PRES] /' & \
+	  $(MAKE) -s lint-tests 2>&1 | sed 's/^/[LINT-TEST] /' & \
+	  $(MAKE) -s lint-config 2>&1 | sed 's/^/[LINT-CONF] /' & \
+	  $(MAKE) -s typecheck-pyright 2>&1 | sed 's/^/[PYRIGHT] /' & \
+	  $(MAKE) -s typecheck-mypy 2>&1 | sed 's/^/[MYPY] /' & \
+	  $(MAKE) -s test-fast 2>&1 | sed 's/^/[PYTEST] /' & \
+	  $(MAKE) -s complexity 2>&1 | sed 's/^/[FLAKE8] /' & \
+	  $(MAKE) -s imports 2>&1 | sed 's/^/[IMPORTS] /' & \
+	  $(MAKE) -s docstrings-style 2>&1 | sed 's/^/[DOCSTYLE] /' & \
+	  $(MAKE) -s docstrings-coverage 2>&1 | sed 's/^/[DOCCOV] /' & \
+	  $(MAKE) -s security-bandit 2>&1 | sed 's/^/[BANDIT] /' & \
+	  $(MAKE) -s security-pip-audit 2>&1 | sed 's/^/[PIP-AUDIT] /' & \
+	  wait; } || failed=1; \
+	{ $(MAKE) -s layer-coverage 2>&1 | sed 's/^/[LAYER-COV] /' || failed=1; }; \
+	if [ $$failed -eq 1 ]; then \
+		echo "$(RED)❌ One or more quality checks failed$(NC)"; \
+		exit 1; \
+	else \
+		echo "$(GREEN)✅ All quality checks passed!$(NC)"; \
+	fi
 
 # Combined targets
 .PHONY: all
 all: format quality ## Format code then run all quality checks
+
+.PHONY: check
+check: quality ## Alias for quality - runs all quality checks, tests, and coverage
+
+.PHONY: validate
+validate: quality ## Alias for quality - runs all quality checks, tests, and coverage
 
 .PHONY: ci
 ci: lint typecheck test security complexity imports docstrings ## Run all CI checks (no formatting)

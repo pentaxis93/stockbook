@@ -303,7 +303,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["."]
+source = ["src"]
 omit = [
     "*/tests/*",
     "*/test_*.py",
@@ -311,6 +311,12 @@ omit = [
     "*/venv/*",
     "setup.py",
     "conftest.py",
+    "*/site-packages/*",
+    "*/dist-packages/*",
+    "*/dependency_injector/*",
+    "*.pxd",
+    "dependency_injection/*",
+    "config.py",
 ]
 
 [tool.coverage.report]
@@ -340,8 +346,6 @@ typeCheckingMode = "strict"
 
 # Set python path to include project root for import resolution
 pythonPath = ["."]
-venvPath = "."
-venv = ".venv"
 
 # Strict type checking options
 reportUnknownParameterType = true

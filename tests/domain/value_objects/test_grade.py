@@ -123,3 +123,15 @@ class TestGradeValueObject:
         # Test that normal initialization works (covers line 71 - super().__setattr__)
         grade = Grade("A")
         assert grade.value == "A"
+
+    def test_grade_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        grade = object.__new__(Grade)
+
+        # This exercises the super().__setattr__ branch (line 71)
+        setattr(grade, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        Grade.__init__(grade, "B")
+        assert grade.value == "B"

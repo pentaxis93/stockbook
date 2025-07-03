@@ -157,6 +157,18 @@ class TestTargetStatusEquality:
         status = TargetStatus("active")
         assert status.value == "active"
 
+    def test_target_status_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        status = object.__new__(TargetStatus)
+
+        # This exercises the super().__setattr__ branch (line 69)
+        setattr(status, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        TargetStatus.__init__(status, "active")
+        assert status.value == "active"
+
     def test_target_status_hashable(self) -> None:
         """Should be hashable for use in collections."""
         active1 = TargetStatus("active")

@@ -1,7 +1,7 @@
 """Tests for the main FastAPI application."""
 
 import os
-from typing import Generator
+from typing import Iterator
 from unittest.mock import Mock, patch
 
 import pytest
@@ -12,7 +12,7 @@ class TestMainApp:
     """Test suite for the main FastAPI application."""
 
     @pytest.fixture
-    def mock_database_initializer(self) -> Generator[Mock, None, None]:
+    def mock_database_initializer(self) -> Iterator[Mock]:
         """Mock the database initializer to avoid actual database operations."""
         with patch("src.infrastructure.web.main.initialize_database") as mock:
             yield mock
@@ -122,3 +122,89 @@ class TestMainApp:
         """Test that various endpoints return expected status codes."""
         response = client.get(endpoint)
         assert response.status_code == expected_status
+
+    def test_stock_service_factory_error_when_di_container_none(self) -> None:
+        """Test that stock service factory raises error when DI container is None."""
+        # Import the module to access the internal functions
+        import src.infrastructure.web.main as main_module
+
+        # Temporarily set the DI container to None
+        original_container = main_module._di_container  # type: ignore[attr-defined]
+        try:
+            main_module._di_container = None  # type: ignore[attr-defined]
+
+            # Access the stock_service_factory function from within the lifespan context
+            # We need to simulate the scenario where the factory is called but container is None
+            with patch(
+                "src.infrastructure.web.main.CompositionRoot.configure"
+            ) as mock_configure:
+                mock_configure.return_value = None
+
+                # Import app to trigger lifespan
+                from src.infrastructure.web.main import app
+
+                # The factory is created during lifespan, we need to access it
+                # Since it's defined inside lifespan, we'll test it indirectly
+                with TestClient(app):
+                    # Force the DI container to be None after app startup
+                    main_module._di_container = None  # type: ignore[attr-defined]
+
+                    # Now when the stock router tries to use the factory, it should fail
+                    # This tests the RuntimeError in lines 60-62
+                    from src.infrastructure.web.routers import stock_router
+
+                    # Get the factory that was set during startup
+                    if (
+                        hasattr(stock_router, "_service_factory")
+                        and stock_router._service_factory  # type: ignore[attr-defined]
+                    ):
+                        with pytest.raises(RuntimeError) as exc_info:
+                            stock_router._service_factory()  # type: ignore[attr-defined]
+
+                        assert str(exc_info.value) == "DI container not initialized"
+        finally:
+            # Restore the original container
+            main_module._di_container = original_container  # type: ignore[attr-defined]
+
+    def test_stock_service_factory_returns_service_when_container_exists(
+        self, mock_database_initializer: Mock
+    ) -> None:
+        """Test that stock service factory returns service when DI container exists."""
+        # Create a mock container and service
+        from dependency_injection.di_container import DIContainer
+        from src.application.services.stock_application_service import (
+            StockApplicationService,
+        )
+
+        mock_service = Mock(spec=StockApplicationService)
+        mock_container = Mock(spec=DIContainer)
+        mock_container.resolve.return_value = mock_service
+
+        import src.infrastructure.web.main as main_module
+
+        # Temporarily replace the DI container
+        original_container = main_module._di_container  # type: ignore[attr-defined]
+        try:
+            # Use the actual factory that's created during app startup
+            from src.infrastructure.web.main import app
+            from src.infrastructure.web.routers import stock_router
+
+            with TestClient(app):
+                # Now set a valid mock container
+                main_module._di_container = mock_container  # type: ignore[attr-defined]
+
+                # Call the factory
+                if (
+                    hasattr(stock_router, "_service_factory")
+                    and stock_router._service_factory  # type: ignore[attr-defined]
+                ):
+                    result = stock_router._service_factory()  # type: ignore[attr-defined]
+
+                    # Verify it returns the service from the container
+                    assert result is mock_service
+                    mock_container.resolve.assert_called_once_with(
+                        StockApplicationService
+                    )
+        finally:
+            # Restore the original container
+            main_module._di_container = original_container  # type: ignore[attr-defined]

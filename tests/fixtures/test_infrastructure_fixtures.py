@@ -5,7 +5,7 @@ This module tests that all fixtures work correctly and provide
 the expected functionality for infrastructure testing.
 """
 
-# pyright: reportUnusedImport=false
+# pyright: reportUnusedImport=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUnusedCallResult=false, reportUnnecessaryTypeIgnoreComment=false
 
 from typing import List, cast
 from unittest.mock import Mock
@@ -212,13 +212,13 @@ class TestSQLAlchemyFixtures:
             symbol="ROLL",
             company_name="Rollback Test Co",
         )
-        sqlalchemy_connection.execute(stmt)  # type: ignore[no-untyped-call]
+        sqlalchemy_connection.execute(stmt)
 
         # Verify it exists in this transaction
-        result = sqlalchemy_connection.execute(  # type: ignore[no-untyped-call]
-            select(stock_table.c).where(stock_table.c.symbol == "ROLL")  # type: ignore[arg-type]
+        result = sqlalchemy_connection.execute(
+            select(stock_table).where(stock_table.c.symbol == "ROLL")  # type: ignore[arg-type]
         )
-        assert result.fetchone() is not None  # type: ignore[no-untyped-call]
+        assert result.fetchone() is not None
 
         # Note: After the test, the transaction will be rolled back
 
@@ -246,7 +246,7 @@ class TestSQLAlchemyFixtures:
         )
 
         with pytest.raises(IntegrityError):
-            sqlalchemy_connection.execute(stmt)  # type: ignore[no-untyped-call]
+            sqlalchemy_connection.execute(stmt)
 
     def test_sqlalchemy_seeding_functions(
         self, sqlalchemy_connection: Connection, sample_stocks: List[Stock]
@@ -256,17 +256,17 @@ class TestSQLAlchemyFixtures:
         seed_test_stocks_sqlalchemy(sqlalchemy_connection, sample_stocks)
 
         # Verify stocks were inserted
-        result = sqlalchemy_connection.execute(select(stock_table.c))  # type: ignore[no-untyped-call]
-        rows = result.fetchall()  # type: ignore[no-untyped-call]
-        assert len(rows) == len(sample_stocks)  # type: ignore[arg-type]
+        result = sqlalchemy_connection.execute(select(stock_table))  # type: ignore[arg-type]
+        rows = result.fetchall()
+        assert len(rows) == len(sample_stocks)
 
         # Verify specific stock
-        result = sqlalchemy_connection.execute(  # type: ignore[no-untyped-call]
-            select(stock_table.c).where(stock_table.c.symbol == "MSFT")  # type: ignore[arg-type]
+        result = sqlalchemy_connection.execute(
+            select(stock_table).where(stock_table.c.symbol == "MSFT")  # type: ignore[arg-type]
         )
-        row = result.fetchone()  # type: ignore[no-untyped-call]
+        row = result.fetchone()
         assert row is not None  # Type guard
-        assert row.company_name == "Microsoft Corporation"  # type: ignore[attr-defined]
+        assert row.company_name == "Microsoft Corporation"
 
     def test_sqlalchemy_portfolio_seeding(
         self, sqlalchemy_connection: Connection
@@ -282,10 +282,10 @@ class TestSQLAlchemyFixtures:
         )
 
         # Verify portfolio was created
-        result = sqlalchemy_connection.execute(  # type: ignore[no-untyped-call]
-            select(portfolio_table.c).where(portfolio_table.c.id == portfolio_id)  # type: ignore[arg-type]
+        result = sqlalchemy_connection.execute(
+            select(portfolio_table).where(portfolio_table.c.id == portfolio_id)  # type: ignore[arg-type]
         )
-        row = result.fetchone()  # type: ignore[no-untyped-call]
+        row = result.fetchone()
         assert row is not None
-        assert row.name == "Test Portfolio"  # type: ignore[attr-defined]
-        assert row.currency == "USD"  # type: ignore[attr-defined]
+        assert row.name == "Test Portfolio"
+        assert row.currency == "USD"

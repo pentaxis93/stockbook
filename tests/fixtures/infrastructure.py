@@ -72,7 +72,7 @@ def sqlalchemy_in_memory_engine() -> Generator[Engine, None, None]:
 
     # Enable foreign keys for SQLite
     with engine.begin() as conn:
-        conn.execute(text("PRAGMA foreign_keys = ON"))
+        _ = conn.execute(text("PRAGMA foreign_keys = ON"))
 
     yield engine
 
@@ -482,7 +482,7 @@ def seed_test_stocks_sqlalchemy(conn: Connection, stocks: List[Stock]) -> None:
             grade=stock.grade.value if stock.grade else None,
             notes=stock.notes.value,
         )
-        conn.execute(stmt)
+        _ = conn.execute(stmt)
     # Don't commit here - let the caller manage transactions
 
 
@@ -506,6 +506,6 @@ def seed_test_portfolio_sqlalchemy(
         description=f"Test portfolio created at {datetime.now(timezone.utc)}",
         currency="USD",
     )
-    conn.execute(stmt)
+    _ = conn.execute(stmt)
     # Don't commit here - let the caller manage transactions
     return portfolio_id

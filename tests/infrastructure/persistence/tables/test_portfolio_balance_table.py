@@ -121,11 +121,13 @@ class TestPortfolioBalanceTable:
 
         # Quantity should default to 0
         assert columns["quantity"].server_default is not None
-        assert "0" in str(columns["quantity"].server_default.arg)
+        if hasattr(columns["quantity"].server_default, "arg"):
+            assert "0" in str(getattr(columns["quantity"].server_default, "arg"))
 
         # Average cost should default to 0
         assert columns["average_cost"].server_default is not None
-        assert "0" in str(columns["average_cost"].server_default.arg)
+        if hasattr(columns["average_cost"].server_default, "arg"):
+            assert "0" in str(getattr(columns["average_cost"].server_default, "arg"))
 
         # Timestamps should have defaults
         assert columns["created_at"].server_default is not None

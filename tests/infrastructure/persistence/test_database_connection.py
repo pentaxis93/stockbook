@@ -96,7 +96,7 @@ class TestSqlAlchemyConnectionExecute:
         # Arrange
         mock_connection = Mock(spec=Connection)
         mock_connection.execute.side_effect = DatabaseError(
-            "Connection lost", params={}, orig=None
+            "Connection lost", params={}, orig=Exception()
         )
 
         adapter = SqlAlchemyConnection(mock_connection)
@@ -110,25 +110,10 @@ class TestSqlAlchemyConnectionExecute:
 class TestSqlAlchemyConnectionCommit:
     """Test the commit method of SqlAlchemyConnection."""
 
-    def test_commit_delegates_to_transaction(self) -> None:
-        """Should delegate commit to the connection's transaction."""
+    def test_commit_delegates_to_connection(self) -> None:
+        """Should delegate commit to the connection if it has commit method."""
         # Arrange
         mock_connection = Mock(spec=Connection)
-        mock_transaction = Mock()
-        mock_connection._transaction = mock_transaction
-        adapter = SqlAlchemyConnection(mock_connection)
-
-        # Act
-        adapter.commit()
-
-        # Assert
-        mock_transaction.commit.assert_called_once()
-
-    def test_commit_with_connection_commit_method(self) -> None:
-        """Should use connection.commit() if available."""
-        # Arrange
-        mock_connection = Mock(spec=Connection)
-        mock_connection._transaction = None  # No active transaction
         mock_connection.commit = Mock()
         adapter = SqlAlchemyConnection(mock_connection)
 
@@ -137,6 +122,19 @@ class TestSqlAlchemyConnectionCommit:
 
         # Assert
         mock_connection.commit.assert_called_once()
+
+    def test_commit_with_no_commit_method(self) -> None:
+        """Should handle gracefully when connection has no commit method."""
+        # Arrange
+        mock_connection = Mock(spec=Connection)
+        # Don't add commit method to mock
+        delattr(mock_connection, "commit")
+        adapter = SqlAlchemyConnection(mock_connection)
+
+        # Act - should not raise
+        adapter.commit()
+
+        # Assert - nothing to assert, just checking it doesn't raise
 
     def test_commit_returns_none(self) -> None:
         """Should return None when called."""
@@ -155,19 +153,18 @@ class TestSqlAlchemyConnectionCommit:
 class TestSqlAlchemyConnectionRollback:
     """Test the rollback method of SqlAlchemyConnection."""
 
-    def test_rollback_delegates_to_transaction(self) -> None:
-        """Should delegate rollback to the connection's transaction."""
+    def test_rollback_delegates_to_connection(self) -> None:
+        """Should delegate rollback to the connection if it has rollback method."""
         # Arrange
         mock_connection = Mock(spec=Connection)
-        mock_transaction = Mock()
-        mock_connection._transaction = mock_transaction
+        mock_connection.rollback = Mock()
         adapter = SqlAlchemyConnection(mock_connection)
 
         # Act
         adapter.rollback()
 
         # Assert
-        mock_transaction.rollback.assert_called_once()
+        mock_connection.rollback.assert_called_once()
 
     def test_rollback_returns_none(self) -> None:
         """Should return None when called."""
@@ -202,7 +199,7 @@ class TestSqlAlchemyConnectionClose:
         # Arrange
         mock_connection = Mock(spec=Connection)
         mock_connection.close.side_effect = DatabaseError(
-            "Cannot close", params={}, orig=None
+            "Cannot close", params={}, orig=Exception()
         )
 
         adapter = SqlAlchemyConnection(mock_connection)

@@ -94,8 +94,8 @@ class TestDatabaseInitializer:
 
         # Insert some test data
         engine = sa.create_engine(f"sqlite:///{temp_db_path}")
-        with engine.begin() as conn:  # type: ignore[attr-defined]
-            conn.execute(  # type: ignore[attr-defined]
+        with engine.begin() as conn:
+            _ = conn.execute(
                 sa.text("INSERT INTO stocks (id, symbol) VALUES (:id, :symbol)"),
                 {"id": "test-id", "symbol": "AAPL"},
             )
@@ -104,8 +104,8 @@ class TestDatabaseInitializer:
         initialize_database(temp_db_path)
 
         # Verify data is still there
-        with engine.connect() as conn:  # type: ignore[attr-defined]
-            result = conn.execute(  # type: ignore[attr-defined]
+        with engine.connect() as conn:
+            result = conn.execute(
                 sa.text("SELECT symbol FROM stocks WHERE id = :id"), {"id": "test-id"}
             ).fetchone()
             assert result is not None

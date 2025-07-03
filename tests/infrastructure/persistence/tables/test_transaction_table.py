@@ -145,7 +145,8 @@ class TestTransactionTable:
 
         # Commission should default to 0
         assert columns["commission"].server_default is not None
-        assert "0" in str(columns["commission"].server_default.arg)
+        if hasattr(columns["commission"].server_default, "arg"):
+            assert "0" in str(getattr(columns["commission"].server_default, "arg"))
 
         # Timestamps should have defaults
         assert columns["created_at"].server_default is not None

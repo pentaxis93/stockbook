@@ -366,3 +366,15 @@ class TestIndexChangeEdgeCases:
         assert change != 123
         assert change != None
         assert change != {"value": 5.25}
+
+    def test_index_change_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        change = object.__new__(IndexChange)
+
+        # This exercises the super().__setattr__ branch (line 84)
+        setattr(change, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        IndexChange.__init__(change, 5.25)
+        assert change.value == 5.25

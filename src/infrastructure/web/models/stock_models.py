@@ -5,7 +5,7 @@ Provides Pydantic models for request/response validation and serialization
 for stock-related API endpoints.
 """
 
-from typing import Any, Literal, Optional, Self, Union
+from typing import Any, List, Literal, Optional, Self, Union
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -234,3 +234,32 @@ class StockResponse(BaseModel):
             grade=dto.grade,
             notes=dto.notes,
         )
+
+
+class StockListResponse(BaseModel):
+    """
+    Response model for a list of stocks.
+
+    Provides paginated response format for stock listings.
+    """
+
+    stocks: List[StockResponse]
+    total: int
+
+    model_config = ConfigDict(
+        frozen=True,  # Make immutable
+    )
+
+    @classmethod
+    def from_dto_list(cls, dtos: List[StockDto]) -> "StockListResponse":
+        """
+        Create response from list of StockDto objects.
+
+        Args:
+            dtos: List of stock DTOs from application layer
+
+        Returns:
+            StockListResponse instance
+        """
+        stocks = [StockResponse.from_dto(dto) for dto in dtos]
+        return cls(stocks=stocks, total=len(stocks))

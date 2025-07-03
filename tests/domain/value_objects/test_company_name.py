@@ -119,3 +119,18 @@ class TestCompanyName:
             _ = CompanyName("A" * 201)  # Too long, should raise ValueError
         except ValueError:
             pass  # Expected, we just want to exercise the exception path
+
+    def test_company_name_unexpected_value_error(self) -> None:
+        """Test CompanyName handles unexpected ValueError from parent class."""
+        from unittest.mock import patch
+
+        # Mock the parent class to raise an unexpected ValueError
+        with patch(
+            "src.domain.value_objects.company_name.BaseTextValueObject.__init__"
+        ) as mock_init:
+            mock_init.side_effect = ValueError("Unexpected error from parent")
+
+            # The CompanyName class should re-raise the original exception
+            # since it doesn't contain "cannot exceed"
+            with pytest.raises(ValueError, match="Unexpected error from parent"):
+                _ = CompanyName("Test")

@@ -363,3 +363,16 @@ class TestJournalContentEdgeCases:
         # Test that normal initialization works (covers base class __setattr__)
         content = JournalContent("Valid content")
         assert content.value == "Valid content"
+
+    def test_journal_content_unexpected_value_error(self) -> None:
+        """Test JournalContent handles unexpected ValueError from parent class."""
+        from unittest.mock import patch
+
+        # Mock the parent class to raise an unexpected ValueError (not "cannot be empty" or "cannot exceed")
+        with patch(
+            "src.domain.value_objects.journal_content.BaseTextValueObject.__init__"
+        ) as mock_init:
+            mock_init.side_effect = ValueError("Unexpected validation error")
+
+            with pytest.raises(ValueError, match="Unexpected validation error"):
+                _ = JournalContent("Test content")

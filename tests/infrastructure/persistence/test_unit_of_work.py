@@ -424,7 +424,7 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
         # Arrange
         mock_engine = Mock(spec=Engine)
         mock_engine.connect.side_effect = DatabaseError(
-            "Cannot connect", params={}, orig=None
+            "Cannot connect", params={}, orig=Exception()
         )
 
         uow = SqlAlchemyUnitOfWork(mock_engine)
@@ -442,7 +442,7 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
 
         mock_engine.connect.return_value = mock_connection
         mock_connection.begin.side_effect = DatabaseError(
-            "Cannot begin transaction", params={}, orig=None
+            "Cannot begin transaction", params={}, orig=Exception()
         )
         mock_connection.__enter__ = Mock(return_value=mock_connection)
         mock_connection.__exit__ = Mock(return_value=None)

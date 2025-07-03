@@ -107,3 +107,24 @@ class TestIndustryGroup:
         assert industry != 123
         assert industry != None
         assert industry != {"value": "Technology"}
+
+    def test_industry_group_base_class_coverage(self) -> None:
+        """Test base class coverage for IndustryGroup missing lines."""
+        # Test that normal initialization works (covers line 69 - super().__setattr__)
+        industry = IndustryGroup("Valid Industry")
+        assert industry.value == "Valid Industry"
+
+        # The __setattr__ is called during initialization to set _value
+        # This test ensures the initialization path is covered
+
+    def test_industry_group_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        industry = object.__new__(IndustryGroup)
+
+        # This exercises the super().__setattr__ branch (line 69)
+        setattr(industry, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        IndustryGroup.__init__(industry, "Technology")
+        assert industry.value == "Technology"

@@ -5,7 +5,7 @@ Tests the complete integration of Unit of Work, repositories,
 and SQLAlchemy with an in-memory SQLite database.
 """
 
-# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportCallIssue=false, reportArgumentType=false
 # mypy: disable-error-code="no-untyped-call"
 
 from typing import Generator

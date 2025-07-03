@@ -106,7 +106,7 @@ class StockSymbol:
         try:
             normalized = cls.normalize(symbol)
             return cls._is_valid_format(normalized)
-        except (ValueError, TypeError):
+        except (ValueError, TypeError, AttributeError):
             return False
 
     @classmethod

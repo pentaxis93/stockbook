@@ -148,9 +148,34 @@ class TestStockSymbol:
 
     def test_stock_symbol_base_class_coverage(self) -> None:
         """Test base class coverage for StockSymbol missing lines."""
-        # Test that normal initialization works (covers line 62 - super().__setattr__)
+        # Test that normal initialization works (covers __setattr__ during init)
         symbol = StockSymbol("AAPL")
         assert symbol.value == "AAPL"
+
+    def test_stock_symbol_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        symbol = object.__new__(StockSymbol)
+
+        # This exercises the super().__setattr__ branch (line 62)
+        setattr(symbol, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        StockSymbol.__init__(symbol, "AAPL")
+        assert symbol.value == "AAPL"
+
+    def test_stock_symbol_is_valid_with_type_error(self) -> None:
+        """Test is_valid returns False when normalize raises TypeError."""
+        # Pass None which will cause TypeError in normalize
+        assert StockSymbol.is_valid(None) is False  # type: ignore[arg-type]
+
+    def test_stock_symbol_is_valid_with_non_string_types(self) -> None:
+        """Test is_valid returns False for various non-string types."""
+        # These should all cause TypeError in normalize and return False
+        assert StockSymbol.is_valid(123) is False  # type: ignore[arg-type]
+        assert StockSymbol.is_valid([]) is False  # type: ignore[arg-type]
+        assert StockSymbol.is_valid({}) is False  # type: ignore[arg-type]
+        assert StockSymbol.is_valid(object()) is False  # type: ignore[arg-type]
 
         # Test exception handling in is_valid with invalid symbols (covers lines 109-110)
         # This will trigger ValueError that gets caught and returns False

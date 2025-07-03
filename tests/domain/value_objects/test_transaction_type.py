@@ -162,6 +162,16 @@ class TestTransactionTypeEquality:
         assert str(transaction_type) == "buy"
 
         # Test hash method (covers line 85)
-        transaction_type1 = TransactionType("buy")
-        transaction_type2 = TransactionType("buy")
-        assert hash(transaction_type1) == hash(transaction_type2)
+        assert hash(transaction_type) == hash("buy")
+
+    def test_transaction_type_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        transaction_type = object.__new__(TransactionType)
+
+        # This exercises the super().__setattr__ branch (line 91)
+        setattr(transaction_type, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        TransactionType.__init__(transaction_type, "buy")
+        assert transaction_type.value == "buy"

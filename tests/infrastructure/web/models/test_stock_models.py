@@ -635,3 +635,171 @@ class TestStockModelsIntegration:
         assert any("Symbol cannot be empty" in msg for msg in error_messages)
         # Check for grade validation error instead
         assert any("Grade must be one of" in msg for msg in error_messages)
+
+
+class TestStockListResponse:
+    """Test suite for StockListResponse model."""
+
+    def test_from_dto_list_empty_list(self) -> None:
+        """Should handle empty list of DTOs."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        result = StockListResponse.from_dto_list([])
+
+        assert result.stocks == []
+        assert result.total == 0
+
+    def test_from_dto_list_single_dto(self) -> None:
+        """Should convert single DTO to list response."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        dto = StockDto(
+            id="stock-123",
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            grade="A",
+        )
+
+        result = StockListResponse.from_dto_list([dto])
+
+        assert len(result.stocks) == 1
+        assert result.total == 1
+        assert result.stocks[0].id == "stock-123"
+        assert result.stocks[0].symbol == "AAPL"
+        assert result.stocks[0].name == "Apple Inc."
+
+    def test_from_dto_list_multiple_dtos(self) -> None:
+        """Should convert multiple DTOs to list response."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        dtos = [
+            StockDto(
+                id="stock-123",
+                symbol="AAPL",
+                name="Apple Inc.",
+                sector="Technology",
+                grade="A",
+            ),
+            StockDto(
+                id="stock-456",
+                symbol="MSFT",
+                name="Microsoft Corporation",
+                sector="Technology",
+                grade="A",
+            ),
+            StockDto(
+                id="stock-789",
+                symbol="GOOGL",
+                name="Alphabet Inc.",
+                sector="Technology",
+                grade="B",
+            ),
+        ]
+
+        result = StockListResponse.from_dto_list(dtos)
+
+        assert len(result.stocks) == 3
+        assert result.total == 3
+
+        # Verify all stocks are converted correctly
+        symbols = [stock.symbol for stock in result.stocks]
+        assert "AAPL" in symbols
+        assert "MSFT" in symbols
+        assert "GOOGL" in symbols
+
+    def test_from_dto_list_preserves_order(self) -> None:
+        """Should preserve the order of DTOs in the response."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        dtos = [
+            StockDto(id="1", symbol="AAPL"),
+            StockDto(id="2", symbol="MSFT"),
+            StockDto(id="3", symbol="GOOGL"),
+        ]
+
+        result = StockListResponse.from_dto_list(dtos)
+
+        assert result.stocks[0].symbol == "AAPL"
+        assert result.stocks[1].symbol == "MSFT"
+        assert result.stocks[2].symbol == "GOOGL"
+
+    def test_from_dto_list_with_optional_fields(self) -> None:
+        """Should handle DTOs with optional fields correctly."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        dtos = [
+            StockDto(
+                id=None,  # No ID
+                symbol="AAPL",
+                name=None,  # No name
+                sector=None,  # No sector
+                industry_group=None,
+                grade=None,
+                notes="",
+            ),
+            StockDto(
+                id="stock-123",
+                symbol="MSFT",
+                name="Microsoft Corporation",
+                sector="Technology",
+                industry_group="Software",
+                grade="A",
+                notes="Leading software company",
+            ),
+        ]
+
+        result = StockListResponse.from_dto_list(dtos)
+
+        assert result.total == 2
+
+        # First stock with minimal fields
+        assert result.stocks[0].id is None
+        assert result.stocks[0].symbol == "AAPL"
+        assert result.stocks[0].name is None
+        assert result.stocks[0].sector is None
+
+        # Second stock with all fields
+        assert result.stocks[1].id == "stock-123"
+        assert result.stocks[1].symbol == "MSFT"
+        assert result.stocks[1].name == "Microsoft Corporation"
+        assert result.stocks[1].sector == "Technology"
+
+    def test_stock_list_response_immutability(self) -> None:
+        """Should be immutable after creation."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        response = StockListResponse(stocks=[], total=0)
+
+        with pytest.raises(ValidationError):
+            response.total = 10
+
+    def test_stock_list_response_json_serialization(self) -> None:
+        """Should serialize to JSON correctly."""
+        from src.infrastructure.web.models.stock_models import StockListResponse
+
+        stocks = [
+            StockResponse(
+                id="stock-123",
+                symbol="AAPL",
+                name="Apple Inc.",
+                sector="Technology",
+                grade="A",
+            ),
+            StockResponse(
+                id="stock-456",
+                symbol="MSFT",
+                name="Microsoft Corporation",
+                sector="Technology",
+                grade="A",
+            ),
+        ]
+
+        response = StockListResponse(stocks=stocks, total=2)
+
+        json_data = response.model_dump()
+
+        assert json_data["total"] == 2
+        assert len(json_data["stocks"]) == 2
+        assert json_data["stocks"][0]["symbol"] == "AAPL"
+        assert json_data["stocks"][1]["symbol"] == "MSFT"

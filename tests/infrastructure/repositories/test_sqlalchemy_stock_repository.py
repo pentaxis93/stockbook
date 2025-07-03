@@ -220,7 +220,7 @@ class TestSqlAlchemyStockRepositoryCreate:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.IntegrityError(
-            "UNIQUE constraint failed: stocks.symbol", params={}, orig=None
+            "UNIQUE constraint failed: stocks.symbol", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -239,7 +239,7 @@ class TestSqlAlchemyStockRepositoryCreate:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -251,6 +251,28 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         # Act & Assert
         with pytest.raises(exc.DatabaseError):
+            repository.create(stock)
+
+    def test_create_propagates_non_symbol_integrity_errors(self) -> None:
+        """Should re-raise IntegrityError that's not related to symbol constraint."""
+        # Arrange
+        mock_connection = Mock(spec=IDatabaseConnection)
+        # Simulate a foreign key constraint violation (not symbol-related)
+        mock_connection.execute.side_effect = exc.IntegrityError(
+            "Foreign key constraint violation", params={}, orig=Exception()
+        )
+
+        repository = SqlAlchemyStockRepository(mock_connection)
+
+        stock = Stock(
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        # Act & Assert - Should re-raise the IntegrityError
+        with pytest.raises(
+            exc.IntegrityError, match="Foreign key constraint violation"
+        ):
             repository.create(stock)
 
 
@@ -566,7 +588,7 @@ class TestSqlAlchemyStockRepositoryGetById:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -686,7 +708,7 @@ class TestSqlAlchemyStockRepositoryGetAll:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -795,7 +817,7 @@ class TestSqlAlchemyStockRepositoryUpdate:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -814,7 +836,7 @@ class TestSqlAlchemyStockRepositoryUpdate:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.IntegrityError(
-            "UNIQUE constraint failed: stocks.symbol", params={}, orig=None
+            "UNIQUE constraint failed: stocks.symbol", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -826,6 +848,28 @@ class TestSqlAlchemyStockRepositoryUpdate:
 
         # Act & Assert
         with pytest.raises(ValueError, match="Stock with symbol MSFT already exists"):
+            repository.update("test-id", stock)
+
+    def test_update_propagates_non_symbol_integrity_errors(self) -> None:
+        """Should re-raise IntegrityError that's not related to symbol constraint."""
+        # Arrange
+        mock_connection = Mock(spec=IDatabaseConnection)
+        # Simulate a foreign key constraint violation (not symbol-related)
+        mock_connection.execute.side_effect = exc.IntegrityError(
+            "Foreign key constraint violation", params={}, orig=Exception()
+        )
+
+        repository = SqlAlchemyStockRepository(mock_connection)
+
+        stock = Stock(
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+        )
+
+        # Act & Assert - Should re-raise the IntegrityError
+        with pytest.raises(
+            exc.IntegrityError, match="Foreign key constraint violation"
+        ):
             repository.update("test-id", stock)
 
 
@@ -880,7 +924,7 @@ class TestSqlAlchemyStockRepositoryDelete:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -894,7 +938,7 @@ class TestSqlAlchemyStockRepositoryDelete:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.IntegrityError(
-            "FOREIGN KEY constraint failed", params={}, orig=None
+            "FOREIGN KEY constraint failed", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -951,7 +995,7 @@ class TestSqlAlchemyStockRepositoryExistsBySymbol:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)
@@ -1244,7 +1288,7 @@ class TestSqlAlchemyStockRepositorySearchStocks:
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         mock_connection.execute.side_effect = exc.DatabaseError(
-            "Database connection lost", params={}, orig=None
+            "Database connection lost", params={}, orig=Exception()
         )
 
         repository = SqlAlchemyStockRepository(mock_connection)

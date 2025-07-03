@@ -5,13 +5,18 @@ repos:
     hooks:
       - id: black
         language_version: python3
+        always_run: true
+        pass_filenames: false
+        args: ["."]
 
   # isort import sorting with autostage  
   - repo: https://github.com/pycqa/isort
     rev: 6.0.1
     hooks:
       - id: isort
-        args: ["--profile", "black"]
+        args: ["--profile", "black", "."]
+        always_run: true
+        pass_filenames: false
 
   # Pyright type checking for core infrastructure
   - repo: https://github.com/RobertCraigie/pyright-python
@@ -20,8 +25,17 @@ repos:
       - id: pyright
         name: Type check all business logic layers with pyright
         args: ["--project", "pyproject.toml"]
-        files: ^(src/infrastructure/persistence|src/infrastructure/repositories|src/application|src/domain|src/presentation)/.*\.py$
-        additional_dependencies: []
+        always_run: true
+        pass_filenames: false
+        additional_dependencies: [
+          sqlalchemy>=2.0.36,
+          dependency-injector>=4.48.1,
+          pytest>=8.3.4,
+          pydantic>=2.9.2,
+          fastapi>=0.115.6,
+          nanoid>=2.0.0,
+          httpx>=0.28.1
+        ]
 
   # Custom quality checks (pylint, tests) that don't modify files
   - repo: local

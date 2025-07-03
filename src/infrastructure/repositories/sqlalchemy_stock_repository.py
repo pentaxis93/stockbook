@@ -88,7 +88,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             Stock domain entity or None if not found
         """
         # Create select statement
-        stmt = select(stock_table.c).where(stock_table.c.symbol == symbol.value)
+        stmt = select(stock_table).where(stock_table.c.symbol == symbol.value)
 
         # Execute query
         result = self._connection.execute(stmt)
@@ -165,7 +165,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             Stock domain entity or None if not found
         """
         # Create select statement
-        stmt = select(stock_table.c).where(stock_table.c.id == stock_id)
+        stmt = select(stock_table).where(stock_table.c.id == stock_id)
 
         # Execute query
         result = self._connection.execute(stmt)
@@ -187,7 +187,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             List of Stock domain entities
         """
         # Create select statement for all stocks
-        stmt = select(stock_table.c)
+        stmt = select(stock_table)
 
         # Execute query
         result = self._connection.execute(stmt)
@@ -325,7 +325,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             exc.DatabaseError: For database errors
         """
         # Start with base select statement
-        stmt = select(stock_table.c)
+        stmt = select(stock_table)
 
         # Apply filters dynamically
         if symbol_filter:

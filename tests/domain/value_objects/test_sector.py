@@ -67,6 +67,18 @@ class TestSectorValueObject:
         sector = Sector("Technology")
         assert sector.value == "Technology"
 
+    def test_sector_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        sector = object.__new__(Sector)
+
+        # This exercises the super().__setattr__ branch (line 71)
+        setattr(sector, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        Sector.__init__(sector, "Technology")
+        assert sector.value == "Technology"
+
     def test_sector_hash(self) -> None:
         """Test sector can be used as dictionary key."""
         sector1 = Sector("Technology")

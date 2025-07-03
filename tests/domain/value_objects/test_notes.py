@@ -138,3 +138,30 @@ class TestNotes:
             _ = Notes("A" * 1001)  # Too long, should raise ValueError
         except ValueError:
             pass  # Expected, we just want to exercise the exception path
+
+    def test_notes_unexpected_value_error(self) -> None:
+        """Test Notes handles unexpected ValueError from parent class."""
+        from unittest.mock import patch
+
+        # Mock the parent class to raise an unexpected ValueError
+        with patch(
+            "src.domain.value_objects.notes.BaseTextValueObject.__init__"
+        ) as mock_init:
+            mock_init.side_effect = ValueError("Unexpected error from parent")
+
+            # The Notes class should re-raise the original exception
+            # since it doesn't contain "cannot exceed"
+            with pytest.raises(ValueError, match="Unexpected error from parent"):
+                _ = Notes("Test notes")
+
+    def test_notes_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # Create a partially initialized object
+        notes = object.__new__(Notes)
+
+        # This exercises the super().__setattr__ branch (line 88)
+        setattr(notes, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        Notes.__init__(notes, "Test notes content")
+        assert notes.value == "Test notes content"

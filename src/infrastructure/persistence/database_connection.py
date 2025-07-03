@@ -63,11 +63,8 @@ class SqlAlchemyConnection:
 
         Note: This commits the transaction started with begin().
         """
-        # Get the current transaction and commit it
-        if hasattr(self._connection, "_transaction") and self._connection._transaction:
-            self._connection._transaction.commit()
-        # For newer SQLAlchemy versions, commit the connection itself
-        elif hasattr(self._connection, "commit"):
+        # Use the public API to commit
+        if hasattr(self._connection, "commit"):
             self._connection.commit()
 
     def rollback(self) -> None:
@@ -76,11 +73,8 @@ class SqlAlchemyConnection:
 
         Note: This rolls back the transaction started with begin().
         """
-        # Get the current transaction and rollback
-        if hasattr(self._connection, "_transaction") and self._connection._transaction:
-            self._connection._transaction.rollback()
-        # For newer SQLAlchemy versions, rollback the connection itself
-        elif hasattr(self._connection, "rollback"):
+        # Use the public API to rollback
+        if hasattr(self._connection, "rollback"):
             self._connection.rollback()
 
     def close(self) -> None:

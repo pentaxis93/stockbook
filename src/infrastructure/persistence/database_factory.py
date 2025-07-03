@@ -36,7 +36,7 @@ def create_engine(
         TypeError: If db_path is not a string or Path
         ValueError: If db_path is empty
     """
-    # Validate input
+    # Validate input type (needed for runtime safety even though type checker knows the types)
     if not isinstance(
         db_path, (str, Path)
     ):  # pyright: ignore[reportUnnecessaryIsInstance]
@@ -66,7 +66,7 @@ def create_engine(
     )
 
     # Configure SQLite pragmas
-    @event.listens_for(engine, "connect")  # type: ignore[misc,no-untyped-call]
+    @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_conn: Any, connection_record: Any) -> None:
         """Configure SQLite pragmas on each connection."""
         configure_sqlite_pragmas(dbapi_conn, enable_foreign_keys=True)

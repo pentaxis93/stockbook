@@ -240,6 +240,48 @@ class TestCreateStockCommand:
         )
         assert command.grade is None
 
+    def test_create_stock_command_base_class_coverage(self) -> None:
+        """Test base class coverage for CreateStockCommand missing lines."""
+        # Test that normal initialization works (covers line 94 - super().__setattr__)
+        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        assert command.symbol == "AAPL"
+        assert command.name == "Apple Inc."
+
+        # The __setattr__ is called during initialization to set internal attributes
+        # This test ensures the initialization path is covered
+
+    def test_create_stock_command_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # During initialization, __setattr__ should allow setting attributes
+        # This specifically tests the super().__setattr__ branch (line 94)
+
+        # Create a partially initialized object to test __setattr__ behavior
+        # We'll use object.__new__ to create an instance without calling __init__
+        command = object.__new__(CreateStockCommand)
+
+        # At this point, the object has no _symbol attribute, so __setattr__ should work
+        # This directly exercises the super().__setattr__ branch
+        setattr(command, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        CreateStockCommand.__init__(
+            command,
+            symbol="MSFT",
+            name="Microsoft Corporation",
+            sector="Technology",
+            industry_group="Software",
+            grade="A",
+            notes="Leading software company",
+        )
+
+        # Verify all attributes were set correctly
+        assert command.symbol == "MSFT"
+        assert command.name == "Microsoft Corporation"
+        assert command.sector == "Technology"
+        assert command.industry_group == "Software"
+        assert command.grade == "A"
+        assert command.notes == "Leading software company"
+
 
 class TestUpdateStockCommand:
     """Test suite for UpdateStockCommand."""
@@ -560,3 +602,45 @@ class TestUpdateStockCommand:
         # This ensures coverage of None branch in _normalize_name
         command = UpdateStockCommand(stock_id="test-stock-1", name=None)
         assert command.name is None
+
+    def test_update_stock_command_base_class_coverage(self) -> None:
+        """Test base class coverage for UpdateStockCommand missing lines."""
+        # Test that normal initialization works (covers line 378 - super().__setattr__)
+        command = UpdateStockCommand(stock_id="test-stock-1", name="Updated Name")
+        assert command.stock_id == "test-stock-1"
+        assert command.name == "Updated Name"
+
+        # The __setattr__ is called during initialization to set internal attributes
+        # This test ensures the initialization path is covered
+
+    def test_update_stock_command_setattr_during_initialization(self) -> None:
+        """Test that __setattr__ allows setting attributes during initialization."""
+        # During initialization, __setattr__ should allow setting attributes
+        # This specifically tests the super().__setattr__ branch (line 378)
+
+        # Create a partially initialized object to test __setattr__ behavior
+        # We'll use object.__new__ to create an instance without calling __init__
+        command = object.__new__(UpdateStockCommand)
+
+        # At this point, the object has no _stock_id attribute, so __setattr__ should work
+        # This directly exercises the super().__setattr__ branch
+        setattr(command, "test_attr", "test_value")
+
+        # Now properly initialize the object
+        UpdateStockCommand.__init__(
+            command,
+            stock_id="test-id-123",
+            name="Updated Company Name",
+            sector="Healthcare",
+            industry_group="Pharmaceuticals",
+            grade="B",
+            notes="Updated notes with more details",
+        )
+
+        # Verify all attributes were set correctly
+        assert command.stock_id == "test-id-123"
+        assert command.name == "Updated Company Name"
+        assert command.sector == "Healthcare"
+        assert command.industry_group == "Pharmaceuticals"
+        assert command.grade == "B"
+        assert command.notes == "Updated notes with more details"
