@@ -75,7 +75,6 @@ class MockStockRepository(IStockRepository):
         self,
         symbol_filter: Optional[str] = None,
         name_filter: Optional[str] = None,
-        sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
         grade_filter: Optional[str] = None,
     ) -> List[Stock]:
@@ -91,12 +90,6 @@ class MockStockRepository(IStockRepository):
                 for s in results
                 if s.company_name
                 and name_filter.lower() in s.company_name.value.lower()
-            ]
-        if sector_filter:
-            results = [
-                s
-                for s in results
-                if s.sector and sector_filter.lower() in s.sector.value.lower()
             ]
         if industry_filter:
             results = [

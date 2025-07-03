@@ -54,7 +54,6 @@ async def get_stocks(
     symbol: Annotated[
         Optional[str], Query(description="Filter by stock symbol (partial match)")
     ] = None,
-    sector: Annotated[Optional[str], Query(description="Filter by sector")] = None,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockListResponse:
     """
@@ -62,7 +61,6 @@ async def get_stocks(
 
     Query parameters:
     - symbol: Filter by stock symbol (partial match, case-insensitive)
-    - sector: Filter by sector
 
     Returns:
         StockListResponse containing filtered stocks and total count
@@ -78,20 +76,13 @@ async def get_stocks(
         else:
             symbol = None
 
-        if sector is not None and sector.strip():
-            sector = sector.strip()
-            has_filters = True
-        else:
-            sector = None
-
         # Use appropriate service method based on filters
         if has_filters:
             # Use search_stocks with filters
-            # Note: sector parameter maps to industry_filter in the service
             stock_dtos = service.search_stocks(
                 symbol_filter=symbol,
                 name_filter=None,  # Not exposed in API
-                industry_filter=sector,  # Sector maps to industry_filter
+                industry_filter=None,  # Not exposed in API
             )
         else:
             # No filters - get all stocks

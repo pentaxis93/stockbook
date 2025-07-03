@@ -1122,51 +1122,6 @@ class TestSqlAlchemyStockRepositorySearchStocks:
         assert result[0].company_name is not None
         assert result[0].company_name.value == "Apple Inc."
 
-    def test_search_stocks_filters_by_sector(self) -> None:
-        """Should filter stocks by exact sector match."""
-        # Arrange
-        mock_connection = Mock(spec=IDatabaseConnection)
-        mock_result = Mock()
-
-        mock_rows = [
-            {
-                "id": "stock-1",
-                "symbol": "AAPL",
-                "company_name": "Apple Inc.",
-                "sector": "Technology",
-                "industry_group": "Hardware",
-                "grade": "A",
-                "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
-            },
-            {
-                "id": "stock-2",
-                "symbol": "MSFT",
-                "company_name": "Microsoft Corporation",
-                "sector": "Technology",
-                "industry_group": "Software",
-                "grade": "B",
-                "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
-            },
-        ]
-
-        mock_result.fetchall.return_value = mock_rows
-        mock_connection.execute.return_value = mock_result
-
-        repository = SqlAlchemyStockRepository(mock_connection)
-
-        # Act
-        result = repository.search_stocks(sector_filter="Technology")
-
-        # Assert
-        assert len(result) == 2
-        assert all(
-            stock.sector and stock.sector.value == "Technology" for stock in result
-        )
-
     def test_search_stocks_filters_by_industry_group(self) -> None:
         """Should filter stocks by exact industry group match."""
         # Arrange
@@ -1226,9 +1181,7 @@ class TestSqlAlchemyStockRepositorySearchStocks:
         repository = SqlAlchemyStockRepository(mock_connection)
 
         # Act
-        result = repository.search_stocks(
-            symbol_filter="AA", sector_filter="Technology"
-        )
+        result = repository.search_stocks(symbol_filter="AA")
 
         # Assert
         assert len(result) == 1

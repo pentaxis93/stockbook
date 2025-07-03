@@ -304,7 +304,6 @@ class SqlAlchemyStockRepository(IStockRepository):
         self,
         symbol_filter: Optional[str] = None,
         name_filter: Optional[str] = None,
-        sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
     ) -> List[Stock]:
         """
@@ -313,7 +312,6 @@ class SqlAlchemyStockRepository(IStockRepository):
         Args:
             symbol_filter: Pattern to match against stock symbols (case-insensitive)
             name_filter: Pattern to match against company names (case-insensitive)
-            sector_filter: Exact sector to filter by
             industry_filter: Exact industry group to filter by
 
         Returns:
@@ -333,10 +331,6 @@ class SqlAlchemyStockRepository(IStockRepository):
         if name_filter:
             # Case-insensitive pattern matching for company name
             stmt = stmt.where(stock_table.c.company_name.ilike(f"%{name_filter}%"))
-
-        if sector_filter:
-            # Exact match for sector
-            stmt = stmt.where(stock_table.c.sector == sector_filter)
 
         if industry_filter:
             # Exact match for industry group

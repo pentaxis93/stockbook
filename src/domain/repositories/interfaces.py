@@ -130,7 +130,6 @@ class IStockRepository(ABC):
         self,
         symbol_filter: Optional[str] = None,
         name_filter: Optional[str] = None,
-        sector_filter: Optional[str] = None,
         industry_filter: Optional[str] = None,
     ) -> List[Stock]:
         """
@@ -139,7 +138,6 @@ class IStockRepository(ABC):
         Args:
             symbol_filter: Filter by symbols containing this string (case-insensitive)
             name_filter: Filter by names containing this string (case-insensitive)
-            sector_filter: Filter by sector containing this string (case-insensitive)
             industry_filter: Filter by industry group containing this string (case-insensitive)
 
         Returns:

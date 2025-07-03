@@ -123,33 +123,6 @@ class TestStockRouter:
             industry_filter=None,
         )
 
-    def test_get_stocks_with_sector_filter(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
-    ) -> None:
-        """Should call search_stocks with sector filter mapped to industry_filter."""
-        mock_service.search_stocks.return_value = sample_stock_dtos
-
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
-
-        with TestClient(app) as client:
-            response = client.get("/stocks", params={"sector": "Technology"})
-
-        assert response.status_code == 200
-        data = response.json()
-        assert data["total"] == 2
-
-        # Verify sector is mapped to industry_filter
-        mock_service.search_stocks.assert_called_once_with(
-            symbol_filter=None,
-            name_filter=None,
-            industry_filter="Technology",  # sector -> industry_filter
-        )
-
     def test_get_stocks_with_multiple_filters(self, mock_service: Mock) -> None:
         """Should call search_stocks with all provided filters."""
         filtered_stock = [
@@ -173,7 +146,7 @@ class TestStockRouter:
         with TestClient(app) as client:
             response = client.get(
                 "/stocks",
-                params={"symbol": "GOOGL", "sector": "Technology"},
+                params={"symbol": "GOOGL"},
             )
 
         assert response.status_code == 200
@@ -183,7 +156,7 @@ class TestStockRouter:
         mock_service.search_stocks.assert_called_once_with(
             symbol_filter="GOOGL",
             name_filter=None,
-            industry_filter="Technology",
+            industry_filter=None,
         )
 
     def test_get_stocks_empty_string_filters_ignored(
@@ -200,7 +173,7 @@ class TestStockRouter:
         app.include_router(stock_router.router)
 
         with TestClient(app) as client:
-            response = client.get("/stocks", params={"symbol": "", "sector": "  "})
+            response = client.get("/stocks", params={"symbol": ""})
 
         assert response.status_code == 200
 
@@ -224,7 +197,7 @@ class TestStockRouter:
         with TestClient(app) as client:
             response = client.get(
                 "/stocks",
-                params={"symbol": "  AAPL  ", "sector": " Tech "},
+                params={"symbol": "  AAPL  "},
             )
 
         assert response.status_code == 200
@@ -233,7 +206,7 @@ class TestStockRouter:
         mock_service.search_stocks.assert_called_once_with(
             symbol_filter="AAPL",
             name_filter=None,
-            industry_filter="Tech",
+            industry_filter=None,
         )
 
     def test_get_stocks_service_exception_returns_500(self, mock_service: Mock) -> None:
