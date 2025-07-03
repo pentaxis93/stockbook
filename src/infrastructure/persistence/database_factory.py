@@ -126,9 +126,13 @@ def configure_sqlite_pragmas(
     cursor = connection.cursor()
 
     if enable_foreign_keys:
+        # NOTE: Raw SQL is necessary here because SQLAlchemy doesn't provide
+        # a built-in abstraction for SQLite PRAGMA commands. These are SQLite-specific
+        # configuration commands that must be executed as raw SQL.
         cursor.execute("PRAGMA foreign_keys = ON")
 
     if journal_mode:
+        # NOTE: Raw SQL is necessary for PRAGMA commands (see comment above)
         cursor.execute(f"PRAGMA journal_mode = {journal_mode}")
 
     cursor.close()

@@ -5,11 +5,14 @@ This module tests that all fixtures work correctly and provide
 the expected functionality for infrastructure testing.
 """
 
-import sqlite3
+# pyright: reportUnusedImport=false
+
 from typing import List, cast
 from unittest.mock import Mock
 
 import pytest
+from sqlalchemy import insert, select
+from sqlalchemy.engine import Connection, Engine
 
 from src.domain.entities import Stock
 from src.domain.repositories.interfaces import (
@@ -17,120 +20,15 @@ from src.domain.repositories.interfaces import (
     IStockRepository,
 )
 from src.domain.value_objects import StockSymbol
+from src.infrastructure.persistence.tables.stock_table import stock_table
 
+from .infrastructure import sqlalchemy_connection  # noqa: F401
+from .infrastructure import sqlalchemy_in_memory_engine  # noqa: F401
 from .infrastructure import (
     StockBuilder,
-    db_transaction,
-    seed_test_portfolio,
-    seed_test_stocks,
+    seed_test_portfolio_sqlalchemy,
+    seed_test_stocks_sqlalchemy,
 )
-
-
-class TestInMemoryDatabaseFixture:
-    """Test the in-memory SQLite database fixture."""
-
-    def test_database_creates_schema(self, in_memory_db: sqlite3.Connection) -> None:
-        """Should create all required tables."""
-        cursor = in_memory_db.cursor()
-
-        # Check stocks table exists
-        _ = cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='stocks'"
-        )
-        assert cursor.fetchone() is not None
-
-        # Check portfolios table exists
-        _ = cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='portfolios'"
-        )
-        assert cursor.fetchone() is not None
-
-        # Check transactions table exists
-        _ = cursor.execute(
-            "SELECT name FROM sqlite_master WHERE type='table' AND name='transactions'"
-        )
-        assert cursor.fetchone() is not None
-
-    def test_database_enforces_foreign_keys(
-        self, in_memory_db: sqlite3.Connection
-    ) -> None:
-        """Should enforce foreign key constraints."""
-        with pytest.raises(sqlite3.IntegrityError):
-            _ = in_memory_db.execute(
-                """
-                INSERT INTO transactions (id, portfolio_id, stock_id, transaction_type,
-                                        quantity, price, transaction_date)
-                VALUES ('tx-1', 'invalid-portfolio', 'invalid-stock', 'BUY', 100, 150.00, '2024-01-01')
-                """
-            )
-
-    def test_database_is_isolated_between_tests(
-        self, in_memory_db: sqlite3.Connection
-    ) -> None:
-        """Each test should get a fresh database."""
-        # Insert a stock
-        _ = in_memory_db.execute(
-            """
-            INSERT INTO stocks (id, symbol, company_name)
-            VALUES ('test-1', 'TEST', 'Test Company')
-            """
-        )
-        in_memory_db.commit()
-
-        # Verify it exists
-        cursor = in_memory_db.cursor()
-        _ = cursor.execute("SELECT COUNT(*) FROM stocks")
-        assert cursor.fetchone()[0] == 1
-
-
-class TestTransactionRollbackFixture:
-    """Test the transaction rollback fixture."""
-
-    def test_rollback_prevents_data_persistence(
-        self, transaction_rollback: sqlite3.Connection
-    ) -> None:
-        """Should rollback all changes after test."""
-        conn = transaction_rollback
-
-        # Insert data within the test
-        _ = conn.execute(
-            """
-            INSERT INTO stocks (id, symbol, company_name)
-            VALUES ('rollback-test', 'ROLL', 'Rollback Test')
-            """
-        )
-
-        # Verify it exists during the test
-        cursor = conn.cursor()
-        _ = cursor.execute("SELECT COUNT(*) FROM stocks WHERE id = 'rollback-test'")
-        assert cursor.fetchone()[0] == 1
-
-        # Note: After the test, the fixture will rollback this insert
-
-    def test_nested_transactions_work(
-        self, transaction_rollback: sqlite3.Connection
-    ) -> None:
-        """Should support nested transaction savepoints."""
-        conn = transaction_rollback
-
-        # Create a savepoint
-        _ = conn.execute("SAVEPOINT nested_test")
-
-        # Insert data
-        _ = conn.execute(
-            """
-            INSERT INTO stocks (id, symbol, company_name)
-            VALUES ('nested-1', 'NEST1', 'Nested Test 1')
-            """
-        )
-
-        # Rollback to savepoint
-        _ = conn.execute("ROLLBACK TO SAVEPOINT nested_test")
-
-        # Verify the insert was rolled back
-        cursor = conn.cursor()
-        _ = cursor.execute("SELECT COUNT(*) FROM stocks WHERE id = 'nested-1'")
-        assert cursor.fetchone()[0] == 0
 
 
 class TestMockRepositoryFixtures:
@@ -279,68 +177,115 @@ class TestSampleStocksFixture:
             assert stock.company_name is not None
 
 
-class TestDatabaseHelpers:
-    """Test database helper functions."""
+class TestSQLAlchemyFixtures:
+    """Test the SQLAlchemy-based database fixtures."""
 
-    def test_db_transaction_context_manager(
-        self, in_memory_db: sqlite3.Connection
+    def test_sqlalchemy_engine_creates_all_tables(
+        self, sqlalchemy_in_memory_engine: Engine
     ) -> None:
-        """Should provide transaction context with automatic commit/rollback."""
-        # Test successful transaction
-        with db_transaction(in_memory_db) as cursor:
-            _ = cursor.execute(
-                """
-                INSERT INTO stocks (id, symbol, company_name)
-                VALUES ('ctx-1', 'CTX', 'Context Test')
-                """
-            )
+        """Should create all tables from metadata."""
+        from sqlalchemy import inspect
 
-        # Verify commit happened
-        cursor = in_memory_db.cursor()
-        _ = cursor.execute("SELECT COUNT(*) FROM stocks WHERE id = 'ctx-1'")
-        assert cursor.fetchone()[0] == 1
+        inspector = inspect(sqlalchemy_in_memory_engine)
+        table_names = set(inspector.get_table_names())
 
-        # Test rollback on exception
-        with pytest.raises(sqlite3.IntegrityError):
-            with db_transaction(in_memory_db) as cursor:
-                # This should fail due to duplicate ID
-                _ = cursor.execute(
-                    """
-                    INSERT INTO stocks (id, symbol, company_name)
-                    VALUES ('ctx-1', 'CTX2', 'Context Test 2')
-                    """
-                )
+        # Verify all expected tables exist
+        expected_tables = {
+            "stocks",
+            "portfolios",
+            "transactions",
+            "targets",
+            "portfolio_balances",
+            "journal_entries",
+        }
+        assert expected_tables.issubset(table_names)
 
-    def test_seed_test_stocks(
-        self, in_memory_db: sqlite3.Connection, sample_stocks: List[Stock]
+    def test_sqlalchemy_connection_rollback(
+        self, sqlalchemy_connection: Connection
     ) -> None:
-        """Should seed database with stock entities."""
-        seed_test_stocks(in_memory_db, sample_stocks)
+        """Should rollback changes after test completes."""
+        # stock_table already imported at module level
 
-        # Verify all stocks were inserted
-        cursor = in_memory_db.cursor()
-        _ = cursor.execute("SELECT COUNT(*) FROM stocks")
-        assert cursor.fetchone()[0] == len(sample_stocks)
-
-        # Verify data integrity
-        _ = cursor.execute(
-            "SELECT symbol, company_name FROM stocks WHERE symbol = 'MSFT'"
+        # Insert a stock
+        stmt = insert(stock_table).values(
+            id="rollback-test",
+            symbol="ROLL",
+            company_name="Rollback Test Co",
         )
-        row = cursor.fetchone()
-        assert row[0] == "MSFT"
-        assert row[1] == "Microsoft Corporation"
+        sqlalchemy_connection.execute(stmt)  # type: ignore[no-untyped-call]
 
-    def test_seed_test_portfolio(self, in_memory_db: sqlite3.Connection) -> None:
-        """Should seed database with a portfolio."""
-        portfolio_id = seed_test_portfolio(in_memory_db, "My Test Portfolio")
+        # Verify it exists in this transaction
+        result = sqlalchemy_connection.execute(  # type: ignore[no-untyped-call]
+            select(stock_table.c).where(stock_table.c.symbol == "ROLL")  # type: ignore[arg-type]
+        )
+        assert result.fetchone() is not None  # type: ignore[no-untyped-call]
 
-        assert portfolio_id.startswith("portfolio-")
+        # Note: After the test, the transaction will be rolled back
+
+    def test_sqlalchemy_fixtures_enforce_constraints(
+        self, sqlalchemy_connection: Connection
+    ) -> None:
+        """Should enforce foreign key constraints."""
+        from datetime import datetime
+
+        from sqlalchemy.exc import IntegrityError
+
+        from src.infrastructure.persistence.tables.transaction_table import (
+            transaction_table,
+        )
+
+        # Try to insert transaction with invalid foreign keys
+        stmt = insert(transaction_table).values(
+            id="tx-invalid",
+            portfolio_id="nonexistent-portfolio",
+            stock_id="nonexistent-stock",
+            transaction_type="BUY",
+            quantity=100,
+            price=150.00,
+            transaction_date=datetime(2024, 1, 1),
+        )
+
+        with pytest.raises(IntegrityError):
+            sqlalchemy_connection.execute(stmt)  # type: ignore[no-untyped-call]
+
+    def test_sqlalchemy_seeding_functions(
+        self, sqlalchemy_connection: Connection, sample_stocks: List[Stock]
+    ) -> None:
+        """Should seed data using SQLAlchemy functions."""
+        # Seed stocks
+        seed_test_stocks_sqlalchemy(sqlalchemy_connection, sample_stocks)
+
+        # Verify stocks were inserted
+        result = sqlalchemy_connection.execute(select(stock_table.c))  # type: ignore[no-untyped-call]
+        rows = result.fetchall()  # type: ignore[no-untyped-call]
+        assert len(rows) == len(sample_stocks)  # type: ignore[arg-type]
+
+        # Verify specific stock
+        result = sqlalchemy_connection.execute(  # type: ignore[no-untyped-call]
+            select(stock_table.c).where(stock_table.c.symbol == "MSFT")  # type: ignore[arg-type]
+        )
+        row = result.fetchone()  # type: ignore[no-untyped-call]
+        assert row is not None  # Type guard
+        assert row.company_name == "Microsoft Corporation"  # type: ignore[attr-defined]
+
+    def test_sqlalchemy_portfolio_seeding(
+        self, sqlalchemy_connection: Connection
+    ) -> None:
+        """Should seed portfolio data using SQLAlchemy."""
+        from src.infrastructure.persistence.tables.portfolio_table import (
+            portfolio_table,
+        )
+
+        # Seed portfolio
+        portfolio_id = seed_test_portfolio_sqlalchemy(
+            sqlalchemy_connection, "Test Portfolio"
+        )
 
         # Verify portfolio was created
-        cursor = in_memory_db.cursor()
-        _ = cursor.execute(
-            "SELECT name, is_active FROM portfolios WHERE id = ?", (portfolio_id,)
+        result = sqlalchemy_connection.execute(  # type: ignore[no-untyped-call]
+            select(portfolio_table.c).where(portfolio_table.c.id == portfolio_id)  # type: ignore[arg-type]
         )
-        row = cursor.fetchone()
-        assert row[0] == "My Test Portfolio"
-        assert row[1] == 1  # is_active = True
+        row = result.fetchone()  # type: ignore[no-untyped-call]
+        assert row is not None
+        assert row.name == "Test Portfolio"  # type: ignore[attr-defined]
+        assert row.currency == "USD"  # type: ignore[attr-defined]

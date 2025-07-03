@@ -2,19 +2,23 @@
 Comprehensive test fixtures for testing the infrastructure layer.
 
 This module provides:
-1. In-memory SQLite database fixture
+1. SQLAlchemy-based in-memory database fixtures
 2. Mock repository fixtures
 3. Test data builder for Stock
-4. Transaction rollback fixture for test isolation
+4. SQLAlchemy-based data seeding functions
 """
 
-import sqlite3
-from contextlib import contextmanager
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
+# pyright: reportUnusedVariable=false, reportUnknownArgumentType=false
+
 from datetime import datetime, timezone
 from typing import Generator, List, Optional
 from unittest.mock import Mock
 
 import pytest
+from sqlalchemy import create_engine, insert, text
+from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.pool import StaticPool
 
 from src.domain.entities import Stock
 from src.domain.repositories.interfaces import (
@@ -34,128 +38,70 @@ from src.domain.value_objects import (
     Sector,
     StockSymbol,
 )
+from src.infrastructure.persistence.tables import metadata
+from src.infrastructure.persistence.tables.portfolio_table import portfolio_table
+from src.infrastructure.persistence.tables.stock_table import stock_table
 
 # =============================================================================
-# In-Memory SQLite Database Fixture
+# SQLAlchemy-based Database Fixtures
 # =============================================================================
 
 
 @pytest.fixture
-def in_memory_db() -> Generator[sqlite3.Connection, None, None]:
+def sqlalchemy_in_memory_engine() -> Generator[Engine, None, None]:
     """
-    Create an in-memory SQLite database for testing.
+    Create an in-memory SQLite database engine using SQLAlchemy.
 
-    This fixture provides a fresh database connection for each test,
-    ensuring complete isolation between tests.
+    This fixture provides a fresh SQLAlchemy engine for each test,
+    with all tables created from the application's table definitions.
 
     Yields:
-        sqlite3.Connection: Connection to the in-memory database
+        Engine: SQLAlchemy engine connected to in-memory database
     """
-    # Create in-memory database
-    conn = sqlite3.connect(":memory:")
-    conn.row_factory = sqlite3.Row
+    # Create engine with StaticPool to ensure same connection is reused
+    # This is important for in-memory SQLite databases
+    engine = create_engine(
+        "sqlite:///:memory:",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+        echo=False,  # Set to True for SQL debugging
+    )
 
-    # Enable foreign key constraints
-    _ = conn.execute("PRAGMA foreign_keys = ON")
+    # Create all tables using the application's metadata
+    metadata.create_all(engine)
 
-    # Create schema (simplified version for testing)
-    _create_test_schema(conn)
+    # Enable foreign keys for SQLite
+    with engine.begin() as conn:
+        conn.execute(text("PRAGMA foreign_keys = ON"))
 
-    yield conn
+    yield engine
 
     # Cleanup
-    conn.close()
-
-
-def _create_test_schema(conn: sqlite3.Connection) -> None:
-    """Create a simplified test schema for the in-memory database."""
-    # Stocks table
-    _ = conn.execute(
-        """
-        CREATE TABLE stocks (
-            id TEXT PRIMARY KEY,
-            symbol TEXT UNIQUE NOT NULL,
-            company_name TEXT NOT NULL,
-            sector TEXT,
-            industry_group TEXT,
-            grade TEXT,
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """
-    )
-
-    # Portfolios table
-    _ = conn.execute(
-        """
-        CREATE TABLE portfolios (
-            id TEXT PRIMARY KEY,
-            name TEXT NOT NULL,
-            description TEXT,
-            is_active BOOLEAN DEFAULT 1,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """
-    )
-
-    # Transactions table
-    _ = conn.execute(
-        """
-        CREATE TABLE transactions (
-            id TEXT PRIMARY KEY,
-            portfolio_id TEXT NOT NULL,
-            stock_id TEXT NOT NULL,
-            transaction_type TEXT NOT NULL,
-            quantity INTEGER NOT NULL,
-            price DECIMAL(10, 2) NOT NULL,
-            transaction_date DATE NOT NULL,
-            notes TEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (portfolio_id) REFERENCES portfolios(id),
-            FOREIGN KEY (stock_id) REFERENCES stocks(id)
-        )
-    """
-    )
-
-    # Add other tables as needed...
-    conn.commit()
-
-
-# =============================================================================
-# Transaction Rollback Fixture
-# =============================================================================
+    engine.dispose()
 
 
 @pytest.fixture
-def transaction_rollback(
-    in_memory_db: sqlite3.Connection,
-) -> Generator[sqlite3.Connection, None, None]:
+def sqlalchemy_connection(
+    sqlalchemy_in_memory_engine: Engine,
+) -> Generator[Connection, None, None]:
     """
-    Provide automatic transaction rollback for test isolation.
+    Provide a SQLAlchemy connection with automatic rollback.
 
     This fixture wraps each test in a transaction that is rolled back
-    after the test completes, ensuring no data persists between tests.
+    after the test completes, ensuring complete isolation between tests.
 
     Args:
-        in_memory_db: The in-memory database connection
+        sqlalchemy_in_memory_engine: The in-memory database engine
 
     Yields:
-        sqlite3.Connection: Database connection with active transaction
+        Connection: SQLAlchemy connection with active transaction
     """
-    # Begin transaction
-    _ = in_memory_db.execute("BEGIN")
-
-    # Create a savepoint for nested transaction support
-    _ = in_memory_db.execute("SAVEPOINT test_savepoint")
-
-    try:
-        yield in_memory_db
-    finally:
-        # Always rollback to ensure test isolation
-        _ = in_memory_db.execute("ROLLBACK TO SAVEPOINT test_savepoint")
-        _ = in_memory_db.execute("ROLLBACK")
+    # Start a connection and transaction
+    with sqlalchemy_in_memory_engine.connect() as connection:
+        # Begin a transaction
+        with connection.begin() as transaction:
+            yield connection
+            # Transaction is automatically rolled back when exiting context
 
 
 # =============================================================================
@@ -514,84 +460,52 @@ def sample_stocks() -> List[Stock]:
 
 
 # =============================================================================
-# Database Transaction Helpers
-# =============================================================================
-
-
-@contextmanager
-def db_transaction(conn: sqlite3.Connection) -> Generator[sqlite3.Cursor, None, None]:
-    """
-    Context manager for database transactions with automatic rollback.
-
-    Args:
-        conn: Database connection
-
-    Yields:
-        sqlite3.Cursor: Database cursor for executing queries
-    """
-    cursor = conn.cursor()
-    try:
-        yield cursor
-        conn.commit()
-    except Exception:
-        conn.rollback()
-        raise
-    finally:
-        cursor.close()
-
-
-# =============================================================================
 # Test Data Seeding Functions
 # =============================================================================
 
 
-def seed_test_stocks(conn: sqlite3.Connection, stocks: List[Stock]) -> None:
+def seed_test_stocks_sqlalchemy(conn: Connection, stocks: List[Stock]) -> None:
     """
-    Seed the test database with stock entities.
+    Seed the test database with stock entities using SQLAlchemy.
 
     Args:
-        conn: Database connection
+        conn: SQLAlchemy database connection
         stocks: List of stock entities to insert
     """
-    with db_transaction(conn) as cursor:
-        for stock in stocks:
-            _ = cursor.execute(
-                """
-                INSERT INTO stocks (id, symbol, company_name, sector, industry_group, grade, notes)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    stock.id,
-                    stock.symbol.value,
-                    stock.company_name.value if stock.company_name else None,
-                    stock.sector.value if stock.sector else None,
-                    stock.industry_group.value if stock.industry_group else None,
-                    stock.grade.value if stock.grade else None,
-                    stock.notes.value,
-                ),
-            )
+    for stock in stocks:
+        stmt = insert(stock_table).values(
+            id=stock.id,
+            symbol=stock.symbol.value,
+            company_name=stock.company_name.value if stock.company_name else None,
+            sector=stock.sector.value if stock.sector else None,
+            industry_group=stock.industry_group.value if stock.industry_group else None,
+            grade=stock.grade.value if stock.grade else None,
+            notes=stock.notes.value,
+        )
+        conn.execute(stmt)
+    # Don't commit here - let the caller manage transactions
 
 
-def seed_test_portfolio(conn: sqlite3.Connection, name: str = "Test Portfolio") -> str:
+def seed_test_portfolio_sqlalchemy(
+    conn: Connection, name: str = "Test Portfolio"
+) -> str:
     """
-    Seed the test database with a portfolio.
+    Seed the test database with a portfolio using SQLAlchemy.
 
     Args:
-        conn: Database connection
-        name: Portfolio name
+        conn: SQLAlchemy database connection
+        name: Name of the portfolio
 
     Returns:
         str: ID of the created portfolio
     """
     portfolio_id = f"portfolio-{datetime.now(timezone.utc).timestamp()}"
-
-    with db_transaction(conn) as cursor:
-        _ = cursor.execute(
-            """
-            INSERT INTO portfolios (id, name, description, is_active)
-            VALUES (?, ?, ?, ?)
-            """,
-            (portfolio_id, name, "Test portfolio for testing", True),
-        )
-
+    stmt = insert(portfolio_table).values(
+        id=portfolio_id,
+        name=name,
+        description=f"Test portfolio created at {datetime.now(timezone.utc)}",
+        currency="USD",
+    )
+    conn.execute(stmt)
+    # Don't commit here - let the caller manage transactions
     return portfolio_id

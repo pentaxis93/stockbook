@@ -229,7 +229,11 @@
       "Bash(git restore:*)",
       "Bash(source:*)",
       "Bash(git mv:*)",
-      "Bash(touch:*)"
+      "Bash(touch:*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker run:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker rmi:*)"
     ],
     "deny": []
   }
