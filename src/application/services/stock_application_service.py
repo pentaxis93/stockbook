@@ -104,6 +104,23 @@ class StockApplicationService:
 
         return StockDto.from_entity(stock_entity)
 
+    def get_stock_by_id(self, stock_id: str) -> Optional[StockDto]:
+        """
+        Retrieve stock by ID.
+
+        Args:
+            stock_id: Stock ID to search for
+
+        Returns:
+            Stock DTO if found, None otherwise
+        """
+        stock_entity = self._unit_of_work.stocks.get_by_id(stock_id)
+
+        if stock_entity is None:
+            return None
+
+        return StockDto.from_entity(stock_entity)
+
     def get_all_stocks(self) -> List[StockDto]:
         """
         Retrieve all stocks.

@@ -11,7 +11,7 @@ from typing import Annotated, Callable, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from src.application.services.stock_application_service import StockApplicationService
-from src.infrastructure.web.models.stock_models import StockListResponse
+from src.infrastructure.web.models.stock_models import StockListResponse, StockResponse
 
 logger = logging.getLogger(__name__)
 
@@ -116,4 +116,47 @@ async def get_stocks(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve stocks",
+        ) from e
+
+
+@router.get("/{stock_id}", response_model=StockResponse)
+async def get_stock_by_id(
+    stock_id: str,
+    service: StockApplicationService = Depends(get_stock_service),
+) -> StockResponse:
+    """
+    Get a specific stock by its ID.
+
+    Args:
+        stock_id: The unique identifier of the stock
+
+    Returns:
+        StockResponse containing the stock information
+
+    Raises:
+        HTTPException: 404 if stock not found, 500 for server errors
+    """
+    try:
+        # Get stock from service
+        stock_dto = service.get_stock_by_id(stock_id)
+
+        # Check if stock exists
+        if stock_dto is None:
+            logger.warning(f"Stock with ID {stock_id} not found")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Stock with ID {stock_id} not found",
+            )
+
+        # Convert DTO to response model
+        return StockResponse.from_dto(stock_dto)
+
+    except HTTPException:
+        # Re-raise HTTP exceptions as-is
+        raise
+    except Exception as e:
+        logger.error(f"Error retrieving stock {stock_id}: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to retrieve stock",
         ) from e

@@ -716,3 +716,59 @@ class TestStockApplicationService:
 
         # Verify rollback was called
         self.mock_unit_of_work.rollback.assert_called_once()
+
+    def test_get_stock_by_id_success(self) -> None:
+        """Should retrieve stock by ID successfully."""
+        # Arrange
+        stock_id = "stock-id-123"
+        stock_entity = Stock(
+            symbol=StockSymbol("AAPL"),
+            company_name=CompanyName("Apple Inc."),
+            sector=Sector("Technology"),
+            industry_group=IndustryGroup("Software"),
+            grade=Grade("A"),
+            notes=Notes("Great company"),
+            id="stock-id-123",
+        )
+        self.mock_stock_repository.get_by_id.return_value = stock_entity
+
+        # Act
+        result = self.service.get_stock_by_id(stock_id)
+
+        # Assert
+        assert isinstance(result, StockDto)
+        assert result.id == "stock-id-123"
+        assert result.symbol == "AAPL"
+        assert result.name == "Apple Inc."
+        assert result.sector == "Technology"
+        assert result.industry_group == "Software"
+        assert result.grade == "A"
+        assert result.notes == "Great company"
+
+        # Verify repository interaction
+        self.mock_stock_repository.get_by_id.assert_called_once_with(stock_id)
+
+    def test_get_stock_by_id_not_found(self) -> None:
+        """Should return None when stock not found by ID."""
+        # Arrange
+        stock_id = "non-existent-id"
+        self.mock_stock_repository.get_by_id.return_value = None
+
+        # Act
+        result = self.service.get_stock_by_id(stock_id)
+
+        # Assert
+        assert result is None
+
+        # Verify repository interaction
+        self.mock_stock_repository.get_by_id.assert_called_once_with(stock_id)
+
+    def test_get_stock_by_id_with_repository_error(self) -> None:
+        """Should handle repository errors in get_stock_by_id."""
+        # Arrange
+        stock_id = "stock-id-123"
+        self.mock_stock_repository.get_by_id.side_effect = Exception("Database error")
+
+        # Act & Assert
+        with pytest.raises(Exception, match="Database error"):
+            _ = self.service.get_stock_by_id(stock_id)

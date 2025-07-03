@@ -404,3 +404,142 @@ class TestStockEndpoints:
             industry_filter="Technology",
             grade_filter="A",
         )
+
+    def test_get_stock_by_id_success(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+        sample_stock_dtos: List[StockDto],
+    ) -> None:
+        """Should retrieve stock by ID successfully."""
+        # Arrange
+        stock = sample_stock_dtos[0]  # AAPL
+        mock_stock_service.get_stock_by_id.return_value = stock
+
+        # Act
+        response = client.get(f"/stocks/{stock.id}")
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["id"] == "stock-001"
+        assert data["symbol"] == "AAPL"
+        assert data["name"] == "Apple Inc."
+        assert data["sector"] == "Technology"
+        assert data["industry_group"] == "Hardware"
+        assert data["grade"] == "A"
+        assert data["notes"] == "Leading tech company"
+
+        # Verify the service was called with correct ID
+        mock_stock_service.get_stock_by_id.assert_called_once_with("stock-001")
+
+    def test_get_stock_by_id_not_found(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should return 404 when stock doesn't exist."""
+        # Arrange
+        stock_id = "non-existent-id"
+        mock_stock_service.get_stock_by_id.return_value = None
+
+        # Act
+        response = client.get(f"/stocks/{stock_id}")
+
+        # Assert
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        data = response.json()
+        assert "detail" in data
+        assert f"Stock with ID {stock_id} not found" in data["detail"]
+
+        # Verify the service was called with the ID
+        mock_stock_service.get_stock_by_id.assert_called_once_with(stock_id)
+
+    def test_get_stock_by_id_invalid_format(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should handle invalid ID format gracefully."""
+        # Arrange
+        # Test with various invalid ID formats
+        invalid_ids = [
+            "",  # Empty ID
+            " ",  # Whitespace
+            "123 456",  # Space in ID
+            "id-with-special-chars!@#",  # Special characters
+        ]
+
+        for invalid_id in invalid_ids:
+            # For empty or whitespace IDs, FastAPI will interpret as path parameter missing
+            # and will return 404 for route not found, not our custom 404
+            if invalid_id.strip():
+                mock_stock_service.get_stock_by_id.return_value = None
+
+                # Act
+                response = client.get(f"/stocks/{invalid_id}")
+
+                # Assert
+                # The endpoint should still try to find the stock, even with unusual IDs
+                assert response.status_code == status.HTTP_404_NOT_FOUND
+                data = response.json()
+                assert "detail" in data
+                assert (
+                    "Stock with ID" in data["detail"] and "not found" in data["detail"]
+                )
+
+    def test_get_stock_by_id_service_error(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+    ) -> None:
+        """Should handle service errors gracefully."""
+        # Arrange
+        stock_id = "stock-001"
+        mock_stock_service.get_stock_by_id.side_effect = Exception("Database error")
+
+        # Act
+        response = client.get(f"/stocks/{stock_id}")
+
+        # Assert
+        # The default FastAPI error handler should return 500
+        assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+
+    def test_get_stock_by_id_response_format(
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
+        sample_stock_dtos: List[StockDto],
+    ) -> None:
+        """Should return response in correct StockResponse format."""
+        # Arrange
+        stock = sample_stock_dtos[1]  # MSFT
+        mock_stock_service.get_stock_by_id.return_value = stock
+
+        # Act
+        response = client.get(f"/stocks/{stock.id}")
+
+        # Assert
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+
+        # Verify response structure matches StockResponse
+        expected_fields = [
+            "id",
+            "symbol",
+            "name",
+            "sector",
+            "industry_group",
+            "grade",
+            "notes",
+        ]
+        for field in expected_fields:
+            assert field in data
+        # Verify data types
+        assert isinstance(data["id"], str)
+        assert isinstance(data["symbol"], str)
+        assert isinstance(data["name"], str)
+        assert isinstance(data["sector"], str)
+        assert isinstance(data["industry_group"], str)
+        assert isinstance(data["grade"], str)
+        assert isinstance(data["notes"], str)
