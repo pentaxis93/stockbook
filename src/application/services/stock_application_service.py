@@ -96,13 +96,14 @@ class StockApplicationService:
         Returns:
             Stock DTO if found, None otherwise
         """
-        symbol_vo = StockSymbol(symbol)
-        stock_entity = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
+        with self._unit_of_work:
+            symbol_vo = StockSymbol(symbol)
+            stock_entity = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
 
-        if stock_entity is None:
-            return None
+            if stock_entity is None:
+                return None
 
-        return StockDto.from_entity(stock_entity)
+            return StockDto.from_entity(stock_entity)
 
     def get_stock_by_id(self, stock_id: str) -> Optional[StockDto]:
         """
@@ -114,12 +115,13 @@ class StockApplicationService:
         Returns:
             Stock DTO if found, None otherwise
         """
-        stock_entity = self._unit_of_work.stocks.get_by_id(stock_id)
+        with self._unit_of_work:
+            stock_entity = self._unit_of_work.stocks.get_by_id(stock_id)
 
-        if stock_entity is None:
-            return None
+            if stock_entity is None:
+                return None
 
-        return StockDto.from_entity(stock_entity)
+            return StockDto.from_entity(stock_entity)
 
     def get_all_stocks(self) -> List[StockDto]:
         """
@@ -128,8 +130,9 @@ class StockApplicationService:
         Returns:
             List of stock DTOs
         """
-        stock_entities = self._unit_of_work.stocks.get_all()
-        return [StockDto.from_entity(entity) for entity in stock_entities]
+        with self._unit_of_work:
+            stock_entities = self._unit_of_work.stocks.get_all()
+            return [StockDto.from_entity(entity) for entity in stock_entities]
 
     def stock_exists(self, symbol: str) -> bool:
         """
@@ -141,8 +144,9 @@ class StockApplicationService:
         Returns:
             True if stock exists, False otherwise
         """
-        symbol_vo = StockSymbol(symbol)
-        return self._unit_of_work.stocks.exists_by_symbol(symbol_vo)
+        with self._unit_of_work:
+            symbol_vo = StockSymbol(symbol)
+            return self._unit_of_work.stocks.exists_by_symbol(symbol_vo)
 
     def search_stocks(
         self,
@@ -161,12 +165,13 @@ class StockApplicationService:
         Returns:
             List of stock DTOs matching the criteria
         """
-        stock_entities = self._unit_of_work.stocks.search_stocks(
-            symbol_filter=symbol_filter,
-            name_filter=name_filter,
-            industry_filter=industry_filter,
-        )
-        return [StockDto.from_entity(entity) for entity in stock_entities]
+        with self._unit_of_work:
+            stock_entities = self._unit_of_work.stocks.search_stocks(
+                symbol_filter=symbol_filter,
+                name_filter=name_filter,
+                industry_filter=industry_filter,
+            )
+            return [StockDto.from_entity(entity) for entity in stock_entities]
 
     def update_stock(self, command: UpdateStockCommand) -> StockDto:
         """
