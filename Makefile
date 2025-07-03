@@ -69,7 +69,7 @@ lint-core: ## Run pylint on core business logic (strict rules)
 		--allowed-redefined-builtins=id \
 		--max-args=12 --max-locals=5 --max-returns=8 --max-branches=8 --max-statements=15 \
 		--max-positional-arguments=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10 \
-		$(shell find $(CORE_PATTERN) -name "*.py" 2>/dev/null) || true
+		$(shell find $(CORE_PATTERN) -name "*.py" 2>/dev/null)
 	@echo "$(GREEN)✓ Core linting complete$(NC)"
 
 .PHONY: lint-presentation
@@ -80,7 +80,7 @@ lint-presentation: ## Run pylint on presentation layer (moderate rules)
 		--allowed-redefined-builtins=id \
 		--max-args=6 --max-locals=10 --max-returns=8 --max-branches=15 --max-statements=30 \
 		--docstring-min-length=10 \
-		$(shell find $(PRESENTATION_PATTERN) -name "*.py" 2>/dev/null) || true
+		$(shell find $(PRESENTATION_PATTERN) -name "*.py" 2>/dev/null)
 	@echo "$(GREEN)✓ Presentation linting complete$(NC)"
 
 .PHONY: lint-tests
@@ -89,7 +89,7 @@ lint-tests: ## Run pylint on test files (lenient rules)
 	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
 		--disable=too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,redefined-outer-name,attribute-defined-outside-init,duplicate-code,unused-variable,unused-argument,protected-access,singleton-comparison,pointless-statement,unnecessary-pass,broad-exception-caught,comparison-with-itself,unexpected-keyword-arg,unused-import,logging-fstring-interpolation,no-else-return,import-outside-toplevel,unnecessary-negation,missing-class-docstring,missing-function-docstring,abstract-class-instantiated,consider-using-with,too-many-arguments,too-many-positional-arguments,fixme,too-many-lines \
 		--allowed-redefined-builtins=id \
-		$(shell find $(TEST_DIR) -name "*.py" 2>/dev/null) || true
+		$(shell find $(TEST_DIR) -name "*.py" 2>/dev/null)
 	@echo "$(GREEN)✓ Test linting complete$(NC)"
 
 .PHONY: lint-config
@@ -98,7 +98,7 @@ lint-config: ## Run pylint on configuration files (most lenient)
 	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
 		--disable=too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,missing-class-docstring,missing-function-docstring,missing-module-docstring,invalid-name,too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-statements,too-many-nested-blocks,import-outside-toplevel,broad-exception-caught,duplicate-code,fixme,global-statement,global-variable-not-assigned,wildcard-import,unused-wildcard-import,c-extension-no-member,consider-iterating-dictionary \
 		--allowed-redefined-builtins=id \
-		$(shell find $(CONFIG_PATTERN) -name "*.py" 2>/dev/null) || true
+		$(shell find $(CONFIG_PATTERN) -name "*.py" 2>/dev/null)
 	@echo "$(GREEN)✓ Config linting complete$(NC)"
 
 # Type checking targets
