@@ -36,4 +36,4 @@ ENV DATABASE_PATH=/app/data/database/stockbook.db
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 # Run the application
-CMD ["uvicorn", "src.infrastructure.web.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.presentation.web.main:app", "--host", "0.0.0.0", "--port", "8000"]
