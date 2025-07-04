@@ -123,95 +123,47 @@ class TestMainApp:
         response = client.get(endpoint)
         assert response.status_code == expected_status
 
-    def test_stock_service_factory_error_when_di_container_none(self) -> None:
-        """Test that stock service factory raises error when DI container is None."""
-        from unittest.mock import Mock, patch
+    def test_get_stock_service_dependency_error(self) -> None:
+        """Test that get_stock_service raises error when DI container is not configured."""
+        from fastapi import Request
 
-        import src.presentation.web.main as main_module
+        from src.presentation.web.routers.stock_router import get_stock_service
+
+        # Create a mock request without di_container in app.state
+        mock_request = Mock(spec=Request)
+        mock_request.app = Mock()
+        mock_request.app.state = Mock(spec=[])  # No di_container attribute
+
+        # Should raise RuntimeError
+        with pytest.raises(RuntimeError) as exc_info:
+            _ = get_stock_service(mock_request)
+
+        assert str(exc_info.value) == "DI container not configured in app state"
+
+    def test_get_stock_service_dependency_success(self) -> None:
+        """Test that get_stock_service returns service when DI container exists."""
+        from fastapi import Request
+
         from dependency_injection.di_container import DIContainer
         from src.application.services.stock_application_service import (
             StockApplicationService,
         )
+        from src.presentation.web.routers.stock_router import get_stock_service
 
-        # Store original container
-        original_container = getattr(main_module, "_di_container", None)
-
-        try:
-            # Mock the initialization functions
-            with patch("src.presentation.web.main.initialize_database"):
-                with patch(
-                    "src.presentation.web.main.CompositionRoot.configure"
-                ) as mock_configure:
-                    # Create a mock container
-                    mock_container = Mock(spec=DIContainer)
-                    mock_service = Mock(spec=StockApplicationService)
-                    mock_container.resolve.return_value = mock_service
-                    mock_configure.return_value = mock_container
-
-                    # Import and create the app with test client
-                    from src.presentation.web.main import app
-                    from src.presentation.web.routers import stock_router
-
-                    with TestClient(app):
-                        # Get the factory that was set during startup
-                        factory = getattr(stock_router, "_service_factory", None)
-
-                        assert (
-                            factory is not None
-                        ), "Factory should have been set during lifespan"
-
-                        # Now force the DI container to be None to test line 70
-                        main_module._di_container = None  # type: ignore[attr-defined]
-
-                        # Call the factory - it should raise RuntimeError
-                        with pytest.raises(RuntimeError) as exc_info:
-                            factory()
-
-                        assert str(exc_info.value) == "DI container not initialized"
-        finally:
-            # Restore the original container
-            if original_container is not None:
-                main_module._di_container = original_container  # type: ignore[attr-defined]
-
-    def test_stock_service_factory_returns_service_when_container_exists(
-        self, mock_database_initializer: Mock
-    ) -> None:
-        """Test that stock service factory returns service when DI container exists."""
-        # Create a mock container and service
-        from dependency_injection.di_container import DIContainer
-        from src.application.services.stock_application_service import (
-            StockApplicationService,
-        )
-
+        # Create mocks
         mock_service = Mock(spec=StockApplicationService)
         mock_container = Mock(spec=DIContainer)
         mock_container.resolve.return_value = mock_service
 
-        import src.presentation.web.main as main_module
+        # Create a mock request with di_container in app.state
+        mock_request = Mock(spec=Request)
+        mock_request.app = Mock()
+        mock_request.app.state = Mock()
+        mock_request.app.state.di_container = mock_container
 
-        # Temporarily replace the DI container
-        original_container = main_module._di_container  # type: ignore[attr-defined]
-        try:
-            # Use the actual factory that's created during app startup
-            from src.presentation.web.main import app
-            from src.presentation.web.routers import stock_router
+        # Call the dependency
+        result = get_stock_service(mock_request)
 
-            with TestClient(app):
-                # Now set a valid mock container
-                main_module._di_container = mock_container  # type: ignore[attr-defined]
-
-                # Call the factory
-                if (
-                    hasattr(stock_router, "_service_factory")
-                    and stock_router._service_factory  # type: ignore[attr-defined]
-                ):
-                    result = stock_router._service_factory()  # type: ignore[attr-defined]
-
-                    # Verify it returns the service from the container
-                    assert result is mock_service
-                    mock_container.resolve.assert_called_once_with(
-                        StockApplicationService
-                    )
-        finally:
-            # Restore the original container
-            main_module._di_container = original_container  # type: ignore[attr-defined]
+        # Verify it returns the service from the container
+        assert result is mock_service
+        mock_container.resolve.assert_called_once_with(StockApplicationService)

@@ -7,7 +7,7 @@ of command objects used for stock operations.
 
 import pytest
 
-from src.application.commands.stock_commands import (
+from src.application.commands.stock import (
     CreateStockCommand,
     UpdateStockCommand,
 )
@@ -131,7 +131,7 @@ class TestCreateStockCommand:
         # Test against different types - covers hash function and equality branches
         assert command != "string"
         assert command != 123
-        assert command != None
+        assert command is not None
         assert command != {"symbol": "AAPL"}
 
         # Test hash function is called when using in sets
@@ -425,7 +425,7 @@ class TestUpdateStockCommand:
         # Test against different types - covers hash function and equality branches
         assert command != "string"
         assert command != 123
-        assert command != None
+        assert command is not None
         assert command != {"stock_id": "test-stock-1"}
 
         # Test hash function is called when using in sets

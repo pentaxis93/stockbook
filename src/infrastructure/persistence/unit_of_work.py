@@ -6,7 +6,6 @@ using SQLAlchemy for transaction management and repository coordination.
 """
 
 # pyright: reportUnknownMemberType=false
-# mypy: disable-error-code="no-untyped-call"
 
 from typing import Any, Optional
 
@@ -120,7 +119,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         """Get stock repository instance."""
         self._ensure_active()
         if self._stocks is None:
-            assert self._db_connection is not None  # Ensured by _ensure_active
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                raise RuntimeError("Database connection unexpectedly None")
             self._stocks = SqlAlchemyStockRepository(self._db_connection)
         return self._stocks
 
@@ -129,7 +131,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         """Get portfolio repository instance."""
         self._ensure_active()
         if self._portfolios is None:
-            assert self._db_connection is not None  # Ensured by _ensure_active
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                raise RuntimeError("Database connection unexpectedly None")
             # TODO: Replace with actual implementation when available
             self._portfolios = _SqlAlchemyPortfolioRepository(self._db_connection)  # type: ignore[assignment]
         return self._portfolios  # type: ignore[return-value]
@@ -139,7 +144,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         """Get transaction repository instance."""
         self._ensure_active()
         if self._transactions is None:
-            assert self._db_connection is not None  # Ensured by _ensure_active
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                raise RuntimeError("Database connection unexpectedly None")
             # TODO: Replace with actual implementation when available
             self._transactions = _SqlAlchemyTransactionRepository(self._db_connection)  # type: ignore[assignment]
         return self._transactions  # type: ignore[return-value]
@@ -149,7 +157,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         """Get target repository instance."""
         self._ensure_active()
         if self._targets is None:
-            assert self._db_connection is not None  # Ensured by _ensure_active
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                raise RuntimeError("Database connection unexpectedly None")
             # TODO: Replace with actual implementation when available
             self._targets = _SqlAlchemyTargetRepository(self._db_connection)  # type: ignore[assignment]
         return self._targets  # type: ignore[return-value]
@@ -159,7 +170,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         """Get portfolio balance repository instance."""
         self._ensure_active()
         if self._balances is None:
-            assert self._db_connection is not None  # Ensured by _ensure_active
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                raise RuntimeError("Database connection unexpectedly None")
             # TODO: Replace with actual implementation when available
             self._balances = _SqlAlchemyBalanceRepository(self._db_connection)  # type: ignore[assignment]
         return self._balances  # type: ignore[return-value]
@@ -169,7 +183,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         """Get journal repository instance."""
         self._ensure_active()
         if self._journal is None:
-            assert self._db_connection is not None  # Ensured by _ensure_active
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                raise RuntimeError("Database connection unexpectedly None")
             # TODO: Replace with actual implementation when available
             self._journal = _SqlAlchemyJournalRepository(self._db_connection)  # type: ignore[assignment]
         return self._journal  # type: ignore[return-value]
@@ -214,7 +231,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
 # Placeholder repository classes - will be replaced with actual implementations
 # These are only here to make the unit tests pass for now
 # Using underscore prefix to indicate these are internal/temporary
-class _SqlAlchemyPortfolioRepository:
+class _SqlAlchemyPortfolioRepository:  # pylint: disable=too-few-public-methods
     """Placeholder for portfolio repository."""
 
     def __init__(self, connection: IDatabaseConnection) -> None:
@@ -222,7 +239,7 @@ class _SqlAlchemyPortfolioRepository:
         self._connection = connection
 
 
-class _SqlAlchemyTransactionRepository:
+class _SqlAlchemyTransactionRepository:  # pylint: disable=too-few-public-methods
     """Placeholder for transaction repository."""
 
     def __init__(self, connection: IDatabaseConnection) -> None:
@@ -230,7 +247,7 @@ class _SqlAlchemyTransactionRepository:
         self._connection = connection
 
 
-class _SqlAlchemyTargetRepository:
+class _SqlAlchemyTargetRepository:  # pylint: disable=too-few-public-methods
     """Placeholder for target repository."""
 
     def __init__(self, connection: IDatabaseConnection) -> None:
@@ -238,7 +255,7 @@ class _SqlAlchemyTargetRepository:
         self._connection = connection
 
 
-class _SqlAlchemyBalanceRepository:
+class _SqlAlchemyBalanceRepository:  # pylint: disable=too-few-public-methods
     """Placeholder for balance repository."""
 
     def __init__(self, connection: IDatabaseConnection) -> None:
@@ -246,7 +263,7 @@ class _SqlAlchemyBalanceRepository:
         self._connection = connection
 
 
-class _SqlAlchemyJournalRepository:
+class _SqlAlchemyJournalRepository:  # pylint: disable=too-few-public-methods
     """Placeholder for journal repository."""
 
     def __init__(self, connection: IDatabaseConnection) -> None:

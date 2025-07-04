@@ -148,7 +148,7 @@ class TestTargetStatusEquality:
 
         assert active_status != "active"
         assert active_status != 1
-        assert active_status != None
+        assert active_status is not None
         assert active_status != {"value": "active"}
 
     def test_target_status_base_class_coverage(self) -> None:

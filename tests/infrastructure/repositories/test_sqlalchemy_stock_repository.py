@@ -25,7 +25,6 @@ from src.domain.value_objects import (
     StockSymbol,
 )
 from src.infrastructure.persistence.interfaces import IDatabaseConnection
-from src.infrastructure.persistence.tables.stock_table import stock_table
 from src.infrastructure.repositories.sqlalchemy_stock_repository import (
     SqlAlchemyStockRepository,
 )

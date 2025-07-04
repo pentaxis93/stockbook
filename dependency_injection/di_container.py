@@ -5,6 +5,10 @@ Provides a clean interface for dependency registration and resolution
 using dependency-injector library internally for robust functionality.
 """
 
+# Rationale: DI containers have inherent complexity in managing dependencies,
+# factory functions, and resolution logic. The complexity here is essential
+# to providing a clean abstraction over the underlying DI framework.
+
 import inspect
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
 
@@ -22,7 +26,7 @@ from .lifetimes import Lifetime
 T = TypeVar("T")
 
 
-class RegistrationInfo:
+class RegistrationInfo:  # pylint: disable=too-few-public-methods
     """Information about a registered service."""
 
     def __init__(
@@ -205,6 +209,28 @@ class DIContainer:
                 f"Failed to register factory for {service_type.__name__}: {str(e)}",
             ) from e
 
+    def _check_circular_dependency(self, type_name: str) -> None:
+        """Check for circular dependencies and raise if found."""
+        if type_name in self._resolution_chain:
+            # Find the circular part
+            start_index = self._resolution_chain.index(type_name)
+            circular_chain = self._resolution_chain[start_index:] + [type_name]
+            raise CircularDependencyError(circular_chain)
+
+    def _resolve_instance(self, service_type: Type[T]) -> T:
+        """Resolve an instance using the container provider."""
+        provider_name = self._get_provider_name(service_type)
+        provider = getattr(self._container, provider_name)
+
+        try:
+            return provider()
+        except DIError as e:
+            raise DependencyResolutionError(
+                service_type,
+                f"Failed to resolve {service_type.__name__}: {str(e)}",
+                self._resolution_chain.copy(),
+            ) from e
+
     def resolve(self, service_type: Type[T]) -> T:
         """
         Resolve an instance of the specified type.
@@ -219,13 +245,10 @@ class DIContainer:
             DependencyResolutionError: If the type cannot be resolved
             CircularDependencyError: If circular dependencies are detected
         """
-        # Check for circular dependencies
         type_name = service_type.__name__
-        if type_name in self._resolution_chain:
-            # Find the circular part
-            start_index = self._resolution_chain.index(type_name)
-            circular_chain = self._resolution_chain[start_index:] + [type_name]
-            raise CircularDependencyError(circular_chain)
+
+        # Check for circular dependencies
+        self._check_circular_dependency(type_name)
 
         # Add to resolution chain
         self._resolution_chain.append(type_name)
@@ -239,18 +262,7 @@ class DIContainer:
                 )
 
             # Get the provider and resolve
-            provider_name = self._get_provider_name(service_type)
-            provider = getattr(self._container, provider_name)
-
-            try:
-                instance = provider()
-                return instance
-            except DIError as e:
-                raise DependencyResolutionError(
-                    service_type,
-                    f"Failed to resolve {service_type.__name__}: {str(e)}",
-                    self._resolution_chain.copy(),
-                ) from e
+            return self._resolve_instance(service_type)
 
         finally:
             # Remove from resolution chain
@@ -339,7 +351,7 @@ class DIContainer:
                 def create_string_resolver(type_name: str) -> Callable[[], Any]:
                     def resolver() -> Any:
                         # Find the registered type that matches this name
-                        for registered_type in self._registrations.keys():
+                        for registered_type in self._registrations:
                             if registered_type.__name__ == type_name:
                                 return self.resolve(registered_type)
                         raise DependencyResolutionError(

@@ -199,7 +199,7 @@ class TestJournalContentEquality:
 
         assert content != "Journal content"
         assert content != 1
-        assert content != None
+        assert content is not None
         assert content
 
     def test_journal_content_hashable(self) -> None:
@@ -355,7 +355,7 @@ class TestJournalContentEdgeCases:
         # Test equality with different types - should return False
         assert content != "Market analysis content"
         assert content != 123
-        assert content != None
+        assert content is not None
         assert content != {"value": "Market analysis content"}
 
     def test_journal_content_base_class_coverage(self) -> None:

@@ -9,7 +9,7 @@ from typing import Any, List, Literal, Optional, Self, Union
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
-from src.application.commands.stock_commands import (
+from src.application.commands.stock import (
     CreateStockCommand,
     UpdateStockCommand,
 )

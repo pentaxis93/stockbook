@@ -34,7 +34,12 @@ class Stock(Entity):
     _grade: Optional[Grade]
     _notes: Notes
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
+        # Rationale: Stock is a rich domain entity with multiple business attributes.
+        # Each parameter represents a distinct aspect of the stock (symbol, name, classification,
+        # grade, notes) that cannot be further simplified without losing domain expressiveness.
+        # Using a parameter object here would reduce clarity and add unnecessary complexity
+        # for what is fundamentally a data-rich domain concept.
         self,
         symbol: StockSymbol,
         company_name: Optional[CompanyName] = None,
@@ -60,7 +65,9 @@ class Stock(Entity):
             ValueError: If any validation fails
         """
         # Initialize sector industry service for validation (import here to avoid circular imports)
-        from src.domain.services.sector_industry_service import SectorIndustryService
+        from src.domain.services.sector_industry_service import (  # pylint: disable=import-outside-toplevel; Rationale: This import must be inside the method to prevent circular dependencies; between domain entities and domain services. The Stock entity needs SectorIndustryService; for validation, but the service may also reference Stock, creating a circular import.
+            SectorIndustryService,
+        )
 
         self._sector_industry_service = SectorIndustryService()
 
@@ -251,18 +258,20 @@ class Stock(Entity):
 
     def _apply_field_updates(self, temp_values: Dict[str, Any]) -> None:
         """Apply validated field updates to the entity."""
-        if "symbol" in temp_values:
-            self._symbol = temp_values["symbol"]
-        if "company_name" in temp_values:
-            self._company_name = temp_values["company_name"]
-        if "sector" in temp_values:
-            self._sector = temp_values["sector"]
-        if "industry_group" in temp_values:
-            self._industry_group = temp_values["industry_group"]
-        if "grade" in temp_values:
-            self._grade = temp_values["grade"]
-        if "notes" in temp_values:
-            self._notes = temp_values["notes"]
+        # Map of field names to their corresponding attributes
+        field_mapping = {
+            "symbol": "_symbol",
+            "company_name": "_company_name",
+            "sector": "_sector",
+            "industry_group": "_industry_group",
+            "grade": "_grade",
+            "notes": "_notes",
+        }
+
+        # Apply updates for fields that are present
+        for field, attr in field_mapping.items():
+            if field in temp_values:
+                setattr(self, attr, temp_values[field])
 
     def _validate_sector_industry_combination(
         self, sector: Optional[str], industry_group: Optional[str]

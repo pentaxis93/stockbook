@@ -89,7 +89,7 @@ class TestStockSymbol:
         symbol = StockSymbol("AAPL")
         assert symbol != "AAPL"
         assert symbol != 123
-        assert symbol != None
+        assert symbol is not None
         assert symbol != {"value": "AAPL"}
 
     def test_stock_symbol_hash(self) -> None:

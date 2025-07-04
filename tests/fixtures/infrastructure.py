@@ -99,7 +99,7 @@ def sqlalchemy_connection(
     # Start a connection and transaction
     with sqlalchemy_in_memory_engine.connect() as connection:
         # Begin a transaction
-        with connection.begin() as transaction:
+        with connection.begin():
             yield connection
             # Transaction is automatically rolled back when exiting context
 

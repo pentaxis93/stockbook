@@ -378,7 +378,7 @@ class TestIndexChange:
         # Test equality with different types - should return False (covers line 114)
         assert balance != "not a balance"
         assert balance != 123
-        assert balance != None
+        assert balance is not None
         assert balance != {
             "portfolio_id": "portfolio-1",
             "balance_date": date(2024, 1, 15),

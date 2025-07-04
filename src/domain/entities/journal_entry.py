@@ -21,6 +21,10 @@ class JournalEntry(Entity):
     """
 
     def __init__(
+        # Rationale: JournalEntry captures investment notes and observations.
+        # Parameters represent the entry essentials (date, content) and flexible
+        # references to related entities (portfolio/stock/transaction). This design
+        # allows journal entries to be associated with various investment contexts.
         self,
         entry_date: date,
         content: JournalContent,

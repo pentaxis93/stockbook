@@ -20,7 +20,11 @@ class PortfolioBalance(Entity):
     Follows clean architecture and Domain-Driven Design principles.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        # Rationale: PortfolioBalance captures portfolio value at a point in time.
+        # Each parameter is essential for financial tracking: portfolio reference,
+        # date, balance, cash flows (withdrawals/deposits), and market performance.
+        # Combining these would obscure the distinct financial concepts being tracked.
         self,
         portfolio_id: str,
         balance_date: date,

@@ -49,7 +49,9 @@ class PortfolioCalculationService:
         self.config = config or PortfolioCalculationConfig()
 
     def calculate_total_value(
-        self, portfolio: List[Tuple[Stock, Quantity]], prices: Dict[str, Money]
+        self,
+        portfolio: List[Tuple[Stock, Quantity]],
+        prices: Dict[str, Money],
     ) -> Money:
         """Calculate total portfolio market value."""
         if not portfolio:
@@ -90,22 +92,32 @@ class PortfolioCalculationService:
 
         allocations: List[PositionAllocation] = []
         for stock, quantity in portfolio:
-            symbol_str = str(stock.symbol)
-            current_price = prices[symbol_str]
-            position_value = self.calculate_position_value(
-                stock, quantity, current_price
-            )
-            percentage = (position_value.amount / total_value.amount) * Decimal("100")
-
-            allocation = PositionAllocation(
-                symbol=stock.symbol,
-                value=position_value,
-                percentage=percentage,
-                quantity=int(quantity.value),
+            allocation = self._calculate_single_position_allocation(
+                stock, quantity, prices, total_value
             )
             allocations.append(allocation)
 
         return allocations
+
+    def _calculate_single_position_allocation(
+        self,
+        stock: Stock,
+        quantity: Quantity,
+        prices: Dict[str, Money],
+        total_value: Money,
+    ) -> PositionAllocation:
+        """Calculate allocation for a single position."""
+        symbol_str = str(stock.symbol)
+        current_price = prices[symbol_str]
+        position_value = self.calculate_position_value(stock, quantity, current_price)
+        percentage = (position_value.amount / total_value.amount) * Decimal("100")
+
+        return PositionAllocation(
+            symbol=stock.symbol,
+            value=position_value,
+            percentage=percentage,
+            quantity=int(quantity.value),
+        )
 
     def calculate_industry_allocations(
         self, portfolio: List[Tuple[Stock, Quantity]], prices: Dict[str, Money]

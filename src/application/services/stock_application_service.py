@@ -7,7 +7,7 @@ domain entities and repositories.
 
 from typing import List, Optional
 
-from src.application.commands.stock_commands import (
+from src.application.commands.stock import (
     CreateStockCommand,
     UpdateStockCommand,
 )

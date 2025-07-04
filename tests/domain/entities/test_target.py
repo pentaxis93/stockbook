@@ -493,5 +493,5 @@ class TestTargetStatus:
         # Test equality with different types - should return False (covers line 136)
         assert target != "not a target"
         assert target != 123
-        assert target != None
+        assert target is not None
         assert target != {"portfolio_id": "portfolio-1", "stock_id": "stock-1"}

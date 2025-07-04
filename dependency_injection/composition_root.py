@@ -7,11 +7,16 @@ following clean architecture principles.
 
 from typing import Any, Callable, Dict, Optional
 
+from sqlalchemy.engine import Engine
+
 # Configuration
 from config import Config
 
 # Application layer imports
 from src.application.services.stock_application_service import StockApplicationService
+from src.domain.repositories.interfaces import IStockBookUnitOfWork
+from src.infrastructure.persistence.database_factory import create_engine
+from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
 
 from .di_container import DIContainer
 
@@ -83,12 +88,6 @@ class CompositionRoot:
             container: DI container to configure
             db_path: Path to the database file
         """
-        from sqlalchemy.engine import Engine
-
-        from src.domain.repositories.interfaces import IStockBookUnitOfWork
-        from src.infrastructure.persistence.database_factory import create_engine
-        from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
-
         # Database engine - singleton
         engine = create_engine(db_path)
         container.register_instance(Engine, engine)
@@ -102,8 +101,6 @@ class CompositionRoot:
     @classmethod
     def _configure_application_layer(cls, container: DIContainer) -> None:
         """Configure application layer dependencies."""
-        from src.domain.repositories.interfaces import IStockBookUnitOfWork
-
         # Application services - transient to avoid state issues
         container.register_factory(
             StockApplicationService,

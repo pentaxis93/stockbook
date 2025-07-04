@@ -20,7 +20,11 @@ class Target(Entity):
     Follows clean architecture and Domain-Driven Design principles.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
+        # Rationale: Target is a domain entity representing investment price targets.
+        # Each parameter is essential: portfolio/stock references, pivot/failure prices,
+        # status tracking, and creation date. Using a parameter object would reduce
+        # clarity without meaningful benefit for this investment tracking concept.
         self,
         portfolio_id: str,
         stock_id: str,

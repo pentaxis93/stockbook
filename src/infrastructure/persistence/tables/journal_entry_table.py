@@ -5,37 +5,24 @@ This module defines the journal entry table structure for tracking
 investment research, decisions, and notes.
 """
 
-from sqlalchemy import (
-    CheckConstraint,
-    Column,
-    DateTime,
-    ForeignKey,
-    Index,
-    String,
-    Table,
-    Text,
-    text,
-)
+from sqlalchemy import Column, DateTime, Index, String, Table, Text, text
 
 from src.infrastructure.persistence.tables.stock_table import metadata
+
+from .table_utils import (
+    enum_check_constraint,
+    foreign_key_column,
+    id_column,
+    timestamp_columns,
+)
 
 # Define the journal entry table using SQLAlchemy Core
 journal_entry_table: Table = Table(
     "journal_entries",
     metadata,
-    Column("id", String, primary_key=True, nullable=False),
-    Column(
-        "portfolio_id",
-        String,
-        ForeignKey("portfolios.id"),
-        nullable=True,  # Journal entries can be general
-    ),
-    Column(
-        "stock_id",
-        String,
-        ForeignKey("stocks.id"),
-        nullable=True,  # Journal entries can be portfolio-level
-    ),
+    id_column(),
+    foreign_key_column("portfolio_id", "portfolios", nullable=True),  # Can be general
+    foreign_key_column("stock_id", "stocks", nullable=True),  # Can be portfolio-level
     Column("entry_type", String, nullable=False),
     Column("title", String, nullable=False),
     Column("content", Text, nullable=False),
@@ -46,21 +33,10 @@ journal_entry_table: Table = Table(
         nullable=False,
         server_default=text("CURRENT_TIMESTAMP"),
     ),
-    Column(
-        "created_at",
-        DateTime,
-        nullable=False,
-        server_default=text("CURRENT_TIMESTAMP"),
-    ),
-    Column(
-        "updated_at",
-        DateTime,
-        nullable=False,
-        server_default=text("CURRENT_TIMESTAMP"),
-    ),
+    *timestamp_columns(),
     # Check constraint for entry type
-    CheckConstraint(
-        "entry_type IN ('RESEARCH', 'DECISION', 'REVIEW', 'NOTE')", name="ck_entry_type"
+    enum_check_constraint(
+        "entry_type", ["RESEARCH", "DECISION", "REVIEW", "NOTE"], "ck_entry_type"
     ),
     # Indexes for common queries
     Index("idx_portfolio_entries", "portfolio_id"),

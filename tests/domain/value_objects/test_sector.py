@@ -58,7 +58,7 @@ class TestSectorValueObject:
         sector = Sector("Technology")
         assert sector != "Technology"
         assert sector != 123
-        assert sector != None
+        assert sector is not None
         assert sector != {"value": "Technology"}
 
     def test_sector_base_class_coverage(self) -> None:

@@ -46,20 +46,41 @@ def _collect_all_metadata() -> MetaData:
     return metadata
 
 
-def _create_tables_if_not_exist(engine: Engine, metadata: MetaData) -> None:
+def _create_tables_if_not_exist(engine: Engine, table_metadata: MetaData) -> None:
     """
     Create all tables defined in the metadata if they don't exist.
 
     Args:
         engine: SQLAlchemy engine
-        metadata: MetaData containing table definitions
+        table_metadata: MetaData containing table definitions
     """
     # Create all tables - this is idempotent (won't recreate existing tables)
-    metadata.create_all(engine)
-    logger.info(f"Created/verified {len(metadata.tables)} tables")
+    table_metadata.create_all(engine)
+    logger.info("Created/verified %d tables", len(table_metadata.tables))
 
 
-def initialize_database(database_url: str) -> None:
+def _extract_db_path(database_url: str) -> str:
+    """Extract database path from URL or return path as-is."""
+    if "://" in database_url:
+        # It's a URL
+        if database_url.startswith("sqlite:///"):
+            return database_url.replace("sqlite:///", "")
+        # For non-SQLite databases or invalid URLs
+        raise ValueError(f"Unsupported database URL: {database_url}")
+    # It's a file path
+    return database_url
+
+
+def _ensure_db_directory_exists(db_path: str) -> None:
+    """Create database directory if it doesn't exist."""
+    db_dir = os.path.dirname(db_path)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
+
+def initialize_database(
+    database_url: str,
+) -> None:
     """
     Initialize the database with all required tables.
 
@@ -73,24 +94,13 @@ def initialize_database(database_url: str) -> None:
         Exception: If database initialization fails
     """
     try:
-        logger.info(f"Initializing database: {database_url}")
+        logger.info("Initializing database: %s", database_url)
 
-        # Check if it's a URL or a file path
-        if "://" in database_url:
-            # It's a URL
-            if database_url.startswith("sqlite:///"):
-                db_path = database_url.replace("sqlite:///", "")
-            else:
-                # For non-SQLite databases or invalid URLs
-                raise ValueError(f"Unsupported database URL: {database_url}")
-        else:
-            # It's a file path
-            db_path = database_url
+        # Extract database path from URL
+        db_path = _extract_db_path(database_url)
 
-        # Create directory if it doesn't exist
-        db_dir = os.path.dirname(db_path)
-        if db_dir:
-            os.makedirs(db_dir, exist_ok=True)
+        # Ensure directory exists
+        _ensure_db_directory_exists(db_path)
 
         # Create engine using the factory which expects a path
         engine = create_engine(db_path)
@@ -107,5 +117,5 @@ def initialize_database(database_url: str) -> None:
         logger.info("Database initialized successfully")
 
     except Exception as e:
-        logger.error(f"Failed to initialize database: {str(e)}")
+        logger.error("Failed to initialize database: %s", str(e))
         raise

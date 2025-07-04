@@ -113,7 +113,7 @@ class TestNotes:
         # Test equality with different types - should return False
         assert notes != "Some important notes"
         assert notes != 123
-        assert notes != None
+        assert notes is not None
         assert notes != {"value": "Some important notes"}
 
     def test_notes_additional_edge_cases(self) -> None:

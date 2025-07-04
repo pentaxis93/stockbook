@@ -189,42 +189,42 @@ class TestRepositoryContractDefinitions:
     def test_stock_repository_is_abstract(self) -> None:
         """Should not be able to instantiate IStockRepository directly."""
         with pytest.raises(TypeError):
-            IStockRepository()  # type: ignore
+            IStockRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_portfolio_repository_is_abstract(self) -> None:
         """Should not be able to instantiate IPortfolioRepository directly."""
         with pytest.raises(TypeError):
-            IPortfolioRepository()  # type: ignore
+            IPortfolioRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_transaction_repository_is_abstract(self) -> None:
         """Should not be able to instantiate ITransactionRepository directly."""
         with pytest.raises(TypeError):
-            ITransactionRepository()  # type: ignore
+            ITransactionRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_target_repository_is_abstract(self) -> None:
         """Should not be able to instantiate ITargetRepository directly."""
         with pytest.raises(TypeError):
-            ITargetRepository()  # type: ignore
+            ITargetRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_portfolio_balance_repository_is_abstract(self) -> None:
         """Should not be able to instantiate IPortfolioBalanceRepository directly."""
         with pytest.raises(TypeError):
-            IPortfolioBalanceRepository()  # type: ignore
+            IPortfolioBalanceRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_journal_repository_is_abstract(self) -> None:
         """Should not be able to instantiate IJournalRepository directly."""
         with pytest.raises(TypeError):
-            IJournalRepository()  # type: ignore
+            IJournalRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_unit_of_work_is_abstract(self) -> None:
         """Should not be able to instantiate IUnitOfWork directly."""
         with pytest.raises(TypeError):
-            IUnitOfWork()  # type: ignore
+            IUnitOfWork()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_stockbook_unit_of_work_is_abstract(self) -> None:
         """Should not be able to instantiate IStockBookUnitOfWork directly."""
         with pytest.raises(TypeError):
-            IStockBookUnitOfWork()  # type: ignore
+            IStockBookUnitOfWork()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_all_repositories_inherit_from_abc(self) -> None:
         """Should verify all repository interfaces inherit from ABC."""
@@ -716,7 +716,7 @@ class TestRepositoryContractCompliance:
 
             # Should not be instantiable
             with pytest.raises(TypeError):
-                repo_interface()  # type: ignore
+                repo_interface()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_unit_of_work_transaction_boundaries(self) -> None:
         """Should define clear transaction boundaries."""
@@ -757,7 +757,7 @@ class TestAbstractMethodCoverage:
 
         for abstract_class in abstract_classes:
             with pytest.raises(TypeError):
-                abstract_class()  # type: ignore
+                abstract_class()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_abstract_method_contracts_exist(self) -> None:
         """Test that all repository interfaces define proper abstract method contracts."""

@@ -5,28 +5,19 @@ This module defines the portfolio table structure using SQLAlchemy's Core
 Table construct (not ORM) to maintain clean architecture separation.
 """
 
-from sqlalchemy import Column, DateTime, String, Table, text
+from sqlalchemy import Column, String, Table, text
 
 from src.infrastructure.persistence.tables.stock_table import metadata
+
+from .table_utils import id_column, timestamp_columns
 
 # Define the portfolio table using SQLAlchemy Core
 portfolio_table: Table = Table(
     "portfolios",
     metadata,
-    Column("id", String, primary_key=True, nullable=False),
+    id_column(),
     Column("name", String, nullable=False, unique=True),
     Column("description", String, nullable=True),
     Column("currency", String, nullable=False, server_default=text("'USD'")),
-    Column(
-        "created_at",
-        DateTime,
-        nullable=False,
-        server_default=text("CURRENT_TIMESTAMP"),
-    ),
-    Column(
-        "updated_at",
-        DateTime,
-        nullable=False,
-        server_default=text("CURRENT_TIMESTAMP"),
-    ),
+    *timestamp_columns(),
 )

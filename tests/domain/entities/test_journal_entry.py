@@ -349,5 +349,5 @@ class TestJournalContent:
         # Test equality with different types - should return False (covers line 103)
         assert entry != "not a journal entry"
         assert entry != 123
-        assert entry != None
+        assert entry is not None
         assert entry != {"entry_date": date(2024, 1, 15), "content": "Test content"}

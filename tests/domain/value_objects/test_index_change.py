@@ -195,7 +195,7 @@ class TestIndexChangeEquality:
 
         assert change != 5.75
         assert change != "5.75%"
-        assert change != None
+        assert change is not None
         assert change
 
     def test_index_change_hashable(self) -> None:
@@ -334,7 +334,7 @@ class TestIndexChangeEdgeCases:
         try:
             change = IndexChange(float("nan"))
             # If it doesn't raise an error, check if the value is properly handled
-            assert not change.value == change.value  # NaN != NaN
+            assert change.value != change.value  # NaN != NaN
         except (ValueError, TypeError):
             # This is expected behavior
             pass
@@ -364,7 +364,7 @@ class TestIndexChangeEdgeCases:
         # Test equality with different types - should return False
         assert change != 5.25
         assert change != 123
-        assert change != None
+        assert change is not None
         assert change != {"value": 5.25}
 
     def test_index_change_setattr_during_initialization(self) -> None:

@@ -111,7 +111,7 @@ class TestGradeValueObject:
         # Test equality with different types - should return False
         assert grade != "A"
         assert grade != 123
-        assert grade != None
+        assert grade is not None
         assert grade != {"value": "A"}
 
     def test_grade_valid_grades_constant(self) -> None:

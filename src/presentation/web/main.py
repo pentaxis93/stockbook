@@ -8,38 +8,34 @@ middleware, and endpoints.
 import logging
 import os
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, Dict, Optional
+from typing import Any, AsyncGenerator, Dict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from dependency_injection.composition_root import CompositionRoot
-from dependency_injection.di_container import DIContainer
-from src.application.services.stock_application_service import StockApplicationService
 from src.infrastructure.persistence.database_initializer import initialize_database
 from src.presentation.web.routers import stock_router
 
 logger = logging.getLogger(__name__)
 
-# Global DI container
-_di_container: Optional[DIContainer] = None
-"""Global dependency injection container instance."""
+# DI container is stored in app.state instead of using global variable
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Manage application lifecycle events.
 
     This function handles startup and shutdown events for the FastAPI app.
 
     Args:
-        app: The FastAPI application instance
+        fastapi_app: The FastAPI application instance
 
     Yields:
         None
     """
-    global _di_container
+    # Access app state directly instead of using global
 
     # Startup
     try:
@@ -53,30 +49,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         # Configure dependency injection
         logger.info("Configuring dependency injection...")
-        _di_container = CompositionRoot.configure(database_path=database_path)
+        di_container = CompositionRoot.configure(database_path=database_path)
 
-        # Set up service factory for stock router
-        def stock_service_factory() -> StockApplicationService:
-            """
-            Factory function to create StockApplicationService instances.
-
-            Returns:
-                StockApplicationService: The stock application service instance
-
-            Raises:
-                RuntimeError: If DI container is not initialized
-            """
-            if _di_container is None:
-                raise RuntimeError("DI container not initialized")
-            return _di_container.resolve(StockApplicationService)
-
-        stock_router.set_service_factory(stock_service_factory)
+        # Store DI container in app state for access in dependencies
+        fastapi_app.state.di_container = di_container
         logger.info("Dependency injection configured")
 
-    except Exception as e:
-        # Log error but don't crash the application
-        # This allows the app to start even if DB init fails
-        logger.error(f"Database initialization failed: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        # Rationale: We catch all exceptions during startup to ensure the application
+        # can start even if database initialization fails. This allows for graceful
+        # degradation and debugging of initialization issues.
+        logger.error("Database initialization failed: %s", str(e))
         logger.warning("Application starting without database initialization")
 
     # Yield control to the application

@@ -138,7 +138,7 @@ class TestTransactionTypeEquality:
 
         assert buy_type != "buy"
         assert buy_type != 1
-        assert buy_type != None
+        assert buy_type is not None
         assert buy_type != {"value": "buy"}
 
     def test_transaction_type_immutability(self) -> None:

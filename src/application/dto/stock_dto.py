@@ -8,6 +8,8 @@ application layer and presentation layer.
 from dataclasses import dataclass
 from typing import Any, Optional
 
+from src.domain.entities.stock import Stock
+
 
 @dataclass(frozen=True)
 class StockDto:
@@ -45,9 +47,6 @@ class StockDto:
         Returns:
             StockDto instance
         """
-        # Import here to avoid circular dependency
-        from src.domain.entities.stock import Stock
-
         if not isinstance(entity, Stock):
             raise TypeError("Expected Stock instance")
 

@@ -15,7 +15,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.engine import Engine
 
 from dependency_injection.composition_root import CompositionRoot
-from src.application.commands.stock_commands import CreateStockCommand
+from src.application.commands.stock import CreateStockCommand
 from src.application.services.stock_application_service import StockApplicationService
 from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import IStockBookUnitOfWork

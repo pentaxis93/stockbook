@@ -8,6 +8,7 @@ from typing import List
 from unittest.mock import Mock, patch
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from src.application.dto.stock_dto import StockDto
@@ -47,41 +48,45 @@ class TestStockRouter:
             ),
         ]
 
-    @patch("src.presentation.web.routers.stock_router._service_factory", None)
-    def test_get_stock_service_without_factory_raises_error(self) -> None:
-        """Should raise RuntimeError when service factory is not configured."""
+    @pytest.fixture
+    def app(self, mock_service: Mock) -> FastAPI:
+        """Create FastAPI app with mocked DI container."""
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Create a mock DI container
+        mock_di_container = Mock()
+        mock_di_container.resolve.return_value = mock_service
+
+        # Set the DI container in app state
+        app.state.di_container = mock_di_container
+
+        return app
+
+    def test_get_stock_service_without_di_container_raises_error(self) -> None:
+        """Should raise RuntimeError when DI container is not configured."""
+        app = FastAPI()
+        app.include_router(stock_router.router)
+
+        # Create a mock request without DI container
+        mock_request = Mock()
+        mock_request.app.state = Mock(spec=[])
+
         with pytest.raises(RuntimeError) as exc_info:
-            _ = stock_router.get_stock_service()
+            _ = stock_router.get_stock_service(mock_request)
 
-        assert str(exc_info.value) == "Service factory not configured"
-
-    def test_set_service_factory(self, mock_service: Mock) -> None:
-        """Should set the service factory correctly."""
-
-        def factory() -> StockApplicationService:
-            return mock_service
-
-        stock_router.set_service_factory(factory)
-
-        # Verify the factory returns our mock
-        service = stock_router.get_stock_service()
-        assert service is mock_service
+        assert str(exc_info.value) == "DI container not configured in app state"
 
     def test_get_stocks_no_filters_calls_get_all(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
     ) -> None:
         """Should call get_all_stocks when no filters are provided."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
 
         # Set up the service factory
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        # Create a test client with just the router
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
-
+        # Create test client with the app that has mocked service
         with TestClient(app) as client:
             response = client.get("/stocks")
 
@@ -95,18 +100,13 @@ class TestStockRouter:
         mock_service.search_stocks.assert_not_called()
 
     def test_get_stocks_with_symbol_filter(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
     ) -> None:
         """Should call search_stocks with symbol filter."""
         filtered_stocks = [sample_stock_dtos[0]]  # Just AAPL
         mock_service.search_stocks.return_value = filtered_stocks
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks", params={"symbol": "AAPL"})
@@ -123,7 +123,9 @@ class TestStockRouter:
             industry_filter=None,
         )
 
-    def test_get_stocks_with_multiple_filters(self, mock_service: Mock) -> None:
+    def test_get_stocks_with_multiple_filters(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should call search_stocks with all provided filters."""
         filtered_stock = [
             StockDto(
@@ -136,12 +138,7 @@ class TestStockRouter:
         ]
         mock_service.search_stocks.return_value = filtered_stock
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get(
@@ -160,17 +157,12 @@ class TestStockRouter:
         )
 
     def test_get_stocks_empty_string_filters_ignored(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
     ) -> None:
         """Should treat empty string filters as None and call get_all_stocks."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks", params={"symbol": ""})
@@ -182,17 +174,12 @@ class TestStockRouter:
         mock_service.search_stocks.assert_not_called()
 
     def test_get_stocks_whitespace_trimmed_from_filters(
-        self, mock_service: Mock
+        self, mock_service: Mock, app: FastAPI
     ) -> None:
         """Should trim whitespace from filter values."""
         mock_service.search_stocks.return_value = []
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get(
@@ -209,16 +196,13 @@ class TestStockRouter:
             industry_filter=None,
         )
 
-    def test_get_stocks_service_exception_returns_500(self, mock_service: Mock) -> None:
+    def test_get_stocks_service_exception_returns_500(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should return 500 error when service raises exception."""
         mock_service.get_all_stocks.side_effect = Exception("Database error")
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks")
@@ -227,36 +211,27 @@ class TestStockRouter:
         assert response.json()["detail"] == "Failed to retrieve stocks"
 
     def test_get_stocks_service_exception_with_filters(
-        self, mock_service: Mock
+        self, mock_service: Mock, app: FastAPI
     ) -> None:
         """Should handle service exceptions when using filters."""
         mock_service.search_stocks.side_effect = ValueError("Invalid filter")
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks", params={"symbol": "INVALID"})
 
-        assert response.status_code == 500
-        assert response.json()["detail"] == "Failed to retrieve stocks"
+        # ValueError should be converted to 422 validation error
+        assert response.status_code == 422
+        assert response.json()["detail"] == "Invalid filter"
 
     def test_get_stocks_response_format(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
     ) -> None:
         """Should return proper StockListResponse format."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks")
@@ -280,16 +255,11 @@ class TestStockRouter:
             assert "grade" in stock
             assert "notes" in stock
 
-    def test_get_stocks_empty_result(self, mock_service: Mock) -> None:
+    def test_get_stocks_empty_result(self, mock_service: Mock, app: FastAPI) -> None:
         """Should handle empty result correctly."""
         mock_service.get_all_stocks.return_value = []
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks")
@@ -299,20 +269,15 @@ class TestStockRouter:
         assert data["total"] == 0
         assert data["stocks"] == []
 
-    @patch("src.presentation.web.routers.stock_router.logger")
+    @patch("src.presentation.web.middleware.error_handlers.logger")
     def test_get_stocks_logs_errors(
-        self, mock_logger: Mock, mock_service: Mock
+        self, mock_logger: Mock, mock_service: Mock, app: FastAPI
     ) -> None:
         """Should log errors when exceptions occur."""
         error_msg = "Test error"
         mock_service.get_all_stocks.side_effect = Exception(error_msg)
 
-        stock_router.set_service_factory(lambda: mock_service)
-
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # Mock service is already set up in the app fixture
 
         with TestClient(app) as client:
             response = client.get("/stocks")
@@ -322,11 +287,12 @@ class TestStockRouter:
         # Verify error was logged
         mock_logger.error.assert_called_once()
         log_message = mock_logger.error.call_args[0][0]
+        log_args = mock_logger.error.call_args[0][1]
         assert "Error retrieving stocks:" in log_message
-        assert error_msg in log_message
+        assert log_args == error_msg
 
     def test_update_stock_partial_update_success(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
     ) -> None:
         """Should successfully update only specified fields."""
         # Arrange
@@ -345,12 +311,9 @@ class TestStockRouter:
         )
 
         mock_service.update_stock.return_value = updated_stock
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -374,7 +337,9 @@ class TestStockRouter:
         assert command.grade == "B"
         assert command.notes == "Updated notes"
 
-    def test_update_stock_full_update_success(self, mock_service: Mock) -> None:
+    def test_update_stock_full_update_success(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should successfully update all updatable fields including symbol."""
         # Arrange
         stock_id = "stock-001"
@@ -391,12 +356,9 @@ class TestStockRouter:
         )
 
         mock_service.update_stock.return_value = updated_stock
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         request_data = {
             "symbol": "APLE",
@@ -426,7 +388,7 @@ class TestStockRouter:
         mock_service.update_stock.assert_called_once()
 
     def test_update_stock_symbol_change(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto]
+        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
     ) -> None:
         """Should successfully change stock symbol."""
         # Arrange
@@ -445,12 +407,9 @@ class TestStockRouter:
         )
 
         mock_service.update_stock.return_value = updated_stock
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -461,7 +420,9 @@ class TestStockRouter:
         data = response.json()
         assert data["symbol"] == "APPL"
 
-    def test_update_stock_duplicate_symbol(self, mock_service: Mock) -> None:
+    def test_update_stock_duplicate_symbol(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should return 400 when changing to an existing symbol."""
         # Arrange
         stock_id = "stock-001"
@@ -469,12 +430,9 @@ class TestStockRouter:
             "Stock with symbol MSFT already exists"
         )
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -485,7 +443,7 @@ class TestStockRouter:
         data = response.json()
         assert "already exists" in data["detail"]
 
-    def test_update_stock_not_found(self, mock_service: Mock) -> None:
+    def test_update_stock_not_found(self, mock_service: Mock, app: FastAPI) -> None:
         """Should return 404 when stock doesn't exist."""
         # Arrange
         stock_id = "non-existent-id"
@@ -493,12 +451,9 @@ class TestStockRouter:
             f"Stock with ID {stock_id} not found"
         )
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -509,18 +464,17 @@ class TestStockRouter:
         data = response.json()
         assert "not found" in data["detail"]
 
-    def test_update_stock_empty_request_body(self, mock_service: Mock) -> None:
+    def test_update_stock_empty_request_body(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should return 422 for empty update request."""
         # Arrange
         stock_id = "stock-001"
         mock_service.update_stock.side_effect = ValueError("No fields to update")
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -531,17 +485,14 @@ class TestStockRouter:
         data = response.json()
         assert "No fields to update" in data["detail"]
 
-    def test_update_stock_invalid_grade(self, mock_service: Mock) -> None:
+    def test_update_stock_invalid_grade(self, mock_service: Mock, app: FastAPI) -> None:
         """Should return 422 for invalid grade values."""
         # Arrange
         stock_id = "stock-001"
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -553,17 +504,16 @@ class TestStockRouter:
         assert "detail" in data
         # Should be caught by Pydantic validation
 
-    def test_update_stock_invalid_symbol_format(self, mock_service: Mock) -> None:
+    def test_update_stock_invalid_symbol_format(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should return 422 for invalid symbol format."""
         # Arrange
         stock_id = "stock-001"
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         test_cases = [
             {"symbol": "123ABC"},  # Numbers
@@ -579,7 +529,9 @@ class TestStockRouter:
                 response = client.put(f"/stocks/{stock_id}", json=request_data)
                 assert response.status_code == 422
 
-    def test_update_stock_sector_industry_validation(self, mock_service: Mock) -> None:
+    def test_update_stock_sector_industry_validation(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should validate sector-industry relationship."""
         # Arrange
         stock_id = "stock-001"
@@ -587,12 +539,9 @@ class TestStockRouter:
             "Industry group 'Banking' does not belong to sector 'Technology'"
         )
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -607,7 +556,7 @@ class TestStockRouter:
         assert "does not belong to sector" in data["detail"]
 
     def test_update_stock_clear_industry_when_sector_changes(
-        self, mock_service: Mock
+        self, mock_service: Mock, app: FastAPI
     ) -> None:
         """Should handle domain logic for sector change clearing industry."""
         # Arrange
@@ -625,12 +574,9 @@ class TestStockRouter:
         )
 
         mock_service.update_stock.return_value = updated_stock
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act - only change sector
         with TestClient(app) as client:
@@ -642,18 +588,15 @@ class TestStockRouter:
         assert data["sector"] == "Healthcare"
         assert data["industry_group"] is None
 
-    def test_update_stock_service_error(self, mock_service: Mock) -> None:
+    def test_update_stock_service_error(self, mock_service: Mock, app: FastAPI) -> None:
         """Should return 500 for unexpected service errors."""
         # Arrange
         stock_id = "stock-001"
         mock_service.update_stock.side_effect = RuntimeError("Database error")
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -664,7 +607,9 @@ class TestStockRouter:
         data = response.json()
         assert data["detail"] == "Failed to update stock"
 
-    def test_update_stock_whitespace_trimming(self, mock_service: Mock) -> None:
+    def test_update_stock_whitespace_trimming(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should trim whitespace from all string fields."""
         # Arrange
         stock_id = "stock-001"
@@ -680,12 +625,9 @@ class TestStockRouter:
         )
 
         mock_service.update_stock.return_value = updated_stock
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         request_data = {
             "symbol": "  TRIM  ",
@@ -711,7 +653,9 @@ class TestStockRouter:
         assert command.industry_group == "Software"
         assert command.notes == "Trimmed notes"
 
-    def test_update_stock_empty_strings_as_none(self, mock_service: Mock) -> None:
+    def test_update_stock_empty_strings_as_none(
+        self, mock_service: Mock, app: FastAPI
+    ) -> None:
         """Should treat empty strings as None for optional fields."""
         # Arrange
         stock_id = "stock-001"
@@ -727,12 +671,9 @@ class TestStockRouter:
         )
 
         mock_service.update_stock.return_value = updated_stock
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         request_data = {
             "name": "Empty Fields Corp.",
@@ -757,9 +698,9 @@ class TestStockRouter:
         assert command.grade is None
         assert command.notes == ""  # Notes can be empty string
 
-    @patch("src.presentation.web.routers.stock_router.logger")
+    @patch("src.presentation.web.middleware.error_handlers.logger")
     def test_update_stock_logs_errors(
-        self, mock_logger: Mock, mock_service: Mock
+        self, mock_logger: Mock, mock_service: Mock, app: FastAPI
     ) -> None:
         """Should log errors when exceptions occur."""
         # Arrange
@@ -767,12 +708,9 @@ class TestStockRouter:
         error_msg = "Test error"
         mock_service.update_stock.side_effect = Exception(error_msg)
 
-        stock_router.set_service_factory(lambda: mock_service)
+        # Mock service is already set up in the app fixture
 
-        from fastapi import FastAPI
-
-        app = FastAPI()
-        app.include_router(stock_router.router)
+        # App already configured with mock service
 
         # Act
         with TestClient(app) as client:
@@ -784,5 +722,6 @@ class TestStockRouter:
         # Verify error was logged
         mock_logger.error.assert_called_once()
         log_message = mock_logger.error.call_args[0][0]
+        log_args = mock_logger.error.call_args[0][1]
         assert "Error updating stock" in log_message
-        assert error_msg in log_message
+        assert log_args == error_msg

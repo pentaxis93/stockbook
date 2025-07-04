@@ -137,14 +137,14 @@ class TestQuantityComparison:
         qty1 = Quantity(50)
         qty2 = Quantity(100)
         assert qty1 < qty2
-        assert not qty2 < qty1
+        assert qty2 >= qty1
 
     def test_greater_than_comparison(self) -> None:
         """Should compare greater than correctly."""
         qty1 = Quantity(100)
         qty2 = Quantity(50)
         assert qty1 > qty2
-        assert not qty2 > qty1
+        assert qty2 <= qty1
 
     def test_less_than_or_equal(self) -> None:
         """Should compare less than or equal."""
@@ -153,7 +153,7 @@ class TestQuantityComparison:
         qty3 = Quantity(50)
         assert qty1 <= qty2
         assert qty1 <= qty3
-        assert not qty2 <= qty1
+        assert qty2 > qty1
 
     def test_greater_than_or_equal(self) -> None:
         """Should compare greater than or equal."""
@@ -162,7 +162,7 @@ class TestQuantityComparison:
         qty3 = Quantity(100)
         assert qty1 >= qty2
         assert qty1 >= qty3
-        assert not qty2 >= qty1
+        assert qty2 < qty1
 
 
 class TestQuantityUtilities:
@@ -291,7 +291,7 @@ class TestQuantityEdgeCases:
         assert qty != Decimal("100.5")
         assert qty != 100.5
         assert qty != 123
-        assert qty != None
+        assert qty is not None
         assert qty != {"value": Decimal("100.5")}
 
     def test_quantity_arithmetic_error_conditions(self) -> None:

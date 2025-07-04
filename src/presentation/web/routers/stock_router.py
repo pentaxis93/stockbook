@@ -6,11 +6,12 @@ to the application layer for business logic.
 """
 
 import logging
-from typing import Annotated, Callable, Optional
+from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from src.application.services.stock_application_service import StockApplicationService
+from src.presentation.web.middleware import handle_stock_errors
 from src.presentation.web.models.stock_models import (
     StockListResponse,
     StockRequest,
@@ -28,33 +29,32 @@ router = APIRouter(
 )
 
 
-# Dependency injection placeholder - will be set by main app
-_service_factory: Optional[Callable[[], StockApplicationService]] = None
-"""Factory function for creating StockApplicationService instances."""
+# Service dependency is retrieved from app state via FastAPI's dependency injection
 
 
-def set_service_factory(factory: Callable[[], StockApplicationService]) -> None:
-    """Set the service factory for dependency injection."""
-    global _service_factory
-    _service_factory = factory
-
-
-def get_stock_service() -> StockApplicationService:
+def get_stock_service(request: Request) -> StockApplicationService:
     """
-    Dependency function to get StockApplicationService instance.
+    Dependency function to get StockApplicationService instance from app state.
+
+    Args:
+        request: FastAPI request object containing app state
 
     Returns:
         StockApplicationService instance
 
     Raises:
-        RuntimeError: If service factory not configured
+        RuntimeError: If DI container not configured in app state
     """
-    if _service_factory is None:
-        raise RuntimeError("Service factory not configured")
-    return _service_factory()
+    if not hasattr(request.app.state, "di_container"):
+        raise RuntimeError("DI container not configured in app state")
+    service: StockApplicationService = request.app.state.di_container.resolve(
+        StockApplicationService
+    )
+    return service
 
 
 @router.get("", response_model=StockListResponse)
+@handle_stock_errors
 async def get_stocks(
     symbol: Annotated[
         Optional[str], Query(description="Filter by stock symbol (partial match)")
@@ -70,38 +70,30 @@ async def get_stocks(
     Returns:
         StockListResponse containing filtered stocks and total count
     """
-    try:
-        # Check if we have any non-empty filters
-        has_filters = False
+    # Check if we have any non-empty filters
+    has_filters = False
 
-        # Clean up filter values - empty strings should be None
-        if symbol is not None and symbol.strip():
-            symbol = symbol.strip()
-            has_filters = True
-        else:
-            symbol = None
+    # Clean up filter values - empty strings should be None
+    if symbol is not None and symbol.strip():
+        symbol = symbol.strip()
+        has_filters = True
+    else:
+        symbol = None
 
-        # Use appropriate service method based on filters
-        if has_filters:
-            # Use search_stocks with filters
-            stock_dtos = service.search_stocks(
-                symbol_filter=symbol,
-                name_filter=None,  # Not exposed in API
-                industry_filter=None,  # Not exposed in API
-            )
-        else:
-            # No filters - get all stocks
-            stock_dtos = service.get_all_stocks()
+    # Use appropriate service method based on filters
+    if has_filters:
+        # Use search_stocks with filters
+        stock_dtos = service.search_stocks(
+            symbol_filter=symbol,
+            name_filter=None,  # Not exposed in API
+            industry_filter=None,  # Not exposed in API
+        )
+    else:
+        # No filters - get all stocks
+        stock_dtos = service.get_all_stocks()
 
-        # Convert DTOs to response model
-        return StockListResponse.from_dto_list(stock_dtos)
-
-    except Exception as e:
-        logger.error(f"Error retrieving stocks: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve stocks",
-        ) from e
+    # Convert DTOs to response model
+    return StockListResponse.from_dto_list(stock_dtos)
 
 
 @router.get("/{stock_id}", response_model=StockResponse)
@@ -127,7 +119,7 @@ async def get_stock_by_id(
 
         # Check if stock exists
         if stock_dto is None:
-            logger.warning(f"Stock with ID {stock_id} not found")
+            logger.warning("Stock with ID %s not found", stock_id)
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Stock with ID {stock_id} not found",
@@ -140,7 +132,7 @@ async def get_stock_by_id(
         # Re-raise HTTP exceptions as-is
         raise
     except Exception as e:
-        logger.error(f"Error retrieving stock {stock_id}: {str(e)}")
+        logger.error("Error retrieving stock %s: %s", stock_id, str(e))
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve stock",
@@ -148,6 +140,7 @@ async def get_stock_by_id(
 
 
 @router.post("", response_model=StockResponse, status_code=status.HTTP_201_CREATED)
+@handle_stock_errors
 async def create_stock(
     stock_request: StockRequest,
     service: StockApplicationService = Depends(get_stock_service),
@@ -169,45 +162,18 @@ async def create_stock(
     Raises:
         HTTPException: 422 for validation errors, 400 for duplicates, 500 for server errors
     """
-    try:
-        # Convert request to command
-        command = stock_request.to_command()
+    # Convert request to command
+    command = stock_request.to_command()
 
-        # Call application service
-        stock_dto = service.create_stock(command)
+    # Call application service
+    stock_dto = service.create_stock(command)
 
-        # Convert DTO to response
-        return StockResponse.from_dto(stock_dto)
-
-    except ValueError as e:
-        error_msg = str(e)
-
-        # Check if it's a duplicate stock error
-        if "already exists" in error_msg.lower():
-            logger.warning(
-                f"Attempted to create duplicate stock: {stock_request.symbol}"
-            )
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error_msg,
-            ) from e
-
-        # Other ValueError = validation error
-        logger.warning(f"Validation error creating stock: {error_msg}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=error_msg,
-        ) from e
-
-    except Exception as e:
-        logger.error(f"Error creating stock: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to create stock",
-        ) from e
+    # Convert DTO to response
+    return StockResponse.from_dto(stock_dto)
 
 
 @router.put("/{stock_id}", response_model=StockResponse)
+@handle_stock_errors
 async def update_stock(
     stock_id: str,
     stock_update: StockUpdateRequest,
@@ -234,45 +200,11 @@ async def update_stock(
         HTTPException: 404 if stock not found, 400 for duplicate symbol,
                       422 for validation errors, 500 for server errors
     """
-    try:
-        # Convert request to command
-        command = stock_update.to_command(stock_id)
+    # Convert request to command
+    command = stock_update.to_command(stock_id)
 
-        # Call application service
-        stock_dto = service.update_stock(command)
+    # Call application service
+    stock_dto = service.update_stock(command)
 
-        # Convert DTO to response
-        return StockResponse.from_dto(stock_dto)
-
-    except ValueError as e:
-        error_msg = str(e)
-
-        # Check if it's a not found error
-        if "not found" in error_msg.lower():
-            logger.warning(f"Stock with ID {stock_id} not found for update")
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=error_msg,
-            ) from e
-
-        # Check if it's a duplicate symbol error
-        if "already exists" in error_msg.lower():
-            logger.warning(f"Attempted to change stock {stock_id} to duplicate symbol")
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error_msg,
-            ) from e
-
-        # Other ValueError = validation error
-        logger.warning(f"Validation error updating stock {stock_id}: {error_msg}")
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=error_msg,
-        ) from e
-
-    except Exception as e:
-        logger.error(f"Error updating stock {stock_id}: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update stock",
-        ) from e
+    # Convert DTO to response
+    return StockResponse.from_dto(stock_dto)

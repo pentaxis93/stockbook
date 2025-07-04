@@ -5,12 +5,19 @@ This module provides a concrete implementation of IStockRepository using
 SQLAlchemy Core, maintaining clean architecture separation by avoiding ORM.
 """
 
-# pyright: reportUnknownArgumentType=false, reportUnknownMemberType=false
+# pyright: reportUnknownArgumentType=false, reportUnknownMemberType=false, reportArgumentType=false
 
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import exc, insert, select
+from sqlalchemy import delete as sql_delete
+from sqlalchemy import (
+    exc,
+    func,
+    insert,
+    select,
+)
+from sqlalchemy import update as sql_update
 
 from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import IStockRepository
@@ -88,7 +95,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             Stock domain entity or None if not found
         """
         # Create select statement
-        stmt = select(stock_table).where(stock_table.c.symbol == symbol.value)
+        stmt = select(*stock_table.c).where(stock_table.c.symbol == symbol.value)
 
         # Execute query
         result = self._connection.execute(stmt)
@@ -165,7 +172,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             Stock domain entity or None if not found
         """
         # Create select statement
-        stmt = select(stock_table).where(stock_table.c.id == stock_id)
+        stmt = select(*stock_table.c).where(stock_table.c.id == stock_id)
 
         # Execute query
         result = self._connection.execute(stmt)
@@ -187,7 +194,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             List of Stock domain entities
         """
         # Create select statement for all stocks
-        stmt = select(stock_table)
+        stmt = select(*stock_table.c)
 
         # Execute query
         result = self._connection.execute(stmt)
@@ -224,8 +231,6 @@ class SqlAlchemyStockRepository(IStockRepository):
         row_data["updated_at"] = datetime.now(timezone.utc)
 
         # Create update statement
-        from sqlalchemy import update as sql_update
-
         stmt = (
             sql_update(stock_table)
             .where(stock_table.c.id == stock_id)
@@ -262,8 +267,6 @@ class SqlAlchemyStockRepository(IStockRepository):
             exc.DatabaseError: For other database errors
         """
         # Create delete statement
-        from sqlalchemy import delete as sql_delete
-
         stmt = sql_delete(stock_table).where(stock_table.c.id == stock_id)
 
         # Execute the delete
@@ -286,8 +289,6 @@ class SqlAlchemyStockRepository(IStockRepository):
             exc.DatabaseError: For database errors
         """
         # Create optimized count query
-        from sqlalchemy import func
-
         stmt = (
             select(func.count())  # pylint: disable=not-callable
             .select_from(stock_table)
@@ -321,7 +322,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             exc.DatabaseError: For database errors
         """
         # Start with base select statement
-        stmt = select(stock_table)
+        stmt = select(*stock_table.c)
 
         # Apply filters dynamically
         if symbol_filter:

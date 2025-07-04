@@ -197,7 +197,7 @@ class TestStockDto:
         # Test against different types
         assert dto != "string"
         assert dto != 123
-        assert dto != None
+        assert dto is not None
         assert dto != {"symbol": "AAPL"}
 
     def test_stock_dto_is_immutable(self) -> None:

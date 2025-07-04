@@ -131,7 +131,7 @@ class TestPortfolioNameEquality:
 
         assert name != "Portfolio Name"
         assert name != 1
-        assert name != None
+        assert name is not None
         assert name
 
     def test_portfolio_name_hashable(self) -> None:
@@ -362,7 +362,7 @@ class TestPortfolioNameEdgeCases:
         # Test equality with different types - should return False
         assert name != "Growth Portfolio"
         assert name != 123
-        assert name != None
+        assert name is not None
         assert name != {"value": "Growth Portfolio"}
 
     def test_portfolio_name_base_class_coverage(self) -> None:

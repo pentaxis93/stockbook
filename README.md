@@ -128,10 +128,21 @@ This project enforces strict quality standards through pre-commit hooks:
 
 3. **Quality Checks** run automatically
    - Format: `black` and `isort`
-   - Lint: `pylint` with layer-specific rules
+   - Lint: `pylint` with strict unified standards
    - Type check: `pyright` and `mypy`
    - Test: `pytest` with coverage requirements
    - Security: `bandit` and `pip-audit`
+
+### Code Quality Standards
+
+All code follows the **same strict quality standards** with minor allowances for legitimate test patterns:
+
+- **Core/Production Code**: Strictest complexity and quality metrics
+- **Test Code**: Same strict standards with allowances for:
+  - Protected member access (testing internal state)
+  - Redefined names (pytest fixtures)
+  - Unused arguments (fixture side effects)
+  - Attributes in setup methods
 
 ### Project Structure
 

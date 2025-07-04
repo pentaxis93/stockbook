@@ -5,6 +5,8 @@ This module provides factory functions for creating SQLAlchemy engines
 with appropriate configuration for SQLite databases.
 """
 
+# pyright: reportUnknownMemberType=false, reportUntypedFunctionDecorator=false
+
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -69,6 +71,8 @@ def create_engine(
     @event.listens_for(engine, "connect")
     def set_sqlite_pragma(dbapi_conn: Any, connection_record: Any) -> None:
         """Configure SQLite pragmas on each connection."""
+        # connection_record is required by SQLAlchemy but not used
+        _ = connection_record
         configure_sqlite_pragmas(dbapi_conn, enable_foreign_keys=True)
 
     # Mark function as used by SQLAlchemy event system

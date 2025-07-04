@@ -20,7 +20,11 @@ class Transaction(Entity):
     Follows clean architecture and Domain-Driven Design principles.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments
+        # Rationale: Transaction is a core domain entity that requires all these attributes
+        # to properly represent a stock trade. Each parameter is essential and represents
+        # a distinct aspect of the transaction. Using a parameter object would obscure
+        # the clear intent and reduce readability without meaningful benefit.
         self,
         portfolio_id: str,
         stock_id: str,

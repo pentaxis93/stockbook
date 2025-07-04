@@ -303,5 +303,5 @@ class TestPortfolioName:
         # Test equality with different types - should return False (covers line 94)
         assert portfolio != "not a portfolio"
         assert portfolio != 123
-        assert portfolio != None
+        assert portfolio is not None
         assert portfolio != {"name": "Test Portfolio", "risk_percentage": 15.0}

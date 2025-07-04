@@ -22,12 +22,11 @@ from src.domain.repositories.interfaces import (
 from src.domain.value_objects import StockSymbol
 from src.infrastructure.persistence.tables.stock_table import stock_table
 
-from .infrastructure import sqlalchemy_connection  # noqa: F401
-from .infrastructure import sqlalchemy_in_memory_engine  # noqa: F401
 from .infrastructure import (
     StockBuilder,
     seed_test_portfolio_sqlalchemy,
     seed_test_stocks_sqlalchemy,
+    sqlalchemy_connection,
 )
 
 

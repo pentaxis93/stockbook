@@ -1,0 +1,2 @@
+- Consider hedging positions when the gap vs. the 50-day moving average reaches the one-year maximum level.
+- Implement hedging by selling calls. JR sells calls one week out, either at the 50-day moving average or 10% below the current price. Then he must buy the call back on expiration day. The one-week time frame is to maximize time decay. The second the stock reaches the strike price, the hedge must be re-evaluated. Will the stock break lower? Because the position will become unprotected if the stock crosses below the strike price.

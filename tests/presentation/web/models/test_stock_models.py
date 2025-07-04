@@ -10,7 +10,7 @@ from typing import Any, Dict
 import pytest
 from pydantic import ValidationError
 
-from src.application.commands.stock_commands import CreateStockCommand
+from src.application.commands.stock import CreateStockCommand
 from src.application.dto.stock_dto import StockDto
 from src.presentation.web.models.stock_models import (
     StockListResponse,
@@ -654,7 +654,6 @@ class TestStockListResponse:
 
     def test_from_dto_list_single_dto(self) -> None:
         """Should convert single DTO to list response."""
-        from src.presentation.web.models.stock_models import StockListResponse
 
         dto = StockDto(
             id="stock-123",
@@ -674,7 +673,6 @@ class TestStockListResponse:
 
     def test_from_dto_list_multiple_dtos(self) -> None:
         """Should convert multiple DTOs to list response."""
-        from src.presentation.web.models.stock_models import StockListResponse
 
         dtos = [
             StockDto(
@@ -713,7 +711,6 @@ class TestStockListResponse:
 
     def test_from_dto_list_preserves_order(self) -> None:
         """Should preserve the order of DTOs in the response."""
-        from src.presentation.web.models.stock_models import StockListResponse
 
         dtos = [
             StockDto(id="1", symbol="AAPL"),
@@ -729,7 +726,6 @@ class TestStockListResponse:
 
     def test_from_dto_list_with_optional_fields(self) -> None:
         """Should handle DTOs with optional fields correctly."""
-        from src.presentation.web.models.stock_models import StockListResponse
 
         dtos = [
             StockDto(
@@ -770,7 +766,6 @@ class TestStockListResponse:
 
     def test_stock_list_response_immutability(self) -> None:
         """Should be immutable after creation."""
-        from src.presentation.web.models.stock_models import StockListResponse
 
         response = StockListResponse(stocks=[], total=0)
 
@@ -779,7 +774,6 @@ class TestStockListResponse:
 
     def test_stock_list_response_json_serialization(self) -> None:
         """Should serialize to JSON correctly."""
-        from src.presentation.web.models.stock_models import StockListResponse
 
         stocks = [
             StockResponse(

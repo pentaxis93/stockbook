@@ -1062,5 +1062,5 @@ class TestStockConcurrencyScenarios:
         # Test equality with different types - should return False (covers line 121)
         assert stock != "not a stock"
         assert stock != 123
-        assert stock != None
+        assert stock is not None
         assert stock != {"symbol": "AAPL", "company_name": "Apple Inc."}

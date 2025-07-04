@@ -1,5 +1,7 @@
 """Tests for database initialization functionality."""
 
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
+
 import os
 import tempfile
 from typing import Generator
@@ -8,6 +10,7 @@ from unittest.mock import Mock, patch
 import pytest
 import sqlalchemy as sa
 from sqlalchemy import inspect
+from sqlalchemy.engine import Connection
 
 from src.infrastructure.persistence.database_initializer import initialize_database
 
@@ -95,6 +98,7 @@ class TestDatabaseInitializer:
         # Insert some test data
         engine = sa.create_engine(f"sqlite:///{temp_db_path}")
         with engine.begin() as conn:
+            assert isinstance(conn, Connection)
             _ = conn.execute(
                 sa.text("INSERT INTO stocks (id, symbol) VALUES (:id, :symbol)"),
                 {"id": "test-id", "symbol": "AAPL"},
@@ -105,6 +109,7 @@ class TestDatabaseInitializer:
 
         # Verify data is still there
         with engine.connect() as conn:
+            assert isinstance(conn, Connection)
             result = conn.execute(
                 sa.text("SELECT symbol FROM stocks WHERE id = :id"), {"id": "test-id"}
             ).fetchone()

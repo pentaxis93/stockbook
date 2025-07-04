@@ -51,7 +51,7 @@ class TestDomainEvent:
         event2 = DomainEvent()
 
         # Same event should equal itself
-        assert event1 == event1
+        assert event1 == event1  # pylint: disable=comparison-with-itself
 
         # Different events should not be equal
         assert event1 != event2
@@ -59,7 +59,7 @@ class TestDomainEvent:
         # Event should not equal non-DomainEvent objects
         assert event1 != "not an event"
         assert event1 != 42
-        assert event1 != None
+        assert event1 is not None
         assert event1
 
     def test_domain_event_hash(self) -> None:
@@ -552,7 +552,7 @@ class TestDomainEventArchitecturalConcerns:
         assert hasattr(stock_event, "occurred_at")
 
         # Should support base event operations
-        assert stock_event == stock_event  # Equality
+        assert stock_event == stock_event  # pylint: disable=comparison-with-itself
         assert hash(stock_event) is not None  # Hashability
         assert str(stock_event) is not None  # String representation
 

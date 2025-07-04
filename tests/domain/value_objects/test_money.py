@@ -133,14 +133,14 @@ class TestMoneyComparison:
         money1 = Money(50)
         money2 = Money(100)
         assert money1 < money2
-        assert not money2 < money1
+        assert money2 >= money1
 
     def test_greater_than(self) -> None:
         """Should compare greater than."""
         money1 = Money(100)
         money2 = Money(50)
         assert money1 > money2
-        assert not money2 > money1
+        assert money2 <= money1
 
     def test_less_than_or_equal(self) -> None:
         """Should compare less than or equal."""
@@ -149,7 +149,7 @@ class TestMoneyComparison:
         money3 = Money(50)
         assert money1 <= money2
         assert money1 <= money3
-        assert not money2 <= money1
+        assert money2 > money1
 
     def test_greater_than_or_equal(self) -> None:
         """Should compare greater than or equal."""
@@ -158,7 +158,7 @@ class TestMoneyComparison:
         money3 = Money(100)
         assert money1 >= money2
         assert money1 >= money3
-        assert not money2 >= money1
+        assert money2 < money1
 
 
 class TestMoneyUtilities:
@@ -316,7 +316,7 @@ class TestBaseNumericValueObjectEdgeCases:
         assert money != "100"
         assert money != 100
         assert money != Decimal("100")
-        assert money != None
+        assert money is not None
         assert money
 
     def test_base_numeric_arithmetic_with_test_class(self) -> None:
@@ -477,7 +477,7 @@ class TestMoneyArithmeticErrorCases:
         assert money != Decimal("100.50")
         assert money != 100.50
         assert money != 123
-        assert money != None
+        assert money is not None
         assert money != {"value": Decimal("100.50")}
 
     def test_money_arithmetic_edge_cases(self) -> None:

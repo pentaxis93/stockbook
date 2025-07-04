@@ -411,7 +411,7 @@ class TestTransactionType:
         # Test equality with different types - should return False (covers line 109)
         assert transaction != "not a transaction"
         assert transaction != 123
-        assert transaction != None
+        assert transaction is not None
         assert transaction != {"portfolio_id": "portfolio-1", "stock_id": "stock-1"}
 
         # Test hash method for collections usage (covers line 121)

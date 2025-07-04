@@ -57,6 +57,7 @@ coverage-layers.json
 .pytest_cache/
 cover/
 *.pyc
+.quality-*.status
 
 # Translations
 *.mo

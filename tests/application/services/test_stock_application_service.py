@@ -9,7 +9,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from src.application.commands.stock_commands import (
+from src.application.commands.stock import (
     CreateStockCommand,
     UpdateStockCommand,
 )

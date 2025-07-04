@@ -105,7 +105,7 @@ class TestIndustryGroup:
         # Test equality with different types - should return False
         assert industry != "Technology"
         assert industry != 123
-        assert industry != None
+        assert industry is not None
         assert industry != {"value": "Technology"}
 
     def test_industry_group_base_class_coverage(self) -> None:

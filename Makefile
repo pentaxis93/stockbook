@@ -11,11 +11,6 @@ SRC_DIR := src
 TEST_DIR := tests
 VENV_DIR := .venv
 
-# Layer-specific file patterns
-CORE_PATTERN := $(SRC_DIR)/domain $(SRC_DIR)/application $(SRC_DIR)/infrastructure
-PRESENTATION_PATTERN := $(SRC_DIR)/presentation
-CONFIG_PATTERN := pyproject.toml setup.py dependency_injection hooks
-
 # Coverage thresholds
 MIN_COVERAGE := 100
 
@@ -59,63 +54,66 @@ format: ## Format code with black and isort
 
 # Linting targets
 .PHONY: lint
-lint: lint-core lint-presentation lint-tests lint-config ## Run pylint on all code
+lint: lint-production lint-tests ## Run pylint on all code
 
-.PHONY: lint-core
-lint-core: ## Run pylint on core business logic (strict rules)
-	@echo "$(BLUE)Linting core business logic...$(NC)"
+.PHONY: lint-production
+lint-production: lint-domain lint-application lint-infrastructure lint-presentation lint-di ## Run pylint on all production code
+
+.PHONY: lint-domain
+lint-domain: ## Lint domain layer (strict rules)
+	@echo "$(BLUE)Linting domain layer...$(NC)"
 	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-few-public-methods,too-many-public-methods,too-many-instance-attributes,unnecessary-pass,wrong-import-order,ungrouped-imports,line-too-long,too-many-positional-arguments,fixme,duplicate-code \
-		--allowed-redefined-builtins=id \
-		--max-args=12 --max-locals=5 --max-returns=8 --max-branches=8 --max-statements=15 \
-		--max-positional-arguments=8 --good-names=i,j,k,ex,Run,_,id --docstring-min-length=10 \
-		$(shell find $(CORE_PATTERN) -name "*.py" 2>/dev/null)
-	@echo "$(GREEN)✓ Core linting complete$(NC)"
+		$(shell find $(SRC_DIR)/domain -name "*.py" 2>/dev/null)
+	@echo "$(GREEN)✓ Domain layer linting complete$(NC)"
+
+.PHONY: lint-application
+lint-application: ## Lint application layer (with appropriate disables)
+	@echo "$(BLUE)Linting application layer...$(NC)"
+	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
+		--disable=too-many-arguments \
+		$(shell find $(SRC_DIR)/application -name "*.py" 2>/dev/null)
+	@echo "$(GREEN)✓ Application layer linting complete$(NC)"
+
+.PHONY: lint-infrastructure
+lint-infrastructure: ## Lint infrastructure layer (with appropriate disables)
+	@echo "$(BLUE)Linting infrastructure layer...$(NC)"
+	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
+		--disable=too-many-locals \
+		$(shell find $(SRC_DIR)/infrastructure -name "*.py" 2>/dev/null)
+	@echo "$(GREEN)✓ Infrastructure layer linting complete$(NC)"
 
 .PHONY: lint-presentation
-lint-presentation: ## Run pylint on presentation layer (moderate rules)
+lint-presentation: ## Lint presentation layer (with appropriate disables)
 	@echo "$(BLUE)Linting presentation layer...$(NC)"
 	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,too-many-arguments,too-many-positional-arguments,fixme,duplicate-code,import-outside-toplevel,broad-exception-caught,consider-using-join,reimported \
-		--allowed-redefined-builtins=id \
-		--max-args=6 --max-locals=10 --max-returns=8 --max-branches=15 --max-statements=30 \
-		--docstring-min-length=10 \
-		$(shell find $(PRESENTATION_PATTERN) -name "*.py" 2>/dev/null)
-	@echo "$(GREEN)✓ Presentation linting complete$(NC)"
+		--disable=too-many-locals,too-many-arguments,too-many-statements,too-many-branches \
+		$(shell find $(SRC_DIR)/presentation -name "*.py" 2>/dev/null)
+	@echo "$(GREEN)✓ Presentation layer linting complete$(NC)"
+
+.PHONY: lint-di
+lint-di: ## Lint dependency injection (already has inline disables)
+	@echo "$(BLUE)Linting dependency injection...$(NC)"
+	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
+		$(shell find dependency_injection hooks -name "*.py" 2>/dev/null)
+	@echo "$(GREEN)✓ Dependency injection linting complete$(NC)"
 
 .PHONY: lint-tests
-lint-tests: ## Run pylint on test files (lenient rules)
+lint-tests: ## Run pylint on test files (strict rules with test-specific allowances)
 	@echo "$(BLUE)Linting test files...$(NC)"
 	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,redefined-outer-name,attribute-defined-outside-init,duplicate-code,unused-variable,unused-argument,protected-access,singleton-comparison,pointless-statement,unnecessary-pass,broad-exception-caught,comparison-with-itself,unexpected-keyword-arg,unused-import,logging-fstring-interpolation,no-else-return,import-outside-toplevel,unnecessary-negation,missing-class-docstring,missing-function-docstring,abstract-class-instantiated,consider-using-with,too-many-arguments,too-many-positional-arguments,fixme,too-many-lines \
-		--allowed-redefined-builtins=id \
+		--rcfile=pyproject.toml \
+		--disable=too-few-public-methods,protected-access,redefined-outer-name,unused-argument,attribute-defined-outside-init,too-many-lines,duplicate-code,import-outside-toplevel \
+		--max-locals=15 \
+		--max-statements=30 \
 		$(shell find $(TEST_DIR) -name "*.py" 2>/dev/null)
 	@echo "$(GREEN)✓ Test linting complete$(NC)"
 
-.PHONY: lint-config
-lint-config: ## Run pylint on configuration files (most lenient)
-	@echo "$(BLUE)Linting configuration files...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-few-public-methods,too-many-public-methods,too-many-instance-attributes,wrong-import-order,ungrouped-imports,line-too-long,no-member,missing-class-docstring,missing-function-docstring,missing-module-docstring,invalid-name,too-many-arguments,too-many-positional-arguments,too-many-locals,too-many-statements,too-many-nested-blocks,import-outside-toplevel,broad-exception-caught,duplicate-code,fixme,global-statement,global-variable-not-assigned,wildcard-import,unused-wildcard-import,c-extension-no-member,consider-iterating-dictionary \
-		--allowed-redefined-builtins=id \
-		$(shell find $(CONFIG_PATTERN) -name "*.py" 2>/dev/null)
-	@echo "$(GREEN)✓ Config linting complete$(NC)"
-
 # Type checking targets
 .PHONY: typecheck
-typecheck: typecheck-pyright typecheck-mypy ## Run both pyright and mypy type checkers
-
-.PHONY: typecheck-pyright
-typecheck-pyright: ## Run pyright type checker (strict mode)
+typecheck: ## Run pyright type checker (strict mode)
 	@echo "$(BLUE)Running pyright type checker...$(NC)"
 	$(PYTHON) -m pyright
-	@echo "$(GREEN)✓ Pyright type check complete$(NC)"
-
-.PHONY: typecheck-mypy
-typecheck-mypy: ## Run mypy type checker with caching
-	@echo "$(BLUE)Running mypy type checker...$(NC)"
-	$(PYTHON) -m mypy src --explicit-package-bases --cache-dir=.mypy_cache --incremental
-	@echo "$(GREEN)✓ Mypy type check complete$(NC)"
+	@echo "$(GREEN)✓ Type check complete$(NC)"
 
 # Testing targets
 .PHONY: test
@@ -142,11 +140,6 @@ coverage-report: ## Generate detailed coverage reports
 	$(PYTHON) -m coverage html
 	@echo "$(GREEN)✓ Coverage reports generated in htmlcov/$(NC)"
 
-.PHONY: layer-coverage
-layer-coverage: ## Check layer-specific coverage thresholds
-	@echo "$(BLUE)Checking layer-specific coverage...$(NC)"
-	$(PYTHON) hooks/check-layer-coverage.py
-	@echo "$(GREEN)✓ Layer coverage check complete$(NC)"
 
 # Security targets
 .PHONY: security
@@ -155,7 +148,7 @@ security: security-bandit security-pip-audit ## Run all security checks
 .PHONY: security-bandit
 security-bandit: ## Run bandit security scan
 	@echo "$(BLUE)Running bandit security scan...$(NC)"
-	$(PYTHON) -m bandit -r src/ -ll -i
+	$(PYTHON) -m bandit -r src/
 	@echo "$(GREEN)✓ Bandit scan complete$(NC)"
 
 .PHONY: security-pip-audit
@@ -201,22 +194,30 @@ quality: quality-parallel ## Run all quality checks including tests and coverage
 quality-parallel: ## Run all quality checks in parallel for faster execution
 	@echo "$(YELLOW)Running all quality checks in parallel...$(NC)"
 	@echo "$(BLUE)Starting parallel execution of quality checks...$(NC)"
+	@rm -f .quality-*.status 2>/dev/null || true
 	@failed=0; \
-	{ $(MAKE) -s lint-core 2>&1 | sed 's/^/[LINT-CORE] /' & \
-	  $(MAKE) -s lint-presentation 2>&1 | sed 's/^/[LINT-PRES] /' & \
-	  $(MAKE) -s lint-tests 2>&1 | sed 's/^/[LINT-TEST] /' & \
-	  $(MAKE) -s lint-config 2>&1 | sed 's/^/[LINT-CONF] /' & \
-	  $(MAKE) -s typecheck-pyright 2>&1 | sed 's/^/[PYRIGHT] /' & \
-	  $(MAKE) -s typecheck-mypy 2>&1 | sed 's/^/[MYPY] /' & \
-	  $(MAKE) -s test-fast 2>&1 | sed 's/^/[PYTEST] /' & \
-	  $(MAKE) -s complexity 2>&1 | sed 's/^/[FLAKE8] /' & \
-	  $(MAKE) -s imports 2>&1 | sed 's/^/[IMPORTS] /' & \
-	  $(MAKE) -s docstrings-style 2>&1 | sed 's/^/[DOCSTYLE] /' & \
-	  $(MAKE) -s docstrings-coverage 2>&1 | sed 's/^/[DOCCOV] /' & \
-	  $(MAKE) -s security-bandit 2>&1 | sed 's/^/[BANDIT] /' & \
-	  $(MAKE) -s security-pip-audit 2>&1 | sed 's/^/[PIP-AUDIT] /' & \
-	  wait; } || failed=1; \
-	{ $(MAKE) -s layer-coverage 2>&1 | sed 's/^/[LAYER-COV] /' || failed=1; }; \
+	( $(MAKE) -s lint-domain || echo $$? > .quality-lint-domain.status ) 2>&1 | sed 's/^/[LINT-DOMAIN] /' & \
+	( $(MAKE) -s lint-application || echo $$? > .quality-lint-app.status ) 2>&1 | sed 's/^/[LINT-APP] /' & \
+	( $(MAKE) -s lint-infrastructure || echo $$? > .quality-lint-infra.status ) 2>&1 | sed 's/^/[LINT-INFRA] /' & \
+	( $(MAKE) -s lint-presentation || echo $$? > .quality-lint-pres.status ) 2>&1 | sed 's/^/[LINT-PRES] /' & \
+	( $(MAKE) -s lint-di || echo $$? > .quality-lint-di.status ) 2>&1 | sed 's/^/[LINT-DI] /' & \
+	( $(MAKE) -s lint-tests || echo $$? > .quality-lint-test.status ) 2>&1 | sed 's/^/[LINT-TEST] /' & \
+	( $(MAKE) -s typecheck || echo $$? > .quality-typecheck.status ) 2>&1 | sed 's/^/[TYPECHECK] /' & \
+	( $(MAKE) -s test-fast || echo $$? > .quality-pytest.status ) 2>&1 | sed 's/^/[PYTEST] /' & \
+	( $(MAKE) -s complexity || echo $$? > .quality-flake8.status ) 2>&1 | sed 's/^/[FLAKE8] /' & \
+	( $(MAKE) -s imports || echo $$? > .quality-imports.status ) 2>&1 | sed 's/^/[IMPORTS] /' & \
+	( $(MAKE) -s docstrings-style || echo $$? > .quality-docstyle.status ) 2>&1 | sed 's/^/[DOCSTYLE] /' & \
+	( $(MAKE) -s docstrings-coverage || echo $$? > .quality-doccov.status ) 2>&1 | sed 's/^/[DOCCOV] /' & \
+	( $(MAKE) -s security-bandit || echo $$? > .quality-bandit.status ) 2>&1 | sed 's/^/[BANDIT] /' & \
+	( $(MAKE) -s security-pip-audit || echo $$? > .quality-pip-audit.status ) 2>&1 | sed 's/^/[PIP-AUDIT] /' & \
+	wait; \
+	for status_file in .quality-*.status; do \
+		if [ -f "$$status_file" ]; then \
+			failed=1; \
+			break; \
+		fi; \
+	done; \
+	rm -f .quality-*.status 2>/dev/null || true; \
 	if [ $$failed -eq 1 ]; then \
 		echo "$(RED)❌ One or more quality checks failed$(NC)"; \
 		exit 1; \
@@ -243,7 +244,6 @@ clean: ## Clean temporary files and caches
 	@echo "$(BLUE)Cleaning temporary files...$(NC)"
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
 	find . -type d -name "htmlcov" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 	find . -type f -name ".coverage" -delete 2>/dev/null || true

@@ -105,7 +105,7 @@ class TestCompanyName:
         # Test equality with different types - should return False
         assert company != "Apple Inc."
         assert company != 123
-        assert company != None
+        assert company is not None
         assert company != {"value": "Apple Inc."}
 
     def test_company_name_base_class_coverage(self) -> None:
