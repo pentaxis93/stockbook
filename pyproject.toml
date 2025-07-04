@@ -123,6 +123,12 @@ lines-after-imports = 2
     "D",        # docstrings not required
 ]
 
+"scripts/*" = [
+    # Script files have different requirements
+    "D",        # docstrings not required
+    "S603",     # subprocess calls are intentional in this controlled script
+]
+
 "src/infrastructure/*" = [
     "PLR0914",  # too-many-locals (matching Makefile config)
     "PLR0915",  # too-many-statements (database_factory has 16, limit is 15)

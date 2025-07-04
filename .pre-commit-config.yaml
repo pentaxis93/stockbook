@@ -1,48 +1,10 @@
 repos:
-  # Ruff linting and import sorting (replaces flake8, pylint, isort, pydocstyle, bandit)
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
-    hooks:
-      - id: ruff
-        args: [--fix, --unsafe-fixes]
-        always_run: true
-        pass_filenames: false
-
-  # Black code formatting (Ruff doesn't replace Black)
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-        language_version: python3
-        always_run: true
-        pass_filenames: false
-        args: ["."]
-
-  # Pyright type checking for core infrastructure
-  - repo: https://github.com/RobertCraigie/pyright-python
-    rev: v1.1.402
-    hooks:
-      - id: pyright
-        name: Type check all business logic layers with pyright
-        args: ["--project", "pyproject.toml"]
-        always_run: true
-        pass_filenames: false
-        additional_dependencies: [
-          sqlalchemy>=2.0.36,
-          dependency-injector>=4.48.1,
-          pytest>=8.3.4,
-          pydantic>=2.9.2,
-          fastapi>=0.115.6,
-          nanoid>=2.0.0,
-          httpx>=0.28.1
-        ]
-
-  # Custom quality checks (pylint, tests) that don't modify files
+  # Single quality check hook that runs everything
   - repo: local
     hooks:
-      - id: quality-checks
-        name: Run quality checks (pytest, pylint)
-        entry: hooks/run-quality-checks.sh
-        language: script
+      - id: check-all
+        name: Run all quality checks
+        entry: python scripts/check_all.py
+        language: system
         pass_filenames: false
         always_run: true

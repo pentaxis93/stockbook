@@ -14,15 +14,9 @@
 
 - When writing git commit messages, omit all references to authorship, and especially omit references to Claude.
 
-- Always run `pytest`, `pylint`, `pyright`, `black`, and `isort` and fix all issues before making a commit.
-  - Use `make quality` to run all quality checks that match the pre-commit hooks
-  - Use `make lint` to run layer-specific pylint checks
-  - Use `make test` to run tests with coverage
-  - Use `make format` to run black and isort formatters
-  - Use `make typecheck` to run both pyright and mypy type checkers
-  - Use `make test-fast` for quick test runs during development
-  - Use `make test-watch` to automatically re-run tests on file changes
-  - Use `make all` to format code and run all quality checks in sequence
+- Always run all quality checks and fix all issues before making a commit.
+  - Use `make check` to run ALL quality checks (linting, formatting, type checking, tests, coverage, security)
+  - This single command runs the same checks as pre-commit hooks and CI/CD
   - Use `make help` to see all available commands
 
 - Always update the docs/DEVELOPMENT_ROADMAP.md and README.md files with the latest changes when significant progress is made.
