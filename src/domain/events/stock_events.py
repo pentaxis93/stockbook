@@ -5,7 +5,6 @@ Events that represent significant occurrences in the stock subdomain.
 """
 
 from datetime import datetime
-from typing import Optional
 
 from src.domain.events.base import DomainEvent
 from src.domain.value_objects.stock_symbol import StockSymbol
@@ -24,7 +23,7 @@ class StockAddedEvent(DomainEvent):
         stock_symbol: StockSymbol,
         stock_name: str,
         stock_id: int,
-        occurred_at: Optional[datetime] = None,
+        occurred_at: datetime | None = None,
     ):
         """
         Initialize StockAddedEvent.

@@ -170,7 +170,7 @@ class TestTransactionTypeEquality:
         transaction_type = object.__new__(TransactionType)
 
         # This exercises the super().__setattr__ branch (line 91)
-        setattr(transaction_type, "test_attr", "test_value")
+        transaction_type.test_attr = "test_value"
 
         # Now properly initialize the object
         TransactionType.__init__(transaction_type, "buy")

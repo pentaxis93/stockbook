@@ -15,9 +15,9 @@ from .metrics import (
 )
 
 __all__ = [
-    "PositionAllocation",
     "PortfolioAllocation",
     "PortfolioMetrics",
+    "PositionAllocation",
     "PriceAnalysis",
     "RiskAssessment",
     "RiskLevel",

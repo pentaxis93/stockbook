@@ -6,7 +6,6 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
@@ -33,8 +32,8 @@ class Transaction(Entity):
         price: Money,
         transaction_date: date,
         *,
-        notes: Optional[Notes] = None,
-        id: Optional[str] = None,
+        notes: Notes | None = None,
+        id: str | None = None,
     ):
         """Initialize transaction with required value objects and validation."""
         # Validate foreign key IDs are not empty

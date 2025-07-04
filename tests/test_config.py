@@ -16,7 +16,7 @@ import os
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator
+from collections.abc import Iterator
 from unittest.mock import patch
 
 import pytest
@@ -204,7 +204,7 @@ class TestPortfolioDefaults:
 
         # Risk per trade should be reasonable percentage
         max_risk_per_trade = defaults["max_risk_per_trade"]
-        assert isinstance(max_risk_per_trade, (int, float))
+        assert isinstance(max_risk_per_trade, int | float)
         assert 0 < max_risk_per_trade <= config.max_risk_per_trade_limit
 
 

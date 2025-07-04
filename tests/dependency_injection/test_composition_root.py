@@ -67,7 +67,7 @@ class TestCompositionRoot:
         # Verify it has a unit of work injected
         assert hasattr(stock_service, "_unit_of_work")
         assert isinstance(
-            getattr(stock_service, "_unit_of_work"),
+            stock_service._unit_of_work,  # type: ignore[attr-defined]
             IStockBookUnitOfWork,
         )
 

@@ -6,7 +6,6 @@ and price analysis value objects with focus on business logic validation.
 """
 
 from decimal import Decimal
-from typing import Dict, List
 
 from src.domain.services.value_objects.metrics import (
     PortfolioAllocation,
@@ -99,7 +98,7 @@ class TestPortfolioAllocation:
 
     def test_portfolio_allocation_creation(self) -> None:
         """Test creating a valid portfolio allocation."""
-        allocations: Dict[str, Decimal] = {
+        allocations: dict[str, Decimal] = {
             "Technology": Decimal("40.0"),
             "Healthcare": Decimal("30.0"),
             "Finance": Decimal("30.0"),
@@ -115,7 +114,7 @@ class TestPortfolioAllocation:
 
     def test_get_allocation_percentage_existing_category(self) -> None:
         """Test getting allocation percentage for existing category."""
-        allocations: Dict[str, Decimal] = {
+        allocations: dict[str, Decimal] = {
             "Technology": Decimal("40.0"),
             "Healthcare": Decimal("30.0"),
         }
@@ -129,7 +128,7 @@ class TestPortfolioAllocation:
 
     def test_get_allocation_percentage_missing_category(self) -> None:
         """Test getting allocation percentage for non-existent category."""
-        allocations: Dict[str, Decimal] = {"Technology": Decimal("40.0")}
+        allocations: dict[str, Decimal] = {"Technology": Decimal("40.0")}
         portfolio_allocation = PortfolioAllocation(
             allocations=allocations, total_value=Money(Decimal("10000.00"))
         )
@@ -144,7 +143,7 @@ class TestPortfolioMetrics:
 
     def test_portfolio_metrics_creation(self) -> None:
         """Test creating valid portfolio metrics."""
-        position_allocations: List[PositionAllocation] = [
+        position_allocations: list[PositionAllocation] = [
             PositionAllocation(
                 symbol=StockSymbol("AAPL"),
                 value=Money(Decimal("5000.00")),
@@ -177,7 +176,7 @@ class TestPortfolioMetrics:
 
     def test_largest_position_with_positions(self) -> None:
         """Test largest_position property with multiple positions."""
-        position_allocations: List[PositionAllocation] = [
+        position_allocations: list[PositionAllocation] = [
             PositionAllocation(
                 symbol=StockSymbol("AAPL"),
                 value=Money(Decimal("5000.00")),  # Largest
@@ -223,7 +222,7 @@ class TestPortfolioMetrics:
 
     def test_is_well_diversified_true(self) -> None:
         """Test is_well_diversified property returns True for diversified portfolio."""
-        position_allocations: List[PositionAllocation] = [
+        position_allocations: list[PositionAllocation] = [
             PositionAllocation(
                 symbol=StockSymbol("AAPL"),
                 value=Money(Decimal("1000.00")),
@@ -268,7 +267,7 @@ class TestPortfolioMetrics:
 
     def test_is_well_diversified_false_too_few_positions(self) -> None:
         """Test is_well_diversified property returns False for too few positions."""
-        position_allocations: List[PositionAllocation] = [
+        position_allocations: list[PositionAllocation] = [
             PositionAllocation(
                 symbol=StockSymbol("AAPL"),
                 value=Money(Decimal("3000.00")),
@@ -295,7 +294,7 @@ class TestPortfolioMetrics:
 
     def test_is_well_diversified_false_overweight_position(self) -> None:
         """Test is_well_diversified property returns False for overweight position."""
-        position_allocations: List[PositionAllocation] = [
+        position_allocations: list[PositionAllocation] = [
             PositionAllocation(
                 symbol=StockSymbol("AAPL"),
                 value=Money(Decimal("6000.00")),
@@ -344,7 +343,7 @@ class TestRiskAssessment:
 
     def test_risk_assessment_creation(self) -> None:
         """Test creating a valid risk assessment."""
-        risk_factors: List[str] = ["High volatility", "Market uncertainty"]
+        risk_factors: list[str] = ["High volatility", "Market uncertainty"]
         assessment = RiskAssessment(
             overall_risk_level=RiskLevel.MEDIUM,
             risk_score=Decimal("65.0"),

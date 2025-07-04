@@ -8,9 +8,10 @@ that can be used across all test files without explicit imports.
 import sqlite3
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from pathlib import Path
-from typing import Any, Dict, Generator
+from typing import Any
+from collections.abc import Generator
 
 import pytest
 
@@ -60,7 +61,7 @@ def test_db() -> Generator[Path, None, None]:
 
 
 @pytest.fixture
-def sample_stock_data() -> Dict[str, Dict[str, str]]:
+def sample_stock_data() -> dict[str, dict[str, str]]:
     """
     Provide sample stock data for testing.
 
@@ -93,7 +94,7 @@ def sample_stock_data() -> Dict[str, Dict[str, str]]:
 
 
 @pytest.fixture
-def sample_portfolio(test_db: Path) -> Dict[str, Any]:
+def sample_portfolio(test_db: Path) -> dict[str, Any]:
     """
     Create a sample portfolio with some test data.
 
@@ -134,7 +135,7 @@ def assert_datetime_recent(dt: datetime | str, seconds: int = 5) -> None:
         dt = datetime.fromisoformat(dt.replace("Z", ""))
 
     # Use UTC time for consistency since SQLite CURRENT_TIMESTAMP is UTC
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    now = datetime.now(UTC).replace(tzinfo=None)
 
     time_diff = abs((now - dt).total_seconds())
     assert (

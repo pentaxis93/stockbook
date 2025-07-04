@@ -23,17 +23,17 @@ from .target_status import TargetStatus
 from .transaction_type import TransactionType
 
 __all__ = [
-    "StockSymbol",
     "CompanyName",
-    "IndustryGroup",
-    "Notes",
     "Grade",
-    "TransactionType",
-    "PortfolioName",
-    "TargetStatus",
     "IndexChange",
+    "IndustryGroup",
     "JournalContent",
     "Money",
+    "Notes",
+    "PortfolioName",
     "Quantity",
     "Sector",
+    "StockSymbol",
+    "TargetStatus",
+    "TransactionType",
 ]

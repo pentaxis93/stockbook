@@ -5,7 +5,7 @@ Command object encapsulating the intention to create a new stock
 with all necessary validation and normalization.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.domain.services.sector_industry_service import SectorIndustryService
 from src.domain.value_objects.stock_symbol import StockSymbol
@@ -21,10 +21,10 @@ class CreateStockCommand:
 
     # Private attributes for type checking
     _symbol: str
-    _name: Optional[str]
-    _sector: Optional[str]
-    _industry_group: Optional[str]
-    _grade: Optional[str]
+    _name: str | None
+    _sector: str | None
+    _industry_group: str | None
+    _grade: str | None
     _notes: str
 
     def __init__(
@@ -32,10 +32,10 @@ class CreateStockCommand:
         # These are not domain entities but DTOs that transfer complete information.
         self,
         symbol: str,
-        name: Optional[str] = None,
-        sector: Optional[str] = None,
-        industry_group: Optional[str] = None,
-        grade: Optional[str] = None,
+        name: str | None = None,
+        sector: str | None = None,
+        industry_group: str | None = None,
+        grade: str | None = None,
         notes: str = "",
     ):
         """
@@ -66,22 +66,22 @@ class CreateStockCommand:
         return self._symbol
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Get the company name."""
         return self._name
 
     @property
-    def sector(self) -> Optional[str]:
+    def sector(self) -> str | None:
         """Get the sector."""
         return self._sector
 
     @property
-    def industry_group(self) -> Optional[str]:
+    def industry_group(self) -> str | None:
         """Get the industry group."""
         return self._industry_group
 
     @property
-    def grade(self) -> Optional[str]:
+    def grade(self) -> str | None:
         """Get the stock grade."""
         return self._grade
 
@@ -138,12 +138,12 @@ class CreateStockCommand:
     def _normalize_and_validate_inputs(
         self,
         symbol: str,
-        name: Optional[str],
-        sector: Optional[str],
-        industry_group: Optional[str],
-        grade: Optional[str],
+        name: str | None,
+        sector: str | None,
+        industry_group: str | None,
+        grade: str | None,
         notes: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Normalize and validate all inputs, returning normalized values."""
         # Normalize inputs
         symbol = self._normalize_symbol(symbol)
@@ -167,7 +167,7 @@ class CreateStockCommand:
             "notes": notes,
         }
 
-    def _set_attributes(self, normalized_inputs: Dict[str, Any]) -> None:
+    def _set_attributes(self, normalized_inputs: dict[str, Any]) -> None:
         """Set all attributes using normalized inputs."""
         object.__setattr__(self, "_symbol", normalized_inputs["symbol"])
         object.__setattr__(self, "_name", normalized_inputs["name"])
@@ -183,7 +183,7 @@ class CreateStockCommand:
         return symbol.strip().upper()
 
     @staticmethod
-    def _normalize_name(name: Optional[str]) -> Optional[str]:
+    def _normalize_name(name: str | None) -> str | None:
         """Normalize company name."""
         if name is None:
             return None
@@ -191,7 +191,7 @@ class CreateStockCommand:
         return name.strip() if name.strip() else None
 
     @staticmethod
-    def _normalize_sector(sector: Optional[str]) -> Optional[str]:
+    def _normalize_sector(sector: str | None) -> str | None:
         """Normalize sector."""
         if sector is None:
             return None
@@ -200,7 +200,7 @@ class CreateStockCommand:
         return normalized if normalized else None
 
     @staticmethod
-    def _normalize_industry_group(industry_group: Optional[str]) -> Optional[str]:
+    def _normalize_industry_group(industry_group: str | None) -> str | None:
         """Normalize industry group."""
         if industry_group is None:
             return None
@@ -224,13 +224,13 @@ class CreateStockCommand:
             raise ValueError("Invalid symbol format")
 
     @staticmethod
-    def _validate_name(name: Optional[str]) -> None:
+    def _validate_name(name: str | None) -> None:
         """Validate company name."""
         # Name is now optional, so no validation needed
         pass
 
     @staticmethod
-    def _validate_grade(grade: Optional[str]) -> None:
+    def _validate_grade(grade: str | None) -> None:
         """Validate stock grade."""
         if grade is not None:
             valid_grades = {"A", "B", "C"}
@@ -241,10 +241,9 @@ class CreateStockCommand:
 
     @staticmethod
     def _validate_sector_industry_combination(
-        sector: Optional[str], industry_group: Optional[str]
+        sector: str | None, industry_group: str | None
     ) -> None:
         """Validate sector-industry combination."""
-
         # If no industry group, sector can be anything (or None)
         if industry_group is None:
             return

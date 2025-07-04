@@ -14,12 +14,12 @@ from sqlalchemy.engine import Engine
 from src.infrastructure.persistence.database_factory import create_engine
 
 # Import all tables to ensure they're registered with metadata
-from src.infrastructure.persistence.tables import journal_entry_table  # noqa: F401
-from src.infrastructure.persistence.tables import portfolio_balance_table  # noqa: F401
-from src.infrastructure.persistence.tables import portfolio_table  # noqa: F401
-from src.infrastructure.persistence.tables import stock_table  # noqa: F401
-from src.infrastructure.persistence.tables import target_table  # noqa: F401
-from src.infrastructure.persistence.tables import transaction_table  # noqa: F401
+from src.infrastructure.persistence.tables import journal_entry_table
+from src.infrastructure.persistence.tables import portfolio_balance_table
+from src.infrastructure.persistence.tables import portfolio_table
+from src.infrastructure.persistence.tables import stock_table
+from src.infrastructure.persistence.tables import target_table
+from src.infrastructure.persistence.tables import transaction_table
 from src.infrastructure.persistence.tables import (
     metadata,
 )

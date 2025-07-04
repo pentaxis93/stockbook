@@ -15,10 +15,10 @@ from .transaction import Transaction
 
 __all__ = [
     "Entity",
-    "Stock",
-    "Portfolio",
-    "Transaction",
-    "Target",
-    "PortfolioBalance",
     "JournalEntry",
+    "Portfolio",
+    "PortfolioBalance",
+    "Stock",
+    "Target",
+    "Transaction",
 ]

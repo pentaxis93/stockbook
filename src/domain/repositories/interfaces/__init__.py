@@ -14,12 +14,12 @@ from .transaction_repository import ITransactionRepository
 from .unit_of_work import IStockBookUnitOfWork, IUnitOfWork
 
 __all__ = [
-    "IStockRepository",
-    "IPortfolioRepository",
-    "ITransactionRepository",
-    "ITargetRepository",
-    "IPortfolioBalanceRepository",
     "IJournalRepository",
-    "IUnitOfWork",
+    "IPortfolioBalanceRepository",
+    "IPortfolioRepository",
     "IStockBookUnitOfWork",
+    "IStockRepository",
+    "ITargetRepository",
+    "ITransactionRepository",
+    "IUnitOfWork",
 ]

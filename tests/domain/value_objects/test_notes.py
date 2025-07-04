@@ -160,7 +160,7 @@ class TestNotes:
         notes = object.__new__(Notes)
 
         # This exercises the super().__setattr__ branch (line 88)
-        setattr(notes, "test_attr", "test_value")
+        notes.test_attr = "test_value"
 
         # Now properly initialize the object
         Notes.__init__(notes, "Test notes content")

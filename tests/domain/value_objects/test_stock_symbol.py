@@ -158,7 +158,7 @@ class TestStockSymbol:
         symbol = object.__new__(StockSymbol)
 
         # This exercises the super().__setattr__ branch (line 62)
-        setattr(symbol, "test_attr", "test_value")
+        symbol.test_attr = "test_value"
 
         # Now properly initialize the object
         StockSymbol.__init__(symbol, "AAPL")

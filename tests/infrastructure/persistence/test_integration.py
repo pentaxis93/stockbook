@@ -8,7 +8,7 @@ and SQLAlchemy with an in-memory SQLite database.
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportCallIssue=false, reportArgumentType=false
 # mypy: disable-error-code="no-untyped-call"
 
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from sqlalchemy import create_engine, select
@@ -138,15 +138,14 @@ class TestUnitOfWorkIntegration:
             unit_of_work.commit()
 
         # Act - Try to create duplicate (should fail)
-        with pytest.raises(Exception):
-            with unit_of_work:
-                duplicate = Stock(
-                    symbol=StockSymbol("MSFT"),
-                    company_name=CompanyName("Microsoft Duplicate"),
-                    grade=Grade("B"),
-                )
-                _ = unit_of_work.stocks.create(duplicate)
-                unit_of_work.commit()  # Should fail due to unique constraint
+        with pytest.raises(Exception), unit_of_work:
+            duplicate = Stock(
+                symbol=StockSymbol("MSFT"),
+                company_name=CompanyName("Microsoft Duplicate"),
+                grade=Grade("B"),
+            )
+            _ = unit_of_work.stocks.create(duplicate)
+            unit_of_work.commit()  # Should fail due to unique constraint
 
         # Assert - Original stock unchanged
         with test_engine.connect() as conn:
@@ -215,18 +214,18 @@ class TestUnitOfWorkIntegration:
         assert isinstance(uow, SqlAlchemyUnitOfWork)
 
         # Repositories should not be loaded yet
-        assert getattr(uow, "_stocks") is None
-        assert getattr(uow, "_portfolios") is None
+        assert uow._stocks is None  # type: ignore[attr-defined]
+        assert uow._portfolios is None  # type: ignore[attr-defined]
 
         with uow:
             # Access stocks repository
             _ = uow.stocks
-            assert getattr(uow, "_stocks") is not None
-            assert getattr(uow, "_portfolios") is None  # Still not loaded
+            assert uow._stocks is not None  # type: ignore[attr-defined]
+            assert uow._portfolios is None  # Still not loaded  # type: ignore
 
             # Access portfolios repository
             _ = uow.portfolios
-            assert getattr(uow, "_portfolios") is not None
+            assert uow._portfolios is not None  # type: ignore[attr-defined]
 
 
 class TestDependencyInjectionIntegration:
@@ -243,7 +242,7 @@ class TestDependencyInjectionIntegration:
         # Assert
         assert isinstance(service, StockApplicationService)
         assert hasattr(service, "_unit_of_work")
-        assert isinstance(getattr(service, "_unit_of_work"), IStockBookUnitOfWork)
+        assert isinstance(service._unit_of_work, IStockBookUnitOfWork)  # type: ignore[attr-defined]
 
     def test_end_to_end_stock_creation_with_di(self) -> None:
         """Should create stock through DI-configured service."""
@@ -313,18 +312,17 @@ class TestTransactionIsolation:
     ) -> None:
         """Should rollback all operations on error."""
         # Act & Assert
-        with pytest.raises(ValueError):
-            with unit_of_work:
-                # Create first stock
-                stock1 = Stock(
-                    symbol=StockSymbol("META"),
-                    company_name=CompanyName("Meta"),
-                    grade=Grade("B"),
-                )
-                _ = unit_of_work.stocks.create(stock1)
+        with pytest.raises(ValueError), unit_of_work:
+            # Create first stock
+            stock1 = Stock(
+                symbol=StockSymbol("META"),
+                company_name=CompanyName("Meta"),
+                grade=Grade("B"),
+            )
+            _ = unit_of_work.stocks.create(stock1)
 
-                # Simulate error
-                raise ValueError("Simulated error")
+            # Simulate error
+            raise ValueError("Simulated error")
 
         # Assert - Nothing should be committed
         with test_engine.connect() as conn:

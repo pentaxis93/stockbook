@@ -73,7 +73,7 @@ class TestSectorValueObject:
         sector = object.__new__(Sector)
 
         # This exercises the super().__setattr__ branch (line 71)
-        setattr(sector, "test_attr", "test_value")
+        sector.test_attr = "test_value"
 
         # Now properly initialize the object
         Sector.__init__(sector, "Technology")

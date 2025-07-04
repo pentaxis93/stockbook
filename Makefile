@@ -45,67 +45,70 @@ install-dev: install ## Install development dependencies including pre-commit ho
 
 # Formatting targets
 .PHONY: format
-format: ## Format code with black and isort
+format: ## Format code with black and fix imports with ruff (includes unsafe fixes)
+	@echo "$(BLUE)Running ruff import sorting and fixes (with unsafe fixes)...$(NC)"
+	$(PYTHON) -m ruff check --fix --unsafe-fixes .
 	@echo "$(BLUE)Running black formatter...$(NC)"
 	$(PYTHON) -m black .
-	@echo "$(BLUE)Running isort import sorter...$(NC)"
-	$(PYTHON) -m isort . --profile black
 	@echo "$(GREEN)✓ Code formatted$(NC)"
 
 # Linting targets
 .PHONY: lint
-lint: lint-production lint-tests ## Run pylint on all code
+lint: ## Run ruff linter on all code
+	@echo "$(BLUE)Running ruff linter...$(NC)"
+	$(PYTHON) -m ruff check .
+	@echo "$(GREEN)✓ Linting complete$(NC)"
 
+.PHONY: lint-fix
+lint-fix: ## Run ruff linter with automatic fixes (includes unsafe fixes)
+	@echo "$(BLUE)Running ruff linter with fixes (including unsafe)...$(NC)"
+	$(PYTHON) -m ruff check --fix --unsafe-fixes .
+	@echo "$(GREEN)✓ Linting and fixes complete$(NC)"
+
+.PHONY: lint-fix-safe
+lint-fix-safe: ## Run ruff linter with safe fixes only
+	@echo "$(BLUE)Running ruff linter with safe fixes only...$(NC)"
+	$(PYTHON) -m ruff check --fix .
+	@echo "$(GREEN)✓ Linting and safe fixes complete$(NC)"
+
+# Legacy layer-specific targets (now all use ruff)
 .PHONY: lint-production
-lint-production: lint-domain lint-application lint-infrastructure lint-presentation lint-di ## Run pylint on all production code
+lint-production: lint ## Alias for lint (ruff handles all layers)
 
 .PHONY: lint-domain
-lint-domain: ## Lint domain layer (strict rules)
+lint-domain: ## Lint domain layer (using ruff)
 	@echo "$(BLUE)Linting domain layer...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		$(shell find $(SRC_DIR)/domain -name "*.py" 2>/dev/null)
+	$(PYTHON) -m ruff check $(SRC_DIR)/domain
 	@echo "$(GREEN)✓ Domain layer linting complete$(NC)"
 
 .PHONY: lint-application
-lint-application: ## Lint application layer (with appropriate disables)
+lint-application: ## Lint application layer (using ruff)
 	@echo "$(BLUE)Linting application layer...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-many-arguments \
-		$(shell find $(SRC_DIR)/application -name "*.py" 2>/dev/null)
+	$(PYTHON) -m ruff check $(SRC_DIR)/application
 	@echo "$(GREEN)✓ Application layer linting complete$(NC)"
 
 .PHONY: lint-infrastructure
-lint-infrastructure: ## Lint infrastructure layer (with appropriate disables)
+lint-infrastructure: ## Lint infrastructure layer (using ruff)
 	@echo "$(BLUE)Linting infrastructure layer...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-many-locals \
-		$(shell find $(SRC_DIR)/infrastructure -name "*.py" 2>/dev/null)
+	$(PYTHON) -m ruff check $(SRC_DIR)/infrastructure
 	@echo "$(GREEN)✓ Infrastructure layer linting complete$(NC)"
 
 .PHONY: lint-presentation
-lint-presentation: ## Lint presentation layer (with appropriate disables)
+lint-presentation: ## Lint presentation layer (using ruff)
 	@echo "$(BLUE)Linting presentation layer...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--disable=too-many-locals,too-many-arguments,too-many-statements,too-many-branches \
-		$(shell find $(SRC_DIR)/presentation -name "*.py" 2>/dev/null)
+	$(PYTHON) -m ruff check $(SRC_DIR)/presentation
 	@echo "$(GREEN)✓ Presentation layer linting complete$(NC)"
 
 .PHONY: lint-di
-lint-di: ## Lint dependency injection (already has inline disables)
+lint-di: ## Lint dependency injection (using ruff)
 	@echo "$(BLUE)Linting dependency injection...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		$(shell find dependency_injection hooks -name "*.py" 2>/dev/null)
+	$(PYTHON) -m ruff check dependency_injection hooks
 	@echo "$(GREEN)✓ Dependency injection linting complete$(NC)"
 
 .PHONY: lint-tests
-lint-tests: ## Run pylint on test files (strict rules with test-specific allowances)
+lint-tests: ## Run ruff on test files
 	@echo "$(BLUE)Linting test files...$(NC)"
-	@PYTHONPATH=. $(PYTHON) -m pylint -j 0 --persistent=yes \
-		--rcfile=pyproject.toml \
-		--disable=too-few-public-methods,protected-access,redefined-outer-name,unused-argument,attribute-defined-outside-init,too-many-lines,duplicate-code,import-outside-toplevel \
-		--max-locals=15 \
-		--max-statements=30 \
-		$(shell find $(TEST_DIR) -name "*.py" 2>/dev/null)
+	$(PYTHON) -m ruff check $(TEST_DIR)
 	@echo "$(GREEN)✓ Test linting complete$(NC)"
 
 # Type checking targets
@@ -143,13 +146,13 @@ coverage-report: ## Generate detailed coverage reports
 
 # Security targets
 .PHONY: security
-security: security-bandit security-pip-audit ## Run all security checks
+security: security-ruff security-pip-audit ## Run all security checks
 
-.PHONY: security-bandit
-security-bandit: ## Run bandit security scan
-	@echo "$(BLUE)Running bandit security scan...$(NC)"
-	$(PYTHON) -m bandit -r src/
-	@echo "$(GREEN)✓ Bandit scan complete$(NC)"
+.PHONY: security-ruff
+security-ruff: ## Run ruff security checks (replaces bandit)
+	@echo "$(BLUE)Running ruff security scan...$(NC)"
+	$(PYTHON) -m ruff check --select S src/
+	@echo "$(GREEN)✓ Security scan complete$(NC)"
 
 .PHONY: security-pip-audit
 security-pip-audit: ## Run pip-audit dependency scan
@@ -159,9 +162,9 @@ security-pip-audit: ## Run pip-audit dependency scan
 
 # Quality check targets
 .PHONY: complexity
-complexity: ## Check cognitive complexity with flake8
-	@echo "$(BLUE)Checking cognitive complexity...$(NC)"
-	$(PYTHON) -m flake8 src/domain/ src/application/
+complexity: ## Check complexity with ruff (replaces flake8)
+	@echo "$(BLUE)Checking code complexity...$(NC)"
+	$(PYTHON) -m ruff check --select C901 src/
 	@echo "$(GREEN)✓ Complexity check complete$(NC)"
 
 .PHONY: imports
@@ -174,9 +177,9 @@ imports: ## Check import architecture with import-linter
 docstrings: docstrings-style docstrings-coverage ## Check all docstring quality
 
 .PHONY: docstrings-style
-docstrings-style: ## Check docstring style with pydocstyle
+docstrings-style: ## Check docstring style with ruff (replaces pydocstyle)
 	@echo "$(BLUE)Checking docstring style...$(NC)"
-	$(PYTHON) -m pydocstyle src/
+	$(PYTHON) -m ruff check src/
 	@echo "$(GREEN)✓ Docstring style check complete$(NC)"
 
 .PHONY: docstrings-coverage
@@ -196,19 +199,14 @@ quality-parallel: ## Run all quality checks in parallel for faster execution
 	@echo "$(BLUE)Starting parallel execution of quality checks...$(NC)"
 	@rm -f .quality-*.status 2>/dev/null || true
 	@failed=0; \
-	( $(MAKE) -s lint-domain || echo $$? > .quality-lint-domain.status ) 2>&1 | sed 's/^/[LINT-DOMAIN] /' & \
-	( $(MAKE) -s lint-application || echo $$? > .quality-lint-app.status ) 2>&1 | sed 's/^/[LINT-APP] /' & \
-	( $(MAKE) -s lint-infrastructure || echo $$? > .quality-lint-infra.status ) 2>&1 | sed 's/^/[LINT-INFRA] /' & \
-	( $(MAKE) -s lint-presentation || echo $$? > .quality-lint-pres.status ) 2>&1 | sed 's/^/[LINT-PRES] /' & \
-	( $(MAKE) -s lint-di || echo $$? > .quality-lint-di.status ) 2>&1 | sed 's/^/[LINT-DI] /' & \
-	( $(MAKE) -s lint-tests || echo $$? > .quality-lint-test.status ) 2>&1 | sed 's/^/[LINT-TEST] /' & \
+	( $(MAKE) -s lint || echo $$? > .quality-lint.status ) 2>&1 | sed 's/^/[LINT] /' & \
 	( $(MAKE) -s typecheck || echo $$? > .quality-typecheck.status ) 2>&1 | sed 's/^/[TYPECHECK] /' & \
 	( $(MAKE) -s test-fast || echo $$? > .quality-pytest.status ) 2>&1 | sed 's/^/[PYTEST] /' & \
-	( $(MAKE) -s complexity || echo $$? > .quality-flake8.status ) 2>&1 | sed 's/^/[FLAKE8] /' & \
+	( $(MAKE) -s complexity || echo $$? > .quality-complexity.status ) 2>&1 | sed 's/^/[COMPLEXITY] /' & \
 	( $(MAKE) -s imports || echo $$? > .quality-imports.status ) 2>&1 | sed 's/^/[IMPORTS] /' & \
 	( $(MAKE) -s docstrings-style || echo $$? > .quality-docstyle.status ) 2>&1 | sed 's/^/[DOCSTYLE] /' & \
 	( $(MAKE) -s docstrings-coverage || echo $$? > .quality-doccov.status ) 2>&1 | sed 's/^/[DOCCOV] /' & \
-	( $(MAKE) -s security-bandit || echo $$? > .quality-bandit.status ) 2>&1 | sed 's/^/[BANDIT] /' & \
+	( $(MAKE) -s security-ruff || echo $$? > .quality-security.status ) 2>&1 | sed 's/^/[SECURITY] /' & \
 	( $(MAKE) -s security-pip-audit || echo $$? > .quality-pip-audit.status ) 2>&1 | sed 's/^/[PIP-AUDIT] /' & \
 	wait; \
 	for status_file in .quality-*.status; do \
@@ -236,7 +234,7 @@ check: quality ## Alias for quality - runs all quality checks, tests, and covera
 validate: quality ## Alias for quality - runs all quality checks, tests, and coverage
 
 .PHONY: ci
-ci: lint typecheck test security complexity imports docstrings ## Run all CI checks (no formatting)
+ci: lint typecheck test security-ruff security-pip-audit complexity imports docstrings ## Run all CI checks (no formatting)
 
 # Utility targets
 .PHONY: clean

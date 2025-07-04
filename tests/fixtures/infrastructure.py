@@ -11,8 +11,8 @@ This module provides:
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 # pyright: reportUnusedVariable=false, reportUnknownArgumentType=false
 
-from datetime import datetime, timezone
-from typing import Generator, List, Optional
+from datetime import datetime, UTC
+from collections.abc import Generator
 from unittest.mock import Mock
 
 import pytest
@@ -301,12 +301,12 @@ class StockBuilder:
 
     def __init__(self) -> None:
         """Initialize builder with default values."""
-        self._id: Optional[str] = None
+        self._id: str | None = None
         self._symbol: str = "AAPL"
         self._company_name: str = "Apple Inc."
-        self._sector: Optional[str] = "Technology"
-        self._industry_group: Optional[str] = "Software"
-        self._grade: Optional[str] = "A"
+        self._sector: str | None = "Technology"
+        self._industry_group: str | None = "Software"
+        self._grade: str | None = "A"
         self._notes: str = "Test stock entity"
 
     def with_id(self, stock_id: str) -> "StockBuilder":
@@ -324,17 +324,17 @@ class StockBuilder:
         self._company_name = name
         return self
 
-    def with_sector(self, sector: Optional[str]) -> "StockBuilder":
+    def with_sector(self, sector: str | None) -> "StockBuilder":
         """Set the sector."""
         self._sector = sector
         return self
 
-    def with_industry_group(self, industry: Optional[str]) -> "StockBuilder":
+    def with_industry_group(self, industry: str | None) -> "StockBuilder":
         """Set the industry group."""
         self._industry_group = industry
         return self
 
-    def with_grade(self, grade: Optional[str]) -> "StockBuilder":
+    def with_grade(self, grade: str | None) -> "StockBuilder":
         """Set the stock grade."""
         self._grade = grade
         return self
@@ -430,7 +430,7 @@ def stock_builder() -> type[StockBuilder]:
 
 
 @pytest.fixture
-def sample_stocks() -> List[Stock]:
+def sample_stocks() -> list[Stock]:
     """
     Create a list of sample stock entities for testing.
 
@@ -464,7 +464,7 @@ def sample_stocks() -> List[Stock]:
 # =============================================================================
 
 
-def seed_test_stocks_sqlalchemy(conn: Connection, stocks: List[Stock]) -> None:
+def seed_test_stocks_sqlalchemy(conn: Connection, stocks: list[Stock]) -> None:
     """
     Seed the test database with stock entities using SQLAlchemy.
 
@@ -499,11 +499,11 @@ def seed_test_portfolio_sqlalchemy(
     Returns:
         str: ID of the created portfolio
     """
-    portfolio_id = f"portfolio-{datetime.now(timezone.utc).timestamp()}"
+    portfolio_id = f"portfolio-{datetime.now(UTC).timestamp()}"
     stmt = insert(portfolio_table).values(
         id=portfolio_id,
         name=name,
-        description=f"Test portfolio created at {datetime.now(timezone.utc)}",
+        description=f"Test portfolio created at {datetime.now(UTC)}",
         currency="USD",
     )
     _ = conn.execute(stmt)

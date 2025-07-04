@@ -8,7 +8,7 @@ arithmetic operations, and business rules consistently across all domains.
 import decimal
 from abc import ABC
 from decimal import ROUND_HALF_UP, Decimal
-from typing import Any, Union
+from typing import Any
 
 
 class BaseNumericValueObject(ABC):
@@ -21,9 +21,7 @@ class BaseNumericValueObject(ABC):
 
     _value: Decimal
 
-    def __init__(
-        self, value: Union[int, float, str, Decimal], allow_negative: bool = True
-    ):
+    def __init__(self, value: int | float | str | Decimal, allow_negative: bool = True):
         """
         Initialize numeric value object with validation.
 
@@ -102,7 +100,7 @@ class BaseNumericValueObject(ABC):
         """Add two instances of the same type."""
         if isinstance(other, self.__class__):
             return self.__class__(self._value + other._value)
-        if isinstance(other, (int, float, Decimal)):
+        if isinstance(other, int | float | Decimal):
             return self.__class__(self._value + Decimal(str(other)))
         raise TypeError(
             f"Can only add {self.__class__.__name__} to {self.__class__.__name__} or numeric types"
@@ -112,7 +110,7 @@ class BaseNumericValueObject(ABC):
         """Subtract instances or numeric values."""
         if isinstance(other, self.__class__):
             result_value = self._value - other._value
-        elif isinstance(other, (int, float, Decimal)):
+        elif isinstance(other, int | float | Decimal):
             result_value = self._value - Decimal(str(other))
         else:
             raise TypeError(
@@ -121,17 +119,15 @@ class BaseNumericValueObject(ABC):
 
         return self.__class__(result_value)
 
-    def __mul__(self, scalar: Union[int, float, Decimal]) -> "BaseNumericValueObject":
+    def __mul__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
         """Multiply by a scalar."""
         return self.__class__(self._value * Decimal(str(scalar)))
 
-    def __rmul__(self, scalar: Union[int, float, Decimal]) -> "BaseNumericValueObject":
+    def __rmul__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
         """Right multiplication (scalar * instance)."""
         return self.__mul__(scalar)
 
-    def __truediv__(
-        self, scalar: Union[int, float, Decimal]
-    ) -> "BaseNumericValueObject":
+    def __truediv__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
         """Divide by a scalar."""
         if scalar == 0:
             raise ZeroDivisionError("Cannot divide by zero")
@@ -171,7 +167,7 @@ class Money(BaseNumericValueObject):
     complexity or advanced allocation features.
     """
 
-    def __init__(self, amount: Union[int, float, str, Decimal]):
+    def __init__(self, amount: int | float | str | Decimal):
         """
         Initialize Money with USD amount.
 
@@ -212,11 +208,11 @@ class Money(BaseNumericValueObject):
             raise TypeError("Can only subtract Money from Money")
         return Money(self._value - other._value)
 
-    def __mul__(self, scalar: Union[int, float, Decimal]) -> "Money":
+    def __mul__(self, scalar: int | float | Decimal) -> "Money":
         """Multiply Money by a scalar."""
         return Money(self._value * Decimal(str(scalar)))
 
-    def __truediv__(self, scalar: Union[int, float, Decimal]) -> "Money":
+    def __truediv__(self, scalar: int | float | Decimal) -> "Money":
         """Divide Money by a scalar."""
         if scalar == 0:
             raise ZeroDivisionError("Cannot divide by zero")

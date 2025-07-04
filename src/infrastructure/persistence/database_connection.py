@@ -8,7 +8,7 @@ protocol by wrapping SQLAlchemy connection objects.
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportAttributeAccessIssue=false
 # mypy: disable-error-code="no-untyped-call,attr-defined"
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from sqlalchemy.engine import Connection
 
@@ -34,8 +34,8 @@ class SqlAlchemyConnection:
     def execute(
         self,
         statement: Any,
-        parameters: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
-        execution_options: Optional[Dict[str, Any]] = None,
+        parameters: dict[str, Any] | list[dict[str, Any]] | None = None,
+        execution_options: dict[str, Any] | None = None,
     ) -> Any:
         """
         Execute a SQLAlchemy Core statement.

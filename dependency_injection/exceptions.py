@@ -5,7 +5,7 @@ Provides clear, helpful error messages for common DI configuration
 and usage mistakes.
 """
 
-from typing import Any, List, Optional, Type
+from typing import Any
 
 
 class DependencyInjectionError(Exception):
@@ -19,10 +19,11 @@ class DependencyResolutionError(DependencyInjectionError):
 
     def __init__(
         self,
-        service_type: Type[Any],
+        service_type: type[Any],
         message: str,
-        resolution_chain: Optional[List[str]] = None,
+        resolution_chain: list[str] | None = None,
     ):
+        """Initialize dependency resolution error with details."""
         self.service_type = service_type
         self.resolution_chain = resolution_chain or []
         super().__init__(message)
@@ -38,7 +39,8 @@ class DependencyResolutionError(DependencyInjectionError):
 class CircularDependencyError(DependencyInjectionError):
     """Raised when a circular dependency is detected."""
 
-    def __init__(self, dependency_chain: List[str]):
+    def __init__(self, dependency_chain: list[str]):
+        """Initialize circular dependency error with the dependency chain."""
         self.dependency_chain = dependency_chain
         chain_str = " -> ".join(dependency_chain)
         message = f"Circular dependency detected: {chain_str}"
@@ -48,7 +50,8 @@ class CircularDependencyError(DependencyInjectionError):
 class DuplicateRegistrationError(DependencyInjectionError):
     """Raised when attempting to register a service that's already registered."""
 
-    def __init__(self, service_type: Type[Any], message: str):
+    def __init__(self, service_type: type[Any], message: str):
+        """Initialize duplicate registration error."""
         self.service_type = service_type
         super().__init__(message)
 
@@ -56,6 +59,7 @@ class DuplicateRegistrationError(DependencyInjectionError):
 class InvalidRegistrationError(DependencyInjectionError):
     """Raised when registration parameters are invalid."""
 
-    def __init__(self, service_type: Type[Any], message: str):
+    def __init__(self, service_type: type[Any], message: str):
+        """Initialize invalid registration error."""
         self.service_type = service_type
         super().__init__(message)

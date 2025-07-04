@@ -135,9 +135,8 @@ class TestSqlAlchemyUnitOfWorkContextManager:
         uow = SqlAlchemyUnitOfWork(mock_engine)
 
         # Act & Assert
-        with pytest.raises(ValueError):
-            with uow:
-                raise ValueError("Test error")
+        with pytest.raises(ValueError), uow:
+            raise ValueError("Test error")
 
         # The connection's __exit__ should be called with exception info
         mock_connection.__exit__.assert_called_once()
@@ -430,9 +429,8 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
         uow = SqlAlchemyUnitOfWork(mock_engine)
 
         # Act & Assert
-        with pytest.raises(DatabaseError, match="Cannot connect"):
-            with uow:
-                pass
+        with pytest.raises(DatabaseError, match="Cannot connect"), uow:
+            pass
 
     def test_handles_transaction_begin_errors(self) -> None:
         """Should handle errors when beginning transaction."""

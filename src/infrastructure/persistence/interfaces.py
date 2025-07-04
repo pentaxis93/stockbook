@@ -8,7 +8,7 @@ clean architecture boundaries.
 
 # pyright: reportUnknownParameterType=false
 
-from typing import Any, Dict, List, Optional, Protocol, Union, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 
 @runtime_checkable
@@ -24,8 +24,8 @@ class IDatabaseConnection(Protocol):
     def execute(
         self,
         statement: Any,  # SQLAlchemy ClauseElement
-        parameters: Optional[Union[Dict[str, Any], List[Dict[str, Any]]]] = None,
-        execution_options: Optional[Dict[str, Any]] = None,
+        parameters: dict[str, Any] | list[dict[str, Any]] | None = None,
+        execution_options: dict[str, Any] | None = None,
     ) -> Any:  # SQLAlchemy Result
         """
         Execute a SQLAlchemy Core statement.

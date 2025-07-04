@@ -6,7 +6,6 @@ across multiple stocks and provide aggregated insights.
 """
 
 from decimal import Decimal
-from typing import Dict, List, Tuple
 
 import pytest
 
@@ -31,7 +30,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 # Test data helpers
 def create_test_stock(
     symbol: str = "AAPL", price: float = 100.00, quantity: int = 10, grade: str = "B"
-) -> Tuple[Stock, Quantity, Money]:
+) -> tuple[Stock, Quantity, Money]:
     """Helper to create test stock with position."""
     stock = Stock(
         symbol=StockSymbol(symbol),
@@ -43,7 +42,7 @@ def create_test_stock(
     return stock, Quantity(quantity), Money(Decimal(str(price)))
 
 
-def create_test_portfolio() -> Tuple[List[Tuple[Stock, Quantity]], Dict[str, Money]]:
+def create_test_portfolio() -> tuple[list[tuple[Stock, Quantity]], dict[str, Money]]:
     """Helper to create a test portfolio with multiple positions."""
     positions = [
         create_test_stock("AAPL", 150.00, 10, "A"),  # $1,500
@@ -52,8 +51,8 @@ def create_test_portfolio() -> Tuple[List[Tuple[Stock, Quantity]], Dict[str, Mon
         create_test_stock("GME", 20.00, 50, "C"),  # $1,000
     ]
 
-    portfolio: List[Tuple[Stock, Quantity]] = []
-    prices: Dict[str, Money] = {}
+    portfolio: list[tuple[Stock, Quantity]] = []
+    prices: dict[str, Money] = {}
 
     for stock, quantity, price in positions:
         portfolio.append((stock, quantity))
@@ -113,8 +112,8 @@ class TestPortfolioValueCalculations:
     def test_calculate_portfolio_value_with_zero_positions(self) -> None:
         """Should handle empty portfolio."""
         service = PortfolioCalculationService()
-        empty_portfolio: List[Tuple[Stock, Quantity]] = []
-        empty_prices: Dict[str, Money] = {}
+        empty_portfolio: list[tuple[Stock, Quantity]] = []
+        empty_prices: dict[str, Money] = {}
 
         total_value = service.calculate_total_value(empty_portfolio, empty_prices)
 
@@ -138,7 +137,7 @@ class TestPortfolioValueCalculations:
         stock, quantity, _ = create_test_stock("AAPL", 150.00, 10, "A")
 
         portfolio = [(stock, quantity)]
-        prices: Dict[str, Money] = {}  # Missing price for AAPL
+        prices: dict[str, Money] = {}  # Missing price for AAPL
 
         with pytest.raises(CalculationError, match="Stock AAPL missing current price"):
             _ = service.calculate_total_value(portfolio, prices)
@@ -178,8 +177,8 @@ class TestPortfolioCalculationEdgeCases:
         service = PortfolioCalculationService()
 
         # Create a large portfolio with many positions
-        large_portfolio: List[Tuple[Stock, Quantity]] = []
-        prices: Dict[str, Money] = {}
+        large_portfolio: list[tuple[Stock, Quantity]] = []
+        prices: dict[str, Money] = {}
 
         expected_total = Decimal("0")
 
@@ -212,8 +211,8 @@ class TestPortfolioCalculationEdgeCases:
     def test_calculate_position_allocations_empty_portfolio(self) -> None:
         """Should handle empty portfolio for position allocations."""
         service = PortfolioCalculationService()
-        empty_portfolio: List[Tuple[Stock, Quantity]] = []
-        empty_prices: Dict[str, Money] = {}
+        empty_portfolio: list[tuple[Stock, Quantity]] = []
+        empty_prices: dict[str, Money] = {}
 
         allocations = service.calculate_position_allocations(
             empty_portfolio, empty_prices
@@ -264,8 +263,8 @@ class TestPortfolioCalculationEdgeCases:
     def test_calculate_industry_allocations_empty_portfolio(self) -> None:
         """Should handle empty portfolio for industry allocations."""
         service = PortfolioCalculationService()
-        empty_portfolio: List[Tuple[Stock, Quantity]] = []
-        empty_prices: Dict[str, Money] = {}
+        empty_portfolio: list[tuple[Stock, Quantity]] = []
+        empty_prices: dict[str, Money] = {}
 
         industry_allocations = service.calculate_industry_allocations(
             empty_portfolio, empty_prices

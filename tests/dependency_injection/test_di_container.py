@@ -6,7 +6,6 @@ of our DI container before implementation.
 """
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import pytest
 
@@ -69,7 +68,7 @@ class MockSimpleService:
 class MockServiceWithOptionalDep:
     """Service with optional dependency (default parameter)."""
 
-    def __init__(self, repository: Optional[ITestRepository] = None):
+    def __init__(self, repository: ITestRepository | None = None):
         self.repository = repository
 
 

@@ -53,7 +53,7 @@ class TestStockTableDefinition:
 
         id_column = stock_table.c.id
         assert isinstance(id_column, Column)
-        assert isinstance(id_column.type, (String, Text))
+        assert isinstance(id_column.type, String | Text)
         assert id_column.primary_key is True
         assert id_column.nullable is False
 
@@ -63,7 +63,7 @@ class TestStockTableDefinition:
 
         symbol_column = stock_table.c.symbol
         assert isinstance(symbol_column, Column)
-        assert isinstance(symbol_column.type, (String, Text))
+        assert isinstance(symbol_column.type, String | Text)
         assert symbol_column.nullable is False
         assert symbol_column.unique is True
 
@@ -73,7 +73,7 @@ class TestStockTableDefinition:
 
         company_name_column = stock_table.c.company_name
         assert isinstance(company_name_column, Column)
-        assert isinstance(company_name_column.type, (String, Text))
+        assert isinstance(company_name_column.type, String | Text)
         assert company_name_column.nullable is True  # Company name is now optional
 
     def test_optional_text_columns(self) -> None:
@@ -84,7 +84,7 @@ class TestStockTableDefinition:
         for col_name in optional_columns:
             column = stock_table.c[col_name]
             assert isinstance(column, Column)
-            assert isinstance(column.type, (String, Text))
+            assert isinstance(column.type, String | Text)
             assert column.nullable is True
 
     def test_timestamp_columns(self) -> None:
@@ -131,7 +131,7 @@ class TestStockTableDefinition:
             if column.name in ["created_at", "updated_at"]:
                 assert isinstance(column.type, types.DateTime)
             else:
-                assert isinstance(column.type, (String, Text))
+                assert isinstance(column.type, String | Text)
 
     def test_table_can_be_created_in_metadata(self) -> None:
         """Should be able to create the table in a test metadata."""

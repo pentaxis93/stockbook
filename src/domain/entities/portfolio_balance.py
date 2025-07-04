@@ -6,7 +6,6 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import IndexChange, Money
@@ -29,10 +28,10 @@ class PortfolioBalance(Entity):
         portfolio_id: str,
         balance_date: date,
         final_balance: Money,
-        withdrawals: Optional[Money] = None,
-        deposits: Optional[Money] = None,
-        index_change: Optional[IndexChange] = None,
-        id: Optional[str] = None,
+        withdrawals: Money | None = None,
+        deposits: Money | None = None,
+        index_change: IndexChange | None = None,
+        id: str | None = None,
     ):
         """Initialize portfolio balance with required value objects and validation."""
         # Validate foreign key ID is not empty
@@ -75,7 +74,7 @@ class PortfolioBalance(Entity):
         return self._deposits
 
     @property
-    def index_change(self) -> Optional[IndexChange]:
+    def index_change(self) -> IndexChange | None:
         """Get index change."""
         return self._index_change
 
@@ -100,13 +99,11 @@ class PortfolioBalance(Entity):
         """Check if portfolio had withdrawals."""
         return not self._withdrawals.is_zero()
 
-    def update_index_change(
-        self, index_change: Union[IndexChange, float, None]
-    ) -> None:
+    def update_index_change(self, index_change: IndexChange | float | None) -> None:
         """Update index change."""
         if index_change is None:
             self._index_change = None
-        elif isinstance(index_change, (int, float)):
+        elif isinstance(index_change, int | float):
             self._index_change = IndexChange(index_change)
         else:
             self._index_change = index_change

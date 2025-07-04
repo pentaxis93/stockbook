@@ -6,7 +6,7 @@ operations and business rules consistently across all domains.
 """
 
 from decimal import Decimal
-from typing import Any, Union
+from typing import Any
 
 from .money import BaseNumericValueObject
 
@@ -19,7 +19,7 @@ class Quantity(BaseNumericValueObject):
     numeric values without complex mathematical operations.
     """
 
-    def __init__(self, value: Union[int, float, str, Decimal]):
+    def __init__(self, value: int | float | str | Decimal):
         """
         Initialize Quantity with a numeric value.
 
@@ -36,7 +36,7 @@ class Quantity(BaseNumericValueObject):
         """Add two Quantity instances."""
         if isinstance(other, Quantity):
             return Quantity(self._value + other._value)
-        if isinstance(other, (int, float, Decimal)):
+        if isinstance(other, int | float | Decimal):
             return Quantity(self._value + Decimal(str(other)))
 
         raise TypeError("Can only add Quantity or numeric types to Quantity")
@@ -45,7 +45,7 @@ class Quantity(BaseNumericValueObject):
         """Subtract Quantity from this Quantity."""
         if isinstance(other, Quantity):
             result_value = self._value - other._value
-        elif isinstance(other, (int, float, Decimal)):
+        elif isinstance(other, int | float | Decimal):
             result_value = self._value - Decimal(str(other))
         else:
             raise TypeError("Can only subtract Quantity or numeric types from Quantity")
@@ -55,11 +55,11 @@ class Quantity(BaseNumericValueObject):
 
         return Quantity(result_value)
 
-    def __mul__(self, scalar: Union[int, float, Decimal]) -> "Quantity":
+    def __mul__(self, scalar: int | float | Decimal) -> "Quantity":
         """Multiply Quantity by a scalar."""
         return Quantity(self._value * Decimal(str(scalar)))
 
-    def __truediv__(self, scalar: Union[int, float, Decimal]) -> "Quantity":
+    def __truediv__(self, scalar: int | float | Decimal) -> "Quantity":
         """Divide Quantity by a scalar."""
         if scalar == 0:
             raise ZeroDivisionError("Cannot divide by zero")

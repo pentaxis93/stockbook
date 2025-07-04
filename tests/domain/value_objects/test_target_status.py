@@ -163,7 +163,7 @@ class TestTargetStatusEquality:
         status = object.__new__(TargetStatus)
 
         # This exercises the super().__setattr__ branch (line 69)
-        setattr(status, "test_attr", "test_value")
+        status.test_attr = "test_value"
 
         # Now properly initialize the object
         TargetStatus.__init__(status, "active")
@@ -249,7 +249,7 @@ class TestTargetStatusValidStatuses:
     def test_valid_statuses_contains_expected_values(self) -> None:
         """Should contain exactly the expected valid statuses."""
         expected_statuses = {"active", "hit", "failed", "cancelled"}
-        assert TargetStatus.VALID_STATUSES == expected_statuses
+        assert expected_statuses == TargetStatus.VALID_STATUSES
 
     def test_valid_statuses_is_immutable_set(self) -> None:
         """Should be an immutable set that cannot be modified."""

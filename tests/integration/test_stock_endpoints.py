@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the GET /stocks endpoint before implementation.
 """
 
-from typing import Generator, List
+from collections.abc import Generator
 from unittest.mock import Mock
 
 import pytest
@@ -48,7 +48,7 @@ class TestStockEndpoints:
         app.dependency_overrides.clear()
 
     @pytest.fixture
-    def sample_stock_dtos(self) -> List[StockDto]:
+    def sample_stock_dtos(self) -> list[StockDto]:
         """Create sample stock DTOs for testing."""
         return [
             StockDto(
@@ -103,7 +103,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should return all stocks when multiple exist."""
         # Arrange
@@ -131,7 +131,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should filter stocks by symbol (partial match, case-insensitive)."""
         # Arrange
@@ -160,7 +160,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should return empty list when no stocks match the filter."""
         # Arrange
@@ -187,7 +187,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should handle invalid/unknown query parameters gracefully."""
         # Arrange
@@ -212,7 +212,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should perform case-insensitive symbol filtering."""
         # Arrange
@@ -238,7 +238,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should return all stocks when filter values are empty."""
         # Arrange
@@ -260,7 +260,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should return response in correct StockListResponse format."""
         # Arrange
@@ -326,7 +326,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should retrieve stock by ID successfully."""
         # Arrange
@@ -426,7 +426,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should return response in correct StockResponse format."""
         # Arrange
@@ -923,7 +923,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: List[StockDto],
+        sample_stock_dtos: list[StockDto],
     ) -> None:
         """Should successfully update only specified fields."""
         # Arrange

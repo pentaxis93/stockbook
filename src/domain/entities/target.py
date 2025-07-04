@@ -6,7 +6,6 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, TargetStatus
@@ -33,8 +32,8 @@ class Target(Entity):
         status: TargetStatus,
         created_date: date,
         *,
-        notes: Optional[Notes] = None,
-        id: Optional[str] = None,
+        notes: Notes | None = None,
+        id: str | None = None,
     ):
         """Initialize target with required value objects and validation."""
         # Validate foreign key IDs are not empty
@@ -126,7 +125,7 @@ class Target(Entity):
         """Check if target has non-empty notes."""
         return self._notes.has_content()
 
-    def update_notes(self, notes: Union[Notes, str]) -> None:
+    def update_notes(self, notes: Notes | str) -> None:
         """Update target notes."""
         if isinstance(notes, str):
             self._notes = Notes(notes)

@@ -4,7 +4,7 @@ TransactionType value object for the StockBook domain.
 Represents transaction types (buy/sell) with validation rules and immutability.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 
 
 class TransactionType:
@@ -15,7 +15,7 @@ class TransactionType:
     Only allows 'buy' and 'sell' transaction types.
     """
 
-    VALID_TYPES = {"buy", "sell"}
+    VALID_TYPES: ClassVar[set[str]] = {"buy", "sell"}
     _value: str
 
     def __init__(self, value: str):

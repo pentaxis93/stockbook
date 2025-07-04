@@ -7,7 +7,6 @@ including various risk metrics and risk management analysis.
 
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Dict, List, Optional, Tuple
 
 from src.domain.entities.stock import Stock
 from src.domain.value_objects import Money, Quantity
@@ -41,7 +40,12 @@ class RiskAssessmentService:
     volatility, concentration, correlation, and scenario analysis.
     """
 
-    def __init__(self, config: Optional[RiskAssessmentConfig] = None):
+    # Risk assessment thresholds
+    MIN_DIVERSIFICATION = 5
+    HIGH_RISK_THRESHOLD = 3
+    MEDIUM_RISK_THRESHOLD = 10
+
+    def __init__(self, config: RiskAssessmentConfig | None = None):
         """Initialize risk assessment service with optional configuration.
 
         Args:
@@ -52,7 +56,7 @@ class RiskAssessmentService:
     def assess_stock_risk(self, stock: Stock) -> RiskAssessment:
         """Calculate overall risk level for individual stocks."""
         # TODO: Implement comprehensive risk assessment logic
-        risk_factors: List[str] = []
+        risk_factors: list[str] = []
         if stock.grade and stock.grade.value in ["D", "F"]:
             risk_factors.append("Low quality grade")
 
@@ -64,8 +68,8 @@ class RiskAssessmentService:
 
     def assess_portfolio_risk(
         self,
-        portfolio: List[Tuple[Stock, Quantity]],
-        prices: Dict[str, Money],  # pylint: disable=unused-argument
+        portfolio: list[tuple[Stock, Quantity]],
+        prices: dict[str, Money],  # pylint: disable=unused-argument
     ) -> RiskAssessment:
         """Calculate overall portfolio risk level."""
         if not portfolio:
@@ -75,17 +79,19 @@ class RiskAssessmentService:
             )
 
         # TODO: Implement comprehensive portfolio risk assessment logic
-        risk_factors: List[str] = []
+        risk_factors: list[str] = []
 
         # Check concentration risk
-        if len(portfolio) < 5:
-            risk_factors.append("Insufficient diversification (< 5 positions)")
+        if len(portfolio) < self.MIN_DIVERSIFICATION:
+            risk_factors.append(
+                f"Insufficient diversification (< {self.MIN_DIVERSIFICATION} positions)"
+            )
 
         # Simple risk score based on portfolio size for now
-        if len(portfolio) < 3:
+        if len(portfolio) < self.HIGH_RISK_THRESHOLD:
             overall_risk = RiskLevel.HIGH
             risk_score = Decimal("80.0")
-        elif len(portfolio) < 10:
+        elif len(portfolio) < self.MEDIUM_RISK_THRESHOLD:
             overall_risk = RiskLevel.MEDIUM
             risk_score = Decimal("50.0")
         else:

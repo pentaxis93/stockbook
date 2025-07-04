@@ -5,7 +5,6 @@ Defines the contract for target data persistence operations.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
 
 from src.domain.entities import Target
 
@@ -31,7 +30,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, target_id: str) -> Optional[Target]:
+    def get_by_id(self, target_id: str) -> Target | None:
         """
         Retrieve target by ID.
 
@@ -44,7 +43,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_active_by_portfolio(self, portfolio_id: str) -> List[Target]:
+    def get_active_by_portfolio(self, portfolio_id: str) -> list[Target]:
         """
         Retrieve active targets for a portfolio.
 
@@ -57,7 +56,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_active_by_stock(self, stock_id: str) -> List[Target]:
+    def get_active_by_stock(self, stock_id: str) -> list[Target]:
         """
         Retrieve active targets for a stock.
 
@@ -70,7 +69,7 @@ class ITargetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_active(self) -> List[Target]:
+    def get_all_active(self) -> list[Target]:
         """
         Retrieve all active targets.
 

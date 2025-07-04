@@ -4,7 +4,7 @@ IndexChange value object for the StockBook domain.
 Represents percentage change in portfolio index with validation rules and immutability.
 """
 
-from typing import Any, Union
+from typing import Any
 
 
 class IndexChange:
@@ -19,7 +19,7 @@ class IndexChange:
     MAX_CHANGE = 100.0
     _value: float
 
-    def __init__(self, value: Union[int, float]):
+    def __init__(self, value: int | float):
         """
         Initialize IndexChange with validation.
 

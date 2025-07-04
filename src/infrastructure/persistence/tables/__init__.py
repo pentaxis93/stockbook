@@ -17,11 +17,11 @@ from src.infrastructure.persistence.tables.target_table import target_table
 from src.infrastructure.persistence.tables.transaction_table import transaction_table
 
 __all__ = [
+    "journal_entry_table",
     "metadata",
-    "stock_table",
+    "portfolio_balance_table",
     "portfolio_table",
+    "stock_table",
     "target_table",
     "transaction_table",
-    "portfolio_balance_table",
-    "journal_entry_table",
 ]

@@ -5,7 +5,7 @@ Defines the contracts for transaction management and repository coordination.
 """
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 from .journal_repository import IJournalRepository
 from .portfolio_balance_repository import IPortfolioBalanceRepository
@@ -36,10 +36,10 @@ class IUnitOfWork(ABC):
     @abstractmethod
     def __exit__(
         self,
-        exc_type: Optional[type],
-        exc_val: Optional[Exception],
-        exc_tb: Optional[Any],
-    ) -> Optional[bool]:
+        exc_type: type | None,
+        exc_val: Exception | None,
+        exc_tb: Any | None,
+    ) -> bool | None:
         """
         Exit the unit of work context.
 

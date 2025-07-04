@@ -6,7 +6,7 @@ application layer and presentation layer.
 """
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from src.domain.entities.stock import Stock
 
@@ -20,12 +20,12 @@ class StockDto:
     without exposing domain entity internals.
     """
 
-    id: Optional[str]
+    id: str | None
     symbol: str
-    name: Optional[str] = None
-    sector: Optional[str] = None
-    industry_group: Optional[str] = None
-    grade: Optional[str] = None
+    name: str | None = None
+    sector: str | None = None
+    industry_group: str | None = None
+    grade: str | None = None
     notes: str = ""
 
     def __post_init__(self) -> None:

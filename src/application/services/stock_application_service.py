@@ -5,8 +5,6 @@ Orchestrates stock-related use cases and coordinates between
 domain entities and repositories.
 """
 
-from typing import List, Optional
-
 from src.application.commands.stock import (
     CreateStockCommand,
     UpdateStockCommand,
@@ -86,7 +84,7 @@ class StockApplicationService:
             self._unit_of_work.rollback()
             raise
 
-    def get_stock_by_symbol(self, symbol: str) -> Optional[StockDto]:
+    def get_stock_by_symbol(self, symbol: str) -> StockDto | None:
         """
         Retrieve stock by symbol.
 
@@ -105,7 +103,7 @@ class StockApplicationService:
 
             return StockDto.from_entity(stock_entity)
 
-    def get_stock_by_id(self, stock_id: str) -> Optional[StockDto]:
+    def get_stock_by_id(self, stock_id: str) -> StockDto | None:
         """
         Retrieve stock by ID.
 
@@ -123,7 +121,7 @@ class StockApplicationService:
 
             return StockDto.from_entity(stock_entity)
 
-    def get_all_stocks(self) -> List[StockDto]:
+    def get_all_stocks(self) -> list[StockDto]:
         """
         Retrieve all stocks.
 
@@ -150,10 +148,10 @@ class StockApplicationService:
 
     def search_stocks(
         self,
-        symbol_filter: Optional[str] = None,
-        name_filter: Optional[str] = None,
-        industry_filter: Optional[str] = None,
-    ) -> List[StockDto]:
+        symbol_filter: str | None = None,
+        name_filter: str | None = None,
+        industry_filter: str | None = None,
+    ) -> list[StockDto]:
         """
         Search stocks with multiple filter criteria.
 

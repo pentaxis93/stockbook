@@ -4,7 +4,7 @@ Domain service for managing sector-industry group relationships.
 Provides validation and lookup capabilities for the sector-industry group hierarchy.
 """
 
-from typing import Dict, List
+from typing import ClassVar
 
 
 class SectorIndustryService:
@@ -17,7 +17,7 @@ class SectorIndustryService:
 
     # Configuration of sector -> industry groups mapping
     # This would typically be loaded from configuration file or database
-    SECTOR_INDUSTRY_MAPPING: Dict[str, List[str]] = {
+    SECTOR_INDUSTRY_MAPPING: ClassVar[dict[str, list[str]]] = {
         "Technology": [
             "Software",
             "Hardware",
@@ -62,7 +62,7 @@ class SectorIndustryService:
         ],
     }
 
-    def get_available_sectors(self) -> List[str]:
+    def get_available_sectors(self) -> list[str]:
         """
         Get list of all available sectors.
 
@@ -71,7 +71,7 @@ class SectorIndustryService:
         """
         return list(self.SECTOR_INDUSTRY_MAPPING.keys())
 
-    def get_industry_groups_for_sector(self, sector: str) -> List[str]:
+    def get_industry_groups_for_sector(self, sector: str) -> list[str]:
         """
         Get list of industry groups available for a given sector.
 
@@ -150,7 +150,7 @@ class SectorIndustryService:
                 return sector
 
         # Collect all available industry groups for error message
-        all_industries: List[str] = []
+        all_industries: list[str] = []
         for industries in self.SECTOR_INDUSTRY_MAPPING.values():
             all_industries.extend(industries)
 

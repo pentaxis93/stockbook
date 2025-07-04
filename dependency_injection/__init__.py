@@ -17,13 +17,13 @@ from .exceptions import (
 from .lifetimes import Lifetime
 
 __all__ = [
-    "DIContainer",
-    "RegistrationInfo",
+    "CircularDependencyError",
     "CompositionRoot",
+    "DIContainer",
     "DependencyInjectionError",
     "DependencyResolutionError",
-    "CircularDependencyError",
     "DuplicateRegistrationError",
     "InvalidRegistrationError",
     "Lifetime",
+    "RegistrationInfo",
 ]

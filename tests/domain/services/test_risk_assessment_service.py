@@ -6,7 +6,6 @@ and portfolios, including various risk metrics and risk management strategies.
 """
 
 from decimal import Decimal
-from typing import Dict, List, Tuple
 
 from src.domain.entities.stock import Stock
 from src.domain.services.portfolio_calculation_service import (
@@ -113,10 +112,10 @@ def create_concentrated_portfolio() -> list[tuple[Stock, Quantity]]:
 
 
 def create_test_prices(
-    portfolio: List[Tuple[Stock, Quantity]],
-) -> Dict[str, Money]:
+    portfolio: list[tuple[Stock, Quantity]],
+) -> dict[str, Money]:
     """Helper to create price dictionary from portfolio."""
-    prices: Dict[str, Money] = {}
+    prices: dict[str, Money] = {}
     for stock, _ in portfolio:
         # Use a default price since we don't need actual prices for stub tests
         prices[str(stock.symbol)] = Money(Decimal("100.00"))
@@ -206,8 +205,8 @@ class TestRiskAssessmentEdgeCases:
         from src.domain.services.exceptions import InsufficientDataError
 
         service = RiskAssessmentService()
-        empty_portfolio: List[Tuple[Stock, Quantity]] = []
-        empty_prices: Dict[str, Money] = {}
+        empty_portfolio: list[tuple[Stock, Quantity]] = []
+        empty_prices: dict[str, Money] = {}
 
         with pytest.raises(
             InsufficientDataError, match="Cannot assess risk of empty portfolio"
@@ -251,7 +250,7 @@ class TestRiskAssessmentEdgeCases:
         portfolio = create_conservative_portfolio()
         incomplete_prices = create_test_prices(portfolio)
         # Remove one price
-        del incomplete_prices[list(incomplete_prices.keys())[0]]
+        del incomplete_prices[next(iter(incomplete_prices.keys()))]
 
         # Should either raise an error or handle gracefully
         try:
@@ -345,8 +344,8 @@ class TestRiskAssessmentIntegration:
         service = RiskAssessmentService()
 
         # Create large portfolio with diverse holdings
-        large_portfolio: List[Tuple[Stock, Quantity]] = []
-        prices: Dict[str, Money] = {}
+        large_portfolio: list[tuple[Stock, Quantity]] = []
+        prices: dict[str, Money] = {}
 
         sectors = ["Technology", "Healthcare", "Financial", "Industrial", "Consumer"]
         grades = ["A", "B", "C", "D"]
@@ -428,14 +427,14 @@ class TestRiskAssessmentAlgorithms:
         # Create portfolios with different diversification levels
 
         # Undiversified: 2 stocks same sector
-        undiversified: List[Tuple[Stock, Quantity]] = []
+        undiversified: list[tuple[Stock, Quantity]] = []
         tech_symbols = ["TECHA", "TECHB"]
         for i, symbol in enumerate(tech_symbols):
             stock = create_test_stock(symbol, 100.00, "A", "Technology")
             undiversified.append((stock, Quantity(50)))
 
         # Diversified: 5 stocks different sectors
-        diversified: List[Tuple[Stock, Quantity]] = []
+        diversified: list[tuple[Stock, Quantity]] = []
         sectors = ["Technology", "Healthcare", "Financial", "Industrial", "Consumer"]
         div_symbols = ["DIVA", "DIVB", "DIVC", "DIVD", "DIVE"]
         for i, sector in enumerate(sectors):
@@ -462,8 +461,8 @@ class TestRiskAssessmentAlgorithms:
         service = RiskAssessmentService()
 
         # Create two portfolios: one balanced, one concentrated
-        balanced_portfolio: List[Tuple[Stock, Quantity]] = []
-        concentrated_portfolio: List[Tuple[Stock, Quantity]] = []
+        balanced_portfolio: list[tuple[Stock, Quantity]] = []
+        concentrated_portfolio: list[tuple[Stock, Quantity]] = []
 
         # Balanced: equal positions
         bal_symbols = ["BALA", "BALB", "BALC", "BALD"]

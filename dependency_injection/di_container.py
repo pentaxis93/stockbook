@@ -10,7 +10,8 @@ using dependency-injector library internally for robust functionality.
 # to providing a clean abstraction over the underlying DI framework.
 
 import inspect
-from typing import Any, Callable, Dict, List, Optional, Type, TypeVar
+from typing import Any, TypeVar
+from collections.abc import Callable
 
 from dependency_injector import containers, providers
 from dependency_injector.errors import Error as DIError
@@ -31,29 +32,31 @@ class RegistrationInfo:  # pylint: disable=too-few-public-methods
 
     def __init__(
         self,
-        service_type: Type[Any],
-        implementation_type: Type[Any],
+        service_type: type[Any],
+        implementation_type: type[Any],
         lifetime: Lifetime,
     ):
+        """Initialize registration info with service details."""
         self.service_type = service_type
         self.implementation_type = implementation_type
         self.lifetime = lifetime
 
 
 class DIContainer:
-    """
-    Dependency injection container that wraps dependency-injector
-    to provide a clean, testable interface.
+    """Dependency injection container that wraps dependency-injector to provide a clean, testable interface.
+
+    This container manages service registrations and resolves dependencies
+    with support for different lifetimes (singleton, transient, scoped).
     """
 
     def __init__(self) -> None:
         """Initialize the DI container."""
         self._container = containers.DeclarativeContainer()
-        self._registrations: Dict[Type[Any], RegistrationInfo] = {}
-        self._resolution_chain: List[str] = []
+        self._registrations: dict[type[Any], RegistrationInfo] = {}
+        self._resolution_chain: list[str] = []
 
     def register_singleton(
-        self, service_type: Type[T], implementation_type: Optional[Type[T]] = None
+        self, service_type: type[T], implementation_type: type[T] | None = None
     ) -> None:
         """
         Register a type as singleton (single instance shared).
@@ -89,11 +92,11 @@ class DIContainer:
         except Exception as e:
             raise InvalidRegistrationError(
                 service_type,
-                f"Failed to register singleton {service_type.__name__}: {str(e)}",
+                f"Failed to register singleton {service_type.__name__}: {e!s}",
             ) from e
 
     def register_transient(
-        self, service_type: Type[T], implementation_type: Optional[Type[T]] = None
+        self, service_type: type[T], implementation_type: type[T] | None = None
     ) -> None:
         """
         Register a type as transient (new instance each time).
@@ -129,10 +132,10 @@ class DIContainer:
         except Exception as e:
             raise InvalidRegistrationError(
                 service_type,
-                f"Failed to register transient {service_type.__name__}: {str(e)}",
+                f"Failed to register transient {service_type.__name__}: {e!s}",
             ) from e
 
-    def register_instance(self, service_type: Type[T], instance: T) -> None:
+    def register_instance(self, service_type: type[T], instance: T) -> None:
         """
         Register a pre-created instance.
 
@@ -168,10 +171,10 @@ class DIContainer:
         except Exception as e:
             raise InvalidRegistrationError(
                 service_type,
-                f"Failed to register instance for {service_type.__name__}: {str(e)}",
+                f"Failed to register instance for {service_type.__name__}: {e!s}",
             ) from e
 
-    def register_factory(self, service_type: Type[T], factory: Callable[[], T]) -> None:
+    def register_factory(self, service_type: type[T], factory: Callable[[], T]) -> None:
         """
         Register a factory function to create instances.
 
@@ -206,7 +209,7 @@ class DIContainer:
         except Exception as e:
             raise InvalidRegistrationError(
                 service_type,
-                f"Failed to register factory for {service_type.__name__}: {str(e)}",
+                f"Failed to register factory for {service_type.__name__}: {e!s}",
             ) from e
 
     def _check_circular_dependency(self, type_name: str) -> None:
@@ -217,7 +220,7 @@ class DIContainer:
             circular_chain = self._resolution_chain[start_index:] + [type_name]
             raise CircularDependencyError(circular_chain)
 
-    def _resolve_instance(self, service_type: Type[T]) -> T:
+    def _resolve_instance(self, service_type: type[T]) -> T:
         """Resolve an instance using the container provider."""
         provider_name = self._get_provider_name(service_type)
         provider = getattr(self._container, provider_name)
@@ -227,11 +230,11 @@ class DIContainer:
         except DIError as e:
             raise DependencyResolutionError(
                 service_type,
-                f"Failed to resolve {service_type.__name__}: {str(e)}",
+                f"Failed to resolve {service_type.__name__}: {e!s}",
                 self._resolution_chain.copy(),
             ) from e
 
-    def resolve(self, service_type: Type[T]) -> T:
+    def resolve(self, service_type: type[T]) -> T:
         """
         Resolve an instance of the specified type.
 
@@ -269,7 +272,7 @@ class DIContainer:
             if type_name in self._resolution_chain:
                 self._resolution_chain.remove(type_name)
 
-    def is_registered(self, service_type: Type[Any]) -> bool:
+    def is_registered(self, service_type: type[Any]) -> bool:
         """
         Check if a service type is registered.
 
@@ -281,7 +284,7 @@ class DIContainer:
         """
         return service_type in self._registrations
 
-    def get_registrations(self) -> List[Type[Any]]:
+    def get_registrations(self) -> list[type[Any]]:
         """
         Get list of all registered service types.
 
@@ -290,9 +293,7 @@ class DIContainer:
         """
         return list(self._registrations.keys())
 
-    def get_registration_info(
-        self, service_type: Type[Any]
-    ) -> Optional[RegistrationInfo]:
+    def get_registration_info(self, service_type: type[Any]) -> RegistrationInfo | None:
         """
         Get registration information for a service type.
 
@@ -305,7 +306,7 @@ class DIContainer:
         return self._registrations.get(service_type)
 
     def _validate_registration(
-        self, service_type: Type[Any], implementation_type: Type[Any]
+        self, service_type: type[Any], implementation_type: type[Any]
     ) -> None:
         """Validate that implementation_type can be used for service_type."""
         if not inspect.isclass(implementation_type):
@@ -319,62 +320,64 @@ class DIContainer:
         if (
             hasattr(service_type, "__abstractmethods__")
             and service_type.__abstractmethods__
+            and not issubclass(implementation_type, service_type)
         ):
-            if not issubclass(implementation_type, service_type):
-                raise InvalidRegistrationError(
-                    service_type,
-                    f"Implementation {implementation_type.__name__} does not implement interface {service_type.__name__}",
-                )
+            raise InvalidRegistrationError(
+                service_type,
+                f"Implementation {implementation_type.__name__} does not implement interface {service_type.__name__}",
+            )
 
-    def _get_provider_name(self, service_type: Type[Any]) -> str:
+    def _get_provider_name(self, service_type: type[Any]) -> str:
         """Generate a unique provider name for the service type."""
         return f"provider_{service_type.__name__}_{id(service_type)}"
 
-    def _get_constructor_args(self, implementation_type: Type[Any]) -> List[Any]:
+    def _get_constructor_args(self, implementation_type: type[Any]) -> list[Any]:
         """Get the constructor arguments for auto-wiring."""
         sig = inspect.signature(implementation_type.__init__)
-        args: List[Any] = []
+        args: list[Any] = []
 
         for param_name, param in sig.parameters.items():
             if param_name == "self":
                 continue
-
-            param_type = param.annotation
-            if param_type == inspect.Parameter.empty:
-                # Skip parameters without type annotations
+            if param.annotation == inspect.Parameter.empty:
                 continue
 
-            # Handle forward references (string type annotations)
-            if isinstance(param_type, str):
-                # For string type annotations, we need to look them up by name
-                # in the registered types at resolution time
-                def create_string_resolver(type_name: str) -> Callable[[], Any]:
-                    def resolver() -> Any:
-                        # Find the registered type that matches this name
-                        for registered_type in self._registrations:
-                            if registered_type.__name__ == type_name:
-                                return self.resolve(registered_type)
-                        raise DependencyResolutionError(
-                            type(None),
-                            f"No registered type found for forward reference '{type_name}'",
-                            self._resolution_chain.copy(),
-                        )
-
-                    return resolver
-
-                dependency_provider = providers.Callable(
-                    create_string_resolver(param_type)
-                )
-            else:
-                # Normal type annotation
-                def create_resolver(resolved_type: Type[Any]) -> Callable[[], Any]:
-                    def resolver() -> Any:
-                        return self.resolve(resolved_type)
-
-                    return resolver
-
-                dependency_provider = providers.Callable(create_resolver(param_type))
-
+            dependency_provider = self._create_dependency_provider(param.annotation)
             args.append(dependency_provider)
 
         return args
+
+    def _create_dependency_provider(self, param_type: Any) -> Any:
+        """Create a dependency provider for a parameter type."""
+        if isinstance(param_type, str):
+            return self._create_string_type_provider(param_type)
+        return self._create_normal_type_provider(param_type)
+
+    def _create_string_type_provider(self, type_name: str) -> Any:
+        """Create a provider for string type annotations (forward references)."""
+
+        def create_string_resolver() -> Callable[[], Any]:
+            def resolver() -> Any:
+                for registered_type in self._registrations:
+                    if registered_type.__name__ == type_name:
+                        return self.resolve(registered_type)
+                raise DependencyResolutionError(
+                    type(None),
+                    f"No registered type found for forward reference '{type_name}'",
+                    self._resolution_chain.copy(),
+                )
+
+            return resolver
+
+        return providers.Callable(create_string_resolver())
+
+    def _create_normal_type_provider(self, param_type: type[Any]) -> Any:
+        """Create a provider for normal type annotations."""
+
+        def create_resolver() -> Callable[[], Any]:
+            def resolver() -> Any:
+                return self.resolve(param_type)
+
+            return resolver
+
+        return providers.Callable(create_resolver())

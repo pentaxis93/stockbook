@@ -8,7 +8,7 @@ following TDD principles to define expected behavior before implementation.
 # pyright: reportPrivateUsage=false, reportUnknownArgumentType=false
 # pyright: reportUnusedImport=false, reportUnusedCallResult=false
 
-from datetime import datetime, timezone
+from datetime import datetime, UTC
 from unittest.mock import Mock
 
 import pytest
@@ -293,8 +293,8 @@ class TestSqlAlchemyStockRepositoryGetBySymbol:
             "industry_group": "Software",
             "grade": "A",
             "notes": "Tech giant",
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
         }
 
         mock_result.fetchone.return_value = mock_row
@@ -362,8 +362,8 @@ class TestSqlAlchemyStockRepositoryGetBySymbol:
             "industry_group": None,
             "grade": None,
             "notes": None,
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
         }
 
         mock_result.fetchone.return_value = mock_row
@@ -397,8 +397,8 @@ class TestSqlAlchemyStockRepositoryGetBySymbol:
             "industry_group": "Software",
             "grade": "B",
             "notes": "Test stock",
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
         }
 
         mock_result.fetchone.return_value = mock_row
@@ -491,8 +491,8 @@ class TestSqlAlchemyStockRepositoryHelperMethods:
             "industry_group": "Software",
             "grade": "A",
             "notes": "Database notes",
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
         }
 
         # Act
@@ -530,8 +530,8 @@ class TestSqlAlchemyStockRepositoryGetById:
             "industry_group": "Internet Services",
             "grade": "A",
             "notes": "Parent of Google",
-            "created_at": datetime.now(timezone.utc),
-            "updated_at": datetime.now(timezone.utc),
+            "created_at": datetime.now(UTC),
+            "updated_at": datetime.now(UTC),
         }
 
         mock_result.fetchone.return_value = mock_row
@@ -641,8 +641,8 @@ class TestSqlAlchemyStockRepositoryGetAll:
                 "industry_group": "Hardware",
                 "grade": "A",
                 "notes": "iPhone maker",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             },
             {
                 "id": "stock-2",
@@ -652,8 +652,8 @@ class TestSqlAlchemyStockRepositoryGetAll:
                 "industry_group": "Software",
                 "grade": "B",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             },
             {
                 "id": "stock-3",
@@ -663,8 +663,8 @@ class TestSqlAlchemyStockRepositoryGetAll:
                 "industry_group": "Banks",
                 "grade": None,
                 "notes": None,
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             },
         ]
 
@@ -1023,8 +1023,8 @@ class TestSqlAlchemyStockRepositorySearchStocks:
                 "industry_group": "Hardware",
                 "grade": "A",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             },
             {
                 "id": "stock-2",
@@ -1034,8 +1034,8 @@ class TestSqlAlchemyStockRepositorySearchStocks:
                 "industry_group": "Software",
                 "grade": "B",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             },
         ]
 
@@ -1066,8 +1066,8 @@ class TestSqlAlchemyStockRepositorySearchStocks:
                 "industry_group": "Hardware",
                 "grade": "A",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             }
         ]
 
@@ -1103,8 +1103,8 @@ class TestSqlAlchemyStockRepositorySearchStocks:
                 "industry_group": "Hardware",
                 "grade": "A",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             }
         ]
 
@@ -1136,8 +1136,8 @@ class TestSqlAlchemyStockRepositorySearchStocks:
                 "industry_group": "Hardware",
                 "grade": "A",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             }
         ]
 
@@ -1169,8 +1169,8 @@ class TestSqlAlchemyStockRepositorySearchStocks:
                 "industry_group": "Hardware",
                 "grade": "A",
                 "notes": "",
-                "created_at": datetime.now(timezone.utc),
-                "updated_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(UTC),
+                "updated_at": datetime.now(UTC),
             }
         ]
 

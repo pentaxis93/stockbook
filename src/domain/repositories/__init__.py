@@ -22,12 +22,12 @@ from .interfaces import (
 # The interfaces package defines the same list, but both modules need it
 # to properly expose the public API at different import levels.
 __all__ = [
-    "IStockRepository",
-    "IPortfolioRepository",
-    "ITransactionRepository",
-    "ITargetRepository",
-    "IPortfolioBalanceRepository",
     "IJournalRepository",
-    "IUnitOfWork",
+    "IPortfolioBalanceRepository",
+    "IPortfolioRepository",
     "IStockBookUnitOfWork",
+    "IStockRepository",
+    "ITargetRepository",
+    "ITransactionRepository",
+    "IUnitOfWork",
 ]

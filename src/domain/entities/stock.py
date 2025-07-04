@@ -5,7 +5,7 @@ Represents a stock/security in the trading system with business logic
 and validation rules encapsulated within the entity.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import (
@@ -28,10 +28,10 @@ class Stock(Entity):
 
     # Type annotations for instance variables
     _symbol: StockSymbol
-    _company_name: Optional[CompanyName]
-    _sector: Optional[Sector]
-    _industry_group: Optional[IndustryGroup]
-    _grade: Optional[Grade]
+    _company_name: CompanyName | None
+    _sector: Sector | None
+    _industry_group: IndustryGroup | None
+    _grade: Grade | None
     _notes: Notes
 
     def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
@@ -42,12 +42,12 @@ class Stock(Entity):
         # for what is fundamentally a data-rich domain concept.
         self,
         symbol: StockSymbol,
-        company_name: Optional[CompanyName] = None,
-        sector: Optional[Sector] = None,
-        industry_group: Optional[IndustryGroup] = None,
-        grade: Optional[Grade] = None,
-        notes: Optional[Notes] = None,
-        id: Optional[str] = None,
+        company_name: CompanyName | None = None,
+        sector: Sector | None = None,
+        industry_group: IndustryGroup | None = None,
+        grade: Grade | None = None,
+        notes: Notes | None = None,
+        id: str | None = None,
     ):
         """
         Initialize Stock entity with value objects.
@@ -91,22 +91,22 @@ class Stock(Entity):
         return self._symbol
 
     @property
-    def company_name(self) -> Optional[CompanyName]:
+    def company_name(self) -> CompanyName | None:
         """Get the company name value object."""
         return self._company_name
 
     @property
-    def sector(self) -> Optional[Sector]:
+    def sector(self) -> Sector | None:
         """Get the sector value object."""
         return self._sector
 
     @property
-    def industry_group(self) -> Optional[IndustryGroup]:
+    def industry_group(self) -> IndustryGroup | None:
         """Get the industry group value object."""
         return self._industry_group
 
     @property
-    def grade(self) -> Optional[Grade]:
+    def grade(self) -> Grade | None:
         """Get the grade value object."""
         return self._grade
 
@@ -158,9 +158,9 @@ class Stock(Entity):
         # All validation passed, now update the actual fields
         self._apply_field_updates(temp_values)
 
-    def _create_temp_value_objects(self, kwargs: Dict[str, Any]) -> Dict[str, Any]:
+    def _create_temp_value_objects(self, kwargs: dict[str, Any]) -> dict[str, Any]:
         """Create temporary value objects for validation."""
-        temp_values: Dict[str, Any] = {}
+        temp_values: dict[str, Any] = {}
 
         # Create value objects in separate methods to reduce complexity
         self._create_symbol(kwargs, temp_values)
@@ -173,7 +173,7 @@ class Stock(Entity):
         return temp_values
 
     def _create_symbol(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Create symbol value object if present."""
         if "symbol" in kwargs:
@@ -181,7 +181,7 @@ class Stock(Entity):
             temp_values["symbol"] = StockSymbol(symbol)
 
     def _create_company_name(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Create company name value object if present."""
         if "name" in kwargs:
@@ -189,7 +189,7 @@ class Stock(Entity):
             temp_values["company_name"] = CompanyName(name) if name else None
 
     def _create_sector(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Create sector value object if present."""
         if "sector" in kwargs:
@@ -197,7 +197,7 @@ class Stock(Entity):
             temp_values["sector"] = Sector(sector) if sector is not None else None
 
     def _create_industry_group(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Create industry group value object if present."""
         if "industry_group" in kwargs:
@@ -207,7 +207,7 @@ class Stock(Entity):
             )
 
     def _create_grade(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Create grade value object if present."""
         if "grade" in kwargs:
@@ -217,14 +217,14 @@ class Stock(Entity):
             )
 
     def _create_notes(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Create notes value object if present."""
         if "notes" in kwargs:
             temp_values["notes"] = Notes(kwargs["notes"])
 
     def _validate_and_adjust_sector_industry(
-        self, kwargs: Dict[str, Any], temp_values: Dict[str, Any]
+        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
     ) -> None:
         """Validate sector-industry combination and adjust if needed."""
         new_sector = kwargs.get("sector", self.sector.value if self.sector else None)
@@ -245,7 +245,7 @@ class Stock(Entity):
         self._validate_sector_industry_combination(new_sector, new_industry_group)
 
     def _should_clear_industry_group_for_new_sector(
-        self, new_sector: Optional[str]
+        self, new_sector: str | None
     ) -> bool:
         """Check if current industry group should be cleared for new sector."""
         return (
@@ -256,7 +256,7 @@ class Stock(Entity):
             )
         )
 
-    def _apply_field_updates(self, temp_values: Dict[str, Any]) -> None:
+    def _apply_field_updates(self, temp_values: dict[str, Any]) -> None:
         """Apply validated field updates to the entity."""
         # Map of field names to their corresponding attributes
         field_mapping = {
@@ -274,7 +274,7 @@ class Stock(Entity):
                 setattr(self, attr, temp_values[field])
 
     def _validate_sector_industry_combination(
-        self, sector: Optional[str], industry_group: Optional[str]
+        self, sector: str | None, industry_group: str | None
     ) -> None:
         """
         Validate that sector and industry_group combination is valid.

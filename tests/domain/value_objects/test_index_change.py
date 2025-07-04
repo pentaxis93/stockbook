@@ -312,7 +312,7 @@ class TestIndexChangeEdgeCases:
         edge_values = [99.995, -99.995, 0.005, -0.005]
         expected_rounded = [100.0, -100.0, 0.01, -0.01]
 
-        for value, expected in zip(edge_values, expected_rounded):
+        for value, expected in zip(edge_values, expected_rounded, strict=False):
             change = IndexChange(value)
             assert change.value == expected
 
@@ -373,7 +373,7 @@ class TestIndexChangeEdgeCases:
         change = object.__new__(IndexChange)
 
         # This exercises the super().__setattr__ branch (line 84)
-        setattr(change, "test_attr", "test_value")
+        change.test_attr = "test_value"
 
         # Now properly initialize the object
         IndexChange.__init__(change, 5.25)

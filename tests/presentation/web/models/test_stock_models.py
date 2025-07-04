@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of StockRequest and StockResponse models used in the FastAPI presentation layer.
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from pydantic import ValidationError
@@ -502,7 +502,7 @@ class TestStockResponse:
     def test_stock_response_from_dto_with_different_types(self) -> None:
         """Should handle DTO with consistent types."""
         # Create a DTO with all expected fields
-        dto_data: Dict[str, Any] = {
+        dto_data: dict[str, Any] = {
             "id": "stock-123",
             "symbol": "AAPL",
             "name": "Apple Inc.",

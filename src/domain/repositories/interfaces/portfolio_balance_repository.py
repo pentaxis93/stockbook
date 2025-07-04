@@ -6,7 +6,6 @@ Defines the contract for portfolio balance data persistence operations.
 
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional
 
 from src.domain.entities import PortfolioBalance
 
@@ -32,7 +31,7 @@ class IPortfolioBalanceRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, balance_id: str) -> Optional[PortfolioBalance]:
+    def get_by_id(self, balance_id: str) -> PortfolioBalance | None:
         """
         Retrieve portfolio balance by ID.
 
@@ -47,7 +46,7 @@ class IPortfolioBalanceRepository(ABC):
     @abstractmethod
     def get_by_portfolio_and_date(
         self, portfolio_id: str, balance_date: date
-    ) -> Optional[PortfolioBalance]:
+    ) -> PortfolioBalance | None:
         """
         Retrieve portfolio balance for a specific date.
 
@@ -62,8 +61,8 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_history(
-        self, portfolio_id: str, limit: Optional[int] = None
-    ) -> List[PortfolioBalance]:
+        self, portfolio_id: str, limit: int | None = None
+    ) -> list[PortfolioBalance]:
         """
         Retrieve balance history for a portfolio.
 
@@ -77,7 +76,7 @@ class IPortfolioBalanceRepository(ABC):
         pass
 
     @abstractmethod
-    def get_latest_balance(self, portfolio_id: str) -> Optional[PortfolioBalance]:
+    def get_latest_balance(self, portfolio_id: str) -> PortfolioBalance | None:
         """
         Retrieve the most recent balance for a portfolio.
 

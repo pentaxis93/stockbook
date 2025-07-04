@@ -1,7 +1,7 @@
 """Shared fixtures for table tests."""
 
 import tempfile
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 import sqlalchemy as sa

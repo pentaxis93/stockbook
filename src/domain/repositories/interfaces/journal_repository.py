@@ -6,7 +6,6 @@ Defines the contract for journal entry data persistence operations.
 
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional
 
 from src.domain.entities import JournalEntry
 
@@ -32,7 +31,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, entry_id: str) -> Optional[JournalEntry]:
+    def get_by_id(self, entry_id: str) -> JournalEntry | None:
         """
         Retrieve journal entry by ID.
 
@@ -45,7 +44,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_recent(self, limit: Optional[int] = None) -> List[JournalEntry]:
+    def get_recent(self, limit: int | None = None) -> list[JournalEntry]:
         """
         Retrieve recent journal entries.
 
@@ -59,8 +58,8 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio(
-        self, portfolio_id: str, limit: Optional[int] = None
-    ) -> List[JournalEntry]:
+        self, portfolio_id: str, limit: int | None = None
+    ) -> list[JournalEntry]:
         """
         Retrieve journal entries for a specific portfolio.
 
@@ -75,8 +74,8 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_stock(
-        self, stock_id: str, limit: Optional[int] = None
-    ) -> List[JournalEntry]:
+        self, stock_id: str, limit: int | None = None
+    ) -> list[JournalEntry]:
         """
         Retrieve journal entries for a specific stock.
 
@@ -90,7 +89,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_transaction(self, transaction_id: str) -> List[JournalEntry]:
+    def get_by_transaction(self, transaction_id: str) -> list[JournalEntry]:
         """
         Retrieve journal entries for a specific transaction.
 
@@ -103,7 +102,7 @@ class IJournalRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_date_range(self, start_date: date, end_date: date) -> List[JournalEntry]:
+    def get_by_date_range(self, start_date: date, end_date: date) -> list[JournalEntry]:
         """
         Retrieve journal entries within a date range.
 

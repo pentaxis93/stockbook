@@ -6,7 +6,6 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import JournalContent
@@ -28,10 +27,10 @@ class JournalEntry(Entity):
         self,
         entry_date: date,
         content: JournalContent,
-        portfolio_id: Optional[str] = None,
-        stock_id: Optional[str] = None,
-        transaction_id: Optional[str] = None,
-        id: Optional[str] = None,
+        portfolio_id: str | None = None,
+        stock_id: str | None = None,
+        transaction_id: str | None = None,
+        id: str | None = None,
     ):
         """Initialize journal entry with required value objects and validation."""
         # Validate optional foreign key IDs
@@ -62,17 +61,17 @@ class JournalEntry(Entity):
         return self._content
 
     @property
-    def portfolio_id(self) -> Optional[str]:
+    def portfolio_id(self) -> str | None:
         """Get portfolio ID."""
         return self._portfolio_id
 
     @property
-    def stock_id(self) -> Optional[str]:
+    def stock_id(self) -> str | None:
         """Get stock ID."""
         return self._stock_id
 
     @property
-    def transaction_id(self) -> Optional[str]:
+    def transaction_id(self) -> str | None:
         """Get transaction ID."""
         return self._transaction_id
 
@@ -93,7 +92,7 @@ class JournalEntry(Entity):
         """Get a preview of the content."""
         return self._content.get_preview(max_length)
 
-    def update_content(self, content: Union[JournalContent, str]) -> None:
+    def update_content(self, content: JournalContent | str) -> None:
         """Update entry content."""
         if isinstance(content, str):
             self._content = JournalContent(content)

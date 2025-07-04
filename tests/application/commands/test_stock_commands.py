@@ -261,7 +261,7 @@ class TestCreateStockCommand:
 
         # At this point, the object has no _symbol attribute, so __setattr__ should work
         # This directly exercises the super().__setattr__ branch
-        setattr(command, "test_attr", "test_value")
+        command.test_attr = "test_value"
 
         # Now properly initialize the object
         CreateStockCommand.__init__(
@@ -624,7 +624,7 @@ class TestUpdateStockCommand:
 
         # At this point, the object has no _stock_id attribute, so __setattr__ should work
         # This directly exercises the super().__setattr__ branch
-        setattr(command, "test_attr", "test_value")
+        command.test_attr = "test_value"
 
         # Now properly initialize the object
         UpdateStockCommand.__init__(

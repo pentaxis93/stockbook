@@ -5,7 +5,6 @@ Defines the contract for stock data persistence operations.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
 
 from src.domain.entities import Stock
 from src.domain.value_objects.stock_symbol import StockSymbol
@@ -32,7 +31,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, stock_id: str) -> Optional[Stock]:
+    def get_by_id(self, stock_id: str) -> Stock | None:
         """
         Retrieve stock by ID.
 
@@ -45,7 +44,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_symbol(self, symbol: StockSymbol) -> Optional[Stock]:
+    def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
         """
         Retrieve stock by symbol.
 
@@ -58,7 +57,7 @@ class IStockRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> List[Stock]:
+    def get_all(self) -> list[Stock]:
         """
         Retrieve all stocks.
 
@@ -118,10 +117,10 @@ class IStockRepository(ABC):
     @abstractmethod
     def search_stocks(
         self,
-        symbol_filter: Optional[str] = None,
-        name_filter: Optional[str] = None,
-        industry_filter: Optional[str] = None,
-    ) -> List[Stock]:
+        symbol_filter: str | None = None,
+        name_filter: str | None = None,
+        industry_filter: str | None = None,
+    ) -> list[Stock]:
         """
         Search stocks with multiple filter criteria.
 

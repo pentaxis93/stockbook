@@ -6,7 +6,6 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
 from datetime import date
-from typing import Optional, Union
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import Notes, PortfolioName
@@ -26,10 +25,10 @@ class Portfolio(Entity):
         # creation tracking, and active status. These cannot be simplified further.
         self,
         name: PortfolioName,
-        description: Optional[Notes] = None,
-        created_date: Optional[date] = None,
+        description: Notes | None = None,
+        created_date: date | None = None,
         is_active: bool = True,
-        id: Optional[str] = None,
+        id: str | None = None,
     ):
         """Initialize portfolio with required value objects and validation."""
         # Store validated attributes
@@ -51,7 +50,7 @@ class Portfolio(Entity):
         return self._description
 
     @property
-    def created_date(self) -> Optional[date]:
+    def created_date(self) -> date | None:
         """Get created date."""
         return self._created_date
 
@@ -77,7 +76,7 @@ class Portfolio(Entity):
         """Check if portfolio has a non-empty description."""
         return self._description.has_content()
 
-    def update_description(self, description: Union[Notes, str]) -> None:
+    def update_description(self, description: Notes | str) -> None:
         """Update portfolio description."""
         if isinstance(description, str):
             self._description = Notes(description)

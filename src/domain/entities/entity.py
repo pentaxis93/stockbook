@@ -6,7 +6,7 @@ Provides common functionality for all domain entities following DDD principles.
 
 import uuid
 from abc import ABC
-from typing import Any, Optional, Self, Type, TypeVar
+from typing import Any, Self, TypeVar
 
 T = TypeVar("T", bound="Entity")
 
@@ -20,7 +20,7 @@ class Entity(ABC):  # noqa: B024
             raise TypeError("Can't instantiate abstract class Entity directly")
         return super().__new__(cls)
 
-    def __init__(self, id: Optional[str] = None) -> None:
+    def __init__(self, id: str | None = None) -> None:
         """Initialize entity with either provided ID or generate new UUID."""
         self._id: str = id if id is not None else str(uuid.uuid4())
 
@@ -30,7 +30,7 @@ class Entity(ABC):  # noqa: B024
         return self._id
 
     @classmethod
-    def from_persistence(cls: Type[Self], id: str, **kwargs: Any) -> Self:
+    def from_persistence(cls: type[Self], id: str, **kwargs: Any) -> Self:
         """Create entity from persistence layer with existing ID."""
         # This will call the subclass constructor with the id parameter
         return cls(id=id, **kwargs)

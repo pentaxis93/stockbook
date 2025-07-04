@@ -6,7 +6,6 @@ of the Entity with focus on ID management and equality behavior.
 """
 
 from abc import ABC
-from typing import Optional
 
 import pytest
 
@@ -16,7 +15,7 @@ from src.domain.entities.entity import Entity
 class ConcreteEntity(Entity):
     """Concrete implementation of Entity for testing."""
 
-    def __init__(self, name: str = "test", id: Optional[str] = None) -> None:
+    def __init__(self, name: str = "test", id: str | None = None) -> None:
         super().__init__(id=id)
         self.name = name
 

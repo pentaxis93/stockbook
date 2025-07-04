@@ -5,7 +5,7 @@ Command object encapsulating the intention to update an existing stock
 with all necessary validation and normalization.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any
 
 from src.domain.value_objects.stock_symbol import StockSymbol
 
@@ -20,24 +20,24 @@ class UpdateStockCommand:
 
     # Private attributes for type checking
     _stock_id: str
-    _symbol: Optional[str]
-    _name: Optional[str]
-    _sector: Optional[str]
-    _industry_group: Optional[str]
-    _grade: Optional[str]
-    _notes: Optional[str]
+    _symbol: str | None
+    _name: str | None
+    _sector: str | None
+    _industry_group: str | None
+    _grade: str | None
+    _notes: str | None
 
     def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         # Rationale: Update commands need all fields to specify which attributes to update.
         # Optional parameters indicate which fields should be modified.
         self,
         stock_id: str,
-        symbol: Optional[str] = None,
-        name: Optional[str] = None,
-        sector: Optional[str] = None,
-        industry_group: Optional[str] = None,
-        grade: Optional[str] = None,
-        notes: Optional[str] = None,
+        symbol: str | None = None,
+        name: str | None = None,
+        sector: str | None = None,
+        industry_group: str | None = None,
+        grade: str | None = None,
+        notes: str | None = None,
     ):
         """
         Initialize UpdateStockCommand with validation.
@@ -68,32 +68,32 @@ class UpdateStockCommand:
         return self._stock_id
 
     @property
-    def symbol(self) -> Optional[str]:
+    def symbol(self) -> str | None:
         """Get the stock symbol."""
         return self._symbol
 
     @property
-    def name(self) -> Optional[str]:
+    def name(self) -> str | None:
         """Get the company name."""
         return self._name
 
     @property
-    def sector(self) -> Optional[str]:
+    def sector(self) -> str | None:
         """Get the sector."""
         return self._sector
 
     @property
-    def industry_group(self) -> Optional[str]:
+    def industry_group(self) -> str | None:
         """Get the industry group."""
         return self._industry_group
 
     @property
-    def grade(self) -> Optional[str]:
+    def grade(self) -> str | None:
         """Get the stock grade."""
         return self._grade
 
     @property
-    def notes(self) -> Optional[str]:
+    def notes(self) -> str | None:
         """Get the notes."""
         return self._notes
 
@@ -115,7 +115,7 @@ class UpdateStockCommand:
             ]
         )
 
-    def get_update_fields(self) -> Dict[str, Any]:
+    def get_update_fields(self) -> dict[str, Any]:
         """
         Get dictionary of fields that are being updated.
 
@@ -185,13 +185,13 @@ class UpdateStockCommand:
         # Each field needs individual normalization and validation logic.
         self,
         stock_id: str,
-        symbol: Optional[str],
-        name: Optional[str],
-        sector: Optional[str],
-        industry_group: Optional[str],
-        grade: Optional[str],
-        notes: Optional[str],
-    ) -> Dict[str, Any]:
+        symbol: str | None,
+        name: str | None,
+        sector: str | None,
+        industry_group: str | None,
+        grade: str | None,
+        notes: str | None,
+    ) -> dict[str, Any]:
         """Validate and normalize all inputs, returning normalized values."""
         # Validate stock_id
         self._validate_stock_id(stock_id)
@@ -228,7 +228,7 @@ class UpdateStockCommand:
             "notes": notes,
         }
 
-    def _set_attributes(self, normalized_inputs: Dict[str, Any]) -> None:
+    def _set_attributes(self, normalized_inputs: dict[str, Any]) -> None:
         """Set all attributes using normalized inputs."""
         object.__setattr__(self, "_stock_id", normalized_inputs["stock_id"])
         object.__setattr__(self, "_symbol", normalized_inputs["symbol"])
@@ -261,7 +261,7 @@ class UpdateStockCommand:
             raise ValueError("Invalid symbol format")
 
     @staticmethod
-    def _normalize_name(name: Optional[str]) -> Optional[str]:
+    def _normalize_name(name: str | None) -> str | None:
         """Normalize company name."""
         if name is None:
             return None  # pragma: no cover
@@ -269,7 +269,7 @@ class UpdateStockCommand:
         return name.strip() if name.strip() else None
 
     @staticmethod
-    def _normalize_sector(sector: Optional[str]) -> Optional[str]:
+    def _normalize_sector(sector: str | None) -> str | None:
         """Normalize sector."""
         if sector is None:
             return None  # pragma: no cover
@@ -278,7 +278,7 @@ class UpdateStockCommand:
         return normalized if normalized else None
 
     @staticmethod
-    def _normalize_industry_group(industry_group: str) -> Optional[str]:
+    def _normalize_industry_group(industry_group: str) -> str | None:
         """Normalize industry group."""
         # Type checking is handled by type annotations
         normalized = industry_group.strip()
@@ -291,13 +291,13 @@ class UpdateStockCommand:
         return notes.strip()
 
     @staticmethod
-    def _validate_name(name: Optional[str]) -> None:
+    def _validate_name(name: str | None) -> None:
         """Validate company name."""
         # Name is now optional, so no validation needed
         pass
 
     @staticmethod
-    def _validate_grade(grade: Optional[str]) -> None:
+    def _validate_grade(grade: str | None) -> None:
         """Validate stock grade."""
         if grade is not None:
             valid_grades = {"A", "B", "C"}

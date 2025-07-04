@@ -48,6 +48,7 @@ StockBook is a modern application built with Python to help track personal and f
 - **Application Layer** - Use cases, commands, and data transfer objects
 - **Dependency Injection** - Professional IoC container with composition root
 - **Testing** - Pytest with layer-specific coverage requirements
+- **Code Quality** - Ruff for fast, comprehensive linting (replaced flake8, pylint, isort, pydocstyle, bandit)
 
 ### Planned Technologies
 - **FastAPI** - Modern async web framework (Phase 2)
@@ -166,7 +167,7 @@ stockbook/
 │   └── dependency_injection/ # DI framework tests
 ├── docs/                    # Documentation
 │   ├── ARCHITECTURE.md     # System design and architecture
-│   ├── DEVELOPMENT_ROADMAP.md # Development phases and progress
+│   ├── RUFF_MIGRATION_GUIDE.md # Linting tool migration guide
 │   ├── ONBOARDING.md       # New developer guide
 │   └── API_DESIGN.md       # Planned API structure
 ├── hooks/                   # Git hooks and quality scripts

@@ -5,7 +5,8 @@ Configures the entire application's dependency graph in one central location,
 following clean architecture principles.
 """
 
-from typing import Any, Callable, Dict, Optional
+from typing import Any
+from collections.abc import Callable
 
 from sqlalchemy.engine import Engine
 
@@ -40,9 +41,9 @@ class CompositionRoot:
     @classmethod
     def configure(
         cls,
-        database_path: Optional[str] = None,
-        config: Optional[Dict[str, Any]] = None,
-        extra_registrations: Optional[Callable[[DIContainer], None]] = None,
+        database_path: str | None = None,
+        config: dict[str, Any] | None = None,
+        extra_registrations: Callable[[DIContainer], None] | None = None,
     ) -> DIContainer:
         """
         Configure the complete application dependency graph.

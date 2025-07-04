@@ -17,7 +17,7 @@ import os
 import re
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Union
+from typing import Any
 
 
 class ConfigError(Exception):
@@ -66,11 +66,22 @@ class Config:
 
     def _load_configuration(self) -> None:
         """Load all configuration settings."""
-        # Application settings
+        self._setup_application_settings()
+        self._setup_paths()
+        self._setup_database()
+        self._setup_display_preferences()
+        self._setup_validation_rules()
+        self._setup_portfolio_defaults()
+        self._setup_feature_flags()
+        self._setup_business_days()
+
+    def _setup_application_settings(self) -> None:
+        """Setup application settings."""
         self.app_name = self._get_env_str("STOCKBOOK_APP_NAME", "StockBook")
         self.DEBUG = self._get_env_bool("STOCKBOOK_DEBUG", False)
 
-        # Database configuration
+    def _setup_database(self) -> None:
+        """Setup database configuration."""
         self.db_path = Path(
             self._get_env_str("STOCKBOOK_DB_PATH", "database/stockbook.db")
         )
@@ -80,43 +91,33 @@ class Config:
         self.test_db_path = Path(
             self._get_env_str("STOCKBOOK_TEST_DB_PATH", "database/test_stockbook.db")
         )
-
-        # Database connection settings
         self.db_connection_timeout = self._get_env_int("STOCKBOOK_DB_TIMEOUT", 30)
         self.db_foreign_keys_enabled = self._get_env_bool(
             "STOCKBOOK_DB_FOREIGN_KEYS", True
         )
         self.db_row_factory = self._get_env_str("STOCKBOOK_DB_ROW_FACTORY", "dict")
 
-        # Directory paths
+    def _setup_paths(self) -> None:
+        """Setup directory paths."""
         self.data_dir = Path(self._get_env_str("STOCKBOOK_DATA_DIR", "data"))
         self.backup_dir = Path(self._get_env_str("STOCKBOOK_BACKUP_DIR", "backups"))
         self.logs_dir = Path(self._get_env_str("STOCKBOOK_LOGS_DIR", "logs"))
 
-        # Display preferences
+    def _setup_display_preferences(self) -> None:
+        """Setup display preferences."""
         self.date_format = self._get_env_str("STOCKBOOK_DATE_FORMAT", "%Y-%m-%d")
         self.datetime_format = self._get_env_str(
             "STOCKBOOK_DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S"
         )
         self.currency_symbol = self._get_env_str("STOCKBOOK_CURRENCY_SYMBOL", "$")
         self.decimal_places = self._get_env_int("STOCKBOOK_DECIMAL_PLACES", 2)
-
-        # Table display settings
         self.table_page_size = self._get_env_int("STOCKBOOK_TABLE_PAGE_SIZE", 20)
         self.max_rows_display = self._get_env_int("STOCKBOOK_MAX_ROWS_DISPLAY", 100)
 
-        # Validation rules
-        self._setup_validation_rules()
-
-        # Portfolio defaults
-        self._setup_portfolio_defaults()
-
-        # Feature flags
-        self._setup_feature_flags()
-
-        # Business day configuration
+    def _setup_business_days(self) -> None:
+        """Setup business day configuration."""
         self.business_days = {0, 1, 2, 3, 4}  # Monday through Friday
-        self.market_holidays: List[str] = []  # Can be populated from external source
+        self.market_holidays: list[str] = []  # Can be populated from external source
 
     def _setup_validation_rules(self) -> None:
         """Setup validation rules for different data types."""
@@ -213,7 +214,7 @@ class Config:
             return default
         return value.lower() in ("true", "1", "yes", "on")
 
-    def _get_env_list(self, key: str, default: List[str]) -> List[str]:
+    def _get_env_list(self, key: str, default: list[str]) -> list[str]:
         """Get list value from environment with default."""
         value = os.getenv(key)
         if value is None:
@@ -243,25 +244,31 @@ class Config:
 
     def _validate_values(self) -> None:
         """Validate configuration values."""
+        self._validate_numeric_values()
+        self._validate_portfolio_values()
+        self._validate_display_values()
+
+    def _validate_numeric_values(self) -> None:
+        """Validate numeric configuration values."""
         if self.decimal_places < 0:
             raise ValidationError("decimal_places must be non-negative")
+        if self.min_price <= 0:
+            raise ValidationError("min_price must be positive")
+        if self.max_price <= self.min_price:
+            raise ValidationError("max_price must be greater than min_price")
+        if self.min_quantity <= 0:
+            raise ValidationError("min_quantity must be positive")
 
+    def _validate_portfolio_values(self) -> None:
+        """Validate portfolio configuration values."""
         max_positions = self.portfolio_defaults.get("max_positions", 0)
         if isinstance(max_positions, int) and max_positions <= 0:
             raise ValidationError("max_positions must be positive")
 
-        if self.min_price <= 0:
-            raise ValidationError("min_price must be positive")
-
-        if self.max_price <= self.min_price:
-            raise ValidationError("max_price must be greater than min_price")
-
-        if self.min_quantity <= 0:
-            raise ValidationError("min_quantity must be positive")
-
+    def _validate_display_values(self) -> None:
+        """Validate display configuration values."""
         if self.table_page_size <= 0:
             raise ValidationError("table_page_size must be positive")
-
         if self.max_rows_display < self.table_page_size:
             raise ValidationError("max_rows_display must be >= table_page_size")
 
@@ -294,9 +301,9 @@ class Config:
         """Check if a feature is enabled."""
         return self.features.get(feature_name, False)
 
-    def get_validation_rules(self, entity_type: str) -> Dict[str, Any]:
+    def get_validation_rules(self, entity_type: str) -> dict[str, Any]:
         """Get validation rules for a specific entity type."""
-        validation_rules_map: Dict[str, Dict[str, Any]] = {
+        validation_rules_map: dict[str, dict[str, Any]] = {
             "stock": {
                 "symbol_pattern": self.stock_symbol_pattern,
                 "symbol_max_length": self.stock_symbol_max_length,
@@ -314,10 +321,10 @@ class Config:
                 "max_quantity": self.max_quantity,
             },
         }
-        default: Dict[str, Any] = {}
+        default: dict[str, Any] = {}
         return validation_rules_map.get(entity_type, default)
 
-    def format_currency(self, amount: Union[int, float]) -> str:
+    def format_currency(self, amount: int | float) -> str:
         """Format amount as currency string."""
         formatted = f"{amount:,.{self.decimal_places}f}"
         return f"{self.currency_symbol}{formatted}"

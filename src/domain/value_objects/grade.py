@@ -4,7 +4,7 @@ Grade value object for the StockBook domain.
 Represents a stock grade with validation rules and immutability.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 
 
 class Grade:
@@ -14,7 +14,7 @@ class Grade:
     Encapsulates validation logic for grades and ensures immutability.
     """
 
-    VALID_GRADES = {"A", "B", "C", "D", "F"}
+    VALID_GRADES: ClassVar[set[str]] = {"A", "B", "C", "D", "F"}
     _value: str
 
     def __init__(self, value: str):

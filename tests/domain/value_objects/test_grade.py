@@ -116,7 +116,7 @@ class TestGradeValueObject:
 
     def test_grade_valid_grades_constant(self) -> None:
         """Test that VALID_GRADES constant is accessible and correct."""
-        assert Grade.VALID_GRADES == {"A", "B", "C", "D", "F"}
+        assert {"A", "B", "C", "D", "F"} == Grade.VALID_GRADES
 
     def test_grade_base_class_coverage(self) -> None:
         """Test base class coverage for Grade missing lines."""
@@ -130,7 +130,7 @@ class TestGradeValueObject:
         grade = object.__new__(Grade)
 
         # This exercises the super().__setattr__ branch (line 71)
-        setattr(grade, "test_attr", "test_value")
+        grade.test_attr = "test_value"
 
         # Now properly initialize the object
         Grade.__init__(grade, "B")

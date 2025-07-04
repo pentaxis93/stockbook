@@ -4,7 +4,7 @@ TargetStatus value object for the StockBook domain.
 Represents target status with validation rules and immutability.
 """
 
-from typing import Any
+from typing import Any, ClassVar
 
 
 class TargetStatus:
@@ -15,7 +15,7 @@ class TargetStatus:
     Valid statuses are: active, hit, failed, cancelled.
     """
 
-    VALID_STATUSES = {"active", "hit", "failed", "cancelled"}
+    VALID_STATUSES: ClassVar[set[str]] = {"active", "hit", "failed", "cancelled"}
     _value: str
 
     def __init__(self, value: str):

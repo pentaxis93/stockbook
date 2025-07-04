@@ -7,8 +7,8 @@ SQLAlchemy Core, maintaining clean architecture separation by avoiding ORM.
 
 # pyright: reportUnknownArgumentType=false, reportUnknownMemberType=false, reportArgumentType=false
 
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import datetime, UTC
+from typing import Any
 
 from sqlalchemy import delete as sql_delete
 from sqlalchemy import (
@@ -84,7 +84,7 @@ class SqlAlchemyStockRepository(IStockRepository):
                 ) from e
             raise
 
-    def get_by_symbol(self, symbol: StockSymbol) -> Optional[Stock]:
+    def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
         """
         Retrieve stock by symbol.
 
@@ -109,7 +109,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         row_dict = row._asdict() if hasattr(row, "_asdict") else row
         return self._row_to_entity(row_dict)
 
-    def _entity_to_row(self, stock: Stock) -> Dict[str, Any]:
+    def _entity_to_row(self, stock: Stock) -> dict[str, Any]:
         """
         Convert Stock entity to database row dictionary.
 
@@ -119,7 +119,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         Returns:
             Dictionary with database column values
         """
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         return {
             "id": stock.id,
@@ -135,7 +135,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             "updated_at": now,
         }
 
-    def _row_to_entity(self, row: Dict[str, Any]) -> Stock:
+    def _row_to_entity(self, row: dict[str, Any]) -> Stock:
         """
         Convert database row to Stock entity.
 
@@ -161,7 +161,7 @@ class SqlAlchemyStockRepository(IStockRepository):
 
     # Stub implementations for other interface methods (to be implemented later)
 
-    def get_by_id(self, stock_id: str) -> Optional[Stock]:
+    def get_by_id(self, stock_id: str) -> Stock | None:
         """
         Retrieve stock by ID.
 
@@ -186,7 +186,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         row_dict = row._asdict() if hasattr(row, "_asdict") else row
         return self._row_to_entity(row_dict)
 
-    def get_all(self) -> List[Stock]:
+    def get_all(self) -> list[Stock]:
         """
         Retrieve all stocks from the database.
 
@@ -228,7 +228,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         row_data.pop("created_at", None)
 
         # Update the updated_at timestamp
-        row_data["updated_at"] = datetime.now(timezone.utc)
+        row_data["updated_at"] = datetime.now(UTC)
 
         # Create update statement
         stmt = (
@@ -303,10 +303,10 @@ class SqlAlchemyStockRepository(IStockRepository):
 
     def search_stocks(
         self,
-        symbol_filter: Optional[str] = None,
-        name_filter: Optional[str] = None,
-        industry_filter: Optional[str] = None,
-    ) -> List[Stock]:
+        symbol_filter: str | None = None,
+        name_filter: str | None = None,
+        industry_filter: str | None = None,
+    ) -> list[Stock]:
         """
         Search for stocks based on optional filters.
 

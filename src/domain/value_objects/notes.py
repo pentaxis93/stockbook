@@ -5,7 +5,7 @@ Represents notes/comments with validation rules and immutability.
 """
 
 from abc import ABC
-from typing import Any, Optional
+from typing import Any
 
 
 class BaseTextValueObject(ABC):
@@ -19,7 +19,7 @@ class BaseTextValueObject(ABC):
     _value: str
 
     def __init__(
-        self, value: str, max_length: Optional[int] = None, allow_empty: bool = True
+        self, value: str, max_length: int | None = None, allow_empty: bool = True
     ):
         """
         Initialize text value object with validation.

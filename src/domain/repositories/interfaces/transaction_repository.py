@@ -6,7 +6,6 @@ Defines the contract for transaction data persistence operations.
 
 from abc import ABC, abstractmethod
 from datetime import date
-from typing import List, Optional
 
 from src.domain.entities import Transaction
 
@@ -33,7 +32,7 @@ class ITransactionRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, transaction_id: str) -> Optional[Transaction]:
+    def get_by_id(self, transaction_id: str) -> Transaction | None:
         """
         Retrieve transaction by ID.
 
@@ -47,8 +46,8 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio(
-        self, portfolio_id: str, limit: Optional[int] = None
-    ) -> List[Transaction]:
+        self, portfolio_id: str, limit: int | None = None
+    ) -> list[Transaction]:
         """
         Retrieve transactions for a specific portfolio.
 
@@ -63,8 +62,8 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_stock(
-        self, stock_id: str, portfolio_id: Optional[str] = None
-    ) -> List[Transaction]:
+        self, stock_id: str, portfolio_id: str | None = None
+    ) -> list[Transaction]:
         """
         Retrieve transactions for a specific stock.
 
@@ -79,8 +78,8 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_date_range(
-        self, start_date: date, end_date: date, portfolio_id: Optional[str] = None
-    ) -> List[Transaction]:
+        self, start_date: date, end_date: date, portfolio_id: str | None = None
+    ) -> list[Transaction]:
         """
         Retrieve transactions within a date range.
 

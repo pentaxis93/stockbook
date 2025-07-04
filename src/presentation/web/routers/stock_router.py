@@ -6,7 +6,7 @@ to the application layer for business logic.
 """
 
 import logging
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
@@ -57,7 +57,7 @@ def get_stock_service(request: Request) -> StockApplicationService:
 @handle_stock_errors
 async def get_stocks(
     symbol: Annotated[
-        Optional[str], Query(description="Filter by stock symbol (partial match)")
+        str | None, Query(description="Filter by stock symbol (partial match)")
     ] = None,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockListResponse:
@@ -106,6 +106,7 @@ async def get_stock_by_id(
 
     Args:
         stock_id: The unique identifier of the stock
+        service: Stock application service dependency
 
     Returns:
         StockResponse containing the stock information

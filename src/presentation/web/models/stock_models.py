@@ -5,7 +5,7 @@ Provides Pydantic models for request/response validation and serialization
 for stock-related API endpoints.
 """
 
-from typing import Any, List, Literal, Optional, Self, Union
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
@@ -14,6 +14,10 @@ from src.application.commands.stock import (
     UpdateStockCommand,
 )
 from src.application.dto.stock_dto import StockDto
+
+
+# Constants for validation
+MAX_SYMBOL_LENGTH = 5
 
 
 class StockRequest(BaseModel):
@@ -25,10 +29,10 @@ class StockRequest(BaseModel):
     """
 
     symbol: str
-    name: Optional[str] = None
-    sector: Optional[str] = None
-    industry_group: Optional[str] = None
-    grade: Optional[Union[Literal["A", "B", "C", "D", "F"], str]] = None
+    name: str | None = None
+    sector: str | None = None
+    industry_group: str | None = None
+    grade: Literal["A", "B", "C", "D", "F"] | str | None = None
     notes: str = ""
 
     model_config = ConfigDict(
@@ -62,14 +66,16 @@ class StockRequest(BaseModel):
         if not normalized.isalpha():
             raise ValueError("Stock symbol must contain only uppercase letters")
         # Check length after format
-        if len(normalized) < 1 or len(normalized) > 5:
-            raise ValueError("Stock symbol must be between 1 and 5 characters")
+        if len(normalized) < 1 or len(normalized) > MAX_SYMBOL_LENGTH:
+            raise ValueError(
+                f"Stock symbol must be between 1 and {MAX_SYMBOL_LENGTH} characters"
+            )
 
         return normalized
 
     @field_validator("name")
     @classmethod
-    def validate_name(cls, value: Optional[str]) -> Optional[str]:
+    def validate_name(cls, value: str | None) -> str | None:
         """
         Validate company name.
 
@@ -86,7 +92,7 @@ class StockRequest(BaseModel):
 
     @field_validator("sector", "industry_group")
     @classmethod
-    def normalize_optional_strings(cls, value: Optional[str]) -> Optional[str]:
+    def normalize_optional_strings(cls, value: str | None) -> str | None:
         """
         Normalize optional string fields.
 
@@ -104,7 +110,7 @@ class StockRequest(BaseModel):
 
     @field_validator("grade", mode="before")
     @classmethod
-    def normalize_grade(cls, value: Any) -> Optional[Literal["A", "B", "C", "D", "F"]]:
+    def normalize_grade(cls, value: Any) -> Literal["A", "B", "C", "D", "F"] | None:
         """
         Normalize and validate grade.
 
@@ -169,12 +175,12 @@ class StockResponse(BaseModel):
     Provides consistent API response format for stock information.
     """
 
-    id: Optional[str]
+    id: str | None
     symbol: str
-    name: Optional[str] = None
-    sector: Optional[str] = None
-    industry_group: Optional[str] = None
-    grade: Optional[str] = None
+    name: str | None = None
+    sector: str | None = None
+    industry_group: str | None = None
+    grade: str | None = None
     notes: str = ""
 
     model_config = ConfigDict(
@@ -204,7 +210,7 @@ class StockResponse(BaseModel):
 
     @field_validator("name")
     @classmethod
-    def validate_name(cls, value: Optional[str]) -> Optional[str]:
+    def validate_name(cls, value: str | None) -> str | None:
         """
         Validate optional name field.
 
@@ -249,7 +255,7 @@ class StockListResponse(BaseModel):
     Provides paginated response format for stock listings.
     """
 
-    stocks: List[StockResponse]
+    stocks: list[StockResponse]
     total: int
 
     model_config = ConfigDict(
@@ -257,7 +263,7 @@ class StockListResponse(BaseModel):
     )
 
     @classmethod
-    def from_dto_list(cls, dtos: List[StockDto]) -> "StockListResponse":
+    def from_dto_list(cls, dtos: list[StockDto]) -> "StockListResponse":
         """
         Create response from list of StockDto objects.
 
@@ -280,11 +286,11 @@ class StockUpdateRequest(BaseModel):
     passing to the application layer.
     """
 
-    symbol: Optional[str] = None
-    name: Optional[str] = None
-    sector: Optional[str] = None
-    industry_group: Optional[str] = None
-    grade: Optional[Union[Literal["A", "B", "C", "D", "F"], str]] = None
+    symbol: str | None = None
+    name: str | None = None
+    sector: str | None = None
+    industry_group: str | None = None
+    grade: Literal["A", "B", "C", "D", "F"] | str | None = None
     notes: str = ""
 
     model_config = ConfigDict(
@@ -294,7 +300,7 @@ class StockUpdateRequest(BaseModel):
 
     @field_validator("symbol")
     @classmethod
-    def validate_symbol(cls, value: Optional[str]) -> Optional[str]:
+    def validate_symbol(cls, value: str | None) -> str | None:
         """
         Validate and normalize stock symbol.
 
@@ -321,14 +327,16 @@ class StockUpdateRequest(BaseModel):
         if not normalized.isalpha():
             raise ValueError("Stock symbol must contain only uppercase letters")
         # Check length after format
-        if len(normalized) < 1 or len(normalized) > 5:
-            raise ValueError("Stock symbol must be between 1 and 5 characters")
+        if len(normalized) < 1 or len(normalized) > MAX_SYMBOL_LENGTH:
+            raise ValueError(
+                f"Stock symbol must be between 1 and {MAX_SYMBOL_LENGTH} characters"
+            )
 
         return normalized
 
     @field_validator("name")
     @classmethod
-    def validate_name(cls, value: Optional[str]) -> Optional[str]:
+    def validate_name(cls, value: str | None) -> str | None:
         """
         Validate company name.
 
@@ -345,7 +353,7 @@ class StockUpdateRequest(BaseModel):
 
     @field_validator("sector", "industry_group")
     @classmethod
-    def normalize_optional_strings(cls, value: Optional[str]) -> Optional[str]:
+    def normalize_optional_strings(cls, value: str | None) -> str | None:
         """
         Normalize optional string fields.
 
@@ -363,7 +371,7 @@ class StockUpdateRequest(BaseModel):
 
     @field_validator("grade", mode="before")
     @classmethod
-    def normalize_grade(cls, value: Any) -> Optional[Literal["A", "B", "C", "D", "F"]]:
+    def normalize_grade(cls, value: Any) -> Literal["A", "B", "C", "D", "F"] | None:
         """
         Normalize and validate grade.
 

@@ -7,7 +7,7 @@ using SQLAlchemy for transaction management and repository coordination.
 
 # pyright: reportUnknownMemberType=false
 
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.engine import Connection, Engine
 
@@ -43,14 +43,14 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             engine: SQLAlchemy engine for database connections
         """
         self._engine = engine
-        self._connection: Optional[Connection] = None
-        self._db_connection: Optional[IDatabaseConnection] = None
-        self._stocks: Optional[IStockRepository] = None
-        self._portfolios: Optional[IPortfolioRepository] = None
-        self._transactions: Optional[ITransactionRepository] = None
-        self._targets: Optional[ITargetRepository] = None
-        self._balances: Optional[IPortfolioBalanceRepository] = None
-        self._journal: Optional[IJournalRepository] = None
+        self._connection: Connection | None = None
+        self._db_connection: IDatabaseConnection | None = None
+        self._stocks: IStockRepository | None = None
+        self._portfolios: IPortfolioRepository | None = None
+        self._transactions: ITransactionRepository | None = None
+        self._targets: ITargetRepository | None = None
+        self._balances: IPortfolioBalanceRepository | None = None
+        self._journal: IJournalRepository | None = None
 
     def __enter__(self) -> "SqlAlchemyUnitOfWork":
         """
@@ -78,10 +78,10 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
 
     def __exit__(
         self,
-        exc_type: Optional[type],
-        exc_val: Optional[Exception],
-        exc_tb: Optional[Any],
-    ) -> Optional[bool]:
+        exc_type: type | None,
+        exc_val: Exception | None,
+        exc_tb: Any | None,
+    ) -> bool | None:
         """
         Exit the unit of work context.
 

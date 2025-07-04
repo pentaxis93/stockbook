@@ -6,8 +6,8 @@ loose coupling between aggregates and bounded contexts.
 """
 
 import uuid
-from datetime import datetime, timezone
-from typing import Any, Optional
+from datetime import datetime, UTC
+from typing import Any
 
 
 class DomainEvent:
@@ -18,7 +18,7 @@ class DomainEvent:
     that other parts of the system may need to react to.
     """
 
-    def __init__(self, occurred_at: Optional[datetime] = None):
+    def __init__(self, occurred_at: datetime | None = None):
         """
         Initialize domain event.
 
@@ -26,7 +26,7 @@ class DomainEvent:
             occurred_at: When the event occurred (defaults to now)
         """
         self._event_id = str(uuid.uuid4())
-        self._occurred_at = occurred_at or datetime.now(timezone.utc)
+        self._occurred_at = occurred_at or datetime.now(UTC)
 
     @property
     def event_id(self) -> str:

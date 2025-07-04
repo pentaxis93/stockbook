@@ -123,7 +123,7 @@ class TestIndustryGroup:
         industry = object.__new__(IndustryGroup)
 
         # This exercises the super().__setattr__ branch (line 69)
-        setattr(industry, "test_attr", "test_value")
+        industry.test_attr = "test_value"
 
         # Now properly initialize the object
         IndustryGroup.__init__(industry, "Technology")

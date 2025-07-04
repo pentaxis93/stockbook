@@ -1,5 +1,14 @@
 repos:
-  # Black code formatting with autostage
+  # Ruff linting and import sorting (replaces flake8, pylint, isort, pydocstyle, bandit)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix, --unsafe-fixes]
+        always_run: true
+        pass_filenames: false
+
+  # Black code formatting (Ruff doesn't replace Black)
   - repo: https://github.com/psf/black
     rev: 25.1.0
     hooks:
@@ -8,15 +17,6 @@ repos:
         always_run: true
         pass_filenames: false
         args: ["."]
-
-  # isort import sorting with autostage  
-  - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-        args: ["--profile", "black", "."]
-        always_run: true
-        pass_filenames: false
 
   # Pyright type checking for core infrastructure
   - repo: https://github.com/RobertCraigie/pyright-python

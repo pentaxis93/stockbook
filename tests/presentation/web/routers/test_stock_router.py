@@ -4,7 +4,6 @@ Unit tests for stock router.
 These tests specifically target the router logic to achieve 100% coverage.
 """
 
-from typing import List
 from unittest.mock import Mock, patch
 
 import pytest
@@ -25,7 +24,7 @@ class TestStockRouter:
         return Mock(spec=StockApplicationService)
 
     @pytest.fixture
-    def sample_stock_dtos(self) -> List[StockDto]:
+    def sample_stock_dtos(self) -> list[StockDto]:
         """Create sample stock DTOs for testing."""
         return [
             StockDto(
@@ -78,7 +77,7 @@ class TestStockRouter:
         assert str(exc_info.value) == "DI container not configured in app state"
 
     def test_get_stocks_no_filters_calls_get_all(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
+        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
     ) -> None:
         """Should call get_all_stocks when no filters are provided."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
@@ -100,7 +99,7 @@ class TestStockRouter:
         mock_service.search_stocks.assert_not_called()
 
     def test_get_stocks_with_symbol_filter(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
+        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
     ) -> None:
         """Should call search_stocks with symbol filter."""
         filtered_stocks = [sample_stock_dtos[0]]  # Just AAPL
@@ -157,7 +156,7 @@ class TestStockRouter:
         )
 
     def test_get_stocks_empty_string_filters_ignored(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
+        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
     ) -> None:
         """Should treat empty string filters as None and call get_all_stocks."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
@@ -226,7 +225,7 @@ class TestStockRouter:
         assert response.json()["detail"] == "Invalid filter"
 
     def test_get_stocks_response_format(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
+        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
     ) -> None:
         """Should return proper StockListResponse format."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
@@ -292,7 +291,7 @@ class TestStockRouter:
         assert log_args == error_msg
 
     def test_update_stock_partial_update_success(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
+        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
     ) -> None:
         """Should successfully update only specified fields."""
         # Arrange
@@ -388,7 +387,7 @@ class TestStockRouter:
         mock_service.update_stock.assert_called_once()
 
     def test_update_stock_symbol_change(
-        self, mock_service: Mock, sample_stock_dtos: List[StockDto], app: FastAPI
+        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
     ) -> None:
         """Should successfully change stock symbol."""
         # Arrange

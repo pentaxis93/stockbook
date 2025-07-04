@@ -15,10 +15,10 @@ from .portfolio_calculation_service import PortfolioCalculationService
 from .risk_assessment_service import RiskAssessmentService
 
 __all__ = [
+    "CalculationError",
+    "DomainServiceError",
+    "InsufficientDataError",
     "PortfolioCalculationService",
     "RiskAssessmentService",
-    "DomainServiceError",
     "ValidationError",
-    "CalculationError",
-    "InsufficientDataError",
 ]

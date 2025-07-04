@@ -7,7 +7,7 @@ the expected functionality for infrastructure testing.
 
 # pyright: reportUnusedImport=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUnusedCallResult=false, reportUnnecessaryTypeIgnoreComment=false
 
-from typing import List, cast
+from typing import cast
 from unittest.mock import Mock
 
 import pytest
@@ -26,7 +26,6 @@ from .infrastructure import (
     StockBuilder,
     seed_test_portfolio_sqlalchemy,
     seed_test_stocks_sqlalchemy,
-    sqlalchemy_connection,
 )
 
 
@@ -161,7 +160,7 @@ class TestSampleStocksFixture:
     """Test the sample stocks fixture."""
 
     def test_sample_stocks_provides_diverse_data(
-        self, sample_stocks: List[Stock]
+        self, sample_stocks: list[Stock]
     ) -> None:
         """Should provide diverse test stock data."""
         assert len(sample_stocks) == 4
@@ -248,7 +247,7 @@ class TestSQLAlchemyFixtures:
             sqlalchemy_connection.execute(stmt)
 
     def test_sqlalchemy_seeding_functions(
-        self, sqlalchemy_connection: Connection, sample_stocks: List[Stock]
+        self, sqlalchemy_connection: Connection, sample_stocks: list[Stock]
     ) -> None:
         """Should seed data using SQLAlchemy functions."""
         # Seed stocks

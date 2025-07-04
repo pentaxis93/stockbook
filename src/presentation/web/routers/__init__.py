@@ -1,6 +1,4 @@
-"""
-Stock routers for FastAPI presentation layer.
-"""
+"""Stock routers for FastAPI presentation layer."""
 
 from . import stock_router
 

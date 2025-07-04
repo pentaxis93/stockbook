@@ -8,7 +8,7 @@ with appropriate configuration for SQLite databases.
 # pyright: reportUnknownMemberType=false, reportUntypedFunctionDecorator=false
 
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
 from sqlalchemy import create_engine as sqla_create_engine
 from sqlalchemy import event
@@ -19,7 +19,7 @@ from config import Config
 
 
 def create_engine(
-    db_path: Union[str, Path],
+    db_path: str | Path,
     echo: bool = False,
     **kwargs: Any,
 ) -> Engine:
@@ -40,7 +40,7 @@ def create_engine(
     """
     # Validate input type (needed for runtime safety even though type checker knows the types)
     if not isinstance(
-        db_path, (str, Path)
+        db_path, str | Path
     ):  # pyright: ignore[reportUnnecessaryIsInstance]
         raise TypeError("Database path must be a string or Path object")
 
@@ -101,7 +101,7 @@ def create_engine_from_config(use_test_db: bool = False) -> Engine:
     )
 
 
-def get_database_url(db_path: Union[str, Path]) -> str:
+def get_database_url(db_path: str | Path) -> str:
     """
     Construct SQLite database URL from path.
 
@@ -117,7 +117,7 @@ def get_database_url(db_path: Union[str, Path]) -> str:
 def configure_sqlite_pragmas(
     connection: Any,
     enable_foreign_keys: bool = True,
-    journal_mode: Optional[str] = None,
+    journal_mode: str | None = None,
 ) -> None:
     """
     Configure SQLite PRAGMA settings on a connection.

@@ -2,8 +2,6 @@
 Test suite for SectorIndustryService domain service.
 """
 
-from typing import List
-
 import pytest
 
 from src.domain.services.sector_industry_service import SectorIndustryService
@@ -130,7 +128,7 @@ class TestSectorIndustryService:
 
     def test_no_duplicate_industry_groups_across_sectors(self) -> None:
         """Test that no industry group appears in multiple sectors."""
-        all_industries: List[str] = []
+        all_industries: list[str] = []
         mapping = self.service.SECTOR_INDUSTRY_MAPPING
 
         for industries in mapping.values():

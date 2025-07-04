@@ -6,7 +6,7 @@ to reduce duplication across table definitions while maintaining
 clarity and type safety.
 """
 
-from typing import Any, List
+from typing import Any
 
 from sqlalchemy import CheckConstraint, Column, DateTime, ForeignKey, String, text
 
@@ -38,7 +38,7 @@ def foreign_key_column(
     )
 
 
-def timestamp_columns() -> List[Column[Any]]:
+def timestamp_columns() -> list[Column[Any]]:
     """
     Create standard created_at and updated_at columns.
 
@@ -62,7 +62,7 @@ def timestamp_columns() -> List[Column[Any]]:
 
 
 def enum_check_constraint(
-    column_name: str, allowed_values: List[str], constraint_name: str
+    column_name: str, allowed_values: list[str], constraint_name: str
 ) -> CheckConstraint:
     """
     Create a check constraint for enum-like columns.

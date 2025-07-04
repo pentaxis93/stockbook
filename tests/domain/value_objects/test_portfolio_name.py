@@ -334,7 +334,9 @@ class TestPortfolioNameEdgeCases:
             "Multi\n\nLine\n\nName",
         ]
 
-        for name_str, expected in zip(names_with_internal_whitespace, expected_results):
+        for name_str, expected in zip(
+            names_with_internal_whitespace, expected_results, strict=False
+        ):
             name = PortfolioName(name_str)
             assert name.value == expected
 
@@ -377,7 +379,7 @@ class TestPortfolioNameEdgeCases:
         name = object.__new__(PortfolioName)
 
         # This exercises the super().__setattr__ branch (line 73)
-        setattr(name, "test_attr", "test_value")
+        name.test_attr = "test_value"
 
         # Now properly initialize the object
         PortfolioName.__init__(name, "My Portfolio")

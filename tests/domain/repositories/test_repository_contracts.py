@@ -6,7 +6,7 @@ proper abstractions for data persistence operations in the domain layer.
 """
 
 from abc import ABC
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pytest
 
@@ -35,7 +35,7 @@ class MockStockRepository(IStockRepository):
     """Mock implementation of IStockRepository for contract testing."""
 
     def __init__(self):
-        self.stocks: Dict[str, Stock] = {}
+        self.stocks: dict[str, Stock] = {}
         self.next_id = 1
 
     def create(self, stock: Stock) -> str:
@@ -44,16 +44,16 @@ class MockStockRepository(IStockRepository):
         self.stocks[stock_id] = stock
         return stock_id
 
-    def get_by_id(self, stock_id: str) -> Optional[Stock]:
+    def get_by_id(self, stock_id: str) -> Stock | None:
         return self.stocks.get(stock_id)
 
-    def get_by_symbol(self, symbol: StockSymbol) -> Optional[Stock]:
+    def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
         for stock in self.stocks.values():
             if stock.symbol == symbol:
                 return stock
         return None
 
-    def get_all(self) -> List[Stock]:
+    def get_all(self) -> list[Stock]:
         return list(self.stocks.values())
 
     def update(self, stock_id: str, stock: Stock) -> bool:
@@ -73,11 +73,11 @@ class MockStockRepository(IStockRepository):
 
     def search_stocks(
         self,
-        symbol_filter: Optional[str] = None,
-        name_filter: Optional[str] = None,
-        industry_filter: Optional[str] = None,
-        grade_filter: Optional[str] = None,
-    ) -> List[Stock]:
+        symbol_filter: str | None = None,
+        name_filter: str | None = None,
+        industry_filter: str | None = None,
+        grade_filter: str | None = None,
+    ) -> list[Stock]:
         results = list(self.stocks.values())
 
         if symbol_filter:
@@ -108,7 +108,7 @@ class MockPortfolioRepository(IPortfolioRepository):
     """Mock implementation of IPortfolioRepository for contract testing."""
 
     def __init__(self):
-        self.portfolios: Dict[str, Portfolio] = {}
+        self.portfolios: dict[str, Portfolio] = {}
         self.next_id = 1
 
     def create(self, portfolio: Portfolio) -> str:
@@ -117,13 +117,13 @@ class MockPortfolioRepository(IPortfolioRepository):
         self.portfolios[portfolio_id] = portfolio
         return portfolio_id
 
-    def get_by_id(self, portfolio_id: str) -> Optional[Portfolio]:
+    def get_by_id(self, portfolio_id: str) -> Portfolio | None:
         return self.portfolios.get(portfolio_id)
 
-    def get_all_active(self) -> List[Portfolio]:
+    def get_all_active(self) -> list[Portfolio]:
         return [p for p in self.portfolios.values() if p.is_active]
 
-    def get_all(self) -> List[Portfolio]:
+    def get_all(self) -> list[Portfolio]:
         return list(self.portfolios.values())
 
     def update(self, portfolio_id: str, portfolio: Portfolio) -> bool:
@@ -151,7 +151,7 @@ class MockUnitOfWork(IUnitOfWork):
         self.entered = True
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> Optional[bool]:
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> bool | None:
         if exc_type is not None:
             self.rollback()
 
@@ -610,7 +610,7 @@ class TestRepositoryContractPerformance:
         repository = MockStockRepository()
 
         # Create many stocks
-        stocks: List[Stock] = []
+        stocks: list[Stock] = []
         for i in range(100):
             # Create valid 5-char symbols using letters only
             symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}"

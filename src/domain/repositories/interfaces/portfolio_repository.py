@@ -5,7 +5,6 @@ Defines the contract for portfolio data persistence operations.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
 
 from src.domain.entities import Portfolio
 
@@ -31,7 +30,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_by_id(self, portfolio_id: str) -> Optional[Portfolio]:
+    def get_by_id(self, portfolio_id: str) -> Portfolio | None:
         """
         Retrieve portfolio by ID.
 
@@ -44,7 +43,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all_active(self) -> List[Portfolio]:
+    def get_all_active(self) -> list[Portfolio]:
         """
         Retrieve all active portfolios.
 
@@ -54,7 +53,7 @@ class IPortfolioRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> List[Portfolio]:
+    def get_all(self) -> list[Portfolio]:
         """
         Retrieve all portfolios (active and inactive).
 

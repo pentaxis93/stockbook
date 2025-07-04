@@ -5,8 +5,8 @@ Following TDD approach - these tests define the expected behavior
 of domain events used for inter-aggregate communication.
 """
 
-from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, List
+from datetime import datetime, timedelta, UTC
+from typing import Any
 
 import pytest
 
@@ -26,7 +26,7 @@ class TestDomainEvent:
         assert isinstance(event.occurred_at, datetime)
 
         # Should be recent (within last second)
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         assert (now - event.occurred_at).total_seconds() < 1
 
     def test_domain_event_with_custom_timestamp(self) -> None:
@@ -165,7 +165,7 @@ class TestDomainEventLifecycle:
         assert event.stock_id == stock_id
 
         # Event should be recent
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         assert (now - event.occurred_at).total_seconds() < 1
 
     def test_event_immutability(self) -> None:
@@ -184,8 +184,8 @@ class TestDomainEventLifecycle:
     def test_event_ordering_by_timestamp(self) -> None:
         """Should support chronological ordering of events."""
         # Create events with specific timestamps
-        early_time = datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
-        later_time = datetime(2024, 1, 1, 11, 0, 0, tzinfo=timezone.utc)
+        early_time = datetime(2024, 1, 1, 10, 0, 0, tzinfo=UTC)
+        later_time = datetime(2024, 1, 1, 11, 0, 0, tzinfo=UTC)
 
         early_event = StockAddedEvent(
             stock_symbol=StockSymbol("AAPL"),
@@ -245,7 +245,7 @@ class TestDomainEventConsistency:
 
     def test_event_uniqueness_guarantees(self) -> None:
         """Should guarantee event uniqueness through event IDs."""
-        events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
 
         # Create multiple events
         for _ in range(100):
@@ -264,7 +264,7 @@ class TestDomainEventConsistency:
 
     def test_event_temporal_consistency(self) -> None:
         """Should maintain temporal consistency across events."""
-        events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
 
         # Create events in sequence
         for i in range(10):
@@ -288,7 +288,7 @@ class TestDomainEventPatterns:
 
     def test_event_collection_operations(self) -> None:
         """Should work properly in event collections."""
-        events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
 
         # Create diverse events
         events.append(
@@ -319,16 +319,13 @@ class TestDomainEventPatterns:
 
     def test_event_filtering_and_querying(self) -> None:
         """Should support event filtering and querying patterns."""
-        events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
 
         # Create mixed events
         for i in range(20):
             # Use alphabet letters for valid symbols
             symbol = chr(ord("A") + (i % 26)) + chr(ord("A") + ((i // 26) % 26))
-            if i % 2 == 0:
-                company_name = f"Tech Company {i}"
-            else:
-                company_name = f"Finance Company {i}"
+            company_name = f"Tech Company {i}" if i % 2 == 0 else f"Finance Company {i}"
 
             event = StockAddedEvent(
                 stock_symbol=StockSymbol(symbol),
@@ -350,10 +347,10 @@ class TestDomainEventPatterns:
 
     def test_event_aggregation_patterns(self) -> None:
         """Should support event aggregation and summary patterns."""
-        events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
 
         # Create events with timestamps over a time range (span multiple hours)
-        base_time = datetime(2024, 1, 1, 10, 0, 0, tzinfo=timezone.utc)
+        base_time = datetime(2024, 1, 1, 10, 0, 0, tzinfo=UTC)
 
         for i in range(50):
             # Create events across multiple hours (every 5 minutes = 12 events per hour)
@@ -369,7 +366,7 @@ class TestDomainEventPatterns:
             events.append(event)
 
         # Group events by hour
-        events_by_hour: Dict[int, List[StockAddedEvent]] = {}
+        events_by_hour: dict[int, list[StockAddedEvent]] = {}
         for event in events:
             hour_key = event.occurred_at.hour
             if hour_key not in events_by_hour:
@@ -384,9 +381,9 @@ class TestDomainEventPatterns:
 
     def test_event_handler_simulation(self) -> None:
         """Should simulate event handler processing patterns."""
-        events: List[StockAddedEvent] = []
-        processed_events: List[StockAddedEvent] = []
-        failed_events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
+        processed_events: list[StockAddedEvent] = []
+        failed_events: list[StockAddedEvent] = []
 
         # Create test events with different symbols
         for i in range(10):
@@ -439,7 +436,7 @@ class TestDomainEventEdgeCases:
             stock_symbol=StockSymbol("EARLY"),
             stock_name="Early Company",
             stock_id=1,
-            occurred_at=datetime.min.replace(tzinfo=timezone.utc),
+            occurred_at=datetime.min.replace(tzinfo=UTC),
         )
 
         # Test with far future timestamp
@@ -447,7 +444,7 @@ class TestDomainEventEdgeCases:
             stock_symbol=StockSymbol("FUTUR"),
             stock_name="Future Company",
             stock_id=2,
-            occurred_at=datetime(2050, 12, 31, 23, 59, 59, tzinfo=timezone.utc),
+            occurred_at=datetime(2050, 12, 31, 23, 59, 59, tzinfo=UTC),
         )
 
         assert early_event.occurred_at.year == datetime.min.year
@@ -476,7 +473,7 @@ class TestDomainEventEdgeCases:
 
     def test_event_memory_efficiency(self) -> None:
         """Should maintain memory efficiency with large event volumes."""
-        events: List[StockAddedEvent] = []
+        events: list[StockAddedEvent] = []
 
         # Create large number of events
         for i in range(1000):
@@ -501,8 +498,8 @@ class TestDomainEventEdgeCases:
 
     def test_event_concurrent_creation_simulation(self) -> None:
         """Should handle concurrent-like event creation patterns."""
-        events_batch_1: List[StockAddedEvent] = []
-        events_batch_2: List[StockAddedEvent] = []
+        events_batch_1: list[StockAddedEvent] = []
+        events_batch_2: list[StockAddedEvent] = []
 
         # Simulate concurrent batches of event creation
         for i in range(50):
@@ -558,7 +555,7 @@ class TestDomainEventArchitecturalConcerns:
 
     def test_event_polymorphism_support(self) -> None:
         """Should support polymorphic event handling."""
-        events: List[DomainEvent] = []
+        events: list[DomainEvent] = []
 
         # Add different types of events to same collection
         stock_event = StockAddedEvent(
@@ -588,7 +585,7 @@ class TestDomainEventArchitecturalConcerns:
 
         # Event should support metadata attachment (conceptually)
         # This tests the design's extensibility for adding metadata
-        event_data: Dict[str, Any] = {
+        event_data: dict[str, Any] = {
             "event": event,
             "metadata": {
                 "source": "user_input",
@@ -602,7 +599,7 @@ class TestDomainEventArchitecturalConcerns:
 
         # Should support event wrapper patterns
         class EventWrapper:
-            def __init__(self, event: DomainEvent, context: Dict[str, Any]):
+            def __init__(self, event: DomainEvent, context: dict[str, Any]):
                 self.event = event
                 self.context = context
 

@@ -8,7 +8,8 @@ middleware, and endpoints.
 import logging
 import os
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator, Dict
+from typing import Any
+from collections.abc import AsyncGenerator
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -91,7 +92,7 @@ app.include_router(stock_router.router)
 
 
 @app.get("/")
-async def root() -> Dict[str, Any]:
+async def root() -> dict[str, Any]:
     """
     Root endpoint providing API information.
 
@@ -112,7 +113,7 @@ async def root() -> Dict[str, Any]:
 
 
 @app.get("/health")
-async def health_check() -> Dict[str, str]:
+async def health_check() -> dict[str, str]:
     """
     Health check endpoint.
 
