@@ -6,7 +6,7 @@ creating all necessary tables if they don't already exist.
 """
 
 import logging
-import os
+from pathlib import Path
 
 from sqlalchemy import MetaData
 from sqlalchemy.engine import Engine
@@ -73,9 +73,10 @@ def _extract_db_path(database_url: str) -> str:
 
 def _ensure_db_directory_exists(db_path: str) -> None:
     """Create database directory if it doesn't exist."""
-    db_dir = os.path.dirname(db_path)
-    if db_dir:
-        os.makedirs(db_dir, exist_ok=True)
+    path = Path(db_path)
+    parent_dir = path.parent
+    if parent_dir != Path():
+        parent_dir.mkdir(parents=True, exist_ok=True)
 
 
 def initialize_database(

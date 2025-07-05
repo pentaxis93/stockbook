@@ -50,7 +50,7 @@ def create_test_stock(
 
     sector, industry_group = industry_mapping.get(industry, ("Technology", "Software"))
 
-    stock = Stock(
+    return Stock(
         symbol=StockSymbol(symbol),
         company_name=CompanyName(f"{symbol} Corp"),
         sector=Sector(sector) if sector else None,
@@ -58,7 +58,6 @@ def create_test_stock(
         grade=Grade(grade) if grade else None,
         id=f"stock-{symbol.lower()}-test",
     )
-    return stock
 
 
 def create_conservative_portfolio() -> list[tuple[Stock, Quantity]]:

@@ -2,9 +2,9 @@
 
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 
-import os
 import tempfile
 from collections.abc import Generator
+from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -27,8 +27,9 @@ class TestDatabaseInitializer:
         yield tmp_path
 
         # Cleanup
-        if os.path.exists(tmp_path):
-            os.unlink(tmp_path)
+        path = Path(tmp_path)
+        if path.exists():
+            path.unlink()
 
     @pytest.fixture
     def mock_metadata(self) -> Mock:
@@ -43,7 +44,7 @@ class TestDatabaseInitializer:
         initialize_database(f"sqlite:///{temp_db_path}")
 
         # Verify database file was created
-        assert os.path.exists(temp_db_path)
+        assert Path(temp_db_path).exists()
 
         # Verify tables were created
         engine = sa.create_engine(f"sqlite:///{temp_db_path}")
@@ -146,7 +147,7 @@ class TestDatabaseInitializer:
         initialize_database(temp_db_path)
 
         # Verify database was created
-        assert os.path.exists(temp_db_path)
+        assert Path(temp_db_path).exists()
 
         # Verify tables were created
         engine = sa.create_engine(f"sqlite:///{temp_db_path}")

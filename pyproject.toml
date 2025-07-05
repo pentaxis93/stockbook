@@ -24,9 +24,18 @@ select = [
     # Additional helpful rules
     "B",                # flake8-bugbear (common bugs)
     "A",                # flake8-builtins (shadowing builtins)
+    "ASYNC",            # flake8-async (async/await best practices)
     "ERA",              # eradicate (commented-out code)
+    "FLY",              # flynt (f-string conversions)
+    "LOG",              # flake8-logging (logging best practices)
+    "PERF",             # Perflint (performance anti-patterns)
+    "PTH",              # flake8-use-pathlib (pathlib usage)
+    "RET",              # flake8-return (return statement checks)
     "SIM",              # flake8-simplify (code simplification)
     "UP",               # pyupgrade (Python version upgrade syntax)
+    "TCH",              # flake8-type-checking (type checking imports)
+    "TID",              # flake8-tidy-imports (import conventions)
+    "FURB",             # refurb (modernize Python code)
     "RUF",              # Ruff-specific rules
 ]
 
