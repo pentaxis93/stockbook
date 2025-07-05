@@ -5,190 +5,168 @@ Tests that DI system provides clear, helpful error messages
 for common configuration and usage mistakes.
 """
 
-import pytest
-
-# These imports will exist after implementation
-# from dependency_injection.exceptions import (
-#     DependencyResolutionError,
-#     CircularDependencyError,
-#     DuplicateRegistrationError,
-#     InvalidRegistrationError
-# )
+from dependency_injection.exceptions import (
+    CircularDependencyError,
+    DependencyInjectionError,
+    DependencyResolutionError,
+    DuplicateRegistrationError,
+    InvalidRegistrationError,
+)
 
 
-@pytest.mark.skip(reason="TDD - implementation pending")
+class MockService:
+    """Mock service for testing."""
+
+    pass
+
+
 class TestDependencyResolutionError:
     """Test dependency resolution error messages."""
 
-    def test_unregistered_type_error_message(self) -> None:
-        """Should provide helpful message for unregistered types."""
-        # Arrange
-        # error = DependencyResolutionError("TestService", "TestService is not registered in the container")
+    def test_basic_error_message(self) -> None:
+        """Should create error with basic message."""
+        error = DependencyResolutionError(
+            MockService, "MockService is not registered in the container"
+        )
 
-        # Assert
-        # assert "TestService" in str(error)
-        # assert "not registered" in str(error)
-        # assert error.service_type == "TestService"
-        pass
+        assert "MockService is not registered" in str(error)
+        assert error.service_type == MockService
+        assert isinstance(error, DependencyInjectionError)
 
-    def test_missing_dependency_error_message(self) -> None:
-        """Should provide helpful message for missing dependencies."""
-        # Arrange - when TestService needs IRepository but IRepository not registered
-        # error = DependencyResolutionError(
-        #     "TestService",
-        #     "Cannot resolve TestService: dependency IRepository is not registered"
-        # )
-
-        # Assert
-        # assert "TestService" in str(error)
-        # assert "IRepository" in str(error)
-        # assert "dependency" in str(error)
-        pass
-
-    def test_resolution_chain_in_error(self) -> None:
+    def test_error_with_resolution_chain(self) -> None:
         """Should show resolution chain in error messages."""
-        # When A -> B -> C and C fails, should show the chain
-        # error = DependencyResolutionError(
-        #     "ServiceA",
-        #     "Cannot resolve ServiceA -> ServiceB -> ServiceC: ServiceC not registered"
-        # )
+        error = DependencyResolutionError(
+            MockService,
+            "Cannot resolve dependency",
+            resolution_chain=["ControllerA", "ServiceB", "RepositoryC"],
+        )
 
-        # assert "ServiceA -> ServiceB -> ServiceC" in str(error)
-        pass
+        error_str = str(error)
+        assert "Cannot resolve dependency" in error_str
+        assert "Resolution chain: ControllerA -> ServiceB -> RepositoryC" in error_str
+        assert error.resolution_chain == ["ControllerA", "ServiceB", "RepositoryC"]
+
+    def test_error_without_resolution_chain(self) -> None:
+        """Should handle error without resolution chain."""
+        error = DependencyResolutionError(MockService, "Simple error message")
+
+        assert str(error) == "Simple error message"
+        assert error.resolution_chain == []
 
 
-@pytest.mark.skip(reason="TDD - implementation pending")
 class TestCircularDependencyError:
     """Test circular dependency detection and error messages."""
 
     def test_simple_circular_dependency_error(self) -> None:
         """Should detect A -> B -> A circular dependency."""
-        # error = CircularDependencyError(["ServiceA", "ServiceB", "ServiceA"])
+        error = CircularDependencyError(["ServiceA", "ServiceB", "ServiceA"])
 
-        # assert "circular dependency" in str(error).lower()
-        # assert "ServiceA" in str(error)
-        # assert "ServiceB" in str(error)
-        # assert error.dependency_chain == ["ServiceA", "ServiceB", "ServiceA"]
-        pass
+        error_str = str(error).lower()
+        assert "circular dependency detected" in error_str
+        assert "servicea -> serviceb -> servicea" in error_str
+        assert error.dependency_chain == ["ServiceA", "ServiceB", "ServiceA"]
+        assert isinstance(error, DependencyInjectionError)
 
     def test_complex_circular_dependency_error(self) -> None:
         """Should detect longer circular dependency chains."""
-        # A -> B -> C -> D -> B (circular)
-        # error = CircularDependencyError(["ServiceA", "ServiceB", "ServiceC", "ServiceD", "ServiceB"])
+        chain = ["ServiceA", "ServiceB", "ServiceC", "ServiceD", "ServiceB"]
+        error = CircularDependencyError(chain)
 
-        # assert "ServiceA -> ServiceB -> ServiceC -> ServiceD -> ServiceB" in str(error)
-        pass
+        assert "ServiceA -> ServiceB -> ServiceC -> ServiceD -> ServiceB" in str(error)
+        assert error.dependency_chain == chain
 
     def test_self_circular_dependency_error(self) -> None:
         """Should detect self-referencing circular dependencies."""
-        # Service that depends on itself
-        # error = CircularDependencyError(["SelfService", "SelfService"])
+        error = CircularDependencyError(["SelfService", "SelfService"])
 
-        # assert "SelfService" in str(error)
-        # assert "depends on itself" in str(error) or "circular" in str(error)
-        pass
+        error_str = str(error)
+        assert "SelfService -> SelfService" in error_str
+        assert "Circular dependency detected" in error_str
 
 
-@pytest.mark.skip(reason="TDD - implementation pending")
 class TestDuplicateRegistrationError:
     """Test duplicate registration handling."""
 
     def test_duplicate_registration_error_message(self) -> None:
         """Should provide clear message for duplicate registrations."""
-        # error = DuplicateRegistrationError(
-        #     "ITestService",
-        #     "ITestService is already registered. Use replace=True to override."
-        # )
+        error = DuplicateRegistrationError(
+            MockService,
+            "MockService is already registered. Use replace=True to override.",
+        )
 
-        # assert "ITestService" in str(error)
-        # assert "already registered" in str(error)
-        # assert "replace=True" in str(error)
-        pass
+        error_str = str(error)
+        assert "MockService is already registered" in error_str
+        assert "replace=True" in error_str
+        assert error.service_type == MockService
+        assert isinstance(error, DependencyInjectionError)
 
     def test_duplicate_with_different_implementation_error(self) -> None:
         """Should show what was previously registered."""
-        # error = DuplicateRegistrationError(
-        #     "ITestService",
-        #     "ITestService is already registered as TestServiceImpl, cannot register as AnotherServiceImpl"
-        # )
+        error = DuplicateRegistrationError(
+            MockService,
+            "MockService is already registered as ServiceImpl, cannot register as AnotherImpl",
+        )
 
-        # assert "TestServiceImpl" in str(error)
-        # assert "AnotherServiceImpl" in str(error)
-        pass
+        error_str = str(error)
+        assert "ServiceImpl" in error_str
+        assert "AnotherImpl" in error_str
 
 
-@pytest.mark.skip(reason="TDD - implementation pending")
 class TestInvalidRegistrationError:
     """Test invalid registration scenarios."""
 
     def test_invalid_implementation_type_error(self) -> None:
         """Should validate implementation type matches interface."""
-        # error = InvalidRegistrationError(
-        #     "ITestService",
-        #     "TestRepository does not implement ITestService"
-        # )
+        error = InvalidRegistrationError(
+            MockService, "TestRepository does not implement MockService"
+        )
 
-        # assert "does not implement" in str(error)
-        # assert "ITestService" in str(error)
-        # assert "TestRepository" in str(error)
-        pass
+        error_str = str(error)
+        assert "does not implement" in error_str
+        assert "MockService" in error_str
+        assert "TestRepository" in error_str
+        assert error.service_type == MockService
+        assert isinstance(error, DependencyInjectionError)
 
     def test_abstract_implementation_error(self) -> None:
         """Should reject abstract classes as implementations."""
-        # error = InvalidRegistrationError(
-        #     "ITestService",
-        #     "Cannot register abstract class AbstractService as implementation"
-        # )
+        error = InvalidRegistrationError(
+            MockService,
+            "Cannot register abstract class AbstractService as implementation",
+        )
 
-        # assert "abstract" in str(error)
-        # assert "AbstractService" in str(error)
-        pass
+        error_str = str(error)
+        assert "abstract" in error_str
+        assert "AbstractService" in error_str
 
     def test_none_implementation_error(self) -> None:
         """Should reject None as implementation."""
-        # error = InvalidRegistrationError(
-        #     "ITestService",
-        #     "Implementation type cannot be None"
-        # )
+        error = InvalidRegistrationError(
+            MockService, "Implementation type cannot be None"
+        )
 
-        # assert "cannot be None" in str(error)
-        pass
+        assert "cannot be None" in str(error)
 
 
-@pytest.mark.skip(reason="TDD - implementation pending")
-class TestErrorHelpfulness:
-    """Test that errors provide helpful guidance."""
+class TestDependencyInjectionError:
+    """Test base exception class."""
 
-    def test_suggests_correct_registration(self) -> None:
-        """Should suggest how to fix registration issues."""
-        # Error message should guide user toward solution
-        # error = DependencyResolutionError(
-        #     "TestService",
-        #     "TestService is not registered. Register it with: container.register_transient(TestService)"
-        # )
+    def test_base_exception_inheritance(self) -> None:
+        """Should inherit from Exception."""
+        error = DependencyInjectionError("Base error message")
 
-        # assert "container.register_transient" in str(error)
-        pass
+        assert isinstance(error, Exception)
+        assert str(error) == "Base error message"
 
-    def test_suggests_dependency_registration(self) -> None:
-        """Should suggest registering missing dependencies."""
-        # error = DependencyResolutionError(
-        #     "TestService",
-        #     "Cannot resolve TestService: dependency IRepository is not registered. "
-        #     "Register IRepository with: container.register_singleton(IRepository, RepositoryImpl)"
-        # )
+    def test_all_exceptions_inherit_from_base(self) -> None:
+        """All DI exceptions should inherit from base."""
+        exceptions = [
+            DependencyResolutionError(MockService, "test"),
+            CircularDependencyError(["A", "B"]),
+            DuplicateRegistrationError(MockService, "test"),
+            InvalidRegistrationError(MockService, "test"),
+        ]
 
-        # assert "Register IRepository" in str(error)
-        pass
-
-    def test_provides_resolution_context(self) -> None:
-        """Should provide context about where resolution failed."""
-        # When resolving complex chain, should show where it failed
-        # error = DependencyResolutionError(
-        #     "TestController",
-        #     "Cannot resolve TestController -> TestService -> IRepository: "
-        #     "IRepository is not registered (required by TestService)"
-        # )
-
-        # assert "required by TestService" in str(error)
-        pass
+        for exc in exceptions:
+            assert isinstance(exc, DependencyInjectionError)
+            assert isinstance(exc, Exception)

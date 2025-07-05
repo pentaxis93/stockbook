@@ -326,6 +326,40 @@ class TestConfigValidation:
         with pytest.raises(ValidationError, match="max_positions must be positive"):
             config.validate(skip_file_checks=True)
 
+        # Invalid min_price
+        config.portfolio_defaults["max_positions"] = 10  # Reset to valid
+        config.min_price = 0
+        with pytest.raises(ValidationError, match="min_price must be positive"):
+            config.validate(skip_file_checks=True)
+
+        # Invalid max_price
+        config.min_price = 0.01  # Reset to valid
+        config.max_price = 0.005  # Less than min_price
+        with pytest.raises(
+            ValidationError, match="max_price must be greater than min_price"
+        ):
+            config.validate(skip_file_checks=True)
+
+        # Invalid min_quantity
+        config.max_price = 100000.0  # Reset to valid
+        config.min_quantity = 0
+        with pytest.raises(ValidationError, match="min_quantity must be positive"):
+            config.validate(skip_file_checks=True)
+
+        # Invalid table_page_size
+        config.min_quantity = 1  # Reset to valid
+        config.table_page_size = 0
+        with pytest.raises(ValidationError, match="table_page_size must be positive"):
+            config.validate(skip_file_checks=True)
+
+        # Invalid max_rows_display
+        config.table_page_size = 20  # Reset to valid
+        config.max_rows_display = 10  # Less than table_page_size
+        with pytest.raises(
+            ValidationError, match="max_rows_display must be >= table_page_size"
+        ):
+            config.validate(skip_file_checks=True)
+
     def test_validate_raises_on_invalid_patterns(self) -> None:
         """Test validation fails for invalid regex patterns."""
         config = Config()
@@ -357,10 +391,48 @@ class TestConfigEnvironmentOverrides:
 
     def test_invalid_environment_values_raise_errors(self) -> None:
         """Test that invalid environment values raise appropriate errors."""
+        # Test invalid integer
         with patch.dict(
             os.environ, {"STOCKBOOK_DECIMAL_PLACES": "invalid"}
         ), pytest.raises(ConfigError, match="Invalid integer value"):
+            Config.reset()
             _ = Config()
+
+        # Test invalid float
+        with patch.dict(
+            os.environ, {"STOCKBOOK_MIN_PRICE": "not_a_float"}
+        ), pytest.raises(ConfigError, match="Invalid float value"):
+            Config.reset()
+            _ = Config()
+
+    def test_boolean_environment_parsing(self) -> None:
+        """Test boolean environment variable parsing."""
+        # Test various true values
+        for true_val in ["true", "1", "yes", "on", "TRUE", "Yes", "ON"]:
+            with patch.dict(os.environ, {"STOCKBOOK_DEBUG": true_val}):
+                Config.reset()
+                config = Config()
+                assert config.DEBUG is True
+
+        # Test false values
+        for false_val in ["false", "0", "no", "off", "FALSE", "No", "OFF", ""]:
+            with patch.dict(os.environ, {"STOCKBOOK_DEBUG": false_val}):
+                Config.reset()
+                config = Config()
+                assert config.DEBUG is False
+
+    def test_list_environment_parsing(self) -> None:
+        """Test list environment variable parsing."""
+        with patch.dict(os.environ, {"STOCKBOOK_VALID_GRADES": "A, B, C, D"}):
+            Config.reset()
+            config = Config()
+            assert config.valid_grades == ["A", "B", "C", "D"]
+
+        # Test empty list
+        with patch.dict(os.environ, {"STOCKBOOK_VALID_GRADES": ""}):
+            Config.reset()
+            config = Config()
+            assert config.valid_grades == [""]
 
 
 class TestConfigMethods:
@@ -420,3 +492,19 @@ class TestConfigIntegration:
         # Verify paths are accessible
         assert config.db_path.name == "stockbook.db"
         assert config.schema_path.name == "schema.sql"
+
+    def test_format_date_method(self) -> None:
+        """Test format_date method."""
+        config = Config()
+        test_date = datetime(2023, 12, 25)
+
+        formatted = config.format_date(test_date)
+        assert formatted == "2023-12-25"
+
+    def test_format_datetime_method(self) -> None:
+        """Test format_datetime method."""
+        config = Config()
+        test_datetime = datetime(2023, 12, 25, 15, 30, 45)
+
+        formatted = config.format_datetime(test_datetime)
+        assert formatted == "2023-12-25 15:30:45"

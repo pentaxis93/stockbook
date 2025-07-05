@@ -187,7 +187,7 @@ addopts = [
     "-v",  # verbose
     "--tb=short",  # shorter tracebacks
     "--strict-markers",  # ensure all markers are registered
-    "--cov=src",  # coverage for src directory only
+    "--cov=src", "--cov=config.py", "--cov=setup.py", "--cov=dependency_injection",  # coverage for src, config.py, setup.py, and dependency_injection
     "--cov-report=term-missing",  # show missing lines in terminal
     "--cov-report=html:htmlcov",  # generate HTML coverage report
     "--dist=worksteal",  # better load balancing for parallel execution
@@ -210,20 +210,17 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src"]
+source = ["src", "dependency_injection"]
 omit = [
     "*/tests/*",
     "*/test_*.py",
     "*/.venv/*",
     "*/venv/*",
-    "setup.py",
     "conftest.py",
     "*/site-packages/*",
     "*/dist-packages/*",
     "*/dependency_injector/*",
     "*.pxd",
-    "dependency_injection/*",
-    "config.py",
 ]
 
 [tool.coverage.report]

@@ -48,8 +48,6 @@ def main() -> None:
         (["python", "-m", "pyright"], "Type Check"),
         (
             [
-                "python",
-                "-m",
                 "pytest",
                 "-n",
                 "auto",
