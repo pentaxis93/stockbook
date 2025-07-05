@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: check-all
         name: Run all quality checks
-        entry: python scripts/check_all.py
+        entry: python scripts/test_all.py
         language: system
         pass_filenames: false
         always_run: true

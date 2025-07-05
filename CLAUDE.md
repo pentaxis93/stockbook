@@ -15,7 +15,8 @@
 - When writing git commit messages, omit all references to authorship, and especially omit references to Claude.
 
 - Always run all quality checks and fix all issues before making a commit.
-  - Use `make check` to run ALL quality checks (linting, formatting, type checking, tests, coverage, security)
+  - Use `make test` to run ALL quality checks (linting, formatting, type checking, tests, coverage, security)
+  - This is the ONLY command that should be used for testing and quality checks
   - This single command runs the same checks as pre-commit hooks and CI/CD
   - Use `make help` to see all available commands
 

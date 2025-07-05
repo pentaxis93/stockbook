@@ -7,7 +7,8 @@ unsafe-fixes = true
 [tool.ruff.lint]
 select = [
     # Core rules from replaced tools
-    "E", "W",           # pycodestyle (replaces flake8 E/W codes)
+    "E",                # pycodestyle errors (replaces flake8 E codes)
+    "W",                # pycodestyle warnings (replaces flake8 W codes)
     "F",                # Pyflakes (replaces flake8 F codes)
     "I",                # isort (import sorting)
     "D",                # pydocstyle (docstring checks)
@@ -15,7 +16,10 @@ select = [
     "C901",             # McCabe complexity (replaces flake8 complexity)
     
     # Pylint equivalents
-    "PLC", "PLE", "PLR", "PLW",  # Pylint Convention, Error, Refactor, Warning
+    "PLC",              # Pylint Convention rules
+    "PLE",              # Pylint Error rules
+    "PLR",              # Pylint Refactor rules
+    "PLW",              # Pylint Warning rules
     
     # Additional helpful rules
     "B",                # flake8-bugbear (common bugs)

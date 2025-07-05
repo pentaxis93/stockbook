@@ -32,7 +32,7 @@ jobs:
           pip install -e .
       
       - name: Run all quality checks
-        run: python scripts/check_all.py
+        run: python scripts/test_all.py
         env:
           # Ensure the script has access to all tools
           PYTHONPATH: ${{ github.workspace }}
