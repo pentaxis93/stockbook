@@ -8,10 +8,10 @@ services:
       - "8000:8000"
     volumes:
       - ./data/database:/app/data/database
-      - ./logs:/app/logs
+      - ./data/logs:/app/data/logs
       - ./data/backups:/app/data/backups
     environment:
-      - DATABASE_PATH=/app/data/database/stockbook.db
+      - STOCKBOOK_DB_PATH=/app/data/database/stockbook.db
       - LOG_LEVEL=INFO
       - PYTHONUNBUFFERED=1
     healthcheck:

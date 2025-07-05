@@ -83,13 +83,15 @@ class Config:
     def _setup_database(self) -> None:
         """Setup database configuration."""
         self.db_path = Path(
-            self._get_env_str("STOCKBOOK_DB_PATH", "database/stockbook.db")
+            self._get_env_str("STOCKBOOK_DB_PATH", "data/database/stockbook.db")
         )
         self.schema_path = Path(
-            self._get_env_str("STOCKBOOK_SCHEMA_PATH", "database/schema.sql")
+            self._get_env_str("STOCKBOOK_SCHEMA_PATH", "data/database/schema.sql")
         )
         self.test_db_path = Path(
-            self._get_env_str("STOCKBOOK_TEST_DB_PATH", "database/test_stockbook.db")
+            self._get_env_str(
+                "STOCKBOOK_TEST_DB_PATH", "data/database/test_stockbook.db"
+            )
         )
         self.db_connection_timeout = self._get_env_int("STOCKBOOK_DB_TIMEOUT", 30)
         self.db_foreign_keys_enabled = self._get_env_bool(
@@ -100,8 +102,10 @@ class Config:
     def _setup_paths(self) -> None:
         """Setup directory paths."""
         self.data_dir = Path(self._get_env_str("STOCKBOOK_DATA_DIR", "data"))
-        self.backup_dir = Path(self._get_env_str("STOCKBOOK_BACKUP_DIR", "backups"))
-        self.logs_dir = Path(self._get_env_str("STOCKBOOK_LOGS_DIR", "logs"))
+        self.backup_dir = Path(
+            self._get_env_str("STOCKBOOK_BACKUP_DIR", "data/backups")
+        )
+        self.logs_dir = Path(self._get_env_str("STOCKBOOK_LOGS_DIR", "data/logs"))
 
     def _setup_display_preferences(self) -> None:
         """Setup display preferences."""

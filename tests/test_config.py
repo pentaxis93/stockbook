@@ -45,15 +45,15 @@ class TestConfigInitialization:
         config = Config()
 
         # Database configuration
-        assert config.db_path == Path("database/stockbook.db")
-        assert config.schema_path == Path("database/schema.sql")
-        assert config.test_db_path == Path("database/test_stockbook.db")
+        assert config.db_path == Path("data/database/stockbook.db")
+        assert config.schema_path == Path("data/database/schema.sql")
+        assert config.test_db_path == Path("data/database/test_stockbook.db")
 
         # File paths
         assert config.app_name == "StockBook"
         assert config.data_dir == Path("data")
-        assert config.backup_dir == Path("backups")
-        assert config.logs_dir == Path("logs")
+        assert config.backup_dir == Path("data/backups")
+        assert config.logs_dir == Path("data/logs")
 
         # Display preferences
         assert config.date_format == "%Y-%m-%d"

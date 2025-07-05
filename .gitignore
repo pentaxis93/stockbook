@@ -1,6 +1,7 @@
 # StockBook specific
-database/*.db
+data/database/*.db
 *.db
+data/logs/
 .serena/
 
 # Byte-compiled / optimized / DLL files
