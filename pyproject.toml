@@ -187,7 +187,7 @@ addopts = [
     "-v",  # verbose
     "--tb=short",  # shorter tracebacks
     "--strict-markers",  # ensure all markers are registered
-    "--cov=.",  # coverage for all source code
+    "--cov=src",  # coverage for src directory only
     "--cov-report=term-missing",  # show missing lines in terminal
     "--cov-report=html:htmlcov",  # generate HTML coverage report
     "--dist=worksteal",  # better load balancing for parallel execution
