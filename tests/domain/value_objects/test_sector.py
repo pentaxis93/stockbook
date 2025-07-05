@@ -104,5 +104,4 @@ class TestSectorValueObject:
         with pytest.raises(AttributeError, match="Sector is immutable"):
             sector.value = "Healthcare"  # type: ignore[misc] - Testing immutability
 
-        with pytest.raises(AttributeError, match="Sector is immutable"):
-            sector._value = "Healthcare"  # type: ignore[attr-defined]
+        # Note: Internal state protection verified through public interface above

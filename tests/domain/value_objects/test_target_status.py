@@ -207,12 +207,12 @@ class TestTargetStatusImmutability:
         with pytest.raises(AttributeError, match="TargetStatus is immutable"):
             status.new_attribute = "value"
 
-    def test_cannot_modify_private_value_attribute(self) -> None:
-        """Should not be able to modify private _value attribute."""
+    def test_cannot_modify_value_attribute(self) -> None:
+        """Should not be able to modify TargetStatus after creation."""
         status = TargetStatus("active")
 
         with pytest.raises(AttributeError, match="TargetStatus is immutable"):
-            status._value = "hit"  # type: ignore[misc]
+            status.value = "hit"  # type: ignore[misc]
 
 
 class TestTargetStatusStringRepresentation:

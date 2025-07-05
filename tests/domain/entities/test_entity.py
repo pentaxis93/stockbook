@@ -145,7 +145,8 @@ class TestEntity:
     def test_repr_excludes_private_attributes(self) -> None:
         """Repr should not include private attributes."""
         entity = ConcreteEntity(id="private-test")
-        entity._private_attr = "should-not-appear"  # type: ignore
+        # Use object.__setattr__ to bypass attribute setting restrictions
+        object.__setattr__(entity, "_private_attr", "should-not-appear")
 
         repr_str = repr(entity)
 

@@ -167,12 +167,12 @@ class TestPortfolioNameImmutability:
         with pytest.raises(AttributeError, match="PortfolioName is immutable"):
             name.new_attribute = "value"
 
-    def test_cannot_modify_private_value_attribute(self) -> None:
-        """Should not be able to modify private _value attribute."""
+    def test_cannot_modify_value_attribute(self) -> None:
+        """Should not be able to modify PortfolioName after creation."""
         name = PortfolioName("Portfolio Name")
 
         with pytest.raises(AttributeError, match="PortfolioName is immutable"):
-            name._value = "Modified Name"  # type: ignore[misc]
+            name.value = "Modified Name"  # type: ignore[misc]
 
 
 class TestPortfolioNameStringRepresentation:

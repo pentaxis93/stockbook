@@ -242,11 +242,11 @@ class TestIndexChangeImmutability:
             change.new_attribute = "value"
 
     def test_cannot_modify_private_value_attribute(self) -> None:
-        """Should not be able to modify private _value attribute."""
+        """Should not be able to modify IndexChange after creation."""
         change = IndexChange(5.75)
 
         with pytest.raises(AttributeError, match="IndexChange is immutable"):
-            change._value = 10.0  # type: ignore[misc]
+            change.value = 10.0  # type: ignore[misc]
 
 
 class TestIndexChangeStringRepresentation:

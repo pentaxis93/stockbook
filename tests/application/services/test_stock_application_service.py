@@ -626,10 +626,10 @@ class TestStockApplicationService:
         with pytest.raises(Exception, match="Context manager error"):
             _ = self.service.create_stock(command)
 
-    def test_validate_update_command_and_get_stock_success(self) -> None:
-        """Should validate command and return stock entity successfully."""
+    def test_update_stock_validates_and_retrieves_stock(self) -> None:
+        """Should validate command and retrieve stock through update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", name="Apple Inc.")
+        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
         stock_entity = Stock(
             id="stock-1",
             symbol=StockSymbol("AAPL"),
@@ -637,35 +637,37 @@ class TestStockApplicationService:
         )
 
         self.mock_stock_repository.get_by_id.return_value = stock_entity
+        self.mock_stock_repository.update.return_value = True
 
         # Act
-        result = self.service._validate_update_command_and_get_stock(command)  # type: ignore[reportPrivateUsage]
+        result = self.service.update_stock(command)
 
         # Assert
-        assert result == stock_entity
+        assert result.id == "stock-1"
+        assert result.name == "Updated Apple Inc."
         self.mock_stock_repository.get_by_id.assert_called_once_with("stock-1")
 
-    def test_validate_update_command_and_get_stock_not_found(self) -> None:
-        """Should raise error when stock not found."""
+    def test_update_stock_raises_when_stock_not_found(self) -> None:
+        """Should raise error when stock not found through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-999", name="Apple Inc.")
         self.mock_stock_repository.get_by_id.return_value = None
 
         # Act & Assert
         with pytest.raises(ValueError, match="Stock with ID stock-999 not found"):
-            _ = self.service._validate_update_command_and_get_stock(command)  # type: ignore[reportPrivateUsage]
+            _ = self.service.update_stock(command)
 
-    def test_validate_update_command_and_get_stock_no_updates(self) -> None:
-        """Should raise error when no fields to update."""
+    def test_update_stock_raises_when_no_fields_to_update(self) -> None:
+        """Should raise error when no fields to update through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1")  # No fields to update
 
         # Act & Assert
         with pytest.raises(ValueError, match="No fields to update"):
-            _ = self.service._validate_update_command_and_get_stock(command)  # type: ignore[reportPrivateUsage]
+            _ = self.service.update_stock(command)
 
-    def test_apply_updates_and_save_success(self) -> None:
-        """Should apply updates and save successfully."""
+    def test_update_stock_applies_updates_and_saves(self) -> None:
+        """Should apply updates and save through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
         stock_entity = Stock(
@@ -674,22 +676,20 @@ class TestStockApplicationService:
             company_name=CompanyName("Apple Inc."),
         )
 
+        self.mock_stock_repository.get_by_id.return_value = stock_entity
         self.mock_stock_repository.update.return_value = True
 
-        # Mock the update_fields method on the entity
-        stock_entity.update_fields = Mock()
-
         # Act
-        self.service._apply_updates_and_save(command, stock_entity)  # type: ignore[reportPrivateUsage]
+        result = self.service.update_stock(command)
 
         # Assert
-        stock_entity.update_fields.assert_called_once_with(name="Updated Apple Inc.")
+        assert result.name == "Updated Apple Inc."
         self.mock_stock_repository.update.assert_called_once_with(
             "stock-1", stock_entity
         )
 
-    def test_apply_updates_and_save_update_failure(self) -> None:
-        """Should raise error when repository update fails."""
+    def test_update_stock_raises_when_repository_update_fails(self) -> None:
+        """Should raise error when repository update fails through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
         stock_entity = Stock(
@@ -698,14 +698,12 @@ class TestStockApplicationService:
             company_name=CompanyName("Apple Inc."),
         )
 
+        self.mock_stock_repository.get_by_id.return_value = stock_entity
         self.mock_stock_repository.update.return_value = False  # Simulate failure
-
-        # Mock the update_fields method on the entity
-        stock_entity.update_fields = Mock()
 
         # Act & Assert
         with pytest.raises(ValueError, match="Failed to update stock"):
-            self.service._apply_updates_and_save(command, stock_entity)  # type: ignore[reportPrivateUsage]
+            _ = self.service.update_stock(command)
 
     def test_get_stock_by_symbol_with_invalid_symbol_format(self) -> None:
         """Should handle invalid symbol format in get_stock_by_symbol."""

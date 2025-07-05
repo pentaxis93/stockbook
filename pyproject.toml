@@ -37,6 +37,7 @@ select = [
     "TID",              # flake8-tidy-imports (import conventions)
     "FURB",             # refurb (modernize Python code)
     "RUF",              # Ruff-specific rules
+    "SLF",              # flake8-self (private member access)
 ]
 
 ignore = [

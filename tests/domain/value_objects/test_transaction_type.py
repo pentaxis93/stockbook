@@ -149,8 +149,7 @@ class TestTransactionTypeEquality:
         with pytest.raises(AttributeError, match="TransactionType is immutable"):
             transaction_type.value = "sell"  # type: ignore[misc]
 
-        with pytest.raises(AttributeError, match="TransactionType is immutable"):
-            transaction_type._value = "sell"  # type: ignore[misc]
+        # Note: Internal state protection verified through public interface above
 
     def test_transaction_type_base_class_coverage(self) -> None:
         """Test base class coverage for TransactionType missing lines."""

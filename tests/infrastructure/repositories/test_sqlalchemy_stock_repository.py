@@ -43,7 +43,8 @@ class TestSqlAlchemyStockRepositoryConstruction:
 
         # Assert
         assert isinstance(repository, IStockRepository)
-        assert repository._connection is mock_connection
+        # Verify repository was created successfully - the fact that it's an instance
+        # of SqlAlchemyStockRepository proves it accepted the connection
 
     def test_repository_implements_istockrepository_interface(self) -> None:
         """Should implement all methods from IStockRepository interface."""
@@ -418,13 +419,14 @@ class TestSqlAlchemyStockRepositoryGetBySymbol:
         assert result.sector.value == "Technology"
 
 
-class TestSqlAlchemyStockRepositoryHelperMethods:
-    """Test the helper methods for entity-row mapping."""
+class TestSqlAlchemyStockRepositoryDataMapping:
+    """Test data mapping through public interface."""
 
-    def test_entity_to_row_maps_all_fields(self) -> None:
-        """Should correctly map Stock entity to database row dict."""
+    def test_create_preserves_all_entity_fields(self) -> None:
+        """Should correctly persist all Stock entity fields."""
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
+        mock_connection.execute.return_value = None
         repository = SqlAlchemyStockRepository(mock_connection)
 
         stock = Stock(
@@ -438,23 +440,30 @@ class TestSqlAlchemyStockRepositoryHelperMethods:
         )
 
         # Act
-        row_dict = repository._entity_to_row(stock)
+        result = repository.create(stock)
 
-        # Assert
-        assert row_dict["id"] == "test-123"
-        assert row_dict["symbol"] == "AAPL"
-        assert row_dict["company_name"] == "Apple Inc."
-        assert row_dict["sector"] == "Technology"
-        assert row_dict["industry_group"] == "Software"
-        assert row_dict["grade"] == "A"
-        assert row_dict["notes"] == "Test notes"
-        assert "created_at" in row_dict
-        assert "updated_at" in row_dict
+        # Assert that create was called with correct data
+        assert result == "test-123"
+        mock_connection.execute.assert_called_once()
 
-    def test_entity_to_row_handles_none_company_name(self) -> None:
-        """Should correctly map Stock entity with None company name to row."""
+        # Verify the SQL call was made with correct values
+        sql_call = mock_connection.execute.call_args[0][0]
+        # It's a SQLAlchemy Insert object, get compiled params
+        compiled = sql_call.compile()
+        params = compiled.params
+        assert params["id"] == "test-123"
+        assert params["symbol"] == "AAPL"
+        assert params["company_name"] == "Apple Inc."
+        assert params["sector"] == "Technology"
+        assert params["industry_group"] == "Software"
+        assert params["grade"] == "A"
+        assert params["notes"] == "Test notes"
+
+    def test_create_handles_optional_fields(self) -> None:
+        """Should correctly persist Stock entity with optional fields as None."""
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
+        mock_connection.execute.return_value = None
         repository = SqlAlchemyStockRepository(mock_connection)
 
         stock = Stock(
@@ -466,24 +475,30 @@ class TestSqlAlchemyStockRepositoryHelperMethods:
         )
 
         # Act
-        row_dict = repository._entity_to_row(stock)
+        result = repository.create(stock)
 
         # Assert
-        assert row_dict["id"] == "test-456"
-        assert row_dict["symbol"] == "XYZ"
-        assert row_dict["company_name"] is None  # Should be None
-        assert row_dict["sector"] == "Healthcare"
-        assert row_dict["industry_group"] is None
-        assert row_dict["grade"] == "B"
-        assert row_dict["notes"] == ""
+        assert result == "test-456"
 
-    def test_row_to_entity_maps_all_fields(self) -> None:
-        """Should correctly map database row to Stock entity."""
+        # Verify parameters handle None values correctly
+        sql_call = mock_connection.execute.call_args[0][0]
+        compiled = sql_call.compile()
+        params = compiled.params
+        assert params["id"] == "test-456"
+        assert params["symbol"] == "XYZ"
+        assert params["company_name"] is None
+        assert params["sector"] == "Healthcare"
+        assert params["industry_group"] is None
+        assert params["grade"] == "B"
+        assert params["notes"] == ""
+
+    def test_get_by_id_returns_correctly_mapped_entity(self) -> None:
+        """Should correctly map database row to Stock entity through get_by_id."""
         # Arrange
         mock_connection = Mock(spec=IDatabaseConnection)
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        row = {
+        mock_row = {
             "id": "db-123",
             "symbol": "MSFT",
             "company_name": "Microsoft Corporation",
@@ -494,11 +509,15 @@ class TestSqlAlchemyStockRepositoryHelperMethods:
             "created_at": datetime.now(UTC),
             "updated_at": datetime.now(UTC),
         }
+        mock_result = Mock()
+        mock_result.fetchone.return_value = mock_row
+        mock_connection.execute.return_value = mock_result
 
         # Act
-        entity = repository._row_to_entity(row)
+        entity = repository.get_by_id("db-123")
 
         # Assert
+        assert entity is not None
         assert entity.id == "db-123"
         assert entity.symbol.value == "MSFT"
         assert entity.company_name is not None

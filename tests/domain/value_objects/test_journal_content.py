@@ -235,12 +235,12 @@ class TestJournalContentImmutability:
         with pytest.raises(AttributeError, match="JournalContent is immutable"):
             content.new_attribute = "value"
 
-    def test_cannot_modify_private_value_attribute(self) -> None:
-        """Should not be able to modify private _value attribute."""
+    def test_cannot_modify_value_attribute(self) -> None:
+        """Should not be able to modify JournalContent after creation."""
         content = JournalContent("Journal content")
 
         with pytest.raises(AttributeError, match="JournalContent is immutable"):
-            content._value = "Modified content"  # type: ignore[misc]
+            content.value = "Modified content"  # type: ignore[misc]
 
 
 class TestJournalContentStringRepresentation:
