@@ -177,7 +177,7 @@ line-ending = "lf"
 
 [tool.pytest.ini_options]
 # Test discovery and execution
-testpaths = ["tests"]
+# testpaths = ["tests"]  # Commented out to allow pytest to search from project root
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
@@ -187,7 +187,7 @@ addopts = [
     "-v",  # verbose
     "--tb=short",  # shorter tracebacks
     "--strict-markers",  # ensure all markers are registered
-    "--cov=src", "--cov=config.py", "--cov=setup.py", "--cov=dependency_injection",  # coverage for src, config.py, setup.py, and dependency_injection
+    "--cov=.",  # coverage for entire project root
     "--cov-report=term-missing",  # show missing lines in terminal
     "--cov-report=html:htmlcov",  # generate HTML coverage report
     "--dist=worksteal",  # better load balancing for parallel execution
@@ -210,7 +210,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src", "dependency_injection"]
+source = ["."]  # Use project root for coverage
 omit = [
     "*/tests/*",
     "*/test_*.py",
