@@ -75,10 +75,6 @@ convention = "google"
   "S603", # subprocess calls are intentional in this controlled script
 ]
 
-"src/application/*" = [
-  "PLR0913", # too-many-arguments (commands need multiple parameters)
-]
-
 [tool.pytest.ini_options]
 # Test discovery and execution
 # testpaths = ["tests"]  # Commented out to allow pytest to search from project root

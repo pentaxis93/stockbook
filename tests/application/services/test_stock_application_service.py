@@ -11,7 +11,9 @@ import pytest
 
 from src.application.commands.stock import (
     CreateStockCommand,
+    CreateStockInputs,
     UpdateStockCommand,
+    UpdateStockInputs,
 )
 from src.application.dto.stock_dto import StockDto
 from src.application.services.stock_application_service import StockApplicationService
@@ -40,7 +42,7 @@ class TestStockApplicationService:
     def test_create_stock_with_valid_command(self) -> None:
         """Should create stock successfully with valid command."""
         # Arrange
-        command = CreateStockCommand(
+        inputs = CreateStockInputs(
             symbol="AAPL",
             name="Apple Inc.",
             sector="Technology",
@@ -48,6 +50,7 @@ class TestStockApplicationService:
             grade="A",
             notes="Great company",
         )
+        command = CreateStockCommand(inputs)
 
         # Mock repository to return None (stock doesn't exist)
         self.mock_stock_repository.get_by_symbol.return_value = None
@@ -82,12 +85,13 @@ class TestStockApplicationService:
     def test_create_stock_without_company_name(self) -> None:
         """Should create stock successfully without company name."""
         # Arrange
-        command = CreateStockCommand(
+        inputs = CreateStockInputs(
             symbol="TSLA",
             name=None,  # No company name
             sector="Technology",
             grade="B",
         )
+        command = CreateStockCommand(inputs)
 
         # Mock repository to return None (stock doesn't exist)
         self.mock_stock_repository.get_by_symbol.return_value = None
@@ -111,7 +115,8 @@ class TestStockApplicationService:
     def test_create_stock_with_duplicate_symbol_raises_error(self) -> None:
         """Should raise error when trying to create stock with existing symbol."""
         # Arrange
-        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.")
+        command = CreateStockCommand(inputs)
 
         # Mock repository to return existing stock
         existing_stock = (
@@ -134,7 +139,8 @@ class TestStockApplicationService:
     def test_create_stock_handles_repository_error(self) -> None:
         """Should handle repository errors gracefully."""
         # Arrange
-        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.")
+        command = CreateStockCommand(inputs)
 
         self.mock_stock_repository.get_by_symbol.return_value = None
         self.mock_stock_repository.create.side_effect = Exception("Database error")
@@ -377,7 +383,7 @@ class TestStockApplicationService:
     def test_update_stock_with_valid_command(self) -> None:
         """Should update stock successfully with valid command."""
         # Arrange
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="stock-1",
             name="Apple Inc. (Updated)",
             sector="Technology",
@@ -385,6 +391,7 @@ class TestStockApplicationService:
             grade="A",
             notes="Updated notes",
         )
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -422,10 +429,11 @@ class TestStockApplicationService:
     def test_update_stock_with_partial_command(self) -> None:
         """Should update only specified fields."""
         # Arrange
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="stock-1",
             grade="A",  # Only updating grade
         )
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -458,7 +466,8 @@ class TestStockApplicationService:
     def test_update_stock_with_nonexistent_stock_raises_error(self) -> None:
         """Should raise error when stock doesn't exist."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-999", grade="A")
+        inputs = UpdateStockInputs(stock_id="stock-999", grade="A")
+        command = UpdateStockCommand(inputs)
         self.mock_stock_repository.get_by_id.return_value = None
 
         # Act & Assert
@@ -471,7 +480,8 @@ class TestStockApplicationService:
     def test_update_stock_with_empty_command_raises_error(self) -> None:
         """Should raise error when no fields to update."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1")  # No fields to update
+        inputs = UpdateStockInputs(stock_id="stock-1")
+        command = UpdateStockCommand(inputs)  # No fields to update
 
         # Act & Assert
         with pytest.raises(ValueError, match="No fields to update"):
@@ -480,7 +490,8 @@ class TestStockApplicationService:
     def test_update_stock_with_repository_failure_raises_error(self) -> None:
         """Should handle repository update failure."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", grade="A")
+        inputs = UpdateStockInputs(stock_id="stock-1", grade="A")
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -504,7 +515,8 @@ class TestStockApplicationService:
     def test_update_stock_with_exception_rolls_back_transaction(self) -> None:
         """Should rollback transaction on any exception."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", grade="A")
+        inputs = UpdateStockInputs(stock_id="stock-1", grade="A")
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -528,7 +540,8 @@ class TestStockApplicationService:
     def test_update_stock_with_duplicate_symbol_raises_error(self) -> None:
         """Should raise error when changing to an existing symbol."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", symbol="MSFT")
+        inputs = UpdateStockInputs(stock_id="stock-1", symbol="MSFT")
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -560,7 +573,8 @@ class TestStockApplicationService:
     def test_update_stock_with_same_symbol_allowed(self) -> None:
         """Should allow updating stock with same symbol (no change)."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", symbol="AAPL", grade="A")
+        inputs = UpdateStockInputs(stock_id="stock-1", symbol="AAPL", grade="A")
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -588,7 +602,8 @@ class TestStockApplicationService:
     def test_update_stock_changing_symbol_to_available_one(self) -> None:
         """Should allow changing symbol when new symbol is available."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", symbol="APLE")
+        inputs = UpdateStockInputs(stock_id="stock-1", symbol="APLE")
+        command = UpdateStockCommand(inputs)
 
         existing_stock = (
             Stock.Builder()
@@ -617,7 +632,8 @@ class TestStockApplicationService:
     def test_create_stock_with_value_object_creation_error(self) -> None:
         """Should handle errors during value object creation."""
         # Arrange
-        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.")
+        command = CreateStockCommand(inputs)
 
         # Mock repository to return None (stock doesn't exist)
         self.mock_stock_repository.get_by_symbol.return_value = None
@@ -638,7 +654,8 @@ class TestStockApplicationService:
     def test_create_stock_with_context_manager_exit_exception(self) -> None:
         """Should handle exceptions in context manager exit."""
         # Arrange
-        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.")
+        command = CreateStockCommand(inputs)
 
         # Mock repository to return None (stock doesn't exist)
         self.mock_stock_repository.get_by_symbol.return_value = None
@@ -653,7 +670,8 @@ class TestStockApplicationService:
     def test_update_stock_validates_and_retrieves_stock(self) -> None:
         """Should validate command and retrieve stock through update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        inputs = UpdateStockInputs(stock_id="stock-1", name="Updated Apple Inc.")
+        command = UpdateStockCommand(inputs)
         stock_entity = (
             Stock.Builder()
             .with_id("stock-1")
@@ -676,7 +694,8 @@ class TestStockApplicationService:
     def test_update_stock_raises_when_stock_not_found(self) -> None:
         """Should raise error when stock not found through update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-999", name="Apple Inc.")
+        inputs = UpdateStockInputs(stock_id="stock-999", name="Apple Inc.")
+        command = UpdateStockCommand(inputs)
         self.mock_stock_repository.get_by_id.return_value = None
 
         # Act & Assert
@@ -686,7 +705,8 @@ class TestStockApplicationService:
     def test_update_stock_raises_when_no_fields_to_update(self) -> None:
         """Should raise error when no fields to update through update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1")  # No fields to update
+        inputs = UpdateStockInputs(stock_id="stock-1")
+        command = UpdateStockCommand(inputs)  # No fields to update
 
         # Act & Assert
         with pytest.raises(ValueError, match="No fields to update"):
@@ -695,7 +715,8 @@ class TestStockApplicationService:
     def test_update_stock_applies_updates_and_saves(self) -> None:
         """Should apply updates and save through update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        inputs = UpdateStockInputs(stock_id="stock-1", name="Updated Apple Inc.")
+        command = UpdateStockCommand(inputs)
         stock_entity = (
             Stock.Builder()
             .with_id("stock-1")
@@ -719,7 +740,8 @@ class TestStockApplicationService:
     def test_update_stock_raises_when_repository_update_fails(self) -> None:
         """Should raise error when repository update fails through update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        inputs = UpdateStockInputs(stock_id="stock-1", name="Updated Apple Inc.")
+        command = UpdateStockCommand(inputs)
         stock_entity = (
             Stock.Builder()
             .with_id("stock-1")
@@ -782,7 +804,8 @@ class TestStockApplicationService:
     def test_create_stock_with_commit_failure(self) -> None:
         """Should handle commit failure in create_stock."""
         # Arrange
-        command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
+        inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.")
+        command = CreateStockCommand(inputs)
         self.mock_stock_repository.get_by_symbol.return_value = None
 
         # Mock commit to fail
@@ -798,7 +821,8 @@ class TestStockApplicationService:
     def test_update_stock_with_commit_failure(self) -> None:
         """Should handle commit failure in update_stock."""
         # Arrange
-        command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
+        inputs = UpdateStockInputs(stock_id="stock-1", name="Updated Apple Inc.")
+        command = UpdateStockCommand(inputs)
         stock_entity = (
             Stock.Builder()
             .with_id("stock-1")

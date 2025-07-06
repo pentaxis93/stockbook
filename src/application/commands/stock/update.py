@@ -4,9 +4,23 @@ Command object encapsulating the intention to update an existing stock
 with all necessary validation and normalization.
 """
 
+from dataclasses import dataclass
 from typing import Any
 
 from src.domain.value_objects.stock_symbol import StockSymbol
+
+
+@dataclass(frozen=True)
+class UpdateStockInputs:
+    """Input data for updating a stock."""
+
+    stock_id: str
+    symbol: str | None = None
+    name: str | None = None
+    sector: str | None = None
+    industry_group: str | None = None
+    grade: str | None = None
+    notes: str | None = None
 
 
 class UpdateStockCommand:
@@ -25,36 +39,17 @@ class UpdateStockCommand:
     _grade: str | None
     _notes: str | None
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # Rationale: Update commands need all fields to specify which attributes
-        # to update. Optional parameters indicate which fields should be modified.
-        self,
-        stock_id: str,
-        symbol: str | None = None,
-        name: str | None = None,
-        sector: str | None = None,
-        industry_group: str | None = None,
-        grade: str | None = None,
-        notes: str | None = None,
-    ):
+    def __init__(self, inputs: UpdateStockInputs) -> None:
         """Initialize UpdateStockCommand with validation.
 
         Args:
-            stock_id: ID of the stock to update
-            symbol: New stock symbol (None to keep unchanged)
-            name: New company name (None to keep unchanged)
-            sector: New sector classification (None to keep unchanged)
-            industry_group: New industry classification (None to keep unchanged)
-            grade: New stock grade (A/B/C or None)
-            notes: New notes (None to keep unchanged)
+            inputs: Input data for updating a stock
 
         Raises:
             ValueError: If validation fails
         """
         # Validate and normalize all inputs
-        normalized_inputs = self._validate_and_normalize_inputs(
-            stock_id, symbol, name, sector, industry_group, grade, notes
-        )
+        normalized_inputs = self._validate_and_normalize_inputs(inputs)
 
         # Set all attributes using the normalized values
         self._set_attributes(normalized_inputs)
@@ -170,58 +165,53 @@ class UpdateStockCommand:
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"UpdateStockCommand(stock_id={self.stock_id}, symbol={self.symbol!r}, "
+            f"UpdateStockCommand(stock_id={self.stock_id!r}, symbol={self.symbol!r}, "
             f"name={self.name!r}, sector={self.sector!r}, "
             f"industry_group={self.industry_group!r}, grade={self.grade!r}, "
             f"notes={self.notes!r})"
         )
 
-    def _validate_and_normalize_inputs(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # Rationale: Validation methods naturally have complexity when handling
-        # multiple optional fields. Each field needs individual normalization and
-        # validation logic.
-        self,
-        stock_id: str,
-        symbol: str | None,
-        name: str | None,
-        sector: str | None,
-        industry_group: str | None,
-        grade: str | None,
-        notes: str | None,
+    def _validate_and_normalize_inputs(
+        self, inputs: UpdateStockInputs
     ) -> dict[str, Any]:
         """Validate and normalize all inputs, returning normalized values."""
         # Validate stock_id
-        self._validate_stock_id(stock_id)
+        self._validate_stock_id(inputs.stock_id)
 
         # Normalize and validate symbol
+        symbol = inputs.symbol
         if symbol is not None:
             symbol = self._normalize_symbol(symbol)
             self._validate_symbol(symbol)
 
         # Normalize and validate inputs
+        name = inputs.name
         if name is not None:
             name = self._normalize_name(name)
             self._validate_name(name)
 
+        sector = inputs.sector
         if sector is not None:
             sector = self._normalize_sector(sector)
 
+        industry_group = inputs.industry_group
         if industry_group is not None:
             industry_group = self._normalize_industry_group(industry_group)
 
+        notes = inputs.notes
         if notes is not None:
             notes = self._normalize_notes(notes)
 
         # Validate grade
-        self._validate_grade(grade)
+        self._validate_grade(inputs.grade)
 
         return {
-            "stock_id": stock_id,
+            "stock_id": inputs.stock_id,
             "symbol": symbol,
             "name": name,
             "sector": sector,
             "industry_group": industry_group,
-            "grade": grade,
+            "grade": inputs.grade,
             "notes": notes,
         }
 

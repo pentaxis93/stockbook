@@ -4,10 +4,23 @@ Command object encapsulating the intention to create a new stock
 with all necessary validation and normalization.
 """
 
+from dataclasses import dataclass
 from typing import Any
 
 from src.domain.services.sector_industry_service import SectorIndustryService
 from src.domain.value_objects.stock_symbol import StockSymbol
+
+
+@dataclass(frozen=True)
+class CreateStockInputs:
+    """Input data for creating a stock."""
+
+    symbol: str
+    name: str | None = None
+    sector: str | None = None
+    industry_group: str | None = None
+    grade: str | None = None
+    notes: str = ""
 
 
 class CreateStockCommand:
@@ -25,35 +38,17 @@ class CreateStockCommand:
     _grade: str | None
     _notes: str
 
-    def __init__(
-        # Rationale: Command objects legitimately need all parameters to capture
-        # user intent. These are not domain entities but DTOs that transfer
-        # complete information.
-        self,
-        symbol: str,
-        name: str | None = None,
-        sector: str | None = None,
-        industry_group: str | None = None,
-        grade: str | None = None,
-        notes: str = "",
-    ):
+    def __init__(self, inputs: CreateStockInputs) -> None:
         """Initialize CreateStockCommand with validation.
 
         Args:
-            symbol: Stock symbol (will be normalized)
-            name: Company name (optional)
-            sector: Sector classification
-            industry_group: Industry classification (must belong to sector if provided)
-            grade: Stock grade (A/B/C or None)
-            notes: Additional notes
+            inputs: Input data for creating a stock
 
         Raises:
             ValueError: If validation fails
         """
         # Normalize and validate all inputs
-        normalized_inputs = self._normalize_and_validate_inputs(
-            symbol, name, sector, industry_group, grade, notes
-        )
+        normalized_inputs = self._normalize_and_validate_inputs(inputs)
 
         # Set all attributes using the normalized values
         self._set_attributes(normalized_inputs)
@@ -134,26 +129,20 @@ class CreateStockCommand:
         )
 
     def _normalize_and_validate_inputs(
-        self,
-        symbol: str,
-        name: str | None,
-        sector: str | None,
-        industry_group: str | None,
-        grade: str | None,
-        notes: str,
+        self, inputs: CreateStockInputs
     ) -> dict[str, Any]:
         """Normalize and validate all inputs, returning normalized values."""
         # Normalize inputs
-        symbol = self._normalize_symbol(symbol)
-        name = self._normalize_name(name)
-        sector = self._normalize_sector(sector)
-        industry_group = self._normalize_industry_group(industry_group)
-        notes = self._normalize_notes(notes)
+        symbol = self._normalize_symbol(inputs.symbol)
+        name = self._normalize_name(inputs.name)
+        sector = self._normalize_sector(inputs.sector)
+        industry_group = self._normalize_industry_group(inputs.industry_group)
+        notes = self._normalize_notes(inputs.notes)
 
         # Validate inputs
         self._validate_symbol(symbol)
         self._validate_name(name)
-        self._validate_grade(grade)
+        self._validate_grade(inputs.grade)
         self._validate_sector_industry_combination(sector, industry_group)
 
         return {
@@ -161,7 +150,7 @@ class CreateStockCommand:
             "name": name,
             "sector": sector,
             "industry_group": industry_group,
-            "grade": grade,
+            "grade": inputs.grade,
             "notes": notes,
         }
 

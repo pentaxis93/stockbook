@@ -10,7 +10,9 @@ from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from src.application.commands.stock import (
     CreateStockCommand,
+    CreateStockInputs,
     UpdateStockCommand,
+    UpdateStockInputs,
 )
 from src.application.dto.stock_dto import StockDto
 
@@ -149,7 +151,7 @@ class StockRequest(BaseModel):
         Returns:
             CreateStockCommand for application layer
         """
-        return CreateStockCommand(
+        inputs = CreateStockInputs(
             symbol=self.symbol,
             name=self.name,
             sector=self.sector,
@@ -157,6 +159,7 @@ class StockRequest(BaseModel):
             grade=self.grade,
             notes=self.notes,
         )
+        return CreateStockCommand(inputs)
 
 
 class StockResponse(BaseModel):
@@ -413,7 +416,7 @@ class StockUpdateRequest(BaseModel):
         Returns:
             UpdateStockCommand for application layer
         """
-        return UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id=stock_id,
             symbol=self.symbol,
             name=self.name,
@@ -422,3 +425,4 @@ class StockUpdateRequest(BaseModel):
             grade=self.grade,
             notes=self.notes,
         )
+        return UpdateStockCommand(inputs)

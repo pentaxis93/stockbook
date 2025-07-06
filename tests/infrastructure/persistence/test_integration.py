@@ -15,7 +15,7 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.engine import Engine
 
 from dependency_injection.composition_root import CompositionRoot
-from src.application.commands.stock import CreateStockCommand
+from src.application.commands.stock import CreateStockCommand, CreateStockInputs
 from src.application.services.stock_application_service import StockApplicationService
 from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import (
@@ -84,7 +84,7 @@ class TestUnitOfWorkIntegration:
     ) -> None:
         """Should create stock and commit to database."""
         # Arrange
-        command = CreateStockCommand(
+        inputs = CreateStockInputs(
             symbol="AAPL",
             name="Apple Inc.",
             sector="Technology",
@@ -92,6 +92,7 @@ class TestUnitOfWorkIntegration:
             grade="A",
             notes="Test stock",
         )
+        command = CreateStockCommand(inputs)
 
         # Act
         try:
@@ -277,7 +278,7 @@ class TestDependencyInjectionIntegration:
         service = container.resolve(StockApplicationService)
 
         # Act
-        command = CreateStockCommand(
+        inputs = CreateStockInputs(
             symbol="TSLA",
             name="Tesla Inc.",
             sector="Technology",
@@ -285,6 +286,7 @@ class TestDependencyInjectionIntegration:
             grade="B",
             notes="EV manufacturer",
         )
+        command = CreateStockCommand(inputs)
         stock_dto = service.create_stock(command)
 
         # Assert

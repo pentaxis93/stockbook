@@ -7,7 +7,7 @@ of the UpdateStockCommand used for stock update operations.
 
 import pytest
 
-from src.application.commands.stock import UpdateStockCommand
+from src.application.commands.stock import UpdateStockCommand, UpdateStockInputs
 
 
 class TestUpdateStockCommand:
@@ -15,13 +15,14 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_with_valid_data(self) -> None:
         """Should create command with valid update data."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="Apple Inc. (Updated)",
             industry_group="Technology",
             grade="A",
             notes="Updated notes",
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.stock_id == "test-stock-1"
         assert command.name == "Apple Inc. (Updated)"
@@ -31,11 +32,12 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_with_partial_data(self) -> None:
         """Should create command with only some fields to update."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             grade="B",
             notes="Updated notes only",
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.stock_id == "test-stock-1"
         assert command.name is None
@@ -45,12 +47,13 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_strips_whitespace(self) -> None:
         """Should strip whitespace from fields."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="  Apple Inc.  ",
             industry_group="  Technology  ",
             notes="  Updated notes  ",
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.name == "Apple Inc."
         assert command.industry_group == "Technology"
@@ -58,12 +61,13 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_with_empty_string_sets_none(self) -> None:
         """Should convert empty strings to None for optional fields."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="Apple Inc.",
             industry_group="",
             notes="",
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.name == "Apple Inc."
         assert command.industry_group is None
@@ -72,36 +76,45 @@ class TestUpdateStockCommand:
     def test_update_stock_command_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = UpdateStockCommand(stock_id="")
+            inputs = UpdateStockInputs(stock_id="")
+            _ = UpdateStockCommand(inputs)
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = UpdateStockCommand(stock_id="   ")  # whitespace-only string
+            inputs = UpdateStockInputs(stock_id="   ")  # whitespace-only string
+            _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
         with pytest.raises(ValueError, match="Invalid grade"):
-            _ = UpdateStockCommand(stock_id="test-stock-1", grade="Z")
+            inputs = UpdateStockInputs(stock_id="test-stock-1", grade="Z")
+            _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_with_empty_name_allowed(self) -> None:
         """Should allow empty name as it's optional."""
-        command = UpdateStockCommand(stock_id="test-stock-1", name="")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", name="")
+        command = UpdateStockCommand(inputs)
         assert command.name is None  # Empty string normalized to None
 
-        command2 = UpdateStockCommand(stock_id="test-stock-1", name="   ")
+        inputs2 = UpdateStockInputs(stock_id="test-stock-1", name="   ")
+        command2 = UpdateStockCommand(inputs2)
         assert command2.name is None  # Whitespace normalized to None
 
     def test_update_stock_command_equality(self) -> None:
         """Should compare commands for equality."""
-        command1 = UpdateStockCommand(stock_id="test-stock-1", grade="A")
-        command2 = UpdateStockCommand(stock_id="test-stock-1", grade="A")
-        command3 = UpdateStockCommand(stock_id="test-stock-2", grade="A")
+        inputs1 = UpdateStockInputs(stock_id="test-stock-1", grade="A")
+        inputs2 = UpdateStockInputs(stock_id="test-stock-1", grade="A")
+        inputs3 = UpdateStockInputs(stock_id="test-stock-2", grade="A")
+        command1 = UpdateStockCommand(inputs1)
+        command2 = UpdateStockCommand(inputs2)
+        command3 = UpdateStockCommand(inputs3)
 
         assert command1 == command2
         assert command1 != command3
 
     def test_update_stock_command_string_representation(self) -> None:
         """Should have meaningful string representation."""
-        command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", grade="A")
+        command = UpdateStockCommand(inputs)
 
         str_repr = str(command)
         assert "UpdateStockCommand" in str_repr
@@ -109,7 +122,8 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_is_immutable(self) -> None:
         """Command should be immutable after creation."""
-        command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", grade="A")
+        command = UpdateStockCommand(inputs)
 
         with pytest.raises(AttributeError):
             command.stock_id = "different-id"  # type: ignore[misc]
@@ -119,23 +133,26 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_has_no_updates_when_all_fields_none(self) -> None:
         """Should detect when no fields are being updated."""
-        command = UpdateStockCommand(stock_id="test-stock-1")
+        inputs = UpdateStockInputs(stock_id="test-stock-1")
+        command = UpdateStockCommand(inputs)
 
         assert not command.has_updates()
 
     def test_update_stock_command_has_updates_when_fields_provided(self) -> None:
         """Should detect when fields are being updated."""
-        command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", grade="A")
+        command = UpdateStockCommand(inputs)
 
         assert command.has_updates()
 
     def test_update_stock_command_get_update_fields(self) -> None:
         """Should return only fields that are being updated."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="Apple Inc.",
             grade="A",
         )
+        command = UpdateStockCommand(inputs)
 
         fields = command.get_update_fields()
         assert "name" in fields
@@ -147,7 +164,8 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_equality_with_non_matching_types(self) -> None:
         """Should return False when compared with non-command objects."""
-        command = UpdateStockCommand(stock_id="test-stock-1", grade="A")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", grade="A")
+        command = UpdateStockCommand(inputs)
 
         # Test against different types - covers hash function and equality branches
         assert command != "string"
@@ -161,31 +179,35 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_sector_property_getter(self) -> None:
         """Should return sector value through property getter."""
-        command = UpdateStockCommand(stock_id="test-stock-1", sector="Technology")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", sector="Technology")
+        command = UpdateStockCommand(inputs)
 
         # Test sector property getter
         assert command.sector == "Technology"
 
         # Test None case
-        command_no_sector = UpdateStockCommand(stock_id="test-stock-1")
+        inputs_no_sector = UpdateStockInputs(stock_id="test-stock-1")
+        command_no_sector = UpdateStockCommand(inputs_no_sector)
         assert command_no_sector.sector is None
 
     def test_update_stock_command_normalize_sector_none_case(self) -> None:
         """Should handle None sector normalization correctly."""
         # Test the None case in _normalize_sector method
-        command = UpdateStockCommand(stock_id="test-stock-1", sector=None)
+        inputs = UpdateStockInputs(stock_id="test-stock-1", sector=None)
+        command = UpdateStockCommand(inputs)
 
         assert command.sector is None
 
     def test_update_stock_command_with_explicit_none_sector(self) -> None:
         """Should handle explicitly passed None sector."""
         # This tests the return None branch in _normalize_sector
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="Test Company",
             sector=None,  # Explicitly None
             grade="A",
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.sector is None
         assert command.name == "Test Company"
@@ -193,95 +215,99 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_repr_representation(self) -> None:
         """Should have meaningful repr representation."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="Apple Inc.",
             industry_group="Software",
             grade="A",
             notes="Updated notes",
         )
+        command = UpdateStockCommand(inputs)
 
         repr_str = repr(command)
         assert "UpdateStockCommand" in repr_str
-        assert "stock_id=test-stock-1" in repr_str
+        assert "stock_id='test-stock-1'" in repr_str
         assert "name='Apple Inc.'" in repr_str
         assert "industry_group='Software'" in repr_str
         assert "grade='A'" in repr_str
         assert "notes='Updated notes'" in repr_str
 
-    def test_update_stock_command_hash_consistency(self) -> None:
-        """Should be hashable and work in sets/dicts."""
-        command1 = UpdateStockCommand(stock_id="test-stock-1", grade="A")
-        command2 = UpdateStockCommand(stock_id="test-stock-1", grade="A")
+    def test_update_stock_command_normalize_empty_sector_string(self) -> None:
+        """Should normalize empty sector string to None."""
+        inputs = UpdateStockInputs(
+            stock_id="test-stock-1",
+            sector="",  # Empty string
+        )
+        command = UpdateStockCommand(inputs)
 
-        # Should be able to use in sets
-        command_set = {command1, command2}
-        assert len(command_set) == 1  # Same data should result in one item
+        assert command.sector is None
 
-        # Should be able to use as dict keys
-        command_dict = {command1: "value"}
-        assert command_dict[command2] == "value"  # Same data should work as key
+    def test_update_stock_command_equality_with_sectors(self) -> None:
+        """Should compare commands with sectors for equality."""
+        inputs1 = UpdateStockInputs(stock_id="test-stock-1", sector="Technology")
+        inputs2 = UpdateStockInputs(stock_id="test-stock-1", sector="Technology")
+        inputs3 = UpdateStockInputs(stock_id="test-stock-1", sector="Healthcare")
+        command1 = UpdateStockCommand(inputs1)
+        command2 = UpdateStockCommand(inputs2)
+        command3 = UpdateStockCommand(inputs3)
 
-    def test_update_stock_command_equality_with_sector_field(self) -> None:
-        """Should test equality with sector field properly included in __eq__."""
-        # Test that sector field is properly compared in __eq__ method
-        command1 = UpdateStockCommand(stock_id="test-stock-1", sector="Technology")
-        command2 = UpdateStockCommand(stock_id="test-stock-1", sector="Healthcare")
-
-        # These should NOT be equal because they have different sectors
-        assert command1 != command2
-
-        # Test with same sector - should be equal
-        command3 = UpdateStockCommand(stock_id="test-stock-1", sector="Technology")
-        assert command1 == command3
+        assert command1 == command2  # Same sectors
+        assert command1 != command3  # Different sectors
 
         # Test with None sectors - should be equal
-        command4 = UpdateStockCommand(stock_id="test-stock-1", sector=None)
-        command5 = UpdateStockCommand(stock_id="test-stock-1", sector=None)
+        inputs4 = UpdateStockInputs(stock_id="test-stock-1", sector=None)
+        inputs5 = UpdateStockInputs(stock_id="test-stock-1", sector=None)
+        command4 = UpdateStockCommand(inputs4)
+        command5 = UpdateStockCommand(inputs5)
         assert command4 == command5
 
     def test_update_stock_command_whitespace_only_stock_id_validation(self) -> None:
         """Should validate stock_id for whitespace-only strings."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = UpdateStockCommand(stock_id="   ")  # Whitespace-only
+            inputs = UpdateStockInputs(stock_id="   ")  # Whitespace-only
+            _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_whitespace_only_name_validation(self) -> None:
         """Should allow whitespace-only name as it's optional."""
-        command = UpdateStockCommand(stock_id="test-stock-1", name="   ")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", name="   ")
+        command = UpdateStockCommand(inputs)
         assert command.name is None  # Whitespace normalized to None
 
     def test_update_stock_command_industry_group_empty_string_normalization(
         self,
     ) -> None:
         """Should normalize empty industry_group string to None."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             industry_group="",  # Empty string
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.industry_group is None
 
     def test_update_stock_command_industry_group_whitespace_normalization(self) -> None:
         """Should normalize whitespace-only industry_group to None."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             industry_group="   ",  # Whitespace-only
         )
+        command = UpdateStockCommand(inputs)
 
         assert command.industry_group is None
 
     def test_update_stock_command_all_grade_values(self) -> None:
         """Should accept all valid grade values."""
         for grade in ["A", "B", "C", None]:
-            command = UpdateStockCommand(
+            inputs = UpdateStockInputs(
                 stock_id="test-stock-1",
                 grade=grade,
             )
+            command = UpdateStockCommand(inputs)
             assert command.grade == grade
 
     def test_update_stock_command_get_update_fields_all_fields(self) -> None:
         """Should return all fields when all are provided."""
-        command = UpdateStockCommand(
+        inputs = UpdateStockInputs(
             stock_id="test-stock-1",
             name="Test Company",
             sector="Technology",
@@ -289,10 +315,10 @@ class TestUpdateStockCommand:
             grade="A",
             notes="Test notes",
         )
+        command = UpdateStockCommand(inputs)
 
         fields = command.get_update_fields()
-        expected_fields = {"name", "sector", "industry_group", "grade", "notes"}
-        assert set(fields.keys()) == expected_fields
+        assert len(fields) == 5
         assert fields["name"] == "Test Company"
         assert fields["sector"] == "Technology"
         assert fields["industry_group"] == "Software"
@@ -301,7 +327,8 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_get_update_fields_empty(self) -> None:
         """Should return empty dict when no fields are provided."""
-        command = UpdateStockCommand(stock_id="test-stock-1")
+        inputs = UpdateStockInputs(stock_id="test-stock-1")
+        command = UpdateStockCommand(inputs)
 
         fields = command.get_update_fields()
         assert not fields
@@ -319,7 +346,8 @@ class TestUpdateStockCommand:
 
         for field_name, field_value in fields_to_test:
             kwargs = {"stock_id": "test-stock-1", field_name: field_value}
-            command = UpdateStockCommand(**kwargs)
+            inputs = UpdateStockInputs(**kwargs)
+            command = UpdateStockCommand(inputs)
             assert (
                 command.has_updates()
             ), f"Failed to detect update for field {field_name}"
@@ -327,13 +355,15 @@ class TestUpdateStockCommand:
     def test_update_stock_command_with_explicit_none_name(self) -> None:
         """Should handle explicitly passed None name."""
         # This ensures coverage of None branch in _normalize_name
-        command = UpdateStockCommand(stock_id="test-stock-1", name=None)
+        inputs = UpdateStockInputs(stock_id="test-stock-1", name=None)
+        command = UpdateStockCommand(inputs)
         assert command.name is None
 
     def test_update_stock_command_base_class_coverage(self) -> None:
         """Test base class coverage for UpdateStockCommand missing lines."""
         # Test that normal initialization works (covers line 378 - super().__setattr__)
-        command = UpdateStockCommand(stock_id="test-stock-1", name="Updated Name")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", name="Updated Name")
+        command = UpdateStockCommand(inputs)
         assert command.stock_id == "test-stock-1"
         assert command.name == "Updated Name"
 
@@ -349,24 +379,23 @@ class TestUpdateStockCommand:
         # We'll use object.__new__ to create an instance without calling __init__
         command = object.__new__(UpdateStockCommand)
 
-        # At this point, the object has no _stock_id attribute, so __setattr__
-        # should work
+        # Object has no _stock_id attribute, so __setattr__ should work
         # This directly exercises the super().__setattr__ branch
         command.test_attr = "test_value"
 
         # Now properly initialize the object
-        UpdateStockCommand.__init__(
-            command,
-            stock_id="test-id-123",
+        inputs = UpdateStockInputs(
+            stock_id="test-stock-1",
             name="Updated Company Name",
             sector="Healthcare",
             industry_group="Pharmaceuticals",
             grade="B",
             notes="Updated notes with more details",
         )
+        UpdateStockCommand.__init__(command, inputs)
 
         # Verify all attributes were set correctly
-        assert command.stock_id == "test-id-123"
+        assert command.stock_id == "test-stock-1"
         assert command.name == "Updated Company Name"
         assert command.sector == "Healthcare"
         assert command.industry_group == "Pharmaceuticals"
@@ -375,7 +404,8 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_with_symbol(self) -> None:
         """Should handle symbol updates."""
-        command = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", symbol="AAPL")
+        command = UpdateStockCommand(inputs)
         assert command.symbol == "AAPL"
         assert command.has_updates() is True
         update_fields = command.get_update_fields()
@@ -384,37 +414,45 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_symbol_normalization(self) -> None:
         """Should normalize symbol to uppercase."""
-        command = UpdateStockCommand(stock_id="test-stock-1", symbol="aapl")
+        inputs = UpdateStockInputs(stock_id="test-stock-1", symbol="aapl")
+        command = UpdateStockCommand(inputs)
         assert command.symbol == "AAPL"
 
     def test_update_stock_command_invalid_symbol(self) -> None:
         """Should reject invalid symbols."""
         with pytest.raises(ValueError, match="Invalid symbol format"):
-            _ = UpdateStockCommand(
+            inputs = UpdateStockInputs(
                 stock_id="test-stock-1",
                 symbol="123ABC",  # Contains numbers
             )
+            _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_empty_symbol(self) -> None:
         """Should reject empty symbols."""
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
-            _ = UpdateStockCommand(stock_id="test-stock-1", symbol="")
+            inputs = UpdateStockInputs(stock_id="test-stock-1", symbol="")
+            _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_symbol_in_equality(self) -> None:
         """Should include symbol in equality comparison."""
-        command1 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
-        command2 = UpdateStockCommand(stock_id="test-stock-1", symbol="MSFT")
-        command3 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        inputs1 = UpdateStockInputs(stock_id="test-stock-1", symbol="AAPL")
+        inputs2 = UpdateStockInputs(stock_id="test-stock-1", symbol="MSFT")
+        inputs3 = UpdateStockInputs(stock_id="test-stock-1", symbol="AAPL")
+        command1 = UpdateStockCommand(inputs1)
+        command2 = UpdateStockCommand(inputs2)
+        command3 = UpdateStockCommand(inputs3)
 
         assert command1 != command2  # Different symbols
-        assert command1 == command3  # Same symbol
+        assert command1 == command3  # Same symbols
 
-    def test_update_stock_command_symbol_in_hash(self) -> None:
+    def test_update_stock_command_symbol_hash(self) -> None:
         """Should include symbol in hash calculation."""
-        command1 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
-        command2 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        inputs1 = UpdateStockInputs(stock_id="test-stock-1", symbol="AAPL")
+        inputs2 = UpdateStockInputs(stock_id="test-stock-1", symbol="AAPL")
+        command1 = UpdateStockCommand(inputs1)
+        command2 = UpdateStockCommand(inputs2)
 
-        # Same data should have same hash
+        # Same values should have same hash
         assert hash(command1) == hash(command2)
 
         # Can be used in sets
@@ -423,8 +461,10 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_symbol_property(self) -> None:
         """Should access symbol via property."""
-        command = UpdateStockCommand(stock_id="test-stock-1")
+        inputs = UpdateStockInputs(stock_id="test-stock-1")
+        command = UpdateStockCommand(inputs)
         assert command.symbol is None
 
-        command2 = UpdateStockCommand(stock_id="test-stock-1", symbol="AAPL")
+        inputs2 = UpdateStockInputs(stock_id="test-stock-1", symbol="AAPL")
+        command2 = UpdateStockCommand(inputs2)
         assert command2.symbol == "AAPL"
