@@ -153,7 +153,8 @@ class StockApplicationService:
         Args:
             symbol_filter: Filter by symbols containing this string (case-insensitive)
             name_filter: Filter by names containing this string (case-insensitive)
-            industry_filter: Filter by industry group containing this string (case-insensitive)
+            industry_filter: Filter by industry group containing this string
+                (case-insensitive)
 
         Returns:
             List of stock DTOs matching the criteria

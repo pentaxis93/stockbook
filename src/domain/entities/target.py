@@ -210,8 +210,14 @@ class Target(Entity):
 
     def __str__(self) -> str:
         """String representation."""
-        return f"Target(pivot: {self._pivot_price}, failure: {self._failure_price}, status={self._status.value})"
+        return (
+            f"Target(pivot: {self._pivot_price}, failure: {self._failure_price}, "
+            f"status={self._status.value})"
+        )
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"Target(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, status={self._status.value!r})"
+        return (
+            f"Target(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, "
+            f"status={self._status.value!r})"
+        )

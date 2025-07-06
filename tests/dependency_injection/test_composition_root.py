@@ -96,8 +96,10 @@ class TestCompositionRoot:
         # coordinator = container.resolve(StockPageCoordinator)
 
         # Assert - verify entire chain is wired
-        # assert isinstance(coordinator.controller.stock_service._unit_of_work, SqliteUnitOfWork)
-        # assert isinstance(coordinator.controller.stock_service._unit_of_work.stocks, SqliteStockRepository)
+        # assert isinstance(coordinator.controller.stock_service._unit_of_work,
+        #                  SqliteUnitOfWork)
+        # assert isinstance(coordinator.controller.stock_service._unit_of_work.stocks,
+        #                  SqliteStockRepository)
         # assert isinstance(coordinator.adapter.controller, StockController)
         pass
 

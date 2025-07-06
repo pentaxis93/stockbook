@@ -99,7 +99,8 @@ class TestIndustryGroup:
         assert repr(industry) == "IndustryGroup('Technology')"
 
     def test_industry_group_equality_with_non_industry_group_object(self) -> None:
-        """Test that industry group equality returns False for non-IndustryGroup objects."""
+        """Test that industry group equality returns False for non-IndustryGroup
+        objects."""
         industry = IndustryGroup("Technology")
 
         # Test equality with different types - should return False

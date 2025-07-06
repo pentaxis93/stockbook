@@ -90,7 +90,8 @@ class TestPortfolioBalance:
     def test_create_portfolio_balance_with_invalid_index_change_raises_error(
         self,
     ) -> None:
-        """Should raise error for invalid index change through IndexChange value object."""
+        """Should raise error for invalid index change through IndexChange value
+        object."""
         with pytest.raises(ValueError, match="Index change cannot exceed"):
             _ = IndexChange(
                 150.0
@@ -424,7 +425,8 @@ class TestIndexChange:
         assert change.value == 5.12
 
     def test_portfolio_balance_equality_with_non_portfolio_balance_object(self) -> None:
-        """Test that portfolio balance equality returns False for non-PortfolioBalance objects."""
+        """Test that portfolio balance equality returns False for
+        non-PortfolioBalance objects."""
 
         balance = (
             PortfolioBalance.Builder()
@@ -472,7 +474,8 @@ class TestPortfolioBalanceBuilder:
         assert balance.id == "balance-id"
 
     def test_builder_creates_portfolio_balance_with_minimal_fields(self) -> None:
-        """Test that Builder can create a portfolio balance with only required fields."""
+        """Test that Builder can create a portfolio balance with only required
+        fields."""
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-1")

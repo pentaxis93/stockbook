@@ -85,7 +85,8 @@ class TestStock:
             assert stock.grade.value == grade_str
 
     def test_empty_name_allowed(self) -> None:
-        """Test that empty name is now allowed (users can create stock with only symbol)"""
+        """Test that empty name is now allowed (users can create stock with only
+        symbol)"""
         stock = (
             Stock.Builder()
             .with_symbol(StockSymbol("TEST"))

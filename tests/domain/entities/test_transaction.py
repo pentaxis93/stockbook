@@ -291,7 +291,8 @@ class TestTransaction:
     def test_create_transaction_with_invalid_transaction_type_raises_error(
         self,
     ) -> None:
-        """Should raise error for invalid transaction type through TransactionType value object."""
+        """Should raise error for invalid transaction type through TransactionType
+        value object."""
         with pytest.raises(
             ValueError, match="Transaction type must be 'buy' or 'sell'"
         ):
@@ -420,7 +421,10 @@ class TestTransaction:
             .build()
         )
 
-        expected = "Transaction(portfolio_id=portfolio-id-1, stock_id=stock-id-2, type='sell', quantity=50, price=$200.00)"
+        expected = (
+            "Transaction(portfolio_id=portfolio-id-1, stock_id=stock-id-2, "
+            "type='sell', quantity=50, price=$200.00)"
+        )
         assert repr(transaction) == expected
 
     def test_calculate_total_value(self) -> None:
@@ -629,7 +633,8 @@ class TestTransactionType:
         transaction_hash = hash(transaction)
         assert isinstance(transaction_hash, int)
 
-        # Test that transactions with different IDs have different hashes (likely but not guaranteed)
+        # Test that transactions with different IDs have different hashes
+        # (likely but not guaranteed)
         same_transaction = (
             Transaction.Builder()
             .with_portfolio_id("portfolio-1")

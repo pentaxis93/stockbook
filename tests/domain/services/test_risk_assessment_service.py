@@ -145,7 +145,8 @@ class TestRiskAssessmentStubs:
         assert isinstance(risk_assessment.risk_factors, list)
 
     def test_assess_portfolio_risk_returns_assessment(self) -> None:
-        """Should return portfolio RiskAssessment based on simple diversification rules."""
+        """Should return portfolio RiskAssessment based on simple diversification
+        rules."""
         service = RiskAssessmentService()
         portfolio = create_conservative_portfolio()
         prices = create_test_prices(portfolio)
@@ -278,7 +279,8 @@ class TestRiskAssessmentEdgeCases:
         risk_d = service.assess_stock_risk(grade_d_stock)
 
         # Grade D should generally be riskier than Grade A
-        # Note: Current implementation may be stubbed, so this tests future implementation
+        # Note: Current implementation may be stubbed, so this tests future
+        # implementation
         assert isinstance(risk_a, RiskAssessment)
         assert isinstance(risk_d, RiskAssessment)
 
@@ -303,7 +305,8 @@ class TestRiskAssessmentIntegration:
     """Test integration scenarios for risk assessment service."""
 
     def test_portfolio_risk_assessment_with_allocation_service(self) -> None:
-        """Should integrate with allocation calculations for comprehensive risk assessment."""
+        """Should integrate with allocation calculations for comprehensive risk
+        assessment."""
         risk_service = RiskAssessmentService()
         calc_service = PortfolioCalculationService()
 
@@ -360,7 +363,13 @@ class TestRiskAssessmentIntegration:
             sector = sectors[i % len(sectors)]
             grade = grades[i % len(grades)]
             # Create 5-char symbols using letters only
-            symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}{chr(ord('A') + ((i // 17576) % 26))}{chr(ord('A') + ((i // 456976) % 26))}"
+            symbol = (
+                f"{chr(ord('A') + (i % 26))}"
+                f"{chr(ord('A') + ((i // 26) % 26))}"
+                f"{chr(ord('A') + ((i // 676) % 26))}"
+                f"{chr(ord('A') + ((i // 17576) % 26))}"
+                f"{chr(ord('A') + ((i // 456976) % 26))}"
+            )
 
             stock = create_test_stock(symbol, 50.00 + (i % 100), grade, sector)
             large_portfolio.append((stock, Quantity(10 + (i % 50))))

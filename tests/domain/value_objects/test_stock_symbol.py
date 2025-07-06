@@ -177,7 +177,8 @@ class TestStockSymbol:
         assert StockSymbol.is_valid({}) is False  # type: ignore[arg-type]
         assert StockSymbol.is_valid(object()) is False  # type: ignore[arg-type]
 
-        # Test exception handling in is_valid with invalid symbols (covers lines 109-110)
+        # Test exception handling in is_valid with invalid symbols (covers lines
+        # 109-110)
         # This will trigger ValueError that gets caught and returns False
         assert StockSymbol.is_valid("") is False  # Empty string causes validation error
 

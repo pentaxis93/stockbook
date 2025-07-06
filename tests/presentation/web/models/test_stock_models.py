@@ -178,7 +178,8 @@ class TestStockRequest:
     def test_stock_request_industry_without_sector_raises_validation_error(
         self,
     ) -> None:
-        """Should raise ValidationError when industry_group is provided without sector."""
+        """Should raise ValidationError when industry_group is provided without
+        sector."""
         with pytest.raises(ValidationError) as exc_info:
             _ = StockRequest(
                 symbol="AAPL", name="Apple Inc.", industry_group="Software"

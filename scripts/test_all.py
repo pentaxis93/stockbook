@@ -43,7 +43,7 @@ def main() -> None:
             ["python", "-m", "ruff", "check", "--fix", "--unsafe-fixes", "."],
             "Ruff Auto-fix",
         ),
-        (["python", "-m", "black", "."], "Black Format"),
+        (["python", "-m", "ruff", "format", "."], "Ruff Format"),
         # Then check
         (["python", "-m", "ruff", "check", "."], "Ruff Lint"),
         (["python", "-m", "pyright"], "Type Check"),

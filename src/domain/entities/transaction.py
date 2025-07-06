@@ -183,8 +183,15 @@ class Transaction(Entity):
 
     def __str__(self) -> str:
         """String representation."""
-        return f"{self._transaction_type} {self._quantity.value} @ {self._price} on {self._transaction_date}"
+        return (
+            f"{self._transaction_type} {self._quantity.value} @ {self._price} "
+            f"on {self._transaction_date}"
+        )
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"Transaction(portfolio_id={self._portfolio_id}, stock_id={self._stock_id}, type={self._transaction_type.value!r}, quantity={self._quantity.value}, price={self._price})"
+        return (
+            f"Transaction(portfolio_id={self._portfolio_id}, "
+            f"stock_id={self._stock_id}, type={self._transaction_type.value!r}, "
+            f"quantity={self._quantity.value}, price={self._price})"
+        )

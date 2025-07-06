@@ -116,9 +116,11 @@ class IStockRepository(ABC):
         """Search stocks with multiple filter criteria.
 
         Args:
-            symbol_filter: Filter by symbols containing this string (case-insensitive)
+            symbol_filter: Filter by symbols containing this string
+                (case-insensitive)
             name_filter: Filter by names containing this string (case-insensitive)
-            industry_filter: Filter by industry group containing this string (case-insensitive)
+            industry_filter: Filter by industry group containing this string
+                (case-insensitive)
 
         Returns:
             List of Stock domain models matching the criteria

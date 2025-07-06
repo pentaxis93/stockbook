@@ -265,7 +265,8 @@ class TestTarget:
             )
 
     def test_create_target_with_invalid_status_raises_error(self) -> None:
-        """Should raise error for invalid target status through TargetStatus value object."""
+        """Should raise error for invalid target status through TargetStatus value
+        object."""
         with pytest.raises(ValueError, match="Target status must be one of"):
             _ = TargetStatus(
                 "invalid_status"

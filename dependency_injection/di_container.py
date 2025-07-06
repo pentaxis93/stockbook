@@ -43,7 +43,9 @@ class RegistrationInfo:  # pylint: disable=too-few-public-methods
 
 
 class DIContainer:
-    """Dependency injection container that wraps dependency-injector to provide a clean, testable interface.
+    """Dependency injection container that wraps dependency-injector.
+
+    Provides a clean, testable interface for dependency management.
 
     This container manages service registrations and resolves dependencies
     with support for different lifetimes (singleton, transient, scoped).
@@ -152,7 +154,8 @@ class DIContainer:
         if not isinstance(instance, service_type):
             raise InvalidRegistrationError(
                 service_type,
-                f"Instance of type {type(instance).__name__} is not compatible with service type {service_type.__name__}",
+                f"Instance of type {type(instance).__name__} is not compatible "
+                + f"with service type {service_type.__name__}",
             )
 
         try:
@@ -316,7 +319,8 @@ class DIContainer:
         ):
             raise InvalidRegistrationError(
                 service_type,
-                f"Implementation {implementation_type.__name__} does not implement interface {service_type.__name__}",
+                f"Implementation {implementation_type.__name__} does not implement "
+                + f"interface {service_type.__name__}",
             )
 
     def _get_provider_name(self, service_type: type[Any]) -> str:

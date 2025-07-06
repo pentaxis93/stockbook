@@ -349,7 +349,8 @@ class TestUpdateStockCommand:
         # We'll use object.__new__ to create an instance without calling __init__
         command = object.__new__(UpdateStockCommand)
 
-        # At this point, the object has no _stock_id attribute, so __setattr__ should work
+        # At this point, the object has no _stock_id attribute, so __setattr__
+        # should work
         # This directly exercises the super().__setattr__ branch
         command.test_attr = "test_value"
 
@@ -390,7 +391,8 @@ class TestUpdateStockCommand:
         """Should reject invalid symbols."""
         with pytest.raises(ValueError, match="Invalid symbol format"):
             _ = UpdateStockCommand(
-                stock_id="test-stock-1", symbol="123ABC"  # Contains numbers
+                stock_id="test-stock-1",
+                symbol="123ABC",  # Contains numbers
             )
 
     def test_update_stock_command_empty_symbol(self) -> None:

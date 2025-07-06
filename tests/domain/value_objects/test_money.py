@@ -51,7 +51,8 @@ class TestMoneyCreation:
             _ = Money("invalid")
 
     def test_precision_handling(self) -> None:
-        """Should handle high-precision decimal amounts by rounding to currency precision."""
+        """Should handle high-precision decimal amounts by rounding to currency
+        precision."""
         money = Money(Decimal("100.123456789"))
         assert money.amount == Decimal("100.12")  # Rounded to 2 decimal places
 

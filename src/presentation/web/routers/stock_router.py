@@ -157,7 +157,8 @@ async def create_stock(
         StockResponse with 201 Created status
 
     Raises:
-        HTTPException: 422 for validation errors, 400 for duplicates, 500 for server errors
+        HTTPException: 422 for validation errors, 400 for duplicates, 500 for
+            server errors
     """
     # Convert request to command
     command = stock_request.to_command()

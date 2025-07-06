@@ -19,7 +19,8 @@ class Portfolio(Entity):
 
     def __init__(
         # Rationale: Portfolio is a fundamental domain entity with minimal attributes.
-        # Each parameter represents essential portfolio characteristics: name, description,
+        # Each parameter represents essential portfolio characteristics: name,
+        # description,
         # creation tracking, and active status. These cannot be simplified further.
         self,
         name: PortfolioName,

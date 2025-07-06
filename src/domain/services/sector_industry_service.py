@@ -122,8 +122,9 @@ class SectorIndustryService:
             valid_industries = self.get_industry_groups_for_sector(sector)
             valid_industries_str = ", ".join(valid_industries)
             raise ValueError(
-                f"Industry group {industry_group!r} is not valid for sector {sector!r}. "
-                + f"Valid industry groups for this sector: {valid_industries_str}"
+                f"Industry group {industry_group!r} is not valid for sector "
+                + f"{sector!r}. Valid industry groups for this sector: "
+                + f"{valid_industries_str}"
             )
 
     def get_sector_for_industry_group(self, industry_group: str) -> str:

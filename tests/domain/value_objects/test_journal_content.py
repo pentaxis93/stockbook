@@ -35,7 +35,7 @@ class TestJournalContentCreation:
     def test_create_with_multiline_content(self) -> None:
         """Should handle multiline journal content."""
         multiline_text = """This is a multiline journal entry.
-        
+
         Today I learned about portfolio diversification.
         Key points:
         1. Don't put all eggs in one basket
@@ -45,7 +45,7 @@ class TestJournalContentCreation:
         content = JournalContent(multiline_text)
 
         expected = """This is a multiline journal entry.
-        
+
         Today I learned about portfolio diversification.
         Key points:
         1. Don't put all eggs in one basket
@@ -104,7 +104,8 @@ class TestJournalContentBusinessLogic:
     def test_get_preview_with_long_content_uses_default_length(self) -> None:
         """Should truncate content to default preview length (50 chars)."""
         long_content = JournalContent(
-            "This is a very long journal entry that definitely exceeds fifty characters in length"
+            "This is a very long journal entry that definitely exceeds fifty "
+            + "characters in length"
         )
 
         preview = long_content.get_preview()
@@ -256,7 +257,8 @@ class TestJournalContentStringRepresentation:
         """Should return representation with content preview."""
         short_content = JournalContent("Short entry")
         long_content = JournalContent(
-            "This is a very long journal entry that will definitely be truncated in the repr"
+            "This is a very long journal entry that will definitely be "
+            + "truncated in the repr"
         )
 
         assert repr(short_content) == "JournalContent('Short entry')"
@@ -349,7 +351,8 @@ class TestJournalContentEdgeCases:
         assert internal_whitespace.value == "Word1    Word2"
 
     def test_journal_content_equality_with_non_journal_content_object(self) -> None:
-        """Test that journal content equality returns False for non-JournalContent objects."""
+        """Test that journal content equality returns False for non-JournalContent
+        objects."""
         content = JournalContent("Market analysis content")
 
         # Test equality with different types - should return False
@@ -368,7 +371,8 @@ class TestJournalContentEdgeCases:
         """Test JournalContent handles unexpected ValueError from parent class."""
         from unittest.mock import patch
 
-        # Mock the parent class to raise an unexpected ValueError (not "cannot be empty" or "cannot exceed")
+        # Mock the parent class to raise an unexpected ValueError (not "cannot be
+        # empty" or "cannot exceed")
         with patch(
             "src.domain.value_objects.journal_content.BaseTextValueObject.__init__"
         ) as mock_init:

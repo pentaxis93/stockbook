@@ -80,7 +80,8 @@ class TestPortfolio:
         )  # Description defaults to empty when None
 
     def test_create_portfolio_with_invalid_name_raises_error(self) -> None:
-        """Should raise error for invalid portfolio name through PortfolioName value object."""
+        """Should raise error for invalid portfolio name through PortfolioName
+        value object."""
         with pytest.raises(ValueError, match="Portfolio name cannot be empty"):
             _ = PortfolioName("")  # Error happens at PortfolioName construction
 

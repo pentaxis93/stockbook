@@ -186,7 +186,13 @@ class TestPortfolioCalculationEdgeCases:
 
         for i in range(1000):  # 1000 positions
             # Generate 5-char symbols using letters only
-            symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}{chr(ord('A') + ((i // 17576) % 26))}{chr(ord('A') + ((i // 456976) % 26))}"
+            symbol = (
+                f"{chr(ord('A') + (i % 26))}"
+                f"{chr(ord('A') + ((i // 26) % 26))}"
+                f"{chr(ord('A') + ((i // 676) % 26))}"
+                f"{chr(ord('A') + ((i // 17576) % 26))}"
+                f"{chr(ord('A') + ((i // 456976) % 26))}"
+            )
             price_value = Decimal("100.00") + (i % 100)  # Prices from $100 to $199
             quantity_value = 10 + (i % 20)  # Quantities from 10 to 29
 
@@ -434,7 +440,8 @@ class TestPortfolioPerformanceMetrics:
         #
         # risk_metrics = service.calculate_risk_metrics(portfolio)
         #
-        # assert risk_metrics.overall_risk_level in [RiskLevel.LOW, RiskLevel.MEDIUM, RiskLevel.HIGH]
+        # assert risk_metrics.overall_risk_level in [RiskLevel.LOW,
+        #                                           RiskLevel.MEDIUM, RiskLevel.HIGH]
         # assert risk_metrics.volatility_score >= 0
         # assert len(risk_metrics.risk_factors) > 0
         pass
@@ -504,7 +511,8 @@ class TestPortfolioRebalancingAnalysis:
         # tax_aware_suggestions = service.suggest_tax_efficient_rebalancing(portfolio)
         #
         # # Should prefer to rebalance using new contributions rather than selling
-        # contribution_based = [s for s in tax_aware_suggestions if s.method == RebalanceMethod.NEW_CONTRIBUTIONS]
+        # contribution_based = [s for s in tax_aware_suggestions
+        #                      if s.method == RebalanceMethod.NEW_CONTRIBUTIONS]
         # assert len(contribution_based) > 0
         pass
 

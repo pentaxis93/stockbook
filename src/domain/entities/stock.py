@@ -104,7 +104,8 @@ class Stock(Entity):
         if symbol is None:
             raise ValueError("Symbol is required")
 
-        # Initialize sector industry service for validation (import here to avoid circular imports)
+        # Initialize sector industry service for validation
+        # (import here to avoid circular imports)
         from src.domain.services.sector_industry_service import (  # pylint: disable=import-outside-toplevel; Rationale: This import must be inside the method to prevent circular dependencies; between domain entities and domain services. The Stock entity needs SectorIndustryService; for validation, but the service may also reference Stock, creating a circular import.
             SectorIndustryService,
         )
@@ -184,7 +185,8 @@ class Stock(Entity):
 
         Args:
             **kwargs: Field names and values to update.
-                     Supported fields: symbol, name, sector, industry_group, grade, notes
+                     Supported fields: symbol, name, sector, industry_group,
+                     grade, notes
 
         Raises:
             ValueError: If any field is invalid
@@ -272,7 +274,8 @@ class Stock(Entity):
             "industry_group", self.industry_group.value if self.industry_group else None
         )
 
-        # Special logic: if changing sector, check if current industry_group is compatible
+        # Special logic: if changing sector, check if current industry_group
+        # is compatible
         if (
             "sector" in kwargs
             and "industry_group" not in kwargs

@@ -388,7 +388,8 @@ class TestStockEndpoints:
         ]
 
         for invalid_id in invalid_ids:
-            # For empty or whitespace IDs, FastAPI will interpret as path parameter missing
+            # For empty or whitespace IDs, FastAPI will interpret as path
+            # parameter missing
             # and will return 404 for route not found, not our custom 404
             if invalid_id.strip():
                 mock_stock_service.get_stock_by_id.return_value = None

@@ -76,7 +76,8 @@ class TestMainApp:
         assert "/docs" in data["endpoints"]
 
     def test_database_initialization_error_handling(self) -> None:
-        """Test that database initialization errors are logged but don't crash the app."""
+        """Test that database initialization errors are logged but don't crash
+        the app."""
         with patch("src.presentation.web.main.initialize_database") as mock_init:
             # Make the initializer raise an exception
             mock_init.side_effect = Exception("Database connection failed")
@@ -124,7 +125,8 @@ class TestMainApp:
         assert response.status_code == expected_status
 
     def test_get_stock_service_dependency_error(self) -> None:
-        """Test that get_stock_service raises error when DI container is not configured."""
+        """Test that get_stock_service raises error when DI container is not
+        configured."""
         from fastapi import Request
 
         from src.presentation.web.routers.stock_router import get_stock_service

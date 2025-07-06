@@ -26,8 +26,9 @@ class CreateStockCommand:
     _notes: str
 
     def __init__(
-        # Rationale: Command objects legitimately need all parameters to capture user intent.
-        # These are not domain entities but DTOs that transfer complete information.
+        # Rationale: Command objects legitimately need all parameters to capture
+        # user intent. These are not domain entities but DTOs that transfer
+        # complete information.
         self,
         symbol: str,
         name: str | None = None,
@@ -128,8 +129,8 @@ class CreateStockCommand:
         """Developer representation."""
         return (
             f"CreateStockCommand(symbol={self.symbol!r}, name={self.name!r}, "
-            f"sector={self.sector!r}, industry_group={self.industry_group!r}, grade={self.grade!r}, "
-            f"notes={self.notes!r})"
+            f"sector={self.sector!r}, industry_group={self.industry_group!r}, "
+            f"grade={self.grade!r}, notes={self.notes!r})"
         )
 
     def _normalize_and_validate_inputs(

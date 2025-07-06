@@ -76,7 +76,10 @@ class TestSectorIndustryService:
         """Test strict validation with invalid industry raises ValueError."""
         with pytest.raises(
             ValueError,
-            match="Industry group 'Pharmaceuticals' is not valid for sector 'Technology'",
+            match=(
+                "Industry group 'Pharmaceuticals' is not valid for sector "
+                "'Technology'"
+            ),
         ):
             self.service.validate_sector_industry_combination_strict(
                 "Technology", "Pharmaceuticals"

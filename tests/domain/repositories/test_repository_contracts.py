@@ -615,7 +615,11 @@ class TestRepositoryContractPerformance:
         stocks: list[Stock] = []
         for i in range(100):
             # Create valid 5-char symbols using letters only
-            symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}"
+            symbol = (
+                f"{chr(ord('A') + (i % 26))}"
+                f"{chr(ord('A') + ((i // 26) % 26))}"
+                f"{chr(ord('A') + ((i // 676) % 26))}"
+            )
             stock = create_test_stock(symbol, "A")
             stocks.append(stock)
             _ = repository.create(stock)
@@ -762,7 +766,8 @@ class TestAbstractMethodCoverage:
                 abstract_class()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
     def test_abstract_method_contracts_exist(self) -> None:
-        """Test that all repository interfaces define proper abstract method contracts."""
+        """Test that all repository interfaces define proper abstract method
+        contracts."""
         # Test IStockRepository methods exist
         assert hasattr(IStockRepository, "create")
         assert hasattr(IStockRepository, "get_by_id")

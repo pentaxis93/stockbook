@@ -181,4 +181,7 @@ class PortfolioBalance(Entity):
 
     def __repr__(self) -> str:
         """Developer representation."""
-        return f"PortfolioBalance(portfolio_id={self._portfolio_id}, date={self._balance_date})"
+        return (
+            f"PortfolioBalance(portfolio_id={self._portfolio_id}, "
+            f"date={self._balance_date})"
+        )

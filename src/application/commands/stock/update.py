@@ -26,8 +26,8 @@ class UpdateStockCommand:
     _notes: str | None
 
     def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # Rationale: Update commands need all fields to specify which attributes to update.
-        # Optional parameters indicate which fields should be modified.
+        # Rationale: Update commands need all fields to specify which attributes
+        # to update. Optional parameters indicate which fields should be modified.
         self,
         stock_id: str,
         symbol: str | None = None,
@@ -170,14 +170,16 @@ class UpdateStockCommand:
     def __repr__(self) -> str:
         """Developer representation."""
         return (
-            f"UpdateStockCommand(stock_id={self.stock_id}, symbol={self.symbol!r}, name={self.name!r}, "
-            f"sector={self.sector!r}, industry_group={self.industry_group!r}, grade={self.grade!r}, "
+            f"UpdateStockCommand(stock_id={self.stock_id}, symbol={self.symbol!r}, "
+            f"name={self.name!r}, sector={self.sector!r}, "
+            f"industry_group={self.industry_group!r}, grade={self.grade!r}, "
             f"notes={self.notes!r})"
         )
 
     def _validate_and_normalize_inputs(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # Rationale: Validation methods naturally have complexity when handling multiple optional fields.
-        # Each field needs individual normalization and validation logic.
+        # Rationale: Validation methods naturally have complexity when handling
+        # multiple optional fields. Each field needs individual normalization and
+        # validation logic.
         self,
         stock_id: str,
         symbol: str | None,

@@ -226,7 +226,8 @@ class TestStock:
             _ = Grade("Z")  # Error happens at Grade construction
 
     def test_create_stock_with_too_long_name_raises_error(self) -> None:
-        """Should raise error for company name that's too long (delegated to value object)."""
+        """Should raise error for company name that's too long (delegated to
+        value object)."""
         long_name = "A" * 201  # Max is 200 characters
 
         with pytest.raises(
@@ -235,7 +236,8 @@ class TestStock:
             _ = CompanyName(long_name)  # Error happens at CompanyName construction
 
     def test_create_stock_with_too_long_industry_raises_error(self) -> None:
-        """Should raise error for industry group that's too long (delegated to value object)."""
+        """Should raise error for industry group that's too long (delegated to
+        value object)."""
         long_industry = "A" * 101  # Max is 100 characters
 
         with pytest.raises(
@@ -246,7 +248,8 @@ class TestStock:
             )  # Error happens at IndustryGroup construction
 
     def test_create_stock_with_too_long_notes_raises_error(self) -> None:
-        """Should raise error for notes that are too long (delegated to value object)."""
+        """Should raise error for notes that are too long (delegated to value
+        object)."""
         long_notes = "A" * 1001  # Max is 1000 characters
 
         with pytest.raises(ValueError, match="Notes cannot exceed 1000 characters"):
@@ -356,7 +359,10 @@ class TestStock:
             .build()
         )
 
-        expected = "Stock(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), grade=Grade('A'))"
+        expected = (
+            "Stock(symbol=StockSymbol('AAPL'), company_name=CompanyName('Apple Inc.'), "
+            "grade=Grade('A'))"
+        )
         assert repr(stock) == expected
 
         # Test with no company name
@@ -491,7 +497,9 @@ class TestStock:
         # Try to update with invalid grade - should fail and rollback all
         with pytest.raises(ValueError, match="Grade must be one of"):
             stock.update_fields(
-                name="Apple Inc. Updated", grade="Z", notes="New notes"  # Invalid grade
+                name="Apple Inc. Updated",
+                grade="Z",
+                notes="New notes",  # Invalid grade
             )
 
         # Original values should be unchanged
@@ -648,7 +656,10 @@ class TestStock:
 
         with pytest.raises(
             ValueError,
-            match="Industry group 'Pharmaceuticals' is not valid for sector 'Technology'",
+            match=(
+                "Industry group 'Pharmaceuticals' is not valid for sector "
+                "'Technology'"
+            ),
         ):
             _ = (
                 Stock.Builder()
@@ -734,7 +745,10 @@ class TestStock:
 
         with pytest.raises(
             ValueError,
-            match="Industry group 'Pharmaceuticals' is not valid for sector 'Technology'",
+            match=(
+                "Industry group 'Pharmaceuticals' is not valid for sector "
+                "'Technology'"
+            ),
         ):
             stock.update_fields(
                 name="Apple Inc. Updated",
@@ -835,7 +849,10 @@ class TestStock:
 
         with pytest.raises(
             ValueError,
-            match="Stock symbol must be between 1 and 5 characters|must contain only letters",
+            match=(
+                "Stock symbol must be between 1 and 5 characters|must contain "
+                "only letters"
+            ),
         ):
             stock.update_fields(symbol="123ABC")
 
@@ -1042,7 +1059,8 @@ class TestStockDomainInvariants:
         stock1 = Stock.Builder().with_symbol(symbol).with_company_name(name1).build()
         stock2 = Stock.Builder().with_symbol(symbol).with_company_name(name2).build()
 
-        # With ID-based equality, stocks with same symbol but different IDs are NOT equal
+        # With ID-based equality, stocks with same symbol but different IDs are
+        # NOT equal
         assert stock1 != stock2
         assert hash(stock1) != hash(stock2)
 
@@ -1050,7 +1068,8 @@ class TestStockDomainInvariants:
         stock_set = {stock1, stock2}
         assert len(stock_set) == 2  # Both stocks are in the set due to different IDs
 
-        # Repository would need to check for symbol uniqueness before allowing insert/update
+        # Repository would need to check for symbol uniqueness before allowing
+        # insert/update
 
     def test_sector_industry_consistency_invariant(self) -> None:
         """Should enforce sector-industry group consistency at all times."""
@@ -1112,7 +1131,8 @@ class TestStockDomainInvariants:
         assert stock.industry_group is None  # Cleared automatically
 
     def test_entity_validation_cascade(self) -> None:
-        """Should validate that all value object constraints are enforced through entity."""
+        """Should validate that all value object constraints are enforced through
+        entity."""
         symbol = StockSymbol("TEST")
         company_name = CompanyName("Test Corp")
 

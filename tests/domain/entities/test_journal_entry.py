@@ -94,7 +94,8 @@ class TestJournalEntry:
             )
 
     def test_create_journal_entry_with_invalid_content_raises_error(self) -> None:
-        """Should raise error for invalid content through JournalContent value object."""
+        """Should raise error for invalid content through JournalContent value
+        object."""
         with pytest.raises(ValueError, match="Journal content cannot be empty"):
             _ = JournalContent("")  # Error happens at JournalContent construction
 
@@ -190,7 +191,8 @@ class TestJournalEntry:
             .with_entry_date(date(2024, 1, 15))
             .with_content(
                 JournalContent(
-                    "This is a longer journal entry with significant market observations and analysis."
+                    "This is a longer journal entry with significant market "
+                    + "observations and analysis."
                 )
             )
             .build()
@@ -287,7 +289,9 @@ class TestJournalEntry:
             .with_entry_date(date(2024, 1, 15))
             .with_content(
                 JournalContent(
-                    "This is a very long journal entry that contains extensive market analysis and observations that should be truncated for preview purposes."
+                    "This is a very long journal entry that contains extensive "
+                    + "market analysis and observations that should be truncated for "
+                    + "preview purposes."
                 )
             )
             .build()
@@ -400,7 +404,8 @@ class TestJournalContent:
         assert len(journal_content.value) == 10000
 
     def test_journal_entry_equality_with_non_journal_entry_object(self) -> None:
-        """Test that journal entry equality returns False for non-JournalEntry objects."""
+        """Test that journal entry equality returns False for non-JournalEntry
+        objects."""
         entry = (
             JournalEntry.Builder()
             .with_entry_date(date(2024, 1, 15))

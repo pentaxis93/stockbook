@@ -102,7 +102,8 @@ class TestGradeValueObject:
             grade.value = "B"  # type: ignore[misc] - Testing immutability
 
         # Also verify that internal state is protected
-        # Note: Testing implementation detail is removed - immutability is verified above
+        # Note: Testing implementation detail is removed - immutability is
+        # verified above
 
     def test_grade_equality_with_non_grade_object(self) -> None:
         """Test that grade equality returns False for non-Grade objects."""

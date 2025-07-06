@@ -79,7 +79,8 @@ class TestQuantityArithmetic:
         assert result.value == Decimal("70")
 
     def test_subtract_resulting_in_negative_raises_error(self) -> None:
-        """Should raise error when subtraction results in negative (default behavior)."""
+        """Should raise error when subtraction results in negative (default
+        behavior)."""
         qty1 = Quantity(30)
         qty2 = Quantity(100)
         with pytest.raises(ValueError, match="Resulting quantity cannot be negative"):

@@ -73,7 +73,8 @@ class TestPortfolioBalanceTable:
         assert "stocks.id" in fk_targets
 
     def test_portfolio_balance_table_unique_constraint(self) -> None:
-        """Test that portfolio_balance table has unique constraint on portfolio_id + stock_id."""
+        """Test that portfolio_balance table has unique constraint on
+        portfolio_id + stock_id."""
         # Check for composite unique constraint
         constraints = [
             c

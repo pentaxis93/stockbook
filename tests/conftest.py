@@ -139,9 +139,10 @@ def assert_datetime_recent(dt: datetime | str, seconds: int = 5) -> None:
     now = datetime.now(UTC).replace(tzinfo=None)
 
     time_diff = abs((now - dt).total_seconds())
-    assert (
-        time_diff < seconds
-    ), f"Datetime {dt} is not recent (difference: {time_diff} seconds, limit: {seconds})"
+    assert time_diff < seconds, (
+        f"Datetime {dt} is not recent (difference: {time_diff} seconds, "
+        f"limit: {seconds})"
+    )
 
 
 def count_db_rows(table_name: str, test_db_path: Path) -> int:

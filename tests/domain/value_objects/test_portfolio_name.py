@@ -358,7 +358,8 @@ class TestPortfolioNameEdgeCases:
             _ = PortfolioName(too_long_unicode_name)
 
     def test_portfolio_name_equality_with_non_portfolio_name_object(self) -> None:
-        """Test that portfolio name equality returns False for non-PortfolioName objects."""
+        """Test that portfolio name equality returns False for non-PortfolioName
+        objects."""
         name = PortfolioName("Growth Portfolio")
 
         # Test equality with different types - should return False

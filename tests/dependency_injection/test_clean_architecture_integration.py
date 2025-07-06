@@ -31,7 +31,8 @@ class TestCleanArchitectureWiring:
         # coordinator = container.resolve(StockPageCoordinator)
 
         # Verify dependency directions are correct
-        # assert not hasattr(coordinator.controller.stock_service, '_repository')  # Should use UoW
+        # assert not hasattr(coordinator.controller.stock_service, '_repository')
+        # Should use UoW
         # assert hasattr(coordinator.controller.stock_service, '_unit_of_work')
         pass
 

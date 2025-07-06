@@ -478,7 +478,11 @@ class TestDomainEventEdgeCases:
         # Create large number of events
         for i in range(1000):
             # Generate valid symbols using letters only
-            symbol = f"{chr(ord('A') + (i % 26))}{chr(ord('A') + ((i // 26) % 26))}{chr(ord('A') + ((i // 676) % 26))}"
+            symbol = (
+                f"{chr(ord('A') + (i % 26))}"
+                f"{chr(ord('A') + ((i // 26) % 26))}"
+                f"{chr(ord('A') + ((i // 676) % 26))}"
+            )
             event = StockAddedEvent(
                 stock_symbol=StockSymbol(symbol),
                 stock_name=f"Company {i}",

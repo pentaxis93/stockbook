@@ -41,21 +41,10 @@ select = [
 ]
 
 ignore = [
-  # Line length and formatting - handled by black
-  "E501", # line-too-long
-  "W291", # trailing-whitespace
-  "W293", # blank-line-with-whitespace
-  "E203", # whitespace-before-colon (conflicts with Black)
-
-  # Docstring rules matching pydocstyle config
-  "D105", # missing-magic-method-docstring
-
-  # TODO/FIXME comments are allowed
+  "D105",   # missing-magic-method-docstring
   "FIX002", # line-contains-todo
   "ERA001", # commented-out-code (we allow TODOs)
-
-  # Allow 'id' as parameter name (matching pylint config)
-  "A002", # builtin-argument-shadowing (for 'id' parameter)
+  "A002",   # builtin-argument-shadowing (for 'id' parameter)
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -135,9 +124,6 @@ indent-style = "space"
 
 # Unix-style line endings
 line-ending = "lf"
-
-# Old tool configurations removed - now using Ruff for linting
-
 
 [tool.pytest.ini_options]
 # Test discovery and execution
@@ -228,10 +214,6 @@ reportAssertAlwaysTrue = true
 reportSelfClsParameterName = true
 reportImplicitStringConcatenation = true
 
-# Note: We use Pyright for type checking (see [tool.pyright] section)
-# MyPy was removed to avoid conflicts and redundancy
-
-
 [tool.importlinter]
 root_package = "src"
 
@@ -244,6 +226,3 @@ modules = ["src.domain"]
 name = "Layered architecture"
 type = "layers"
 layers = ["src.infrastructure", "src.application", "src.domain"]
-# Infrastructure layer now added
-
-# Removed pydocstyle and bandit configurations - now using Ruff

@@ -41,7 +41,8 @@ class PortfolioCalculationService:
         """Initialize portfolio calculation service with optional configuration.
 
         Args:
-            config: Configuration settings for portfolio calculations, uses defaults if None
+            config: Configuration settings for portfolio calculations, uses
+                defaults if None
         """
         self.config = config or PortfolioCalculationConfig()
 

@@ -238,7 +238,8 @@ class TestUnitOfWorkIntegration:
             # Access portfolios repository - should work without error
             portfolios_repo = uow.portfolios
             assert portfolios_repo is not None
-            # Note: This is a placeholder repository, not yet implementing IPortfolioRepository
+            # Note: This is a placeholder repository, not yet implementing
+            # IPortfolioRepository
 
             # Verify same instances are returned on subsequent calls
             assert uow.stocks is stocks_repo

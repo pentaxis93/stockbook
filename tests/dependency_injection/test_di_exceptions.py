@@ -104,7 +104,10 @@ class TestDuplicateRegistrationError:
         """Should show what was previously registered."""
         error = DuplicateRegistrationError(
             MockService,
-            "MockService is already registered as ServiceImpl, cannot register as AnotherImpl",
+            (
+                "MockService is already registered as ServiceImpl, cannot register "
+                + "as AnotherImpl"
+            ),
         )
 
         error_str = str(error)
