@@ -5,6 +5,8 @@ This module tests the IndexChange value object which encapsulates
 percentage change validation and business logic for portfolio index tracking.
 """
 
+import contextlib
+
 import pytest
 
 from src.domain.value_objects.index_change import IndexChange
@@ -350,12 +352,9 @@ class TestIndexChangeEdgeCases:
 
         # Test values that would exceed boundaries after rounding
         # Note: The actual implementation might handle this differently
-        try:
+        with contextlib.suppress(ValueError):
             _ = IndexChange(100.005)  # Would round to 100.01
             # If this doesn't raise an error, the implementation allows it
-        except ValueError:
-            # This is expected if the implementation validates after rounding
-            pass
 
     def test_index_change_equality_with_non_index_change_object(self) -> None:
         """Test that index change equality returns False for non-IndexChange objects."""

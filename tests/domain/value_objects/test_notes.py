@@ -5,6 +5,8 @@ Following TDD approach - these tests define the expected behavior
 of the Notes value object with validation.
 """
 
+import contextlib
+
 import pytest
 
 from src.domain.value_objects.notes import Notes
@@ -134,10 +136,8 @@ class TestNotes:
 
         # Test exception handling coverage (line 117)
         # This test exercises the exception re-raising path
-        try:
+        with contextlib.suppress(ValueError):
             _ = Notes("A" * 1001)  # Too long, should raise ValueError
-        except ValueError:
-            pass  # Expected, we just want to exercise the exception path
 
     def test_notes_unexpected_value_error(self) -> None:
         """Test Notes handles unexpected ValueError from parent class."""

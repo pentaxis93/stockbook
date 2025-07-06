@@ -51,13 +51,10 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
-  "S101",    # assert statements allowed in tests
   "PLR2004", # magic values allowed in tests
   "D",       # docstrings not required in tests
-  "PLC0415", # import-outside-toplevel allowed in tests
   "PLR0914", # too-many-locals allowed in tests (was max-locals=15)
   "PLR0915", # too-many-statements allowed in tests (was max-statements=30)
-  "PLR1722", # sys-exit allowed in tests
   "PLR0911", # too-many-return-statements
   "PLR0912", # too-many-branches
   "B017",    # pytest.raises(Exception) allowed in tests
@@ -67,7 +64,6 @@ convention = "google"
   "PLR0124", # comparison-with-itself allowed for equality tests
   "B007",    # unused-loop-control-variable allowed in tests
   "SIM103",  # return-in-try-except-finally allowed in tests
-  "SIM105",  # try-except-pass allowed in tests
   "SIM117",  # nested-with allowed in tests
   "RUF001",  # ambiguous-unicode-character allowed in tests
   "S108",    # hardcoded-temp-file allowed in tests

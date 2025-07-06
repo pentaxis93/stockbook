@@ -5,6 +5,8 @@ Following TDD approach - these tests define the expected behavior
 of the CompanyName value object with validation.
 """
 
+import contextlib
+
 import pytest
 
 from src.domain.value_objects.company_name import CompanyName
@@ -115,10 +117,8 @@ class TestCompanyName:
         assert company.value == "Valid company"
 
         # Test exception handling coverage (line 36)
-        try:
+        with contextlib.suppress(ValueError):
             _ = CompanyName("A" * 201)  # Too long, should raise ValueError
-        except ValueError:
-            pass  # Expected, we just want to exercise the exception path
 
     def test_company_name_unexpected_value_error(self) -> None:
         """Test CompanyName handles unexpected ValueError from parent class."""
