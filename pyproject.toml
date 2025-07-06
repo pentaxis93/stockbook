@@ -70,48 +70,18 @@ convention = "google"
   "PLR0913", # too-many-arguments allowed in test helpers and fixtures
 ]
 
-"dependency_injection/*" = [
-  # These files already have inline disables
-  "PLR0917", # too-many-positional-arguments
-]
-
-"hooks/*" = [
-  # Hook scripts have different requirements
-  "D", # docstrings not required
-]
-
-"scripts/*" = [
+"scripts/test_all.py" = [
   # Script files have different requirements
-  "D",    # docstrings not required
   "S603", # subprocess calls are intentional in this controlled script
 ]
 
-"src/infrastructure/*" = [
-  "PLR0914", # too-many-locals (matching Makefile config)
-  "PLR0915", # too-many-statements (database_factory has 16, limit is 15)
-]
-
 "src/presentation/*" = [
-  "PLR0914", # too-many-locals
-  "PLR0915", # too-many-statements
-  "PLR0912", # too-many-branches
-  "B008",    # function-call-in-default-argument (needed for FastAPI Depends)
-  "C901",    # too-complex (error handlers need multiple exception types)
+  "B008", # function-call-in-default-argument (needed for FastAPI Depends)
 ]
 
 "src/application/*" = [
   "PLR0913", # too-many-arguments (commands need multiple parameters)
 ]
-
-[tool.ruff.format]
-# Use double quotes for strings
-quote-style = "double"
-
-# Use spaces for indentation
-indent-style = "space"
-
-# Unix-style line endings
-line-ending = "lf"
 
 [tool.pytest.ini_options]
 # Test discovery and execution
@@ -158,7 +128,6 @@ omit = [
   "conftest.py",
   "*/site-packages/*",
   "*/dist-packages/*",
-  "*/dependency_injector/*",
   "*.pxd",
 ]
 
