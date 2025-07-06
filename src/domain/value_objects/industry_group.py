@@ -1,5 +1,4 @@
-"""
-IndustryGroup value object for the StockBook domain.
+"""IndustryGroup value object for the StockBook domain.
 
 Represents an industry group classification with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from typing import Any
 
 
 class IndustryGroup:
-    """
-    Value object representing an industry group.
+    """Value object representing an industry group.
 
     Encapsulates validation logic for industry groups and ensures immutability.
     """
@@ -18,8 +16,7 @@ class IndustryGroup:
     _value: str
 
     def __init__(self, value: str):
-        """
-        Initialize IndustryGroup with validation.
+        """Initialize IndustryGroup with validation.
 
         Args:
             value: The industry group string

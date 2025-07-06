@@ -1,5 +1,4 @@
-"""
-Stock repository interface.
+"""Stock repository interface.
 
 Defines the contract for stock data persistence operations.
 """
@@ -15,8 +14,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def create(self, stock: Stock) -> str:
-        """
-        Create a new stock record.
+        """Create a new stock record.
 
         Args:
             stock: Stock domain model
@@ -32,8 +30,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def get_by_id(self, stock_id: str) -> Stock | None:
-        """
-        Retrieve stock by ID.
+        """Retrieve stock by ID.
 
         Args:
             stock_id: Stock identifier
@@ -45,8 +42,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
-        """
-        Retrieve stock by symbol.
+        """Retrieve stock by symbol.
 
         Args:
             symbol: Stock symbol value object
@@ -58,8 +54,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def get_all(self) -> list[Stock]:
-        """
-        Retrieve all stocks.
+        """Retrieve all stocks.
 
         Returns:
             List of Stock domain models
@@ -68,8 +63,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def update(self, stock_id: str, stock: Stock) -> bool:
-        """
-        Update existing stock.
+        """Update existing stock.
 
         Args:
             stock_id: Stock identifier
@@ -86,8 +80,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def delete(self, stock_id: str) -> bool:
-        """
-        Delete stock by ID.
+        """Delete stock by ID.
 
         Args:
             stock_id: Stock identifier
@@ -103,8 +96,7 @@ class IStockRepository(ABC):
 
     @abstractmethod
     def exists_by_symbol(self, symbol: StockSymbol) -> bool:
-        """
-        Check if stock exists by symbol.
+        """Check if stock exists by symbol.
 
         Args:
             symbol: Stock symbol value object to check
@@ -121,8 +113,7 @@ class IStockRepository(ABC):
         name_filter: str | None = None,
         industry_filter: str | None = None,
     ) -> list[Stock]:
-        """
-        Search stocks with multiple filter criteria.
+        """Search stocks with multiple filter criteria.
 
         Args:
             symbol_filter: Filter by symbols containing this string (case-insensitive)

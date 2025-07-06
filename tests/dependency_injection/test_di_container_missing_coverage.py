@@ -12,6 +12,7 @@ from dependency_injection.exceptions import (
     InvalidRegistrationError,
 )
 
+
 if TYPE_CHECKING:
     UnknownService = Any
 

@@ -1,5 +1,4 @@
-"""
-Money value object for the shared kernel.
+"""Money value object for the shared kernel.
 
 Provides a robust, immutable money representation that handles currency,
 arithmetic operations, and business rules consistently across all domains.
@@ -12,8 +11,7 @@ from typing import Any
 
 
 class BaseNumericValueObject(ABC):
-    """
-    Base class for numeric value objects with common operations.
+    """Base class for numeric value objects with common operations.
 
     Provides shared functionality for validation, arithmetic operations,
     comparisons, and precision handling using Decimal.
@@ -22,8 +20,7 @@ class BaseNumericValueObject(ABC):
     _value: Decimal
 
     def __init__(self, value: int | float | str | Decimal, allow_negative: bool = True):
-        """
-        Initialize numeric value object with validation.
+        """Initialize numeric value object with validation.
 
         Args:
             value: Numeric value (converted to Decimal for precision)
@@ -160,16 +157,14 @@ class BaseNumericValueObject(ABC):
 
 
 class Money(BaseNumericValueObject):
-    """
-    Simplified immutable value object representing USD monetary amounts.
+    """Simplified immutable value object representing USD monetary amounts.
 
     Focused on essential operations for stock tracking without multi-currency
     complexity or advanced allocation features.
     """
 
     def __init__(self, amount: int | float | str | Decimal):
-        """
-        Initialize Money with USD amount.
+        """Initialize Money with USD amount.
 
         Args:
             amount: Monetary amount (converted to Decimal for precision)

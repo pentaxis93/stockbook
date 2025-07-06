@@ -9,6 +9,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+
 # Unused imports removed - tests are stubs
 
 # These imports will exist after implementation

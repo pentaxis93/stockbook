@@ -2,6 +2,7 @@
 
 from setuptools import find_packages, setup
 
+
 # Only run setup() when this file is executed directly, not when imported.
 # This allows the file to be safely imported by test runners and coverage tools.
 if __name__ == "__main__":

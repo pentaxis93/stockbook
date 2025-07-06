@@ -22,6 +22,7 @@ from .infrastructure import (
     stock_builder,
 )
 
+
 # Re-export for pytest discovery
 __all__ = [
     "mock_journal_repository",

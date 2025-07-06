@@ -1,5 +1,4 @@
-"""
-Journal entry table definition using SQLAlchemy Core.
+"""Journal entry table definition using SQLAlchemy Core.
 
 This module defines the journal entry table structure for tracking
 investment research, decisions, and notes.
@@ -15,6 +14,7 @@ from .table_utils import (
     id_column,
     timestamp_columns,
 )
+
 
 # Define the journal entry table using SQLAlchemy Core
 journal_entry_table: Table = Table(

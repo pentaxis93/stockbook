@@ -1,5 +1,4 @@
-"""
-Stock models for FastAPI presentation layer.
+"""Stock models for FastAPI presentation layer.
 
 Provides Pydantic models for request/response validation and serialization
 for stock-related API endpoints.
@@ -21,8 +20,7 @@ MAX_SYMBOL_LENGTH = 5
 
 
 class StockRequest(BaseModel):
-    """
-    Request model for creating a stock.
+    """Request model for creating a stock.
 
     Validates and normalizes input data from API requests before
     passing to the application layer.
@@ -43,8 +41,7 @@ class StockRequest(BaseModel):
     @field_validator("symbol")
     @classmethod
     def validate_symbol(cls, value: str) -> str:
-        """
-        Validate and normalize stock symbol.
+        """Validate and normalize stock symbol.
 
         Args:
             value: Raw symbol string
@@ -76,8 +73,7 @@ class StockRequest(BaseModel):
     @field_validator("name")
     @classmethod
     def validate_name(cls, value: str | None) -> str | None:
-        """
-        Validate company name.
+        """Validate company name.
 
         Args:
             value: Raw name string or None
@@ -93,8 +89,7 @@ class StockRequest(BaseModel):
     @field_validator("sector", "industry_group")
     @classmethod
     def normalize_optional_strings(cls, value: str | None) -> str | None:
-        """
-        Normalize optional string fields.
+        """Normalize optional string fields.
 
         Args:
             value: Optional string value
@@ -111,8 +106,7 @@ class StockRequest(BaseModel):
     @field_validator("grade", mode="before")
     @classmethod
     def normalize_grade(cls, value: Any) -> Literal["A", "B", "C", "D", "F"] | None:
-        """
-        Normalize and validate grade.
+        """Normalize and validate grade.
 
         Args:
             value: Grade value
@@ -138,8 +132,7 @@ class StockRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_sector_industry_relationship(self) -> Self:
-        """
-        Validate that industry_group requires sector.
+        """Validate that industry_group requires sector.
 
         Returns:
             Self after validation
@@ -152,8 +145,7 @@ class StockRequest(BaseModel):
         return self
 
     def to_command(self) -> CreateStockCommand:
-        """
-        Convert request to CreateStockCommand.
+        """Convert request to CreateStockCommand.
 
         Returns:
             CreateStockCommand for application layer
@@ -169,8 +161,7 @@ class StockRequest(BaseModel):
 
 
 class StockResponse(BaseModel):
-    """
-    Response model for stock data.
+    """Response model for stock data.
 
     Provides consistent API response format for stock information.
     """
@@ -192,8 +183,7 @@ class StockResponse(BaseModel):
     @field_validator("symbol")
     @classmethod
     def validate_symbol(cls, value: str) -> str:
-        """
-        Validate required symbol field.
+        """Validate required symbol field.
 
         Args:
             value: String value
@@ -211,8 +201,7 @@ class StockResponse(BaseModel):
     @field_validator("name")
     @classmethod
     def validate_name(cls, value: str | None) -> str | None:
-        """
-        Validate optional name field.
+        """Validate optional name field.
 
         Args:
             value: String value or None
@@ -228,8 +217,7 @@ class StockResponse(BaseModel):
 
     @classmethod
     def from_dto(cls, dto: StockDto) -> "StockResponse":
-        """
-        Create response from StockDto.
+        """Create response from StockDto.
 
         Args:
             dto: Stock DTO from application layer
@@ -249,8 +237,7 @@ class StockResponse(BaseModel):
 
 
 class StockListResponse(BaseModel):
-    """
-    Response model for a list of stocks.
+    """Response model for a list of stocks.
 
     Provides paginated response format for stock listings.
     """
@@ -264,8 +251,7 @@ class StockListResponse(BaseModel):
 
     @classmethod
     def from_dto_list(cls, dtos: list[StockDto]) -> "StockListResponse":
-        """
-        Create response from list of StockDto objects.
+        """Create response from list of StockDto objects.
 
         Args:
             dtos: List of stock DTOs from application layer
@@ -278,8 +264,7 @@ class StockListResponse(BaseModel):
 
 
 class StockUpdateRequest(BaseModel):
-    """
-    Request model for updating a stock.
+    """Request model for updating a stock.
 
     All fields are optional to support partial updates.
     Validates and normalizes input data from API requests before
@@ -301,8 +286,7 @@ class StockUpdateRequest(BaseModel):
     @field_validator("symbol")
     @classmethod
     def validate_symbol(cls, value: str | None) -> str | None:
-        """
-        Validate and normalize stock symbol.
+        """Validate and normalize stock symbol.
 
         Args:
             value: Raw symbol string or None
@@ -337,8 +321,7 @@ class StockUpdateRequest(BaseModel):
     @field_validator("name")
     @classmethod
     def validate_name(cls, value: str | None) -> str | None:
-        """
-        Validate company name.
+        """Validate company name.
 
         Args:
             value: Raw name string or None
@@ -354,8 +337,7 @@ class StockUpdateRequest(BaseModel):
     @field_validator("sector", "industry_group")
     @classmethod
     def normalize_optional_strings(cls, value: str | None) -> str | None:
-        """
-        Normalize optional string fields.
+        """Normalize optional string fields.
 
         Args:
             value: Optional string value
@@ -372,8 +354,7 @@ class StockUpdateRequest(BaseModel):
     @field_validator("grade", mode="before")
     @classmethod
     def normalize_grade(cls, value: Any) -> Literal["A", "B", "C", "D", "F"] | None:
-        """
-        Normalize and validate grade.
+        """Normalize and validate grade.
 
         Args:
             value: Grade value
@@ -400,8 +381,7 @@ class StockUpdateRequest(BaseModel):
     @field_validator("notes")
     @classmethod
     def validate_notes(cls, value: str) -> str:
-        """
-        Validate notes field.
+        """Validate notes field.
 
         Args:
             value: Notes string
@@ -413,8 +393,7 @@ class StockUpdateRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_sector_industry_relationship(self) -> Self:
-        """
-        Validate that industry_group requires sector.
+        """Validate that industry_group requires sector.
 
         Returns:
             Self after validation
@@ -427,8 +406,7 @@ class StockUpdateRequest(BaseModel):
         return self
 
     def to_command(self, stock_id: str) -> UpdateStockCommand:
-        """
-        Convert request to UpdateStockCommand.
+        """Convert request to UpdateStockCommand.
 
         Args:
             stock_id: ID of the stock to update

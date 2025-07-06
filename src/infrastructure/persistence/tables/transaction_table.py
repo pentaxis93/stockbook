@@ -1,5 +1,4 @@
-"""
-Transaction table definition using SQLAlchemy Core.
+"""Transaction table definition using SQLAlchemy Core.
 
 This module defines the transaction table structure for buy/sell transactions.
 """
@@ -14,6 +13,7 @@ from .table_utils import (
     id_column,
     timestamp_columns,
 )
+
 
 # Define the transaction table using SQLAlchemy Core
 transaction_table: Table = Table(

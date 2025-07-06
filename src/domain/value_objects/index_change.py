@@ -1,5 +1,4 @@
-"""
-IndexChange value object for the StockBook domain.
+"""IndexChange value object for the StockBook domain.
 
 Represents percentage change in portfolio index with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from typing import Any
 
 
 class IndexChange:
-    """
-    Value object representing a portfolio index change percentage.
+    """Value object representing a portfolio index change percentage.
 
     Encapsulates validation logic for index changes and ensures immutability.
     Valid changes are between -100% and +100%.
@@ -20,8 +18,7 @@ class IndexChange:
     _value: float
 
     def __init__(self, value: int | float):
-        """
-        Initialize IndexChange with validation.
+        """Initialize IndexChange with validation.
 
         Args:
             value: The index change percentage as a float

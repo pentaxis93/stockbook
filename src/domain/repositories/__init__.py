@@ -1,5 +1,4 @@
-"""
-Repository interfaces for the StockBook domain.
+"""Repository interfaces for the StockBook domain.
 
 These interfaces define the contracts for data persistence
 without coupling the domain to specific implementations.
@@ -16,6 +15,7 @@ from .interfaces import (
     ITransactionRepository,
     IUnitOfWork,
 )
+
 
 # pylint: disable=duplicate-code
 # Rationale: This duplicate list is necessary for proper module re-exports.

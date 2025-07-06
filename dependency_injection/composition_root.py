@@ -1,12 +1,11 @@
-"""
-Composition root for dependency injection configuration.
+"""Composition root for dependency injection configuration.
 
 Configures the entire application's dependency graph in one central location,
 following clean architecture principles.
 """
 
-from typing import Any
 from collections.abc import Callable
+from typing import Any
 
 from sqlalchemy.engine import Engine
 
@@ -21,6 +20,7 @@ from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
 
 from .di_container import DIContainer
 
+
 # Presentation layer imports removed - will be rebuilt later
 
 
@@ -31,8 +31,7 @@ from .di_container import DIContainer
 
 
 class CompositionRoot:
-    """
-    Central configuration point for dependency injection.
+    """Central configuration point for dependency injection.
 
     Responsible for wiring up the entire application dependency graph
     in a way that respects clean architecture boundaries.
@@ -45,8 +44,7 @@ class CompositionRoot:
         config: dict[str, Any] | None = None,
         extra_registrations: Callable[[DIContainer], None] | None = None,
     ) -> DIContainer:
-        """
-        Configure the complete application dependency graph.
+        """Configure the complete application dependency graph.
 
         Args:
             database_path: Path to the SQLite database file (defaults to Config.db_path)
@@ -82,8 +80,7 @@ class CompositionRoot:
     def _configure_infrastructure_layer(
         cls, container: DIContainer, db_path: str
     ) -> None:
-        """
-        Configure infrastructure layer dependencies.
+        """Configure infrastructure layer dependencies.
 
         Args:
             container: DI container to configure

@@ -1,5 +1,4 @@
-"""
-TransactionType value object for the StockBook domain.
+"""TransactionType value object for the StockBook domain.
 
 Represents transaction types (buy/sell) with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from typing import Any, ClassVar
 
 
 class TransactionType:
-    """
-    Value object representing a transaction type.
+    """Value object representing a transaction type.
 
     Encapsulates validation logic for transaction types and ensures immutability.
     Only allows 'buy' and 'sell' transaction types.
@@ -19,8 +17,7 @@ class TransactionType:
     _value: str
 
     def __init__(self, value: str):
-        """
-        Initialize TransactionType with validation.
+        """Initialize TransactionType with validation.
 
         Args:
             value: The transaction type string
@@ -49,8 +46,7 @@ class TransactionType:
         return self._value
 
     def is_buy(self) -> bool:
-        """
-        Check if this is a buy transaction.
+        """Check if this is a buy transaction.
 
         Returns:
             True if transaction type is 'buy', False otherwise
@@ -58,8 +54,7 @@ class TransactionType:
         return self._value == "buy"
 
     def is_sell(self) -> bool:
-        """
-        Check if this is a sell transaction.
+        """Check if this is a sell transaction.
 
         Returns:
             True if transaction type is 'sell', False otherwise

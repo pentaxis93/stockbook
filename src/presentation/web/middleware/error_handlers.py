@@ -1,5 +1,4 @@
-"""
-Error handling middleware for web endpoints.
+"""Error handling middleware for web endpoints.
 
 Provides decorators and utilities for consistent error handling
 across all API endpoints.
@@ -7,10 +6,11 @@ across all API endpoints.
 
 import functools
 import logging
-from typing import Any, TypeVar
 from collections.abc import Callable
+from typing import Any, TypeVar
 
 from fastapi import HTTPException, status
+
 
 logger = logging.getLogger(__name__)
 
@@ -26,8 +26,7 @@ ERROR_MESSAGES = {
 
 
 def handle_stock_errors(func: F) -> F:
-    """
-    Decorator for handling common stock-related errors.
+    """Decorator for handling common stock-related errors.
 
     Converts domain exceptions to appropriate HTTP responses:
     - ValueError with "already exists" -> 400 Bad Request

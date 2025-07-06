@@ -8,7 +8,7 @@ following TDD principles to define expected behavior before implementation.
 # pyright: reportPrivateUsage=false, reportUnknownArgumentType=false
 # pyright: reportUnusedImport=false, reportUnusedCallResult=false
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest

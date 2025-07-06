@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of domain events used for inter-aggregate communication.
 """
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import pytest

@@ -1,5 +1,4 @@
-"""
-Domain service exceptions - simplified starter kit.
+"""Domain service exceptions - simplified starter kit.
 
 Provides a focused set of exceptions with clear patterns for common
 domain service error scenarios. Designed to teach best practices
@@ -10,8 +9,7 @@ from typing import Any
 
 
 class DomainServiceError(Exception):
-    """
-    Base exception for all domain service errors.
+    """Base exception for all domain service errors.
 
     Provides common error handling patterns with optional context details.
     All domain service exceptions should inherit from this class.
@@ -30,8 +28,7 @@ class DomainServiceError(Exception):
 
 
 class ValidationError(DomainServiceError):
-    """
-    Raised when input validation fails.
+    """Raised when input validation fails.
 
     Use this when data doesn't meet business rules or format requirements.
     Includes optional field and value context for debugging.
@@ -54,8 +51,7 @@ class ValidationError(DomainServiceError):
 
 
 class CalculationError(DomainServiceError):
-    """
-    Raised when business calculations fail.
+    """Raised when business calculations fail.
 
     Use this when mathematical operations cannot be completed
     due to invalid inputs, missing data, or calculation constraints.
@@ -73,8 +69,7 @@ class CalculationError(DomainServiceError):
 
 
 class InsufficientDataError(DomainServiceError):
-    """
-    Raised when required data is missing for operations.
+    """Raised when required data is missing for operations.
 
     Use this when analysis or calculations cannot proceed
     due to missing required information.

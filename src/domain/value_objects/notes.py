@@ -1,5 +1,4 @@
-"""
-Notes value object for the StockBook domain.
+"""Notes value object for the StockBook domain.
 
 Represents notes/comments with validation rules and immutability.
 """
@@ -9,8 +8,7 @@ from typing import Any
 
 
 class BaseTextValueObject(ABC):
-    """
-    Base class for text-based value objects with validation.
+    """Base class for text-based value objects with validation.
 
     Provides common functionality for text validation, normalization,
     and immutability enforcement.
@@ -21,8 +19,7 @@ class BaseTextValueObject(ABC):
     def __init__(
         self, value: str, max_length: int | None = None, allow_empty: bool = True
     ):
-        """
-        Initialize text value object with validation.
+        """Initialize text value object with validation.
 
         Args:
             value: The text value
@@ -55,8 +52,7 @@ class BaseTextValueObject(ABC):
         return self._value
 
     def has_content(self) -> bool:
-        """
-        Check if value has content.
+        """Check if value has content.
 
         Returns:
             True if value has non-empty content, False otherwise
@@ -89,8 +85,7 @@ class BaseTextValueObject(ABC):
 
 
 class Notes(BaseTextValueObject):
-    """
-    Value object representing notes/comments.
+    """Value object representing notes/comments.
 
     Encapsulates validation logic for notes and ensures immutability.
     """
@@ -98,8 +93,7 @@ class Notes(BaseTextValueObject):
     MAX_LENGTH = 1000
 
     def __init__(self, value: str):
-        """
-        Initialize Notes with validation.
+        """Initialize Notes with validation.
 
         Args:
             value: The notes string

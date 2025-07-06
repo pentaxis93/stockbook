@@ -1,5 +1,4 @@
-"""
-Transaction repository interface.
+"""Transaction repository interface.
 
 Defines the contract for transaction data persistence operations.
 """
@@ -15,8 +14,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def create(self, transaction: Transaction) -> str:
-        """
-        Create a new transaction.
+        """Create a new transaction.
 
         Args:
             transaction: Transaction domain model
@@ -33,8 +31,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_id(self, transaction_id: str) -> Transaction | None:
-        """
-        Retrieve transaction by ID.
+        """Retrieve transaction by ID.
 
         Args:
             transaction_id: Transaction identifier
@@ -48,8 +45,7 @@ class ITransactionRepository(ABC):
     def get_by_portfolio(
         self, portfolio_id: str, limit: int | None = None
     ) -> list[Transaction]:
-        """
-        Retrieve transactions for a specific portfolio.
+        """Retrieve transactions for a specific portfolio.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -64,8 +60,7 @@ class ITransactionRepository(ABC):
     def get_by_stock(
         self, stock_id: str, portfolio_id: str | None = None
     ) -> list[Transaction]:
-        """
-        Retrieve transactions for a specific stock.
+        """Retrieve transactions for a specific stock.
 
         Args:
             stock_id: Stock identifier
@@ -80,8 +75,7 @@ class ITransactionRepository(ABC):
     def get_by_date_range(
         self, start_date: date, end_date: date, portfolio_id: str | None = None
     ) -> list[Transaction]:
-        """
-        Retrieve transactions within a date range.
+        """Retrieve transactions within a date range.
 
         Args:
             start_date: Start date (inclusive)
@@ -95,8 +89,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def update(self, transaction_id: str, transaction: Transaction) -> bool:
-        """
-        Update existing transaction.
+        """Update existing transaction.
 
         Args:
             transaction_id: Transaction identifier
@@ -114,8 +107,7 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def delete(self, transaction_id: str) -> bool:
-        """
-        Delete transaction by ID.
+        """Delete transaction by ID.
 
         Args:
             transaction_id: Transaction identifier

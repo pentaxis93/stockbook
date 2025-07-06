@@ -41,35 +41,18 @@ select = [
 ]
 
 ignore = [
-  # Matching current pylint disables
-
   # Line length and formatting - handled by black
   "E501", # line-too-long
   "W291", # trailing-whitespace
   "W293", # blank-line-with-whitespace
   "E203", # whitespace-before-colon (conflicts with Black)
 
-  # Import organization - some conflicts with our structure
-  "I001", # unsorted-imports (we have specific ordering)
-
   # Docstring rules matching pydocstyle config
-  "D100", # missing-module-docstring
-  "D104", # missing-package-docstring
   "D105", # missing-magic-method-docstring
-  "D212", # multi-line-summary-first-line (conflicts with D213)
 
   # TODO/FIXME comments are allowed
   "FIX002", # line-contains-todo
-  "FIX004", # line-contains-fixme
   "ERA001", # commented-out-code (we allow TODOs)
-
-  # Security rules that need case-by-case review
-  "S101", # assert-used (needed in tests)
-  "S105", # hardcoded-password-string (false positives)
-  "S106", # hardcoded-password-func-arg
-
-  # Unnecessary pass statements (matching pylint config)
-  "PIE790", # unnecessary-pass
 
   # Allow 'id' as parameter name (matching pylint config)
   "A002", # builtin-argument-shadowing (for 'id' parameter)
@@ -97,6 +80,7 @@ lines-after-imports = 2
   "PLR0911", # too-many-return-statements
   "PLR0912", # too-many-branches
   "B017",    # pytest.raises(Exception) allowed in tests
+  "S101",    # assert-used (needed in tests)
   "S608",    # SQL injection not a concern in test fixtures
   "A001",    # builtin shadowing allowed in tests (id)
   "PLR0124", # comparison-with-itself allowed for equality tests
@@ -263,4 +247,3 @@ layers = ["src.infrastructure", "src.application", "src.domain"]
 # Infrastructure layer now added
 
 # Removed pydocstyle and bandit configurations - now using Ruff
-

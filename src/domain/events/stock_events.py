@@ -1,5 +1,4 @@
-"""
-Stock-related domain events.
+"""Stock-related domain events.
 
 Events that represent significant occurrences in the stock subdomain.
 """
@@ -11,8 +10,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class StockAddedEvent(DomainEvent):
-    """
-    Event raised when a new stock is added to the system.
+    """Event raised when a new stock is added to the system.
 
     This event can be used by other parts of the system to react to
     new stocks being available for trading.
@@ -25,8 +23,7 @@ class StockAddedEvent(DomainEvent):
         stock_id: int,
         occurred_at: datetime | None = None,
     ):
-        """
-        Initialize StockAddedEvent.
+        """Initialize StockAddedEvent.
 
         Args:
             stock_symbol: Symbol of the added stock

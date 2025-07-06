@@ -1,5 +1,4 @@
-"""
-Target table definition using SQLAlchemy Core.
+"""Target table definition using SQLAlchemy Core.
 
 This module defines the target table structure for portfolio allocation targets.
 """
@@ -15,6 +14,7 @@ from sqlalchemy import (
 from src.infrastructure.persistence.tables.stock_table import metadata
 
 from .table_utils import foreign_key_column, id_column, timestamp_columns
+
 
 # Define the target table using SQLAlchemy Core
 target_table: Table = Table(

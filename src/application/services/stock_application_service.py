@@ -1,5 +1,4 @@
-"""
-Stock application service.
+"""Stock application service.
 
 Orchestrates stock-related use cases and coordinates between
 domain entities and repositories.
@@ -18,16 +17,14 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class StockApplicationService:
-    """
-    Application service for stock operations.
+    """Application service for stock operations.
 
     Provides high-level use case operations for stock management,
     coordinating between domain entities and repositories.
     """
 
     def __init__(self, unit_of_work: IStockBookUnitOfWork):
-        """
-        Initialize service with unit of work.
+        """Initialize service with unit of work.
 
         Args:
             unit_of_work: Unit of work for transaction management
@@ -35,8 +32,7 @@ class StockApplicationService:
         self._unit_of_work = unit_of_work
 
     def create_stock(self, command: CreateStockCommand) -> StockDto:
-        """
-        Create a new stock.
+        """Create a new stock.
 
         Args:
             command: Command containing stock creation data
@@ -89,8 +85,7 @@ class StockApplicationService:
             raise
 
     def get_stock_by_symbol(self, symbol: str) -> StockDto | None:
-        """
-        Retrieve stock by symbol.
+        """Retrieve stock by symbol.
 
         Args:
             symbol: Stock symbol to search for
@@ -108,8 +103,7 @@ class StockApplicationService:
             return StockDto.from_entity(stock_entity)
 
     def get_stock_by_id(self, stock_id: str) -> StockDto | None:
-        """
-        Retrieve stock by ID.
+        """Retrieve stock by ID.
 
         Args:
             stock_id: Stock ID to search for
@@ -126,8 +120,7 @@ class StockApplicationService:
             return StockDto.from_entity(stock_entity)
 
     def get_all_stocks(self) -> list[StockDto]:
-        """
-        Retrieve all stocks.
+        """Retrieve all stocks.
 
         Returns:
             List of stock DTOs
@@ -137,8 +130,7 @@ class StockApplicationService:
             return [StockDto.from_entity(entity) for entity in stock_entities]
 
     def stock_exists(self, symbol: str) -> bool:
-        """
-        Check if stock exists by symbol.
+        """Check if stock exists by symbol.
 
         Args:
             symbol: Stock symbol to check
@@ -156,8 +148,7 @@ class StockApplicationService:
         name_filter: str | None = None,
         industry_filter: str | None = None,
     ) -> list[StockDto]:
-        """
-        Search stocks with multiple filter criteria.
+        """Search stocks with multiple filter criteria.
 
         Args:
             symbol_filter: Filter by symbols containing this string (case-insensitive)
@@ -176,8 +167,7 @@ class StockApplicationService:
             return [StockDto.from_entity(entity) for entity in stock_entities]
 
     def update_stock(self, command: UpdateStockCommand) -> StockDto:
-        """
-        Update an existing stock.
+        """Update an existing stock.
 
         Args:
             command: Command containing stock update data

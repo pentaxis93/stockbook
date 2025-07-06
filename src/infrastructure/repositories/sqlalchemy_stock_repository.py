@@ -1,5 +1,4 @@
-"""
-SQLAlchemy Core implementation of the Stock repository.
+"""SQLAlchemy Core implementation of the Stock repository.
 
 This module provides a concrete implementation of IStockRepository using
 SQLAlchemy Core, maintaining clean architecture separation by avoiding ORM.
@@ -7,17 +6,17 @@ SQLAlchemy Core, maintaining clean architecture separation by avoiding ORM.
 
 # pyright: reportUnknownArgumentType=false, reportUnknownMemberType=false, reportArgumentType=false
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
 
-from sqlalchemy import delete as sql_delete
 from sqlalchemy import (
+    delete as sql_delete,
     exc,
     func,
     insert,
     select,
+    update as sql_update,
 )
-from sqlalchemy import update as sql_update
 
 from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import IStockRepository
@@ -34,8 +33,7 @@ from src.infrastructure.persistence.tables.stock_table import stock_table
 
 
 class SqlAlchemyStockRepository(IStockRepository):
-    """
-    SQLAlchemy Core implementation of the stock repository.
+    """SQLAlchemy Core implementation of the stock repository.
 
     This repository uses SQLAlchemy Core (not ORM) to maintain clean
     architecture separation while providing database persistence for
@@ -43,8 +41,7 @@ class SqlAlchemyStockRepository(IStockRepository):
     """
 
     def __init__(self, connection: IDatabaseConnection) -> None:
-        """
-        Initialize the repository with a database connection.
+        """Initialize the repository with a database connection.
 
         Args:
             connection: Database connection supporting SQLAlchemy Core operations
@@ -52,8 +49,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         self._connection = connection
 
     def create(self, stock: Stock) -> str:
-        """
-        Create a new stock record in the database.
+        """Create a new stock record in the database.
 
         Args:
             stock: Stock domain entity to persist
@@ -85,8 +81,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             raise
 
     def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
-        """
-        Retrieve stock by symbol.
+        """Retrieve stock by symbol.
 
         Args:
             symbol: Stock symbol value object
@@ -110,8 +105,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         return self._row_to_entity(row_dict)
 
     def _entity_to_row(self, stock: Stock) -> dict[str, Any]:
-        """
-        Convert Stock entity to database row dictionary.
+        """Convert Stock entity to database row dictionary.
 
         Args:
             stock: Stock domain entity
@@ -136,8 +130,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         }
 
     def _row_to_entity(self, row: dict[str, Any]) -> Stock:
-        """
-        Convert database row to Stock entity.
+        """Convert database row to Stock entity.
 
         Args:
             row: Database row as dictionary
@@ -167,8 +160,7 @@ class SqlAlchemyStockRepository(IStockRepository):
     # Stub implementations for other interface methods (to be implemented later)
 
     def get_by_id(self, stock_id: str) -> Stock | None:
-        """
-        Retrieve stock by ID.
+        """Retrieve stock by ID.
 
         Args:
             stock_id: Unique identifier of the stock
@@ -192,8 +184,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         return self._row_to_entity(row_dict)
 
     def get_all(self) -> list[Stock]:
-        """
-        Retrieve all stocks from the database.
+        """Retrieve all stocks from the database.
 
         Returns:
             List of Stock domain entities
@@ -212,8 +203,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         ]
 
     def update(self, stock_id: str, stock: Stock) -> bool:
-        """
-        Update an existing stock record.
+        """Update an existing stock record.
 
         Args:
             stock_id: ID of the stock to update
@@ -258,8 +248,7 @@ class SqlAlchemyStockRepository(IStockRepository):
             raise
 
     def delete(self, stock_id: str) -> bool:
-        """
-        Delete a stock record from the database.
+        """Delete a stock record from the database.
 
         Args:
             stock_id: ID of the stock to delete
@@ -281,8 +270,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         return bool(result.rowcount > 0)
 
     def exists_by_symbol(self, symbol: StockSymbol) -> bool:
-        """
-        Check if a stock with the given symbol exists.
+        """Check if a stock with the given symbol exists.
 
         Args:
             symbol: Stock symbol to check
@@ -312,8 +300,7 @@ class SqlAlchemyStockRepository(IStockRepository):
         name_filter: str | None = None,
         industry_filter: str | None = None,
     ) -> list[Stock]:
-        """
-        Search for stocks based on optional filters.
+        """Search for stocks based on optional filters.
 
         Args:
             symbol_filter: Pattern to match against stock symbols (case-insensitive)

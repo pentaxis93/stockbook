@@ -1,5 +1,4 @@
-"""
-Portfolio balance repository interface.
+"""Portfolio balance repository interface.
 
 Defines the contract for portfolio balance data persistence operations.
 """
@@ -15,8 +14,7 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def create(self, balance: PortfolioBalance) -> str:
-        """
-        Create or update portfolio balance for a date.
+        """Create or update portfolio balance for a date.
 
         Args:
             balance: PortfolioBalance domain model
@@ -32,8 +30,7 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_by_id(self, balance_id: str) -> PortfolioBalance | None:
-        """
-        Retrieve portfolio balance by ID.
+        """Retrieve portfolio balance by ID.
 
         Args:
             balance_id: Balance record identifier
@@ -47,8 +44,7 @@ class IPortfolioBalanceRepository(ABC):
     def get_by_portfolio_and_date(
         self, portfolio_id: str, balance_date: date
     ) -> PortfolioBalance | None:
-        """
-        Retrieve portfolio balance for a specific date.
+        """Retrieve portfolio balance for a specific date.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -63,8 +59,7 @@ class IPortfolioBalanceRepository(ABC):
     def get_history(
         self, portfolio_id: str, limit: int | None = None
     ) -> list[PortfolioBalance]:
-        """
-        Retrieve balance history for a portfolio.
+        """Retrieve balance history for a portfolio.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -77,8 +72,7 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_latest_balance(self, portfolio_id: str) -> PortfolioBalance | None:
-        """
-        Retrieve the most recent balance for a portfolio.
+        """Retrieve the most recent balance for a portfolio.
 
         Args:
             portfolio_id: Portfolio identifier

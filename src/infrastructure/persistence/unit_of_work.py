@@ -1,5 +1,4 @@
-"""
-Unit of Work implementation using SQLAlchemy.
+"""Unit of Work implementation using SQLAlchemy.
 
 This module provides a concrete implementation of the Unit of Work pattern
 using SQLAlchemy for transaction management and repository coordination.
@@ -28,16 +27,14 @@ from src.infrastructure.repositories.sqlalchemy_stock_repository import (
 
 
 class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
-    """
-    SQLAlchemy implementation of the Unit of Work pattern.
+    """SQLAlchemy implementation of the Unit of Work pattern.
 
     Manages database transactions and provides repository instances
     that share the same transactional connection.
     """
 
     def __init__(self, engine: Engine) -> None:
-        """
-        Initialize unit of work with SQLAlchemy engine.
+        """Initialize unit of work with SQLAlchemy engine.
 
         Args:
             engine: SQLAlchemy engine for database connections
@@ -53,8 +50,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         self._journal: IJournalRepository | None = None
 
     def __enter__(self) -> "SqlAlchemyUnitOfWork":
-        """
-        Enter the unit of work context.
+        """Enter the unit of work context.
 
         Creates a new database connection and begins a transaction.
 
@@ -82,8 +78,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         exc_val: Exception | None,
         exc_tb: Any | None,
     ) -> bool | None:
-        """
-        Exit the unit of work context.
+        """Exit the unit of work context.
 
         Commits transaction on success, rolls back on exception.
 
@@ -192,8 +187,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         return self._journal  # type: ignore[return-value]
 
     def commit(self) -> None:
-        """
-        Commit all changes made during this unit of work.
+        """Commit all changes made during this unit of work.
 
         Raises:
             RuntimeError: If unit of work is not active
@@ -204,8 +198,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             self._db_connection.commit()
 
     def rollback(self) -> None:
-        """
-        Rollback all changes made during this unit of work.
+        """Rollback all changes made during this unit of work.
 
         This should restore the system to the state it was in
         before this unit of work began.
@@ -218,8 +211,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             self._db_connection.rollback()
 
     def _ensure_active(self) -> None:
-        """
-        Ensure unit of work is active.
+        """Ensure unit of work is active.
 
         Raises:
             RuntimeError: If unit of work is not active

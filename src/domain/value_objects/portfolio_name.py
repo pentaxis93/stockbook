@@ -1,5 +1,4 @@
-"""
-PortfolioName value object for the StockBook domain.
+"""PortfolioName value object for the StockBook domain.
 
 Represents portfolio names with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from typing import Any
 
 
 class PortfolioName:
-    """
-    Value object representing a portfolio name.
+    """Value object representing a portfolio name.
 
     Encapsulates validation logic for portfolio names and ensures immutability.
     Portfolio names must be non-empty and cannot exceed 100 characters.
@@ -19,8 +17,7 @@ class PortfolioName:
     _value: str
 
     def __init__(self, value: str):
-        """
-        Initialize PortfolioName with validation.
+        """Initialize PortfolioName with validation.
 
         Args:
             value: The portfolio name string

@@ -1,5 +1,4 @@
-"""
-Create stock command.
+"""Create stock command.
 
 Command object encapsulating the intention to create a new stock
 with all necessary validation and normalization.
@@ -12,8 +11,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class CreateStockCommand:
-    """
-    Command to create a new stock in the system.
+    """Command to create a new stock in the system.
 
     Encapsulates all data needed to create a stock, with validation
     to ensure the command is well-formed before execution.
@@ -38,8 +36,7 @@ class CreateStockCommand:
         grade: str | None = None,
         notes: str = "",
     ):
-        """
-        Initialize CreateStockCommand with validation.
+        """Initialize CreateStockCommand with validation.
 
         Args:
             symbol: Stock symbol (will be normalized)

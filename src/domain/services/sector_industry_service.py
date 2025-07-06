@@ -1,5 +1,4 @@
-"""
-Domain service for managing sector-industry group relationships.
+"""Domain service for managing sector-industry group relationships.
 
 Provides validation and lookup capabilities for the sector-industry group hierarchy.
 """
@@ -8,8 +7,7 @@ from typing import ClassVar
 
 
 class SectorIndustryService:
-    """
-    Domain service for sector-industry group relationship management.
+    """Domain service for sector-industry group relationship management.
 
     Maintains the configuration of which industry groups belong to which sectors
     and provides validation methods.
@@ -63,8 +61,7 @@ class SectorIndustryService:
     }
 
     def get_available_sectors(self) -> list[str]:
-        """
-        Get list of all available sectors.
+        """Get list of all available sectors.
 
         Returns:
             List of sector names
@@ -72,8 +69,7 @@ class SectorIndustryService:
         return list(self.SECTOR_INDUSTRY_MAPPING.keys())
 
     def get_industry_groups_for_sector(self, sector: str) -> list[str]:
-        """
-        Get list of industry groups available for a given sector.
+        """Get list of industry groups available for a given sector.
 
         Args:
             sector: Sector name
@@ -95,8 +91,7 @@ class SectorIndustryService:
     def validate_sector_industry_combination(
         self, sector: str, industry_group: str
     ) -> bool:
-        """
-        Validate that an industry group belongs to the specified sector.
+        """Validate that an industry group belongs to the specified sector.
 
         Args:
             sector: Sector name
@@ -114,8 +109,7 @@ class SectorIndustryService:
     def validate_sector_industry_combination_strict(
         self, sector: str, industry_group: str
     ) -> None:
-        """
-        Validate sector-industry combination with exceptions.
+        """Validate sector-industry combination with exceptions.
 
         Args:
             sector: Sector name
@@ -133,8 +127,7 @@ class SectorIndustryService:
             )
 
     def get_sector_for_industry_group(self, industry_group: str) -> str:
-        """
-        Find which sector contains the given industry group.
+        """Find which sector contains the given industry group.
 
         Args:
             industry_group: Industry group name

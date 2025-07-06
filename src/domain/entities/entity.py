@@ -1,5 +1,4 @@
-"""
-Base entity class for domain entities.
+"""Base entity class for domain entities.
 
 Provides common functionality for all domain entities following DDD principles.
 """
@@ -7,6 +6,7 @@ Provides common functionality for all domain entities following DDD principles.
 import uuid
 from abc import ABC
 from typing import Any, Self, TypeVar
+
 
 T = TypeVar("T", bound="Entity")
 

@@ -1,5 +1,4 @@
-"""
-Consolidated value objects for portfolio analysis and metrics.
+"""Consolidated value objects for portfolio analysis and metrics.
 
 Simple, focused data structures that represent the results of portfolio
 calculations, risk assessment, and analysis operations.

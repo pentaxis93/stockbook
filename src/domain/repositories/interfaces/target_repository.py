@@ -1,5 +1,4 @@
-"""
-Target repository interface.
+"""Target repository interface.
 
 Defines the contract for target data persistence operations.
 """
@@ -14,8 +13,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def create(self, target: Target) -> str:
-        """
-        Create a new target.
+        """Create a new target.
 
         Args:
             target: Target domain model
@@ -31,8 +29,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def get_by_id(self, target_id: str) -> Target | None:
-        """
-        Retrieve target by ID.
+        """Retrieve target by ID.
 
         Args:
             target_id: Target identifier
@@ -44,8 +41,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def get_active_by_portfolio(self, portfolio_id: str) -> list[Target]:
-        """
-        Retrieve active targets for a portfolio.
+        """Retrieve active targets for a portfolio.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -57,8 +53,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def get_active_by_stock(self, stock_id: str) -> list[Target]:
-        """
-        Retrieve active targets for a stock.
+        """Retrieve active targets for a stock.
 
         Args:
             stock_id: Stock identifier
@@ -70,8 +65,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def get_all_active(self) -> list[Target]:
-        """
-        Retrieve all active targets.
+        """Retrieve all active targets.
 
         Returns:
             List of active Target domain models
@@ -80,8 +74,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def update(self, target_id: str, target: Target) -> bool:
-        """
-        Update existing target.
+        """Update existing target.
 
         Args:
             target_id: Target identifier
@@ -98,8 +91,7 @@ class ITargetRepository(ABC):
 
     @abstractmethod
     def update_status(self, target_id: str, status: str) -> bool:
-        """
-        Update target status.
+        """Update target status.
 
         Args:
             target_id: Target identifier

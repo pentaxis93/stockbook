@@ -1,5 +1,4 @@
-"""
-Stock router for FastAPI endpoints.
+"""Stock router for FastAPI endpoints.
 
 Handles HTTP requests related to stock operations and delegates
 to the application layer for business logic.
@@ -19,6 +18,7 @@ from src.presentation.web.models.stock_models import (
     StockUpdateRequest,
 )
 
+
 logger = logging.getLogger(__name__)
 
 # Create router instance
@@ -33,8 +33,7 @@ router = APIRouter(
 
 
 def get_stock_service(request: Request) -> StockApplicationService:
-    """
-    Dependency function to get StockApplicationService instance from app state.
+    """Dependency function to get StockApplicationService instance from app state.
 
     Args:
         request: FastAPI request object containing app state
@@ -61,8 +60,7 @@ async def get_stocks(
     ] = None,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockListResponse:
-    """
-    Get list of stocks with optional filtering.
+    """Get list of stocks with optional filtering.
 
     Query parameters:
     - symbol: Filter by stock symbol (partial match, case-insensitive)
@@ -101,8 +99,7 @@ async def get_stock_by_id(
     stock_id: str,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockResponse:
-    """
-    Get a specific stock by its ID.
+    """Get a specific stock by its ID.
 
     Args:
         stock_id: The unique identifier of the stock
@@ -146,8 +143,7 @@ async def create_stock(
     stock_request: StockRequest,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockResponse:
-    """
-    Create a new stock.
+    """Create a new stock.
 
     Request body:
     - symbol: Stock ticker symbol (required, 1-5 letters)
@@ -180,8 +176,7 @@ async def update_stock(
     stock_update: StockUpdateRequest,
     service: StockApplicationService = Depends(get_stock_service),
 ) -> StockResponse:
-    """
-    Update an existing stock.
+    """Update an existing stock.
 
     Path parameters:
     - stock_id: The unique identifier of the stock

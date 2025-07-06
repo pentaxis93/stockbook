@@ -11,8 +11,8 @@ This module provides:
 # pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 # pyright: reportUnusedVariable=false, reportUnknownArgumentType=false
 
-from datetime import datetime, UTC
 from collections.abc import Generator
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -41,6 +41,7 @@ from src.domain.value_objects import (
 from src.infrastructure.persistence.tables import metadata
 from src.infrastructure.persistence.tables.portfolio_table import portfolio_table
 from src.infrastructure.persistence.tables.stock_table import stock_table
+
 
 # =============================================================================
 # SQLAlchemy-based Database Fixtures

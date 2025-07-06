@@ -1,5 +1,4 @@
-"""
-StockSymbol value object for representing stock ticker symbols.
+"""StockSymbol value object for representing stock ticker symbols.
 
 Provides validation, normalization, and type safety for stock symbols
 used throughout the trading application.
@@ -10,8 +9,7 @@ from typing import Any
 
 
 class StockSymbol:
-    """
-    Immutable value object representing a stock ticker symbol.
+    """Immutable value object representing a stock ticker symbol.
 
     Enforces validation rules for stock symbols including:
     - Length constraints (1-5 characters)
@@ -28,8 +26,7 @@ class StockSymbol:
     _value: str
 
     def __init__(self, symbol: str):
-        """
-        Initialize StockSymbol with validation and normalization.
+        """Initialize StockSymbol with validation and normalization.
 
         Args:
             symbol: Stock ticker symbol string
@@ -84,8 +81,7 @@ class StockSymbol:
 
     @classmethod
     def normalize(cls, symbol: str) -> str:
-        """
-        Normalize symbol format.
+        """Normalize symbol format.
 
         Args:
             symbol: Raw symbol string
@@ -97,8 +93,7 @@ class StockSymbol:
 
     @classmethod
     def is_valid(cls, symbol: str) -> bool:
-        """
-        Check if symbol is valid without creating instance.
+        """Check if symbol is valid without creating instance.
 
         Args:
             symbol: Symbol string to validate
@@ -114,8 +109,7 @@ class StockSymbol:
 
     @classmethod
     def _is_valid_format(cls, normalized_symbol: str) -> bool:
-        """
-        Check if normalized symbol matches required format.
+        """Check if normalized symbol matches required format.
 
         Args:
             normalized_symbol: Already normalized symbol

@@ -1,5 +1,4 @@
-"""
-Portfolio aggregate root entity.
+"""Portfolio aggregate root entity.
 
 Rich domain entity implementing clean architecture with value objects.
 Follows Domain-Driven Design principles with business logic encapsulation.
@@ -12,8 +11,7 @@ from src.domain.value_objects import Notes, PortfolioName
 
 
 class Portfolio(Entity):
-    """
-    Portfolio aggregate root representing a collection of investments.
+    """Portfolio aggregate root representing a collection of investments.
 
     Rich domain entity with value objects and business logic.
     Follows clean architecture and Domain-Driven Design principles.

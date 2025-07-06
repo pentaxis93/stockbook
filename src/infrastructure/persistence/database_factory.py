@@ -1,5 +1,4 @@
-"""
-Database engine factory for SQLAlchemy.
+"""Database engine factory for SQLAlchemy.
 
 This module provides factory functions for creating SQLAlchemy engines
 with appropriate configuration for SQLite databases.
@@ -10,8 +9,10 @@ with appropriate configuration for SQLite databases.
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import create_engine as sqla_create_engine
-from sqlalchemy import event
+from sqlalchemy import (
+    create_engine as sqla_create_engine,
+    event,
+)
 from sqlalchemy.engine import Engine
 from sqlalchemy.pool import StaticPool
 
@@ -23,8 +24,7 @@ def create_engine(
     echo: bool = False,
     **kwargs: Any,
 ) -> Engine:
-    """
-    Create a SQLAlchemy engine for SQLite database.
+    """Create a SQLAlchemy engine for SQLite database.
 
     Args:
         db_path: Path to the database file or ":memory:" for in-memory
@@ -82,8 +82,7 @@ def create_engine(
 
 
 def create_engine_from_config(use_test_db: bool = False) -> Engine:
-    """
-    Create a SQLAlchemy engine using application configuration.
+    """Create a SQLAlchemy engine using application configuration.
 
     Args:
         use_test_db: Whether to use test database path
@@ -102,8 +101,7 @@ def create_engine_from_config(use_test_db: bool = False) -> Engine:
 
 
 def get_database_url(db_path: str | Path) -> str:
-    """
-    Construct SQLite database URL from path.
+    """Construct SQLite database URL from path.
 
     Args:
         db_path: Database file path
@@ -119,8 +117,7 @@ def configure_sqlite_pragmas(
     enable_foreign_keys: bool = True,
     journal_mode: str | None = None,
 ) -> None:
-    """
-    Configure SQLite PRAGMA settings on a connection.
+    """Configure SQLite PRAGMA settings on a connection.
 
     Args:
         connection: SQLite database connection

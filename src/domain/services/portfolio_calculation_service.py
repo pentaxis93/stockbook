@@ -1,5 +1,4 @@
-"""
-Portfolio calculation service.
+"""Portfolio calculation service.
 
 Provides business logic for portfolio-level calculations that operate
 across multiple stocks and provide aggregated insights.
@@ -32,8 +31,7 @@ class PortfolioCalculationConfig:
 
 
 class PortfolioCalculationService:
-    """
-    Service for portfolio-level calculations and analysis.
+    """Service for portfolio-level calculations and analysis.
 
     Handles calculations that operate across multiple stocks and provide
     aggregated portfolio insights and metrics.

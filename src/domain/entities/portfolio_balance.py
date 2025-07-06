@@ -1,5 +1,4 @@
-"""
-Portfolio Balance entity.
+"""Portfolio Balance entity.
 
 Rich domain entity implementing clean architecture with value objects.
 Follows Domain-Driven Design principles with business logic encapsulation.
@@ -7,18 +6,18 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 
 from __future__ import annotations
 
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import IndexChange, Money
+
 
 if TYPE_CHECKING:
     from datetime import date
 
 
 class PortfolioBalance(Entity):
-    """
-    Portfolio Balance entity representing portfolio value at a specific date.
+    """Portfolio Balance entity representing portfolio value at a specific date.
 
     Rich domain entity with value objects and business logic.
     Follows clean architecture and Domain-Driven Design principles.

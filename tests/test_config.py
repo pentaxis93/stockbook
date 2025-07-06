@@ -14,12 +14,13 @@ Following TDD approach - tests are written first to define expected behavior.
 
 import os
 import tempfile
+from collections.abc import Iterator
 from datetime import datetime
 from pathlib import Path
-from collections.abc import Iterator
 from unittest.mock import patch
 
 import pytest
+
 
 # Import the config module (will fail initially - that's expected in TDD)
 try:

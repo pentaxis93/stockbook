@@ -1,5 +1,4 @@
-"""
-Dependency injection container implementation.
+"""Dependency injection container implementation.
 
 Provides a clean interface for dependency registration and resolution
 using dependency-injector library internally for robust functionality.
@@ -10,8 +9,8 @@ using dependency-injector library internally for robust functionality.
 # to providing a clean abstraction over the underlying DI framework.
 
 import inspect
-from typing import Any, TypeVar
 from collections.abc import Callable
+from typing import Any, TypeVar
 
 from dependency_injector import containers, providers
 from dependency_injector.errors import Error as DIError
@@ -23,6 +22,7 @@ from .exceptions import (
     InvalidRegistrationError,
 )
 from .lifetimes import Lifetime
+
 
 T = TypeVar("T")
 
@@ -58,8 +58,7 @@ class DIContainer:
     def register_singleton(
         self, service_type: type[T], implementation_type: type[T] | None = None
     ) -> None:
-        """
-        Register a type as singleton (single instance shared).
+        """Register a type as singleton (single instance shared).
 
         Args:
             service_type: The service interface or class to register
@@ -98,8 +97,7 @@ class DIContainer:
     def register_transient(
         self, service_type: type[T], implementation_type: type[T] | None = None
     ) -> None:
-        """
-        Register a type as transient (new instance each time).
+        """Register a type as transient (new instance each time).
 
         Args:
             service_type: The service interface or class to register
@@ -136,8 +134,7 @@ class DIContainer:
             ) from e
 
     def register_instance(self, service_type: type[T], instance: T) -> None:
-        """
-        Register a pre-created instance.
+        """Register a pre-created instance.
 
         Args:
             service_type: The service interface or class to register
@@ -175,8 +172,7 @@ class DIContainer:
             ) from e
 
     def register_factory(self, service_type: type[T], factory: Callable[[], T]) -> None:
-        """
-        Register a factory function to create instances.
+        """Register a factory function to create instances.
 
         Args:
             service_type: The service interface or class to register
@@ -235,8 +231,7 @@ class DIContainer:
             ) from e
 
     def resolve(self, service_type: type[T]) -> T:
-        """
-        Resolve an instance of the specified type.
+        """Resolve an instance of the specified type.
 
         Args:
             service_type: The type to resolve
@@ -273,8 +268,7 @@ class DIContainer:
                 self._resolution_chain.remove(type_name)
 
     def is_registered(self, service_type: type[Any]) -> bool:
-        """
-        Check if a service type is registered.
+        """Check if a service type is registered.
 
         Args:
             service_type: The type to check
@@ -285,8 +279,7 @@ class DIContainer:
         return service_type in self._registrations
 
     def get_registrations(self) -> list[type[Any]]:
-        """
-        Get list of all registered service types.
+        """Get list of all registered service types.
 
         Returns:
             List of registered service types
@@ -294,8 +287,7 @@ class DIContainer:
         return list(self._registrations.keys())
 
     def get_registration_info(self, service_type: type[Any]) -> RegistrationInfo | None:
-        """
-        Get registration information for a service type.
+        """Get registration information for a service type.
 
         Args:
             service_type: The type to get info for

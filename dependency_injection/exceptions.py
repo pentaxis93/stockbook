@@ -1,5 +1,4 @@
-"""
-Dependency injection exceptions.
+"""Dependency injection exceptions.
 
 Provides clear, helpful error messages for common DI configuration
 and usage mistakes.

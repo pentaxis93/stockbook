@@ -1,5 +1,4 @@
-"""
-Stock table definition using SQLAlchemy Core.
+"""Stock table definition using SQLAlchemy Core.
 
 This module defines the stock table structure using SQLAlchemy's Core
 Table construct (not ORM) to maintain clean architecture separation.
@@ -8,6 +7,7 @@ Table construct (not ORM) to maintain clean architecture separation.
 from sqlalchemy import Column, MetaData, String, Table
 
 from .table_utils import id_column, timestamp_columns
+
 
 # Create metadata instance for all tables
 metadata: MetaData = MetaData()

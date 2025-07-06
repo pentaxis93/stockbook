@@ -1,5 +1,4 @@
-"""
-Database connection interfaces for infrastructure layer.
+"""Database connection interfaces for infrastructure layer.
 
 This module defines protocols for database connections to support
 both regular and transactional connections while maintaining
@@ -13,8 +12,7 @@ from typing import Any, Protocol, runtime_checkable
 
 @runtime_checkable
 class IDatabaseConnection(Protocol):
-    """
-    Protocol for database connections supporting SQLAlchemy Core operations.
+    """Protocol for database connections supporting SQLAlchemy Core operations.
 
     This interface abstracts database connections to support both
     regular connections and transactional connections, allowing
@@ -27,8 +25,7 @@ class IDatabaseConnection(Protocol):
         parameters: dict[str, Any] | list[dict[str, Any]] | None = None,
         execution_options: dict[str, Any] | None = None,
     ) -> Any:  # SQLAlchemy Result
-        """
-        Execute a SQLAlchemy Core statement.
+        """Execute a SQLAlchemy Core statement.
 
         Args:
             statement: SQLAlchemy statement to execute
@@ -43,24 +40,21 @@ class IDatabaseConnection(Protocol):
         """
 
     def commit(self) -> None:
-        """
-        Commit the current transaction.
+        """Commit the current transaction.
 
         Note: This may be a no-op for connections already in a transaction
         managed by a Unit of Work.
         """
 
     def rollback(self) -> None:
-        """
-        Rollback the current transaction.
+        """Rollback the current transaction.
 
         Note: This may be a no-op for connections already in a transaction
         managed by a Unit of Work.
         """
 
     def close(self) -> None:
-        """
-        Close the connection.
+        """Close the connection.
 
         Note: This may be a no-op for connections managed by a connection pool
         or Unit of Work.

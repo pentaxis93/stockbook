@@ -1,5 +1,4 @@
-"""
-Database initialization module.
+"""Database initialization module.
 
 This module provides functions to initialize the database schema,
 creating all necessary tables if they don't already exist.
@@ -14,15 +13,16 @@ from sqlalchemy.engine import Engine
 from src.infrastructure.persistence.database_factory import create_engine
 
 # Import all tables to ensure they're registered with metadata
-from src.infrastructure.persistence.tables import journal_entry_table
-from src.infrastructure.persistence.tables import portfolio_balance_table
-from src.infrastructure.persistence.tables import portfolio_table
-from src.infrastructure.persistence.tables import stock_table
-from src.infrastructure.persistence.tables import target_table
-from src.infrastructure.persistence.tables import transaction_table
 from src.infrastructure.persistence.tables import (
+    journal_entry_table,
     metadata,
+    portfolio_balance_table,
+    portfolio_table,
+    stock_table,
+    target_table,
+    transaction_table,
 )
+
 
 # These imports are needed to register tables with metadata
 _ = journal_entry_table
@@ -36,8 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 def _collect_all_metadata() -> MetaData:
-    """
-    Collect all table metadata.
+    """Collect all table metadata.
 
     Returns:
         MetaData: Combined metadata from all table definitions
@@ -47,8 +46,7 @@ def _collect_all_metadata() -> MetaData:
 
 
 def _create_tables_if_not_exist(engine: Engine, table_metadata: MetaData) -> None:
-    """
-    Create all tables defined in the metadata if they don't exist.
+    """Create all tables defined in the metadata if they don't exist.
 
     Args:
         engine: SQLAlchemy engine
@@ -82,8 +80,7 @@ def _ensure_db_directory_exists(db_path: str) -> None:
 def initialize_database(
     database_url: str,
 ) -> None:
-    """
-    Initialize the database with all required tables.
+    """Initialize the database with all required tables.
 
     This function is idempotent - it can be called multiple times safely
     and will only create tables that don't already exist.

@@ -1,5 +1,4 @@
-"""
-Grade value object for the StockBook domain.
+"""Grade value object for the StockBook domain.
 
 Represents a stock grade with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from typing import Any, ClassVar
 
 
 class Grade:
-    """
-    Value object representing a stock grade.
+    """Value object representing a stock grade.
 
     Encapsulates validation logic for grades and ensures immutability.
     """
@@ -18,8 +16,7 @@ class Grade:
     _value: str
 
     def __init__(self, value: str):
-        """
-        Initialize Grade with validation.
+        """Initialize Grade with validation.
 
         Args:
             value: The grade string (A, B, C, D, F)

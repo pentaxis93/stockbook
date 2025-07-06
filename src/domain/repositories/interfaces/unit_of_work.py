@@ -1,5 +1,4 @@
-"""
-Unit of Work interfaces.
+"""Unit of Work interfaces.
 
 Defines the contracts for transaction management and repository coordination.
 """
@@ -16,8 +15,7 @@ from .transaction_repository import ITransactionRepository
 
 
 class IUnitOfWork(ABC):
-    """
-    Abstract interface for Unit of Work pattern.
+    """Abstract interface for Unit of Work pattern.
 
     Defines the contract for transaction management that ensures
     data consistency across repository operations.
@@ -25,8 +23,7 @@ class IUnitOfWork(ABC):
 
     @abstractmethod
     def __enter__(self) -> "IUnitOfWork":
-        """
-        Enter the unit of work context.
+        """Enter the unit of work context.
 
         Returns:
             Self for use in context manager
@@ -40,8 +37,7 @@ class IUnitOfWork(ABC):
         exc_val: Exception | None,
         exc_tb: Any | None,
     ) -> bool | None:
-        """
-        Exit the unit of work context.
+        """Exit the unit of work context.
 
         Args:
             exc_type: Exception type if an exception occurred
@@ -55,8 +51,7 @@ class IUnitOfWork(ABC):
 
     @abstractmethod
     def commit(self) -> None:
-        """
-        Commit all changes made during this unit of work.
+        """Commit all changes made during this unit of work.
 
         Raises:
             Exception: If commit fails for any reason
@@ -65,8 +60,7 @@ class IUnitOfWork(ABC):
 
     @abstractmethod
     def rollback(self) -> None:
-        """
-        Rollback all changes made during this unit of work.
+        """Rollback all changes made during this unit of work.
 
         This should restore the system to the state it was in
         before this unit of work began.
@@ -75,8 +69,7 @@ class IUnitOfWork(ABC):
 
 
 class IStockBookUnitOfWork(IUnitOfWork):
-    """
-    StockBook-specific Unit of Work interface.
+    """StockBook-specific Unit of Work interface.
 
     Extends the base IUnitOfWork pattern with domain-specific
     repository access for coordinating stock trading operations.

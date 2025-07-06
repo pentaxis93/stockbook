@@ -235,7 +235,8 @@
       "Bash(docker exec:*)",
       "Bash(docker rmi:*)",
       "Bash(pkill:*)",
-      "Bash(ruff check:*)"
+      "Bash(ruff check:*)",
+      "Bash(ruff rule:*)"
     ],
     "deny": []
   }

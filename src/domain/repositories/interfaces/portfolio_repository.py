@@ -1,5 +1,4 @@
-"""
-Portfolio repository interface.
+"""Portfolio repository interface.
 
 Defines the contract for portfolio data persistence operations.
 """
@@ -14,8 +13,7 @@ class IPortfolioRepository(ABC):
 
     @abstractmethod
     def create(self, portfolio: Portfolio) -> str:
-        """
-        Create a new portfolio.
+        """Create a new portfolio.
 
         Args:
             portfolio: Portfolio domain model
@@ -31,8 +29,7 @@ class IPortfolioRepository(ABC):
 
     @abstractmethod
     def get_by_id(self, portfolio_id: str) -> Portfolio | None:
-        """
-        Retrieve portfolio by ID.
+        """Retrieve portfolio by ID.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -44,8 +41,7 @@ class IPortfolioRepository(ABC):
 
     @abstractmethod
     def get_all_active(self) -> list[Portfolio]:
-        """
-        Retrieve all active portfolios.
+        """Retrieve all active portfolios.
 
         Returns:
             List of active Portfolio domain models
@@ -54,8 +50,7 @@ class IPortfolioRepository(ABC):
 
     @abstractmethod
     def get_all(self) -> list[Portfolio]:
-        """
-        Retrieve all portfolios (active and inactive).
+        """Retrieve all portfolios (active and inactive).
 
         Returns:
             List of all Portfolio domain models
@@ -64,8 +59,7 @@ class IPortfolioRepository(ABC):
 
     @abstractmethod
     def update(self, portfolio_id: str, portfolio: Portfolio) -> bool:
-        """
-        Update existing portfolio.
+        """Update existing portfolio.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -82,8 +76,7 @@ class IPortfolioRepository(ABC):
 
     @abstractmethod
     def deactivate(self, portfolio_id: str) -> bool:
-        """
-        Deactivate portfolio (soft delete).
+        """Deactivate portfolio (soft delete).
 
         Args:
             portfolio_id: Portfolio identifier

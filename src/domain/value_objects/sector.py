@@ -1,5 +1,4 @@
-"""
-Sector value object for the StockBook domain.
+"""Sector value object for the StockBook domain.
 
 Represents a sector classification with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from typing import Any
 
 
 class Sector:
-    """
-    Value object representing a sector.
+    """Value object representing a sector.
 
     Encapsulates validation logic for sectors and ensures immutability.
     """
@@ -18,8 +16,7 @@ class Sector:
     _value: str
 
     def __init__(self, value: str):
-        """
-        Initialize Sector with validation.
+        """Initialize Sector with validation.
 
         Args:
             value: The sector string

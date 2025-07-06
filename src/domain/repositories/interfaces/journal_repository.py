@@ -1,5 +1,4 @@
-"""
-Journal repository interface.
+"""Journal repository interface.
 
 Defines the contract for journal entry data persistence operations.
 """
@@ -15,8 +14,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def create(self, entry: JournalEntry) -> str:
-        """
-        Create a new journal entry.
+        """Create a new journal entry.
 
         Args:
             entry: JournalEntry domain model
@@ -32,8 +30,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_id(self, entry_id: str) -> JournalEntry | None:
-        """
-        Retrieve journal entry by ID.
+        """Retrieve journal entry by ID.
 
         Args:
             entry_id: Entry identifier
@@ -45,8 +42,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_recent(self, limit: int | None = None) -> list[JournalEntry]:
-        """
-        Retrieve recent journal entries.
+        """Retrieve recent journal entries.
 
         Args:
             limit: Maximum number of entries to return
@@ -60,8 +56,7 @@ class IJournalRepository(ABC):
     def get_by_portfolio(
         self, portfolio_id: str, limit: int | None = None
     ) -> list[JournalEntry]:
-        """
-        Retrieve journal entries for a specific portfolio.
+        """Retrieve journal entries for a specific portfolio.
 
         Args:
             portfolio_id: Portfolio identifier
@@ -76,8 +71,7 @@ class IJournalRepository(ABC):
     def get_by_stock(
         self, stock_id: str, limit: int | None = None
     ) -> list[JournalEntry]:
-        """
-        Retrieve journal entries for a specific stock.
+        """Retrieve journal entries for a specific stock.
 
         Args:
             stock_id: Stock identifier
@@ -90,8 +84,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_transaction(self, transaction_id: str) -> list[JournalEntry]:
-        """
-        Retrieve journal entries for a specific transaction.
+        """Retrieve journal entries for a specific transaction.
 
         Args:
             transaction_id: Transaction identifier
@@ -103,8 +96,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_date_range(self, start_date: date, end_date: date) -> list[JournalEntry]:
-        """
-        Retrieve journal entries within a date range.
+        """Retrieve journal entries within a date range.
 
         Args:
             start_date: Start date (inclusive)
@@ -117,8 +109,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def update(self, entry_id: str, entry: JournalEntry) -> bool:
-        """
-        Update existing journal entry.
+        """Update existing journal entry.
 
         Args:
             entry_id: Entry identifier
@@ -135,8 +126,7 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def delete(self, entry_id: str) -> bool:
-        """
-        Delete journal entry by ID.
+        """Delete journal entry by ID.
 
         Args:
             entry_id: Entry identifier

@@ -1,5 +1,4 @@
-"""
-CompanyName value object for the StockBook domain.
+"""CompanyName value object for the StockBook domain.
 
 Represents a company name with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from .notes import BaseTextValueObject
 
 
 class CompanyName(BaseTextValueObject):
-    """
-    Value object representing a company name.
+    """Value object representing a company name.
 
     Encapsulates validation logic for company names and ensures immutability.
     """
@@ -17,8 +15,7 @@ class CompanyName(BaseTextValueObject):
     MAX_LENGTH = 200
 
     def __init__(self, value: str):
-        """
-        Initialize CompanyName with validation.
+        """Initialize CompanyName with validation.
 
         Args:
             value: The company name string

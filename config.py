@@ -1,5 +1,4 @@
-"""
-Configuration management system for StockBook.
+"""Configuration management system for StockBook.
 
 This module provides centralized configuration management including:
 - Database connection settings
@@ -33,8 +32,7 @@ class ValidationError(ConfigError):
 
 
 class Config:
-    """
-    Centralized configuration management for StockBook.
+    """Centralized configuration management for StockBook.
 
     Implements singleton pattern to ensure consistent configuration
     across the application. Supports environment variable overrides
@@ -226,8 +224,7 @@ class Config:
         return [item.strip() for item in value.split(",")]
 
     def validate(self, skip_file_checks: bool = False) -> None:
-        """
-        Validate configuration settings.
+        """Validate configuration settings.
 
         Args:
             skip_file_checks: Skip file existence checks (useful for testing)

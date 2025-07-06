@@ -1,5 +1,4 @@
-"""
-Shared utilities for table definitions.
+"""Shared utilities for table definitions.
 
 This module provides factory functions for common column patterns
 to reduce duplication across table definitions while maintaining
@@ -19,8 +18,7 @@ def id_column() -> Column[Any]:
 def foreign_key_column(
     column_name: str, referenced_table: str, nullable: bool = False
 ) -> Column[Any]:
-    """
-    Create a foreign key column.
+    """Create a foreign key column.
 
     Args:
         column_name: Name of the column
@@ -39,8 +37,7 @@ def foreign_key_column(
 
 
 def timestamp_columns() -> list[Column[Any]]:
-    """
-    Create standard created_at and updated_at columns.
+    """Create standard created_at and updated_at columns.
 
     Returns:
         List containing created_at and updated_at columns
@@ -64,8 +61,7 @@ def timestamp_columns() -> list[Column[Any]]:
 def enum_check_constraint(
     column_name: str, allowed_values: list[str], constraint_name: str
 ) -> CheckConstraint:
-    """
-    Create a check constraint for enum-like columns.
+    """Create a check constraint for enum-like columns.
 
     Args:
         column_name: Name of the column to constrain

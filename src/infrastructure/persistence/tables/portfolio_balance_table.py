@@ -1,5 +1,4 @@
-"""
-Portfolio balance table definition using SQLAlchemy Core.
+"""Portfolio balance table definition using SQLAlchemy Core.
 
 This module defines the portfolio balance table structure for tracking
 current stock holdings and average costs.
@@ -10,6 +9,7 @@ from sqlalchemy import Column, Numeric, Table, UniqueConstraint, text
 from src.infrastructure.persistence.tables.stock_table import metadata
 
 from .table_utils import foreign_key_column, id_column, timestamp_columns
+
 
 # Define the portfolio balance table using SQLAlchemy Core
 portfolio_balance_table: Table = Table(

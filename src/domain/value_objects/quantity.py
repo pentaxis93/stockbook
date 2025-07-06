@@ -1,5 +1,4 @@
-"""
-Quantity value object for the shared kernel.
+"""Quantity value object for the shared kernel.
 
 Provides a robust, immutable quantity representation that handles numeric
 operations and business rules consistently across all domains.
@@ -12,16 +11,14 @@ from .money import BaseNumericValueObject
 
 
 class Quantity(BaseNumericValueObject):
-    """
-    Simplified immutable value object representing quantities.
+    """Simplified immutable value object representing quantities.
 
     Focused on essential operations for stock share quantities and basic
     numeric values without complex mathematical operations.
     """
 
     def __init__(self, value: int | float | str | Decimal):
-        """
-        Initialize Quantity with a numeric value.
+        """Initialize Quantity with a numeric value.
 
         Args:
             value: Numeric value (converted to Decimal for precision)

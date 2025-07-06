@@ -1,5 +1,4 @@
-"""
-Risk assessment service.
+"""Risk assessment service.
 
 Provides comprehensive risk assessment for individual stocks and portfolios,
 including various risk metrics and risk management analysis.
@@ -33,8 +32,7 @@ class RiskAssessmentConfig:
 
 
 class RiskAssessmentService:
-    """
-    Service for comprehensive risk assessment of stocks and portfolios.
+    """Service for comprehensive risk assessment of stocks and portfolios.
 
     Handles risk analysis that operates across multiple dimensions including
     volatility, concentration, correlation, and scenario analysis.

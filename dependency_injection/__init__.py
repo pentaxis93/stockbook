@@ -1,5 +1,4 @@
-"""
-Dependency injection system for StockBook application.
+"""Dependency injection system for StockBook application.
 
 Provides dependency injection container and composition root for clean
 architecture dependency management.
@@ -15,6 +14,7 @@ from .exceptions import (
     InvalidRegistrationError,
 )
 from .lifetimes import Lifetime
+
 
 __all__ = [
     "CircularDependencyError",

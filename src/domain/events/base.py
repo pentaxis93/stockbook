@@ -1,26 +1,23 @@
-"""
-Base domain event infrastructure.
+"""Base domain event infrastructure.
 
 Provides the foundation for domain events that enable
 loose coupling between aggregates and bounded contexts.
 """
 
 import uuid
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any
 
 
 class DomainEvent:
-    """
-    Base class for all domain events.
+    """Base class for all domain events.
 
     Domain events represent significant business occurrences
     that other parts of the system may need to react to.
     """
 
     def __init__(self, occurred_at: datetime | None = None):
-        """
-        Initialize domain event.
+        """Initialize domain event.
 
         Args:
             occurred_at: When the event occurred (defaults to now)

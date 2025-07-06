@@ -1,5 +1,4 @@
-"""
-Update stock command.
+"""Update stock command.
 
 Command object encapsulating the intention to update an existing stock
 with all necessary validation and normalization.
@@ -11,8 +10,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 
 
 class UpdateStockCommand:
-    """
-    Command to update an existing stock in the system.
+    """Command to update an existing stock in the system.
 
     Encapsulates all data needed to update a stock, with validation
     to ensure the command is well-formed before execution.
@@ -39,8 +37,7 @@ class UpdateStockCommand:
         grade: str | None = None,
         notes: str | None = None,
     ):
-        """
-        Initialize UpdateStockCommand with validation.
+        """Initialize UpdateStockCommand with validation.
 
         Args:
             stock_id: ID of the stock to update
@@ -98,8 +95,7 @@ class UpdateStockCommand:
         return self._notes
 
     def has_updates(self) -> bool:
-        """
-        Check if any fields are being updated.
+        """Check if any fields are being updated.
 
         Returns:
             True if at least one field is being updated
@@ -116,8 +112,7 @@ class UpdateStockCommand:
         )
 
     def get_update_fields(self) -> dict[str, Any]:
-        """
-        Get dictionary of fields that are being updated.
+        """Get dictionary of fields that are being updated.
 
         Returns:
             Dictionary with field names as keys and values as values

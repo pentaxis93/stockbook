@@ -1,5 +1,4 @@
-"""
-Value objects for the StockBook domain.
+"""Value objects for the StockBook domain.
 
 Value objects are immutable objects that represent concepts
 through their attributes rather than identity.
@@ -21,6 +20,7 @@ from .sector import Sector
 from .stock_symbol import StockSymbol
 from .target_status import TargetStatus
 from .transaction_type import TransactionType
+
 
 __all__ = [
     "CompanyName",

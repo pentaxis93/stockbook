@@ -8,14 +8,15 @@ that can be used across all test files without explicit imports.
 import sqlite3
 import sys
 import tempfile
-from datetime import datetime, UTC
+from collections.abc import Generator
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-from collections.abc import Generator
 
 import pytest
 
 from config import config
+
 
 # Domain imports removed - will be used when infrastructure is rebuilt
 # Infrastructure imports removed - will be rebuilt later

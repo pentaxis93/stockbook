@@ -1,5 +1,4 @@
-"""
-Transaction aggregate root entity.
+"""Transaction aggregate root entity.
 
 Rich domain entity implementing clean architecture with value objects.
 Follows Domain-Driven Design principles with business logic encapsulation.
@@ -7,18 +6,18 @@ Follows Domain-Driven Design principles with business logic encapsulation.
 
 from __future__ import annotations
 
-from typing import Self, TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
+
 
 if TYPE_CHECKING:
     from datetime import date
 
 
 class Transaction(Entity):
-    """
-    Transaction aggregate root representing a stock trade.
+    """Transaction aggregate root representing a stock trade.
 
     Rich domain entity with value objects and business logic.
     Follows clean architecture and Domain-Driven Design principles.

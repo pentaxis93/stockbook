@@ -1,5 +1,4 @@
-"""
-Stock Data Transfer Object.
+"""Stock Data Transfer Object.
 
 Provides a clean contract for transferring stock data between
 application layer and presentation layer.
@@ -13,8 +12,7 @@ from src.domain.entities.stock import Stock
 
 @dataclass(frozen=True)
 class StockDto:
-    """
-    Immutable data transfer object for stock information.
+    """Immutable data transfer object for stock information.
 
     Contains all stock data needed by the presentation layer
     without exposing domain entity internals.
@@ -38,8 +36,7 @@ class StockDto:
 
     @classmethod
     def from_entity(cls, entity: Any) -> "StockDto":
-        """
-        Create DTO from domain entity.
+        """Create DTO from domain entity.
 
         Args:
             entity: Stock instance

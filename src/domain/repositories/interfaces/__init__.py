@@ -1,5 +1,4 @@
-"""
-Repository interfaces for domain entities.
+"""Repository interfaces for domain entities.
 
 This package contains abstract base classes defining repository contracts
 for each aggregate root in the domain model, following Interface Segregation Principle.
@@ -12,6 +11,7 @@ from .stock_repository import IStockRepository
 from .target_repository import ITargetRepository
 from .transaction_repository import ITransactionRepository
 from .unit_of_work import IStockBookUnitOfWork, IUnitOfWork
+
 
 __all__ = [
     "IJournalRepository",

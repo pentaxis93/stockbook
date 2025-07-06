@@ -1,5 +1,4 @@
-"""
-Stock domain entity with rich business behavior.
+"""Stock domain entity with rich business behavior.
 
 Represents a stock/security in the trading system with business logic
 and validation rules encapsulated within the entity.
@@ -21,8 +20,7 @@ from src.domain.value_objects import (
 
 
 class Stock(Entity):
-    """
-    Rich domain entity representing a stock/security.
+    """Rich domain entity representing a stock/security.
 
     Encapsulates business logic for stock operations including
     validation, calculations, and state management.
@@ -174,8 +172,7 @@ class Stock(Entity):
         )
 
     def has_notes(self) -> bool:
-        """
-        Check if stock has notes.
+        """Check if stock has notes.
 
         Returns:
             True if notes are present and not empty
@@ -183,8 +180,7 @@ class Stock(Entity):
         return self._notes.has_content()
 
     def update_fields(self, **kwargs: Any) -> None:
-        """
-        Update multiple fields at once.
+        """Update multiple fields at once.
 
         Args:
             **kwargs: Field names and values to update.
@@ -320,8 +316,7 @@ class Stock(Entity):
     def _validate_sector_industry_combination(
         self, sector: str | None, industry_group: str | None
     ) -> None:
-        """
-        Validate that sector and industry_group combination is valid.
+        """Validate that sector and industry_group combination is valid.
 
         Args:
             sector: Sector name

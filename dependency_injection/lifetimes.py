@@ -1,5 +1,4 @@
-"""
-Dependency lifetime management enumerations.
+"""Dependency lifetime management enumerations.
 
 Defines how long instances should live and when they should be created.
 """

@@ -1,5 +1,4 @@
-"""
-JournalContent value object for the StockBook domain.
+"""JournalContent value object for the StockBook domain.
 
 Represents journal entry content with validation rules and immutability.
 """
@@ -8,8 +7,7 @@ from .notes import BaseTextValueObject
 
 
 class JournalContent(BaseTextValueObject):
-    """
-    Value object representing journal entry content.
+    """Value object representing journal entry content.
 
     Encapsulates validation logic for journal content and ensures immutability.
     Journal content must be non-empty and cannot exceed 10,000 characters.
@@ -18,8 +16,7 @@ class JournalContent(BaseTextValueObject):
     MAX_LENGTH = 10000
 
     def __init__(self, value: str):
-        """
-        Initialize JournalContent with validation.
+        """Initialize JournalContent with validation.
 
         Args:
             value: The journal content string

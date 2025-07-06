@@ -1,5 +1,4 @@
-"""
-Database connection adapter for SQLAlchemy.
+"""Database connection adapter for SQLAlchemy.
 
 This module provides an adapter that implements the IDatabaseConnection
 protocol by wrapping SQLAlchemy connection objects.
@@ -14,8 +13,7 @@ from sqlalchemy.engine import Connection
 
 
 class SqlAlchemyConnection:
-    """
-    Adapter that wraps SQLAlchemy connection to implement IDatabaseConnection.
+    """Adapter that wraps SQLAlchemy connection to implement IDatabaseConnection.
 
     This adapter allows repositories to work with SQLAlchemy connections
     through the domain-defined interface, maintaining clean architecture
@@ -23,8 +21,7 @@ class SqlAlchemyConnection:
     """
 
     def __init__(self, connection: Connection) -> None:
-        """
-        Initialize the adapter with a SQLAlchemy connection.
+        """Initialize the adapter with a SQLAlchemy connection.
 
         Args:
             connection: SQLAlchemy connection object to wrap
@@ -37,8 +34,7 @@ class SqlAlchemyConnection:
         parameters: dict[str, Any] | list[dict[str, Any]] | None = None,
         execution_options: dict[str, Any] | None = None,
     ) -> Any:
-        """
-        Execute a SQLAlchemy Core statement.
+        """Execute a SQLAlchemy Core statement.
 
         Args:
             statement: SQLAlchemy statement to execute
@@ -58,8 +54,7 @@ class SqlAlchemyConnection:
         )
 
     def commit(self) -> None:
-        """
-        Commit the current transaction.
+        """Commit the current transaction.
 
         Note: This commits the transaction started with begin().
         """
@@ -68,8 +63,7 @@ class SqlAlchemyConnection:
             self._connection.commit()
 
     def rollback(self) -> None:
-        """
-        Rollback the current transaction.
+        """Rollback the current transaction.
 
         Note: This rolls back the transaction started with begin().
         """
@@ -78,8 +72,7 @@ class SqlAlchemyConnection:
             self._connection.rollback()
 
     def close(self) -> None:
-        """
-        Close the connection.
+        """Close the connection.
 
         Note: This may be a no-op for connections managed by a connection pool
         or Unit of Work.
