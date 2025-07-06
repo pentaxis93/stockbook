@@ -190,7 +190,8 @@ addopts = [
     "--cov=.",  # coverage for entire project root
     "--cov-report=term-missing",  # show missing lines in terminal
     "--cov-report=html:htmlcov",  # generate HTML coverage report
-    "--dist=worksteal",  # better load balancing for parallel execution
+    "--cov-fail-under=100",  # fail if coverage below 100%
+    "-n=auto",  # run tests in parallel using all available CPU cores
     "--maxfail=5",  # stop after 5 failures to fail fast
 ]
 

@@ -47,16 +47,7 @@ def main() -> None:
         (["python", "-m", "ruff", "check", "."], "Ruff Lint"),
         (["python", "-m", "pyright"], "Type Check"),
         (
-            [
-                "pytest",
-                "-n",
-                "auto",
-                "--lf",
-                "--ff",
-                "-q",
-                "--tb=short",
-                "--cov-fail-under=100",
-            ],
+            ["pytest"],
             "Tests & Coverage",
         ),
         (["python", "-m", "ruff", "check", "--select", "C901", "src/"], "Complexity"),
