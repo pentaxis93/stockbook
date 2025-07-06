@@ -75,10 +75,6 @@ convention = "google"
   "S603", # subprocess calls are intentional in this controlled script
 ]
 
-"src/presentation/*" = [
-  "B008", # function-call-in-default-argument (needed for FastAPI Depends)
-]
-
 "src/application/*" = [
   "PLR0913", # too-many-arguments (commands need multiple parameters)
 ]

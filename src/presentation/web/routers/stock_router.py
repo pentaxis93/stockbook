@@ -51,13 +51,17 @@ def get_stock_service(request: Request) -> StockApplicationService:
     return service
 
 
+# Module-level singleton for dependency injection to satisfy B008
+stock_service_dependency = Depends(get_stock_service)
+
+
 @router.get("", response_model=StockListResponse)
 @handle_stock_errors
 async def get_stocks(
     symbol: Annotated[
         str | None, Query(description="Filter by stock symbol (partial match)")
     ] = None,
-    service: StockApplicationService = Depends(get_stock_service),
+    service: StockApplicationService = stock_service_dependency,
 ) -> StockListResponse:
     """Get list of stocks with optional filtering.
 
@@ -96,7 +100,7 @@ async def get_stocks(
 @router.get("/{stock_id}", response_model=StockResponse)
 async def get_stock_by_id(
     stock_id: str,
-    service: StockApplicationService = Depends(get_stock_service),
+    service: StockApplicationService = stock_service_dependency,
 ) -> StockResponse:
     """Get a specific stock by its ID.
 
@@ -140,7 +144,7 @@ async def get_stock_by_id(
 @handle_stock_errors
 async def create_stock(
     stock_request: StockRequest,
-    service: StockApplicationService = Depends(get_stock_service),
+    service: StockApplicationService = stock_service_dependency,
 ) -> StockResponse:
     """Create a new stock.
 
@@ -174,7 +178,7 @@ async def create_stock(
 async def update_stock(
     stock_id: str,
     stock_update: StockUpdateRequest,
-    service: StockApplicationService = Depends(get_stock_service),
+    service: StockApplicationService = stock_service_dependency,
 ) -> StockResponse:
     """Update an existing stock.
 
