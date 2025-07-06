@@ -6,91 +6,75 @@ unsafe-fixes = true
 
 [tool.ruff.lint]
 select = [
-    # Core rules from replaced tools
-    "E",                # pycodestyle errors (replaces flake8 E codes)
-    "W",                # pycodestyle warnings (replaces flake8 W codes)
-    "F",                # Pyflakes (replaces flake8 F codes)
-    "I",                # isort (import sorting)
-    "D",                # pydocstyle (docstring checks)
-    "S",                # flake8-bandit (security)
-    "C901",             # McCabe complexity (replaces flake8 complexity)
-    
-    # Pylint equivalents
-    "PLC",              # Pylint Convention rules
-    "PLE",              # Pylint Error rules
-    "PLR",              # Pylint Refactor rules
-    "PLW",              # Pylint Warning rules
-    
-    # Additional helpful rules
-    "B",                # flake8-bugbear (common bugs)
-    "A",                # flake8-builtins (shadowing builtins)
-    "ASYNC",            # flake8-async (async/await best practices)
-    "ERA",              # eradicate (commented-out code)
-    "FLY",              # flynt (f-string conversions)
-    "LOG",              # flake8-logging (logging best practices)
-    "PERF",             # Perflint (performance anti-patterns)
-    "PTH",              # flake8-use-pathlib (pathlib usage)
-    "RET",              # flake8-return (return statement checks)
-    "SIM",              # flake8-simplify (code simplification)
-    "UP",               # pyupgrade (Python version upgrade syntax)
-    "TCH",              # flake8-type-checking (type checking imports)
-    "TID",              # flake8-tidy-imports (import conventions)
-    "FURB",             # refurb (modernize Python code)
-    "RUF",              # Ruff-specific rules
-    "SLF",              # flake8-self (private member access)
+  # Core rules from replaced tools
+  "E",    # pycodestyle errors (replaces flake8 E codes)
+  "W",    # pycodestyle warnings (replaces flake8 W codes)
+  "F",    # Pyflakes (replaces flake8 F codes)
+  "I",    # isort (import sorting)
+  "D",    # pydocstyle (docstring checks)
+  "S",    # flake8-bandit (security)
+  "C901", # McCabe complexity (replaces flake8 complexity)
+
+  # Pylint equivalents
+  "PLC", # Pylint Convention rules
+  "PLE", # Pylint Error rules
+  "PLR", # Pylint Refactor rules
+  "PLW", # Pylint Warning rules
+
+  # Additional helpful rules
+  "B",     # flake8-bugbear (common bugs)
+  "A",     # flake8-builtins (shadowing builtins)
+  "ASYNC", # flake8-async (async/await best practices)
+  "ERA",   # eradicate (commented-out code)
+  "FLY",   # flynt (f-string conversions)
+  "LOG",   # flake8-logging (logging best practices)
+  "PERF",  # Perflint (performance anti-patterns)
+  "PTH",   # flake8-use-pathlib (pathlib usage)
+  "RET",   # flake8-return (return statement checks)
+  "SIM",   # flake8-simplify (code simplification)
+  "UP",    # pyupgrade (Python version upgrade syntax)
+  "TCH",   # flake8-type-checking (type checking imports)
+  "TID",   # flake8-tidy-imports (import conventions)
+  "FURB",  # refurb (modernize Python code)
+  "RUF",   # Ruff-specific rules
+  "SLF",   # flake8-self (private member access)
 ]
 
 ignore = [
-    # Matching current pylint disables
-    "PLR0913",  # too-many-arguments (was max-args = 7)
-    
-    # Line length and formatting - handled by black
-    "E501",     # line-too-long
-    "W291",     # trailing-whitespace
-    "W293",     # blank-line-with-whitespace
-    "E203",     # whitespace-before-colon (conflicts with Black)
-    
-    # Import organization - some conflicts with our structure
-    "I001",     # unsorted-imports (we have specific ordering)
-    
-    # Docstring rules matching pydocstyle config  
-    "D100",     # missing-module-docstring
-    "D104",     # missing-package-docstring
-    "D105",     # missing-magic-method-docstring
-    "D212",     # multi-line-summary-first-line (conflicts with D213)
-    
-    # TODO/FIXME comments are allowed
-    "FIX002",   # line-contains-todo
-    "FIX004",   # line-contains-fixme
-    "ERA001",   # commented-out-code (we allow TODOs)
-    
-    # Security rules that need case-by-case review
-    "S101",     # assert-used (needed in tests)
-    "S105",     # hardcoded-password-string (false positives)
-    "S106",     # hardcoded-password-func-arg
-    
-    # Unnecessary pass statements (matching pylint config)
-    "PIE790",   # unnecessary-pass
-    
-    # Allow 'id' as parameter name (matching pylint config)
-    "A002",     # builtin-argument-shadowing (for 'id' parameter)
+  # Matching current pylint disables
+  "PLR0913", # too-many-arguments (was max-args = 7)
+
+  # Line length and formatting - handled by black
+  "E501", # line-too-long
+  "W291", # trailing-whitespace
+  "W293", # blank-line-with-whitespace
+  "E203", # whitespace-before-colon (conflicts with Black)
+
+  # Import organization - some conflicts with our structure
+  "I001", # unsorted-imports (we have specific ordering)
+
+  # Docstring rules matching pydocstyle config
+  "D100", # missing-module-docstring
+  "D104", # missing-package-docstring
+  "D105", # missing-magic-method-docstring
+  "D212", # multi-line-summary-first-line (conflicts with D213)
+
+  # TODO/FIXME comments are allowed
+  "FIX002", # line-contains-todo
+  "FIX004", # line-contains-fixme
+  "ERA001", # commented-out-code (we allow TODOs)
+
+  # Security rules that need case-by-case review
+  "S101", # assert-used (needed in tests)
+  "S105", # hardcoded-password-string (false positives)
+  "S106", # hardcoded-password-func-arg
+
+  # Unnecessary pass statements (matching pylint config)
+  "PIE790", # unnecessary-pass
+
+  # Allow 'id' as parameter name (matching pylint config)
+  "A002", # builtin-argument-shadowing (for 'id' parameter)
 ]
-
-# Note: Ruff doesn't have a direct equivalent for allowed-redefined-builtins
-# The 'id' builtin is allowed by default in most contexts
-
-[tool.ruff.lint.pylint]
-max-args = 7
-max-locals = 10
-max-returns = 3
-max-branches = 6
-max-statements = 15
-max-nested-blocks = 3
-max-bool-expr = 3
-max-public-methods = 10
-
-[tool.ruff.lint.mccabe]
-max-complexity = 8
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -104,61 +88,61 @@ lines-after-imports = 2
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
-    "S101",     # assert statements allowed in tests
-    "PLR2004",  # magic values allowed in tests
-    "PLR0913",  # too-many-arguments allowed in tests
-    "D",        # docstrings not required in tests
-    "PLC0415",  # import-outside-toplevel allowed in tests
-    "PLR0914",  # too-many-locals allowed in tests (was max-locals=15)
-    "PLR0915",  # too-many-statements allowed in tests (was max-statements=30)
-    "PLR1722",  # sys-exit allowed in tests
-    "PLR0911",  # too-many-return-statements
-    "PLR0912",  # too-many-branches
-    "B017",     # pytest.raises(Exception) allowed in tests
-    "S608",     # SQL injection not a concern in test fixtures
-    "A001",     # builtin shadowing allowed in tests (id)
-    "PLR0124",  # comparison-with-itself allowed for equality tests
-    "B007",     # unused-loop-control-variable allowed in tests
-    "SIM103",   # return-in-try-except-finally allowed in tests
-    "SIM105",   # try-except-pass allowed in tests
-    "SIM117",   # nested-with allowed in tests
-    "RUF001",   # ambiguous-unicode-character allowed in tests
-    "S108",     # hardcoded-temp-file allowed in tests
+  "S101",    # assert statements allowed in tests
+  "PLR2004", # magic values allowed in tests
+  "PLR0913", # too-many-arguments allowed in tests
+  "D",       # docstrings not required in tests
+  "PLC0415", # import-outside-toplevel allowed in tests
+  "PLR0914", # too-many-locals allowed in tests (was max-locals=15)
+  "PLR0915", # too-many-statements allowed in tests (was max-statements=30)
+  "PLR1722", # sys-exit allowed in tests
+  "PLR0911", # too-many-return-statements
+  "PLR0912", # too-many-branches
+  "B017",    # pytest.raises(Exception) allowed in tests
+  "S608",    # SQL injection not a concern in test fixtures
+  "A001",    # builtin shadowing allowed in tests (id)
+  "PLR0124", # comparison-with-itself allowed for equality tests
+  "B007",    # unused-loop-control-variable allowed in tests
+  "SIM103",  # return-in-try-except-finally allowed in tests
+  "SIM105",  # try-except-pass allowed in tests
+  "SIM117",  # nested-with allowed in tests
+  "RUF001",  # ambiguous-unicode-character allowed in tests
+  "S108",    # hardcoded-temp-file allowed in tests
 ]
 
 "dependency_injection/*" = [
-    # These files already have inline disables
-    "PLR0913",  # too-many-arguments
-    "PLR0917",  # too-many-positional-arguments
+  # These files already have inline disables
+  "PLR0913", # too-many-arguments
+  "PLR0917", # too-many-positional-arguments
 ]
 
 "hooks/*" = [
-    # Hook scripts have different requirements
-    "D",        # docstrings not required
+  # Hook scripts have different requirements
+  "D", # docstrings not required
 ]
 
 "scripts/*" = [
-    # Script files have different requirements
-    "D",        # docstrings not required
-    "S603",     # subprocess calls are intentional in this controlled script
+  # Script files have different requirements
+  "D",    # docstrings not required
+  "S603", # subprocess calls are intentional in this controlled script
 ]
 
 "src/infrastructure/*" = [
-    "PLR0914",  # too-many-locals (matching Makefile config)
-    "PLR0915",  # too-many-statements (database_factory has 16, limit is 15)
+  "PLR0914", # too-many-locals (matching Makefile config)
+  "PLR0915", # too-many-statements (database_factory has 16, limit is 15)
 ]
 
 "src/presentation/*" = [
-    "PLR0914",  # too-many-locals
-    "PLR0913",  # too-many-arguments
-    "PLR0915",  # too-many-statements
-    "PLR0912",  # too-many-branches
-    "B008",     # function-call-in-default-argument (needed for FastAPI Depends)
-    "C901",     # too-complex (error handlers need multiple exception types)
+  "PLR0914", # too-many-locals
+  "PLR0913", # too-many-arguments
+  "PLR0915", # too-many-statements
+  "PLR0912", # too-many-branches
+  "B008",    # function-call-in-default-argument (needed for FastAPI Depends)
+  "C901",    # too-complex (error handlers need multiple exception types)
 ]
 
 "src/application/*" = [
-    "PLR0913",  # too-many-arguments
+  "PLR0913", # too-many-arguments
 ]
 
 [tool.ruff.format]
@@ -174,7 +158,6 @@ line-ending = "lf"
 # Old tool configurations removed - now using Ruff for linting
 
 
-
 [tool.pytest.ini_options]
 # Test discovery and execution
 # testpaths = ["tests"]  # Commented out to allow pytest to search from project root
@@ -184,15 +167,15 @@ python_functions = "test_*"
 
 # Output and behavior
 addopts = [
-    "-v",  # verbose
-    "--tb=short",  # shorter tracebacks
-    "--strict-markers",  # ensure all markers are registered
-    "--cov=.",  # coverage for entire project root
-    "--cov-report=term-missing",  # show missing lines in terminal
-    "--cov-report=html:htmlcov",  # generate HTML coverage report
-    "--cov-fail-under=100",  # fail if coverage below 100%
-    "-n=auto",  # run tests in parallel using all available CPU cores
-    "--maxfail=5",  # stop after 5 failures to fail fast
+  "-v",                        # verbose
+  "--tb=short",                # shorter tracebacks
+  "--strict-markers",          # ensure all markers are registered
+  "--cov=.",                   # coverage for entire project root
+  "--cov-report=term-missing", # show missing lines in terminal
+  "--cov-report=html:htmlcov", # generate HTML coverage report
+  "--cov-fail-under=100",      # fail if coverage below 100%
+  "-n=auto",                   # run tests in parallel using all available CPU cores
+  "--maxfail=5",               # stop after 5 failures to fail fast
 ]
 
 # Performance optimizations
@@ -200,51 +183,48 @@ cache_dir = ".pytest_cache"
 
 # Filter warnings
 filterwarnings = [
-    "ignore:.*PyType_Spec.*tp_new.*deprecated.*:DeprecationWarning",
+  "ignore:.*PyType_Spec.*tp_new.*deprecated.*:DeprecationWarning",
 ]
 
 # Test markers
 markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests that interact with database", 
-    "unit: marks pure unit tests with no dependencies",
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+  "integration: marks tests that interact with database",
+  "unit: marks pure unit tests with no dependencies",
 ]
 
 [tool.coverage.run]
-source = ["."]  # Use project root for coverage
+source = ["."] # Use project root for coverage
 omit = [
-    "*/tests/*",
-    "*/test_*.py",
-    "*/.venv/*",
-    "*/venv/*",
-    "conftest.py",
-    "*/site-packages/*",
-    "*/dist-packages/*",
-    "*/dependency_injector/*",
-    "*.pxd",
+  "*/tests/*",
+  "*/test_*.py",
+  "*/.venv/*",
+  "*/venv/*",
+  "conftest.py",
+  "*/site-packages/*",
+  "*/dist-packages/*",
+  "*/dependency_injector/*",
+  "*.pxd",
 ]
 
 [tool.coverage.report]
 exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-    ".*pass.*",
+  "pragma: no cover",
+  "def __repr__",
+  "if self.debug:",
+  "if settings.DEBUG",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if 0:",
+  "if __name__ == .__main__.:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod",
+  ".*pass.*",
 ]
 
 [tool.pyright]
 include = ["src", "tests", "dependency_injection"]
-exclude = [
-    "**/node_modules", 
-    "**/__pycache__"
-]
+exclude = ["**/node_modules", "**/__pycache__"]
 
 # Use strict mode everywhere
 typeCheckingMode = "strict"
@@ -281,11 +261,8 @@ modules = ["src.domain"]
 [[tool.importlinter.contracts]]
 name = "Layered architecture"
 type = "layers"
-layers = [
-    "src.infrastructure",
-    "src.application", 
-    "src.domain"
-]
+layers = ["src.infrastructure", "src.application", "src.domain"]
 # Infrastructure layer now added
 
 # Removed pydocstyle and bandit configurations - now using Ruff
+
