@@ -11,7 +11,6 @@ from typing import Any, TypeVar
 
 from fastapi import HTTPException, status
 
-
 logger = logging.getLogger(__name__)
 
 # Type variable for decorator return type

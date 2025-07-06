@@ -5,8 +5,6 @@ Following TDD approach - these tests define the expected behavior
 of the rich Stock entity with business logic.
 """
 
-# from decimal import Decimal  # Unused import
-
 import pytest
 
 from src.domain.entities.stock import Stock
@@ -1142,7 +1140,6 @@ class TestStockDomainInvariants:
 
         # Test cascading validation failures
         validation_test_cases = [
-            # (field, invalid_value, expected_error_pattern)
             ("name", "A" * 201, "Company name cannot exceed 200 characters"),
             ("sector", "A" * 101, "Sector cannot exceed 100 characters"),
             (

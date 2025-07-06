@@ -90,25 +90,7 @@ class TestPortfolioValueCalculations:
 
     def test_calculate_portfolio_with_different_currencies(self) -> None:
         """Should handle multi-currency portfolios."""
-        # service = PortfolioCalculationService()
-        #
-        # us_stock = Stock(
-        #     symbol=StockSymbol("AAPL"),
-        #     name="Apple Inc",
-        #     current_price=Money(Decimal("150.00"))
-        # )
-        #
-        # uk_stock = Stock(
-        #     symbol=StockSymbol("BARC"),
-        #     name="Barclays",
-        #     current_price=Money(Decimal("200.00"), "GBP")
-        # )
-        #
-        # portfolio = [(us_stock, Quantity(10)), (uk_stock, Quantity(5))]
-        #
-        # # Should require currency conversion service
-        # with pytest.raises(InsufficientDataError):
-        #     service.calculate_total_value(portfolio)
+
         pass
 
     def test_calculate_portfolio_value_with_zero_positions(self) -> None:
@@ -415,17 +397,7 @@ class TestPortfolioAllocationAnalysis:
 
     def test_identify_concentration_risks(self) -> None:
         """Should identify positions that are overly concentrated."""
-        # service = PortfolioCalculationService()
-        # concentrated_portfolio = [
-        #     create_test_stock("DOMINANT", 5000.00, 2, "A"),  # 90% of portfolio
-        #     create_test_stock("SMALL", 100.00, 5, "B"),     # 10% of portfolio
-        # ]
-        #
-        # risks = service.identify_concentration_risks(concentrated_portfolio)
-        #
-        # assert len(risks) == 1
-        # assert risks[0].symbol == "DOMINANT"
-        # assert risks[0].risk_level == ConcentrationRisk.HIGH
+
         pass
 
 
@@ -435,30 +407,12 @@ class TestPortfolioPerformanceMetrics:
 
     def test_calculate_portfolio_risk_metrics(self) -> None:
         """Should calculate comprehensive risk metrics."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_test_portfolio()
-        #
-        # risk_metrics = service.calculate_risk_metrics(portfolio)
-        #
-        # assert risk_metrics.overall_risk_level in [RiskLevel.LOW,
-        #                                           RiskLevel.MEDIUM, RiskLevel.HIGH]
-        # assert risk_metrics.volatility_score >= 0
-        # assert len(risk_metrics.risk_factors) > 0
+
         pass
 
     def test_calculate_growth_vs_value_allocation(self) -> None:
         """Should analyze growth vs value stock allocation."""
-        # service = PortfolioCalculationService()
-        # portfolio = [
-        #     create_growth_stock("GROWTH1", 1000.00),
-        #     create_growth_stock("GROWTH2", 1000.00),
-        #     create_value_stock("VALUE1", 1000.00),
-        # ]
-        #
-        # allocation = service.calculate_growth_value_split(portfolio)
-        #
-        # assert allocation.growth_percentage == 66.7
-        # assert allocation.value_percentage == 33.3
+
         pass
 
 
@@ -468,52 +422,17 @@ class TestPortfolioRebalancingAnalysis:
 
     def test_suggest_rebalancing_for_overweight_positions(self) -> None:
         """Should suggest rebalancing when positions become overweight."""
-        # service = PortfolioCalculationService()
-        # target_allocation = {
-        #     "AAPL": 25.0,
-        #     "GOOGL": 25.0,
-        #     "TSLA": 25.0,
-        #     "GME": 25.0
-        # }
-        #
-        # # Current portfolio has GOOGL at 58.8%
-        # portfolio = create_test_portfolio()
-        #
-        # suggestions = service.suggest_rebalancing(portfolio, target_allocation)
-        #
-        # googl_suggestion = next(s for s in suggestions if s.symbol == "GOOGL")
-        # assert googl_suggestion.action == RebalanceAction.SELL
-        # assert googl_suggestion.target_percentage == 25.0
+
         pass
 
     def test_calculate_rebalancing_trades(self) -> None:
         """Should calculate specific trades needed for rebalancing."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_test_portfolio()
-        # target_allocation = create_equal_weight_targets()
-        #
-        # trades = service.calculate_rebalancing_trades(portfolio, target_allocation)
-        #
-        # # Should suggest selling GOOGL and buying others
-        # sell_trades = [t for t in trades if t.action == TradeAction.SELL]
-        # buy_trades = [t for t in trades if t.action == TradeAction.BUY]
-        #
-        # assert len(sell_trades) > 0
-        # assert len(buy_trades) > 0
+
         pass
 
     def test_calculate_tax_efficient_rebalancing(self) -> None:
         """Should consider tax implications in rebalancing suggestions."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_portfolio_with_tax_implications()
-        #
-        # # Some positions have large unrealized gains
-        # tax_aware_suggestions = service.suggest_tax_efficient_rebalancing(portfolio)
-        #
-        # # Should prefer to rebalance using new contributions rather than selling
-        # contribution_based = [s for s in tax_aware_suggestions
-        #                      if s.method == RebalanceMethod.NEW_CONTRIBUTIONS]
-        # assert len(contribution_based) > 0
+
         pass
 
 
@@ -523,27 +442,12 @@ class TestPortfolioReporting:
 
     def test_generate_allocation_report(self) -> None:
         """Should generate detailed allocation breakdown report."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_test_portfolio()
-        #
-        # report = service.generate_allocation_report(portfolio)
-        #
-        # assert report.by_position is not None
-        # assert report.by_industry is not None
-        # assert report.by_grade is not None
-        # assert report.concentration_analysis is not None
+
         pass
 
     def test_generate_performance_metrics_report(self) -> None:
         """Should generate performance and risk metrics report."""
-        # service = PortfolioCalculationService()
-        # portfolio = create_test_portfolio()
-        #
-        # metrics_report = service.generate_metrics_report(portfolio)
-        #
-        # assert metrics_report.diversity_score is not None
-        # assert metrics_report.risk_assessment is not None
-        # assert metrics_report.weighted_average_grade is not None
+
         pass
 
 
@@ -553,40 +457,15 @@ class TestPortfolioCalculationServiceConfiguration:
 
     def test_service_with_custom_calculation_rules(self) -> None:
         """Should allow custom calculation rule configuration."""
-        # config = PortfolioCalculationConfig(
-        #     concentration_threshold=0.3,  # 30% max per position
-        #     minimum_diversification_score=0.6,
-        #     default_currency="USD"
-        # )
-        #
-        # service = PortfolioCalculationService(config)
-        # assert service.config.concentration_threshold == 0.3
+
         pass
 
     def test_handle_calculation_errors_gracefully(self) -> None:
         """Should handle edge cases and errors gracefully."""
-        # service = PortfolioCalculationService()
-        #
-        # # Portfolio with invalid data
-        # invalid_portfolio = [
-        #     (create_test_stock("TEST", 0, 10), Quantity(0))  # Zero price and quantity
-        # ]
-        #
-        # with pytest.raises(CalculationError):
-        #     service.calculate_total_value(invalid_portfolio)
+
         pass
 
     def test_service_performance_with_large_portfolios(self) -> None:
         """Should handle large portfolios efficiently."""
-        # service = PortfolioCalculationService()
-        # large_portfolio = create_large_test_portfolio(1000)  # 1000 positions
-        #
-        # # Should complete calculations in reasonable time
-        # import time
-        # start_time = time.time()
-        # total_value = service.calculate_total_value(large_portfolio)
-        # calculation_time = time.time() - start_time
-        #
-        # assert calculation_time < 1.0  # Should be under 1 second
-        # assert total_value.amount > 0
+
         pass

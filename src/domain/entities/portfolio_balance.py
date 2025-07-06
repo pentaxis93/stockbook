@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING, Self
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import IndexChange, Money
 
-
 if TYPE_CHECKING:
     from datetime import date
 

@@ -21,7 +21,6 @@ from .stock_symbol import StockSymbol
 from .target_status import TargetStatus
 from .transaction_type import TransactionType
 
-
 __all__ = [
     "CompanyName",
     "Grade",

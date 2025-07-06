@@ -12,7 +12,6 @@ from .stock import Stock
 from .target import Target
 from .transaction import Transaction
 
-
 __all__ = [
     "Entity",
     "JournalEntry",

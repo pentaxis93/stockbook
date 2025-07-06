@@ -13,7 +13,6 @@ from .metrics import (
     TrendDirection,
 )
 
-
 __all__ = [
     "PortfolioAllocation",
     "PortfolioMetrics",

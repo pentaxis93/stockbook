@@ -9,11 +9,9 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-
 # Unused imports removed - tests are stubs
 
 # These imports will exist after implementation
-# from dependency_injection.composition_root import CompositionRoot
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -27,24 +25,11 @@ class TestCleanArchitectureWiring:
         # Infrastructure should only depend on domain/application interfaces
         # Presentation should only depend on application layer
 
-        # container = CompositionRoot.configure()
-        # coordinator = container.resolve(StockPageCoordinator)
-
-        # Verify dependency directions are correct
-        # assert not hasattr(coordinator.controller.stock_service, '_repository')
-        # Should use UoW
-        # assert hasattr(coordinator.controller.stock_service, '_unit_of_work')
         pass
 
     def test_interface_segregation(self) -> None:
         """Should wire interfaces correctly, not concrete types."""
-        # container = CompositionRoot.configure()
-        # stock_service = container.resolve(StockApplicationService)
-
         # Application service should depend on IUnitOfWork, not SQLiteUnitOfWork
-        # assert hasattr(stock_service, '_unit_of_work')
-        # from src.domain.repositories.interfaces import IUnitOfWork
-        # assert isinstance(stock_service._unit_of_work, IUnitOfWork)
         pass
 
     def test_domain_isolation(self) -> None:
@@ -52,12 +37,6 @@ class TestCleanArchitectureWiring:
         # Domain entities should be created without DI container
         # They should not depend on infrastructure or presentation
 
-        # symbol = StockSymbol("AAPL")
-        # entity = Stock(symbol=symbol, name="Apple Inc.")
-
-        # Domain entities work independently
-        # assert entity.symbol.value == "AAPL"
-        # assert entity.name == "Apple Inc."
         pass
 
 
@@ -69,39 +48,20 @@ class TestEndToEndWorkflow:
     def test_create_stock_workflow(self, mock_db: Mock) -> None:
         """Should execute complete stock creation workflow."""
         # Arrange
-        # mock_db.return_value.get_connection.return_value = Mock()
-        # container = CompositionRoot.configure()
-        # coordinator = container.resolve(StockPageCoordinator)
 
         # Act - simulate stock creation workflow
-        # from src.presentation.view_models.stock_view_models import CreateStockRequest
-        # request = CreateStockRequest(
-        #     symbol="AAPL",
-        #     name="Apple Inc.",
-        #     industry_group="Technology",
-        #     grade="A"
-        # )
-        # response = coordinator.controller.create_stock(request)
 
         # Assert
-        # assert response.success
-        # assert response.symbol == "AAPL"
         pass
 
     @patch("infrastructure.persistence.database_connection.DatabaseConnection")
     def test_stock_list_workflow(self, mock_db: Mock) -> None:
         """Should execute complete stock listing workflow."""
         # Arrange
-        # mock_db.return_value.get_connection.return_value = Mock()
-        # container = CompositionRoot.configure()
-        # coordinator = container.resolve(StockPageCoordinator)
 
         # Act
-        # response = coordinator.controller.get_stock_list()
 
         # Assert
-        # assert hasattr(response, 'success')
-        # assert hasattr(response, 'stocks')
         pass
 
     def test_error_propagation_through_layers(self) -> None:
@@ -118,33 +78,12 @@ class TestLayerIsolationTesting:
 
     def test_mock_infrastructure_layer(self) -> None:
         """Should allow mocking infrastructure layer for testing."""
-        # from dependency_injection.di_container import DIContainer
-        # from src.domain.repositories.interfaces import IUnitOfWork
 
-        # # Create test container with mocked infrastructure
-        # container = DIContainer()
-        # mock_uow = Mock(spec=IUnitOfWork)
-        # container.register_instance(IUnitOfWork, mock_uow)
-        # container.register_transient(StockApplicationService)
-
-        # # Application service should work with mocked infrastructure
-        # service = container.resolve(StockApplicationService)
-        # assert service._unit_of_work is mock_uow
         pass
 
     def test_mock_application_layer(self) -> None:
         """Should allow mocking application layer for presentation testing."""
-        # from dependency_injection.di_container import DIContainer
 
-        # # Create test container with mocked application services
-        # container = DIContainer()
-        # mock_stock_service = Mock(spec=StockApplicationService)
-        # container.register_instance(StockApplicationService, mock_stock_service)
-        # container.register_transient(StockController)
-
-        # # Controller should work with mocked service
-        # controller = container.resolve(StockController)
-        # assert controller.stock_service is mock_stock_service
         pass
 
     def test_integration_test_configuration(self) -> None:
@@ -152,11 +91,7 @@ class TestLayerIsolationTesting:
         # Should be able to configure container for integration tests
         # with real database but isolated from production data
 
-        # container = CompositionRoot.configure(database_path=":memory:")
-        # coordinator = container.resolve(StockPageCoordinator)
-
         # Should work with in-memory database for testing
-        # assert coordinator is not None
         pass
 
 
@@ -166,16 +101,7 @@ class TestPerformanceWithDI:
 
     def test_resolution_performance(self) -> None:
         """Should resolve dependencies quickly."""
-        # container = CompositionRoot.configure()
-
-        # import time
-        # start = time.time()
-        # for _ in range(100):
-        #     coordinator = container.resolve(StockPageCoordinator)
-        # end = time.time()
-
         # Resolution should be fast (< 1ms per resolution)
-        # assert (end - start) < 0.1  # 100 resolutions in < 100ms
         pass
 
     def test_memory_usage(self) -> None:
@@ -187,20 +113,5 @@ class TestPerformanceWithDI:
 
     def test_singleton_creation_overhead(self) -> None:
         """Should create singletons only once."""
-        # container = CompositionRoot.configure()
-
         # Track creation calls to ensure singletons created once
-        # creation_count = 0
-        # original_init = DatabaseConnection.__init__
-        # def counting_init(self, *args, **kwargs):
-        #     nonlocal creation_count
-        #     creation_count += 1
-        #     original_init(self, *args, **kwargs)
-
-        # with patch.object(DatabaseConnection, '__init__', counting_init):
-        #     container.resolve(DatabaseConnection)
-        #     container.resolve(DatabaseConnection)
-        #     container.resolve(DatabaseConnection)
-
-        # assert creation_count == 1  # Created only once
         pass

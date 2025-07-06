@@ -15,7 +15,6 @@ from .table_utils import (
     timestamp_columns,
 )
 
-
 # Define the journal entry table using SQLAlchemy Core
 journal_entry_table: Table = Table(
     "journal_entries",

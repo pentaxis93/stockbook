@@ -7,5 +7,4 @@ organized into separate modules for better maintainability.
 from .create import CreateStockCommand
 from .update import UpdateStockCommand
 
-
 __all__ = ["CreateStockCommand", "UpdateStockCommand"]

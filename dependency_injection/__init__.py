@@ -15,7 +15,6 @@ from .exceptions import (
 )
 from .lifetimes import Lifetime
 
-
 __all__ = [
     "CircularDependencyError",
     "CompositionRoot",

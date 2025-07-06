@@ -11,6 +11,8 @@ from typing import Any
 
 from sqlalchemy import (
     create_engine as sqla_create_engine,
+)
+from sqlalchemy import (
     event,
 )
 from sqlalchemy.engine import Engine

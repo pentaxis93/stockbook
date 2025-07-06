@@ -12,7 +12,6 @@ from .target_repository import ITargetRepository
 from .transaction_repository import ITransactionRepository
 from .unit_of_work import IStockBookUnitOfWork, IUnitOfWork
 
-
 __all__ = [
     "IJournalRepository",
     "IPortfolioBalanceRepository",

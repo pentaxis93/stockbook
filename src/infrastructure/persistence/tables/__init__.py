@@ -15,7 +15,6 @@ from src.infrastructure.persistence.tables.stock_table import metadata, stock_ta
 from src.infrastructure.persistence.tables.target_table import target_table
 from src.infrastructure.persistence.tables.transaction_table import transaction_table
 
-
 __all__ = [
     "journal_entry_table",
     "metadata",

@@ -17,7 +17,6 @@ from dependency_injection.composition_root import CompositionRoot
 from src.infrastructure.persistence.database_initializer import initialize_database
 from src.presentation.web.routers import stock_router
 
-
 logger = logging.getLogger(__name__)
 
 # DI container is stored in app.state instead of using global variable

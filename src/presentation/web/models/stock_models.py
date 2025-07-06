@@ -14,7 +14,6 @@ from src.application.commands.stock import (
 )
 from src.application.dto.stock_dto import StockDto
 
-
 # Constants for validation
 MAX_SYMBOL_LENGTH = 5
 

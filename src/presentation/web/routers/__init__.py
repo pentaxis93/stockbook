@@ -2,5 +2,4 @@
 
 from . import stock_router
 
-
 __all__ = ["stock_router"]

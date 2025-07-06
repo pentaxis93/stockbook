@@ -16,7 +16,6 @@ from .interfaces import (
     IUnitOfWork,
 )
 
-
 # pylint: disable=duplicate-code
 # Rationale: This duplicate list is necessary for proper module re-exports.
 # The interfaces package defines the same list, but both modules need it

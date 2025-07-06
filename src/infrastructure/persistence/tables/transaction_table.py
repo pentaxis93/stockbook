@@ -14,7 +14,6 @@ from .table_utils import (
     timestamp_columns,
 )
 
-
 # Define the transaction table using SQLAlchemy Core
 transaction_table: Table = Table(
     "transactions",

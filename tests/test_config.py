@@ -21,7 +21,6 @@ from unittest.mock import patch
 
 import pytest
 
-
 # Import the config module (will fail initially - that's expected in TDD)
 try:
     from config import Config, ConfigError, ValidationError

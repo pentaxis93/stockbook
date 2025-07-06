@@ -42,7 +42,6 @@ from src.infrastructure.persistence.tables import metadata
 from src.infrastructure.persistence.tables.portfolio_table import portfolio_table
 from src.infrastructure.persistence.tables.stock_table import stock_table
 
-
 # =============================================================================
 # SQLAlchemy-based Database Fixtures
 # =============================================================================

@@ -77,30 +77,19 @@ class TestCompositionRoot:
     def test_configure_presentation_layer(self) -> None:
         """Should configure presentation layer components correctly."""
         # Arrange
-        # container = CompositionRoot.configure()
 
         # Act
-        # controller = container.resolve(StockController)
 
         # Assert
-        # assert isinstance(controller, StockController)
-        # assert isinstance(controller.stock_service, StockApplicationService)
         pass
 
     def test_complete_object_graph_wiring(self) -> None:
         """Should wire complete dependency chain correctly."""
         # Arrange
-        # container = CompositionRoot.configure()
 
         # Act - resolve top-level component
-        # coordinator = container.resolve(StockPageCoordinator)
 
         # Assert - verify entire chain is wired
-        # assert isinstance(coordinator.controller.stock_service._unit_of_work,
-        #                  SqliteUnitOfWork)
-        # assert isinstance(coordinator.controller.stock_service._unit_of_work.stocks,
-        #                  SqliteStockRepository)
-        # assert isinstance(coordinator.adapter.controller, StockController)
         pass
 
     def test_singleton_configuration(self) -> None:
@@ -144,41 +133,26 @@ class TestCompositionRootConfiguration:
     def test_configure_with_test_database(self) -> None:
         """Should allow configuration with test database."""
         # Act
-        # container = CompositionRoot.configure(database_path=":memory:")
 
         # Assert
-        # db_connection = container.resolve(DatabaseConnection)
-        # assert db_connection.database_path == ":memory:"
         pass
 
     def test_configure_with_custom_config(self) -> None:
         """Should allow custom configuration overrides."""
         # Arrange
-        # config = {
-        #     "database_path": "/custom/test.db",
-        #     "enable_logging": False
-        # }
 
         # Act
-        # container = CompositionRoot.configure(config=config)
 
         # Assert
-        # db_connection = container.resolve(DatabaseConnection)
-        # assert "/custom/test.db" in str(db_connection.database_path)
         pass
 
     def test_register_additional_services(self) -> None:
         """Should allow registering additional services."""
         # Arrange
-        # def configure_extras(container: DIContainer):
-        #     container.register_singleton(SomeExtraService, SomeExtraServiceImpl)
 
         # Act
-        # container = CompositionRoot.configure(extra_registrations=configure_extras)
 
         # Assert
-        # service = container.resolve(SomeExtraService)
-        # assert isinstance(service, SomeExtraServiceImpl)
         pass
 
 
@@ -189,22 +163,12 @@ class TestBootstrapIntegration:
     def test_bootstrap_app_with_di(self) -> None:
         """Should bootstrap complete application with DI."""
         # This tests the main app.py integration point
-        # from main import bootstrap_app
-
-        # app_components = bootstrap_app()
-        # assert 'coordinator' in app_components
-        # assert 'controller' in app_components
-        # assert isinstance(app_components['coordinator'], StockPageCoordinator)
         pass
 
     def test_fastapi_integration_ready(self) -> None:
         """Should provide components ready for FastAPI integration."""
-        # container = CompositionRoot.configure()
-        # stock_service = container.resolve(StockApplicationService)
-
         # Test that service can be used in FastAPI context
         # This validates the wiring is correct for actual usage
-        # assert hasattr(stock_service, 'create_stock')
         pass
 
 

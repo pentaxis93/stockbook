@@ -20,7 +20,6 @@ from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
 
 from .di_container import DIContainer
 
-
 # Presentation layer imports removed - will be rebuilt later
 
 

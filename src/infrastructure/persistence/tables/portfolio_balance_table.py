@@ -10,7 +10,6 @@ from src.infrastructure.persistence.tables.stock_table import metadata
 
 from .table_utils import foreign_key_column, id_column, timestamp_columns
 
-
 # Define the portfolio balance table using SQLAlchemy Core
 portfolio_balance_table: Table = Table(
     "portfolio_balances",

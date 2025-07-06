@@ -7,7 +7,6 @@ import uuid
 from abc import ABC
 from typing import Any, Self, TypeVar
 
-
 T = TypeVar("T", bound="Entity")
 
 

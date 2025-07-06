@@ -43,19 +43,11 @@ select = [
 ignore = [
   "D105",   # missing-magic-method-docstring
   "FIX002", # line-contains-todo
-  "ERA001", # commented-out-code (we allow TODOs)
   "A002",   # builtin-argument-shadowing (for 'id' parameter)
 ]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
-
-[tool.ruff.lint.isort]
-# Ruff's isort implementation doesn't use "profile"
-# Instead, we configure individual settings
-combine-as-imports = true
-force-wrap-aliases = true
-lines-after-imports = 2
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [

@@ -18,7 +18,6 @@ from src.presentation.web.models.stock_models import (
     StockUpdateRequest,
 )
 
-
 logger = logging.getLogger(__name__)
 
 # Create router instance

@@ -23,7 +23,6 @@ from .exceptions import (
 )
 from .lifetimes import Lifetime
 
-
 T = TypeVar("T")
 
 

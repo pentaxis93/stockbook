@@ -8,7 +8,6 @@ from sqlalchemy import Column, MetaData, String, Table
 
 from .table_utils import id_column, timestamp_columns
 
-
 # Create metadata instance for all tables
 metadata: MetaData = MetaData()
 

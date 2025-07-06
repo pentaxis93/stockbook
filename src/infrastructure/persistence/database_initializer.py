@@ -23,7 +23,6 @@ from src.infrastructure.persistence.tables import (
     transaction_table,
 )
 
-
 # These imports are needed to register tables with metadata
 _ = journal_entry_table
 _ = portfolio_balance_table

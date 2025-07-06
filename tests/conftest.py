@@ -17,7 +17,6 @@ import pytest
 
 from config import config
 
-
 # Domain imports removed - will be used when infrastructure is rebuilt
 # Infrastructure imports removed - will be rebuilt later
 
