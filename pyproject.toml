@@ -110,6 +110,8 @@ lines-after-imports = 2
     "SIM117",   # nested-with allowed in tests
     "RUF001",   # ambiguous-unicode-character allowed in tests
     "S108",     # hardcoded-temp-file allowed in tests
+    "TRY003",   # tests often need to raise exceptions with messages
+    "S110",     # try-except-pass allowed in tests
 ]
 
 "dependency_injection/*" = [
@@ -126,6 +128,11 @@ lines-after-imports = 2
 "src/infrastructure/*" = [
     "PLR0914",  # too-many-locals (matching Makefile config)
     "PLR0915",  # too-many-statements (database_factory has 16, limit is 15)
+    "TRY003",   # Our custom exceptions accept structured parameters, not messages
+]
+
+"src/domain/services/*" = [
+    "TRY003",   # Our custom exceptions accept structured parameters, not messages
 ]
 
 "src/presentation/*" = [
@@ -135,10 +142,24 @@ lines-after-imports = 2
     "PLR0912",  # too-many-branches
     "B008",     # function-call-in-default-argument (needed for FastAPI Depends)
     "C901",     # too-complex (error handlers need multiple exception types)
+    "TRY003",   # Pydantic models and FastAPI use standard ValueError with messages
+]
+
+"src/domain/events/*" = [
+    "TRY003",   # Domain events use standard exceptions
+]
+
+"src/domain/value_objects/*" = [
+    "TRY003",   # Our custom exceptions accept structured parameters, not messages
+]
+
+"src/domain/entities/*" = [
+    "TRY003",   # Our custom exceptions accept structured parameters, not messages
 ]
 
 "src/application/*" = [
     "PLR0913",  # too-many-arguments
+    "TRY003",   # Our custom exceptions accept structured parameters, not messages
 ]
 
 [tool.ruff.format]
