@@ -164,13 +164,15 @@ class MockUnitOfWork(IUnitOfWork):
 
 def create_test_stock(symbol: str = "AAPL", grade: str = "A") -> Stock:
     """Helper to create test stock entity."""
-    return Stock(
-        symbol=StockSymbol(symbol),
-        company_name=CompanyName(f"{symbol} Corporation"),
-        sector=Sector("Technology"),
-        industry_group=IndustryGroup("Software"),
-        grade=Grade(grade),
-        id=f"stock-{symbol.lower()}-test",
+    return (
+        Stock.Builder()
+        .with_symbol(StockSymbol(symbol))
+        .with_company_name(CompanyName(f"{symbol} Corporation"))
+        .with_sector(Sector("Technology"))
+        .with_industry_group(IndustryGroup("Software"))
+        .with_grade(Grade(grade))
+        .with_id(f"stock-{symbol.lower()}-test")
+        .build()
     )
 
 

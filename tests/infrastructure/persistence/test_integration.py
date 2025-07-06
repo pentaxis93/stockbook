@@ -60,10 +60,12 @@ class TestUnitOfWorkIntegration:
 
         # Act
         with uow:
-            stock = Stock(
-                symbol=StockSymbol("TEST"),
-                company_name=CompanyName("Test Company"),
-                grade=Grade("A"),
+            stock = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("TEST"))
+                .with_company_name(CompanyName("Test Company"))
+                .with_grade(Grade("A"))
+                .build()
             )
             stock_id = uow.stocks.create(stock)
             uow.commit()
@@ -132,20 +134,24 @@ class TestUnitOfWorkIntegration:
         """Should rollback transaction on error."""
         # Arrange - Create a stock directly
         with unit_of_work:
-            stock = Stock(
-                symbol=StockSymbol("MSFT"),
-                company_name=CompanyName("Microsoft"),
-                grade=Grade("A"),
+            stock = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("MSFT"))
+                .with_company_name(CompanyName("Microsoft"))
+                .with_grade(Grade("A"))
+                .build()
             )
             _ = unit_of_work.stocks.create(stock)
             unit_of_work.commit()
 
         # Act - Try to create duplicate (should fail)
         with pytest.raises(Exception), unit_of_work:
-            duplicate = Stock(
-                symbol=StockSymbol("MSFT"),
-                company_name=CompanyName("Microsoft Duplicate"),
-                grade=Grade("B"),
+            duplicate = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("MSFT"))
+                .with_company_name(CompanyName("Microsoft Duplicate"))
+                .with_grade(Grade("B"))
+                .build()
             )
             _ = unit_of_work.stocks.create(duplicate)
             unit_of_work.commit()  # Should fail due to unique constraint
@@ -168,15 +174,19 @@ class TestUnitOfWorkIntegration:
         # Act
         with unit_of_work:
             # Create multiple stocks
-            stock1 = Stock(
-                symbol=StockSymbol("GOOG"),
-                company_name=CompanyName("Google"),
-                grade=Grade("A"),
+            stock1 = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("GOOG"))
+                .with_company_name(CompanyName("Google"))
+                .with_grade(Grade("A"))
+                .build()
             )
-            stock2 = Stock(
-                symbol=StockSymbol("AMZN"),
-                company_name=CompanyName("Amazon"),
-                grade=Grade("B"),
+            stock2 = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("AMZN"))
+                .with_company_name(CompanyName("Amazon"))
+                .with_grade(Grade("B"))
+                .build()
             )
 
             _ = unit_of_work.stocks.create(stock1)
@@ -198,10 +208,12 @@ class TestUnitOfWorkIntegration:
         """Should ensure repositories share same connection."""
         with unit_of_work:
             # Create stock
-            stock = Stock(
-                symbol=StockSymbol("IBM"),
-                company_name=CompanyName("IBM Corp"),
-                grade=Grade("B"),
+            stock = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("IBM"))
+                .with_company_name(CompanyName("IBM Corp"))
+                .with_grade(Grade("B"))
+                .build()
             )
             stock_id = unit_of_work.stocks.create(stock)
 
@@ -303,10 +315,12 @@ class TestTransactionIsolation:
 
         # Create and commit in uow1
         with uow1:
-            stock = Stock(
-                symbol=StockSymbol("NFLX"),
-                company_name=CompanyName("Netflix"),
-                grade=Grade("A"),
+            stock = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("NFLX"))
+                .with_company_name(CompanyName("Netflix"))
+                .with_grade(Grade("A"))
+                .build()
             )
             _ = uow1.stocks.create(stock)
             uow1.commit()
@@ -325,10 +339,12 @@ class TestTransactionIsolation:
         # Act & Assert
         with pytest.raises(ValueError), unit_of_work:
             # Create first stock
-            stock1 = Stock(
-                symbol=StockSymbol("META"),
-                company_name=CompanyName("Meta"),
-                grade=Grade("B"),
+            stock1 = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("META"))
+                .with_company_name(CompanyName("Meta"))
+                .with_grade(Grade("B"))
+                .build()
             )
             _ = unit_of_work.stocks.create(stock1)
 

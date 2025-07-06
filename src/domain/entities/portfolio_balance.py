@@ -5,10 +5,15 @@ Rich domain entity implementing clean architecture with value objects.
 Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
-from datetime import date
+from __future__ import annotations
+
+from typing import Self, TYPE_CHECKING
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import IndexChange, Money
+
+if TYPE_CHECKING:
+    from datetime import date
 
 
 class PortfolioBalance(Entity):
@@ -19,27 +24,88 @@ class PortfolioBalance(Entity):
     Follows clean architecture and Domain-Driven Design principles.
     """
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
-        # Rationale: PortfolioBalance captures portfolio value at a point in time.
-        # Each parameter is essential for financial tracking: portfolio reference,
-        # date, balance, cash flows (withdrawals/deposits), and market performance.
-        # Combining these would obscure the distinct financial concepts being tracked.
-        self,
-        portfolio_id: str,
-        balance_date: date,
-        final_balance: Money,
-        withdrawals: Money | None = None,
-        deposits: Money | None = None,
-        index_change: IndexChange | None = None,
-        id: str | None = None,
-    ):
-        """Initialize portfolio balance with required value objects and validation."""
+    class Builder:
+        """Builder for PortfolioBalance to manage multiple parameters elegantly."""
+
+        def __init__(self) -> None:
+            """Initialize builder with default values."""
+            self.portfolio_id: str | None = None
+            self.balance_date: date | None = None
+            self.final_balance: Money | None = None
+            self.withdrawals: Money | None = None
+            self.deposits: Money | None = None
+            self.index_change: IndexChange | None = None
+            self.entity_id: str | None = None
+
+        def with_portfolio_id(self, portfolio_id: str) -> Self:
+            """Set the portfolio ID."""
+            self.portfolio_id = portfolio_id
+            return self
+
+        def with_balance_date(self, balance_date: date) -> Self:
+            """Set the balance date."""
+            self.balance_date = balance_date
+            return self
+
+        def with_final_balance(self, final_balance: Money) -> Self:
+            """Set the final balance."""
+            self.final_balance = final_balance
+            return self
+
+        def with_withdrawals(self, withdrawals: Money | None) -> Self:
+            """Set the withdrawals."""
+            self.withdrawals = withdrawals
+            return self
+
+        def with_deposits(self, deposits: Money | None) -> Self:
+            """Set the deposits."""
+            self.deposits = deposits
+            return self
+
+        def with_index_change(self, index_change: IndexChange | None) -> Self:
+            """Set the index change."""
+            self.index_change = index_change
+            return self
+
+        def with_id(self, entity_id: str | None) -> Self:
+            """Set the entity ID."""
+            self.entity_id = entity_id
+            return self
+
+        def build(self) -> PortfolioBalance:
+            """Build and return the PortfolioBalance instance."""
+            return PortfolioBalance(_builder_instance=self)
+
+    def __init__(self, *, _builder_instance: PortfolioBalance.Builder | None = None):
+        """Initialize portfolio balance through builder pattern."""
+        if _builder_instance is None:
+            raise ValueError("PortfolioBalance must be created through Builder")
+
+        # Extract values from builder
+        portfolio_id = _builder_instance.portfolio_id
+        balance_date = _builder_instance.balance_date
+        final_balance = _builder_instance.final_balance
+        withdrawals = _builder_instance.withdrawals
+        deposits = _builder_instance.deposits
+        index_change = _builder_instance.index_change
+        entity_id = _builder_instance.entity_id
+
+        # Validate required fields
+        if portfolio_id is None:
+            raise ValueError("Portfolio ID is required")
+        if balance_date is None:
+            raise ValueError("Balance date is required")
+        if final_balance is None:
+            raise ValueError("Final balance is required")
+
         # Validate foreign key ID is not empty
         if not portfolio_id:
             raise ValueError("Portfolio ID must be a non-empty string")
 
+        # Initialize parent
+        super().__init__(id=entity_id)
+
         # Store validated attributes
-        super().__init__(id=id)
         self._portfolio_id = portfolio_id
         self._balance_date = balance_date
         self._final_balance = final_balance

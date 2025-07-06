@@ -75,14 +75,16 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            id="test-stock-123",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("A"),
-            notes=Notes("Leading tech company"),
+        stock = (
+            Stock.Builder()
+            .with_id("test-stock-123")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes("Leading tech company"))
+            .build()
         )
 
         # Act
@@ -123,9 +125,11 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("MSFT"),
-            company_name=CompanyName("Microsoft Corporation"),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("MSFT"))
+            .with_company_name(CompanyName("Microsoft Corporation"))
+            .build()
         )
 
         # Act
@@ -157,10 +161,9 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("GOOGL"),
-            company_name=None,  # No company name
-        )
+        stock = (
+            Stock.Builder().with_symbol(StockSymbol("GOOGL")).build()
+        )  # No company name
 
         # Act
         result_id = repository.create(stock)
@@ -192,9 +195,11 @@ class TestSqlAlchemyStockRepositoryCreate:
         repository = SqlAlchemyStockRepository(mock_connection)
 
         # Create stock without ID - Entity base class will generate one
-        stock = Stock(
-            symbol=StockSymbol("GOOGL"),
-            company_name=CompanyName("Alphabet Inc."),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("GOOGL"))
+            .with_company_name(CompanyName("Alphabet Inc."))
+            .build()
         )
 
         # Store the entity's generated ID
@@ -225,9 +230,11 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Act & Assert
@@ -244,9 +251,11 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Act & Assert
@@ -264,9 +273,11 @@ class TestSqlAlchemyStockRepositoryCreate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Act & Assert - Should re-raise the IntegrityError
@@ -429,14 +440,16 @@ class TestSqlAlchemyStockRepositoryDataMapping:
         mock_connection.execute.return_value = None
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            id="test-123",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("A"),
-            notes=Notes("Test notes"),
+        stock = (
+            Stock.Builder()
+            .with_id("test-123")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes("Test notes"))
+            .build()
         )
 
         # Act
@@ -466,13 +479,14 @@ class TestSqlAlchemyStockRepositoryDataMapping:
         mock_connection.execute.return_value = None
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            id="test-456",
-            symbol=StockSymbol("XYZ"),
-            company_name=None,  # No company name
-            sector=Sector("Healthcare"),
-            grade=Grade("B"),
-        )
+        stock = (
+            Stock.Builder()
+            .with_id("test-456")
+            .with_symbol(StockSymbol("XYZ"))
+            .with_sector(Sector("Healthcare"))
+            .with_grade(Grade("B"))
+            .build()
+        )  # No company name
 
         # Act
         result = repository.create(stock)
@@ -749,15 +763,17 @@ class TestSqlAlchemyStockRepositoryUpdate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        updated_stock = Stock(
-            id="stock-999",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc. Updated"),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Hardware"),
-            grade=Grade("B"),  # Changed from A to B
-            notes=Notes("Updated notes"),
-        )
+        updated_stock = (
+            Stock.Builder()
+            .with_id("stock-999")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc. Updated"))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Hardware"))
+            .with_grade(Grade("B"))
+            .with_notes(Notes("Updated notes"))
+            .build()
+        )  # Changed from A to B
 
         # Act
         result = repository.update("stock-999", updated_stock)
@@ -791,9 +807,11 @@ class TestSqlAlchemyStockRepositoryUpdate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        updated_stock = Stock(
-            symbol=StockSymbol("NONE"),
-            company_name=CompanyName("Nonexistent Company"),
+        updated_stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("NONE"))
+            .with_company_name(CompanyName("Nonexistent Company"))
+            .build()
         )
 
         # Act
@@ -813,10 +831,12 @@ class TestSqlAlchemyStockRepositoryUpdate:
         repository = SqlAlchemyStockRepository(mock_connection)
 
         # Stock with different ID than the one we're updating
-        updated_stock = Stock(
-            id="different-id",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        updated_stock = (
+            Stock.Builder()
+            .with_id("different-id")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Act
@@ -840,9 +860,11 @@ class TestSqlAlchemyStockRepositoryUpdate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Act & Assert
@@ -859,10 +881,12 @@ class TestSqlAlchemyStockRepositoryUpdate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("MSFT"),  # Trying to change to existing symbol
-            company_name=CompanyName("Apple Inc."),
-        )
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("MSFT"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
+        )  # Trying to change to existing symbol
 
         # Act & Assert
         with pytest.raises(ValueError, match="Stock with symbol MSFT already exists"):
@@ -879,9 +903,11 @@ class TestSqlAlchemyStockRepositoryUpdate:
 
         repository = SqlAlchemyStockRepository(mock_connection)
 
-        stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Act & Assert - Should re-raise the IntegrityError

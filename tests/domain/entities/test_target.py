@@ -14,19 +14,182 @@ from src.domain.entities.target import Target
 from src.domain.value_objects import Money, Notes, TargetStatus
 
 
+class TestTargetBuilder:
+    """Test cases for Target.Builder pattern."""
+
+    def test_builder_creates_target_with_all_fields(self) -> None:
+        """Test that Builder can create a target with all fields."""
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date(2024, 1, 15))
+            .with_notes(Notes("Important target"))
+            .with_id("target-id")
+            .build()
+        )
+
+        assert target.portfolio_id == "portfolio-1"
+        assert target.stock_id == "stock-1"
+        assert target.pivot_price.amount == Decimal("100.00")
+        assert target.failure_price.amount == Decimal("80.00")
+        assert target.status.value == "active"
+        assert target.created_date == date(2024, 1, 15)
+        assert target.notes.value == "Important target"
+        assert target.id == "target-id"
+
+    def test_builder_creates_target_with_minimal_fields(self) -> None:
+        """Test that Builder can create a target with only required fields."""
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date(2024, 1, 15))
+            .build()
+        )
+
+        assert target.portfolio_id == "portfolio-1"
+        assert target.stock_id == "stock-1"
+        assert target.pivot_price.amount == Decimal("100.00")
+        assert target.failure_price.amount == Decimal("80.00")
+        assert target.status.value == "active"
+        assert target.created_date == date(2024, 1, 15)
+        assert target.notes.value == ""  # Default
+
+    def test_builder_raises_error_when_required_fields_missing(self) -> None:
+        """Test that Builder raises error when required fields are missing."""
+        # Missing portfolio_id
+        with pytest.raises(ValueError, match="Portfolio ID is required"):
+            _ = (
+                Target.Builder()
+                .with_stock_id("stock-1")
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_status(TargetStatus("active"))
+                .with_created_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing stock_id
+        with pytest.raises(ValueError, match="Stock ID is required"):
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_status(TargetStatus("active"))
+                .with_created_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing pivot_price
+        with pytest.raises(ValueError, match="Pivot price is required"):
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_status(TargetStatus("active"))
+                .with_created_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing failure_price
+        with pytest.raises(ValueError, match="Failure price is required"):
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_status(TargetStatus("active"))
+                .with_created_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing status
+        with pytest.raises(ValueError, match="Status is required"):
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_created_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing created_date
+        with pytest.raises(ValueError, match="Created date is required"):
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_status(TargetStatus("active"))
+                .build()
+            )
+
+    def test_builder_validates_empty_ids(self) -> None:
+        """Test that Builder validates empty ID strings."""
+        builder = (
+            Target.Builder()
+            .with_stock_id("stock-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date(2024, 1, 15))
+        )
+
+        # Empty portfolio_id should raise error
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
+            _ = builder.with_portfolio_id("").build()
+
+        # Empty stock_id should raise error
+        _ = builder.with_portfolio_id("portfolio-1")
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
+            _ = builder.with_stock_id("").build()
+
+    def test_builder_method_chaining(self) -> None:
+        """Test that all builder methods return self for chaining."""
+        builder = Target.Builder()
+
+        assert builder.with_portfolio_id("p1") is builder
+        assert builder.with_stock_id("s1") is builder
+        assert builder.with_pivot_price(Money(Decimal("100.00"))) is builder
+        assert builder.with_failure_price(Money(Decimal("80.00"))) is builder
+        assert builder.with_status(TargetStatus("active")) is builder
+        assert builder.with_created_date(date(2024, 1, 15)) is builder
+        assert builder.with_notes(Notes("test")) is builder
+        assert builder.with_id("id1") is builder
+
+    def test_target_constructor_requires_builder(self) -> None:
+        """Test that Target constructor requires a builder instance."""
+        with pytest.raises(ValueError, match="Target must be created through Builder"):
+            _ = Target(_builder_instance=None)
+
+
 class TestTarget:
     """Test Target domain entity with value objects and business logic."""
 
     def test_create_target_with_value_objects(self) -> None:
         """Test creating a target with all value objects."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date(2024, 1, 15),
-            notes=Notes("Important target level"),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date(2024, 1, 15))
+            .with_notes(Notes("Important target level"))
+            .build()
         )
 
         assert target.portfolio_id == "portfolio-id-1"
@@ -39,13 +202,15 @@ class TestTarget:
 
     def test_create_target_with_minimal_data(self) -> None:
         """Test creating target with only required fields."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("150.00")),
-            failure_price=Money(Decimal("120.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("150.00")))
+            .with_failure_price(Money(Decimal("120.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         assert target.portfolio_id == "portfolio-id-1"
@@ -57,14 +222,16 @@ class TestTarget:
 
     def test_create_target_with_none_notes_allowed(self) -> None:
         """Should allow creating target with None for notes."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            notes=None,
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .with_notes(None)
+            .build()
         )
 
         assert target.notes.value == ""  # Notes defaults to empty when None
@@ -72,25 +239,29 @@ class TestTarget:
     def test_create_target_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = Target(
-                portfolio_id="",  # Invalid empty string
-                stock_id="stock-id-1",
-                pivot_price=Money(Decimal("100.00")),
-                failure_price=Money(Decimal("80.00")),
-                status=TargetStatus("active"),
-                created_date=date.today(),
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("")  # Invalid empty string
+                .with_stock_id("stock-id-1")
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_status(TargetStatus("active"))
+                .with_created_date(date.today())
+                .build()
             )
 
     def test_create_target_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = Target(
-                portfolio_id="portfolio-id-1",
-                stock_id="",  # Invalid empty string
-                pivot_price=Money(Decimal("100.00")),
-                failure_price=Money(Decimal("80.00")),
-                status=TargetStatus("active"),
-                created_date=date.today(),
+            _ = (
+                Target.Builder()
+                .with_portfolio_id("portfolio-id-1")
+                .with_stock_id("")  # Invalid empty string
+                .with_pivot_price(Money(Decimal("100.00")))
+                .with_failure_price(Money(Decimal("80.00")))
+                .with_status(TargetStatus("active"))
+                .with_created_date(date.today())
+                .build()
             )
 
     def test_create_target_with_invalid_status_raises_error(self) -> None:
@@ -102,31 +273,37 @@ class TestTarget:
 
     def test_target_equality(self) -> None:
         """Should compare targets based on ID."""
-        target1 = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target1 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
-        target2 = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("110.00")),  # Different price
-            failure_price=Money(Decimal("85.00")),
-            status=TargetStatus("hit"),  # Different status
-            created_date=date.today(),
+        target2 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("110.00")))
+            .with_failure_price(Money(Decimal("85.00")))
+            .with_status(TargetStatus("hit"))
+            .with_created_date(date.today())
+            .build()
         )
 
-        target3 = Target(
-            portfolio_id="portfolio-id-2",  # Different portfolio
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target3 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-2")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         # Different instances with same attributes but different IDs are NOT equal
@@ -134,79 +311,93 @@ class TestTarget:
         assert target1 != target3  # Different IDs
 
         # Same ID means equal
-        target4 = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            id="same-id",
+        target4 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .with_id("same-id")
+            .build()
         )
-        target5 = Target(
-            portfolio_id="portfolio-id-2",  # Different attributes
-            stock_id="stock-id-2",
-            pivot_price=Money(Decimal("200.00")),
-            failure_price=Money(Decimal("150.00")),
-            status=TargetStatus("hit"),
-            created_date=date(2024, 2, 1),
-            id="same-id",
+        target5 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-2")
+            .with_stock_id("stock-id-2")
+            .with_pivot_price(Money(Decimal("200.00")))
+            .with_failure_price(Money(Decimal("150.00")))
+            .with_status(TargetStatus("hit"))
+            .with_created_date(date(2024, 2, 1))
+            .with_id("same-id")
+            .build()
         )
         assert target4 == target5  # Same ID, even with different attributes
 
     def test_target_hash(self) -> None:
         """Should hash consistently based on ID."""
-        target1 = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target1 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
-        target2 = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("150.00")),  # Different price
-            failure_price=Money(Decimal("90.00")),
-            status=TargetStatus("hit"),
-            created_date=date.today(),
+        target2 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("150.00")))
+            .with_failure_price(Money(Decimal("120.00")))
+            .with_status(TargetStatus("hit"))
+            .with_created_date(date.today())
+            .build()
         )
 
         # Different IDs should have different hashes (likely but not guaranteed)
         assert hash(target1) != hash(target2)  # Different IDs
 
         # Same ID should have same hash
-        target3 = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            id="same-id",
+        target3 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .with_id("same-id")
+            .build()
         )
-        target4 = Target(
-            portfolio_id="portfolio-id-2",  # Different attributes
-            stock_id="stock-id-2",
-            pivot_price=Money(Decimal("200.00")),
-            failure_price=Money(Decimal("150.00")),
-            status=TargetStatus("cancelled"),
-            created_date=date(2024, 3, 1),
-            id="same-id",
+        target4 = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-2")
+            .with_stock_id("stock-id-2")
+            .with_pivot_price(Money(Decimal("200.00")))
+            .with_failure_price(Money(Decimal("150.00")))
+            .with_status(TargetStatus("cancelled"))
+            .with_created_date(date(2024, 3, 1))
+            .with_id("same-id")
+            .build()
         )
         assert hash(target3) == hash(target4)  # Same ID, same hash
 
     def test_target_string_representation(self) -> None:
         """Should have informative string representation."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         assert "100.00" in str(target)
@@ -215,13 +406,15 @@ class TestTarget:
 
     def test_target_repr(self) -> None:
         """Should have detailed repr representation."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         expected = (
@@ -232,13 +425,15 @@ class TestTarget:
     # Business behavior tests
     def test_target_activate(self) -> None:
         """Should be able to activate target."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("cancelled"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("cancelled"))
+            .with_created_date(date.today())
+            .build()
         )
 
         target.activate()
@@ -246,13 +441,15 @@ class TestTarget:
 
     def test_target_mark_as_hit(self) -> None:
         """Should be able to mark target as hit."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         target.mark_as_hit()
@@ -260,13 +457,15 @@ class TestTarget:
 
     def test_target_mark_as_failed(self) -> None:
         """Should be able to mark target as failed."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         target.mark_as_failed()
@@ -274,13 +473,15 @@ class TestTarget:
 
     def test_target_cancel(self) -> None:
         """Should be able to cancel target."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         target.cancel()
@@ -288,22 +489,26 @@ class TestTarget:
 
     def test_target_is_active(self) -> None:
         """Should check if target is active."""
-        active_target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        active_target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
-        hit_target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("hit"),
-            created_date=date.today(),
+        hit_target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("hit"))
+            .with_created_date(date.today())
+            .build()
         )
 
         assert active_target.is_active() is True
@@ -311,22 +516,26 @@ class TestTarget:
 
     def test_target_is_hit(self) -> None:
         """Should check if target is hit."""
-        hit_target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("hit"),
-            created_date=date.today(),
+        hit_target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("hit"))
+            .with_created_date(date.today())
+            .build()
         )
 
-        active_target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        active_target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         assert hit_target.is_hit() is True
@@ -334,23 +543,27 @@ class TestTarget:
 
     def test_target_has_notes(self) -> None:
         """Should check if target has notes."""
-        target_with_notes = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            notes=Notes("Important target"),
+        target_with_notes = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .with_notes(Notes("Important target"))
+            .build()
         )
 
-        target_without_notes = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target_without_notes = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         assert target_with_notes.has_notes() is True
@@ -358,13 +571,15 @@ class TestTarget:
 
     def test_target_update_notes(self) -> None:
         """Should be able to update target notes."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         # Update with Notes value object
@@ -378,28 +593,32 @@ class TestTarget:
     def test_target_create_with_id(self) -> None:
         """Should create target with provided ID."""
         test_id = "target-id-123"
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            id=test_id,
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .with_id(test_id)
+            .build()
         )
 
         assert target.id == test_id
 
     def test_target_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
-            id="test-id-1",
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .with_id("test-id-1")
+            .build()
         )
 
         # ID property should not have a setter
@@ -409,14 +628,16 @@ class TestTarget:
     def test_target_from_persistence(self) -> None:
         """Should create target from persistence with existing ID."""
         test_id = "persistence-id-456"
-        target = Target.from_persistence(
-            test_id,
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_id(test_id)
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
 
         assert target.id == test_id
@@ -455,25 +676,29 @@ class TestTargetStatus:
         """Test that target status property methods work correctly."""
 
         # Test failed status (covers line 115)
-        failed_target = Target(
-            portfolio_id="portfolio-1",
-            stock_id="stock-1",
-            failure_price=Money(Decimal("90.00")),
-            pivot_price=Money(Decimal("110.00")),
-            status=TargetStatus("failed"),
-            created_date=date(2024, 1, 15),
+        failed_target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_failure_price(Money(Decimal("90.00")))
+            .with_pivot_price(Money(Decimal("110.00")))
+            .with_status(TargetStatus("failed"))
+            .with_created_date(date(2024, 1, 15))
+            .build()
         )
         assert failed_target.is_failed()
         assert not failed_target.is_cancelled()
 
         # Test cancelled status (covers line 119)
-        cancelled_target = Target(
-            portfolio_id="portfolio-1",
-            stock_id="stock-2",
-            failure_price=Money(Decimal("90.00")),
-            pivot_price=Money(Decimal("110.00")),
-            status=TargetStatus("cancelled"),
-            created_date=date(2024, 1, 15),
+        cancelled_target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-2")
+            .with_failure_price(Money(Decimal("90.00")))
+            .with_pivot_price(Money(Decimal("110.00")))
+            .with_status(TargetStatus("cancelled"))
+            .with_created_date(date(2024, 1, 15))
+            .build()
         )
         assert cancelled_target.is_cancelled()
         assert not cancelled_target.is_failed()
@@ -481,13 +706,15 @@ class TestTargetStatus:
     def test_target_equality_with_non_target_object(self) -> None:
         """Test that target equality returns False for non-Target objects."""
 
-        target = Target(
-            portfolio_id="portfolio-1",
-            stock_id="stock-1",
-            failure_price=Money(Decimal("90.00")),
-            pivot_price=Money(Decimal("110.00")),
-            status=TargetStatus("active"),
-            created_date=date(2024, 1, 15),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_failure_price(Money(Decimal("90.00")))
+            .with_pivot_price(Money(Decimal("110.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date(2024, 1, 15))
+            .build()
         )
 
         # Test equality with different types - should return False (covers line 136)

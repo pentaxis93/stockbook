@@ -351,17 +351,26 @@ class StockBuilder:
         Returns:
             Stock: Configured stock entity
         """
-        return Stock(
-            id=self._id,
-            symbol=StockSymbol(self._symbol),
-            company_name=CompanyName(self._company_name),
-            sector=Sector(self._sector) if self._sector else None,
-            industry_group=(
-                IndustryGroup(self._industry_group) if self._industry_group else None
-            ),
-            grade=Grade(self._grade) if self._grade else None,
-            notes=Notes(self._notes),
+        builder = (
+            Stock.Builder()
+            .with_symbol(StockSymbol(self._symbol))
+            .with_company_name(CompanyName(self._company_name))
+            .with_notes(Notes(self._notes))
         )
+
+        if self._id:
+            builder = builder.with_id(self._id)
+
+        if self._sector:
+            builder = builder.with_sector(Sector(self._sector))
+
+        if self._industry_group:
+            builder = builder.with_industry_group(IndustryGroup(self._industry_group))
+
+        if self._grade:
+            builder = builder.with_grade(Grade(self._grade))
+
+        return builder.build()
 
     # Factory methods for common test scenarios
 

@@ -145,19 +145,24 @@ class SqlAlchemyStockRepository(IStockRepository):
         Returns:
             Stock domain entity
         """
-        return Stock(
-            id=row["id"],
-            symbol=StockSymbol(row["symbol"]),
-            company_name=(
-                CompanyName(row["company_name"]) if row["company_name"] else None
-            ),
-            sector=Sector(row["sector"]) if row["sector"] else None,
-            industry_group=(
-                IndustryGroup(row["industry_group"]) if row["industry_group"] else None
-            ),
-            grade=Grade(row["grade"]) if row["grade"] else None,
-            notes=Notes(row["notes"] if row["notes"] else ""),
+        builder = (
+            Stock.Builder().with_id(row["id"]).with_symbol(StockSymbol(row["symbol"]))
         )
+
+        if row["company_name"]:
+            builder = builder.with_company_name(CompanyName(row["company_name"]))
+        if row["sector"]:
+            builder = builder.with_sector(Sector(row["sector"]))
+        if row["industry_group"]:
+            builder = builder.with_industry_group(IndustryGroup(row["industry_group"]))
+        if row["grade"]:
+            builder = builder.with_grade(Grade(row["grade"]))
+        if row["notes"]:
+            builder = builder.with_notes(Notes(row["notes"]))
+        else:
+            builder = builder.with_notes(Notes(""))
+
+        return builder.build()
 
     # Stub implementations for other interface methods (to be implemented later)
 

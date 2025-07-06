@@ -59,18 +59,22 @@ class StockApplicationService:
                     )
 
                 # Create domain entity
-                stock_entity = Stock(
-                    symbol=symbol_vo,
-                    company_name=CompanyName(command.name) if command.name else None,
-                    sector=Sector(command.sector) if command.sector else None,
-                    industry_group=(
+                builder = Stock.Builder().with_symbol(symbol_vo)
+
+                if command.name:
+                    builder = builder.with_company_name(CompanyName(command.name))
+                if command.sector:
+                    builder = builder.with_sector(Sector(command.sector))
+                if command.industry_group:
+                    builder = builder.with_industry_group(
                         IndustryGroup(command.industry_group)
-                        if command.industry_group
-                        else None
-                    ),
-                    grade=Grade(command.grade) if command.grade else None,
-                    notes=Notes(command.notes) if command.notes else None,
-                )
+                    )
+                if command.grade:
+                    builder = builder.with_grade(Grade(command.grade))
+                if command.notes:
+                    builder = builder.with_notes(Notes(command.notes))
+
+                stock_entity = builder.build()
 
                 # Persist entity
                 _ = self._unit_of_work.stocks.create(stock_entity)

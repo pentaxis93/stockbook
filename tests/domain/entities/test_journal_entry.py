@@ -18,14 +18,18 @@ class TestJournalEntry:
 
     def test_create_journal_entry_with_value_objects(self) -> None:
         """Test creating a journal entry with all value objects."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent(
-                "This is an important market observation about the current trends."
-            ),
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-2",
-            transaction_id="transaction-id-3",
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(
+                JournalContent(
+                    "This is an important market observation about the current trends."
+                )
+            )
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-2")
+            .with_transaction_id("transaction-id-3")
+            .build()
         )
 
         assert entry.entry_date == date(2024, 1, 15)
@@ -39,9 +43,11 @@ class TestJournalEntry:
 
     def test_create_journal_entry_with_minimal_data(self) -> None:
         """Test creating journal entry with only required fields."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Simple entry content."),
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Simple entry content."))
+            .build()
         )
 
         assert entry.entry_date == date(2024, 1, 15)
@@ -53,19 +59,23 @@ class TestJournalEntry:
     def test_create_journal_entry_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = JournalEntry(
-                entry_date=date(2024, 1, 15),
-                content=JournalContent("Test content."),
-                portfolio_id="",  # Invalid empty string
+            _ = (
+                JournalEntry.Builder()
+                .with_entry_date(date(2024, 1, 15))
+                .with_content(JournalContent("Test content."))
+                .with_portfolio_id("")  # Invalid empty string
+                .build()
             )
 
     def test_create_journal_entry_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = JournalEntry(
-                entry_date=date(2024, 1, 15),
-                content=JournalContent("Test content."),
-                stock_id="",  # Invalid empty string
+            _ = (
+                JournalEntry.Builder()
+                .with_entry_date(date(2024, 1, 15))
+                .with_content(JournalContent("Test content."))
+                .with_stock_id("")  # Invalid empty string
+                .build()
             )
 
     def test_create_journal_entry_with_invalid_transaction_id_raises_error(
@@ -75,10 +85,12 @@ class TestJournalEntry:
         with pytest.raises(
             ValueError, match="Transaction ID must be a non-empty string"
         ):
-            _ = JournalEntry(
-                entry_date=date(2024, 1, 15),
-                content=JournalContent("Test content."),
-                transaction_id="",  # Invalid empty string
+            _ = (
+                JournalEntry.Builder()
+                .with_entry_date(date(2024, 1, 15))
+                .with_content(JournalContent("Test content."))
+                .with_transaction_id("")  # Invalid empty string
+                .build()
             )
 
     def test_create_journal_entry_with_invalid_content_raises_error(self) -> None:
@@ -88,20 +100,26 @@ class TestJournalEntry:
 
     def test_journal_entry_equality(self) -> None:
         """Should compare journal entries based on ID."""
-        entry1 = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Market observation about trends."),
+        entry1 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Market observation about trends."))
+            .build()
         )
 
-        entry2 = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Market observation about trends."),
-            portfolio_id="portfolio-id-1",  # Different metadata
+        entry2 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Market observation about trends."))
+            .with_portfolio_id("portfolio-id-1")  # Different metadata
+            .build()
         )
 
-        entry3 = JournalEntry(
-            entry_date=date(2024, 1, 16),  # Different date
-            content=JournalContent("Market observation about trends."),
+        entry3 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 16))  # Different date
+            .with_content(JournalContent("Market observation about trends."))
+            .build()
         )
 
         # Different instances with same attributes but different IDs are NOT equal
@@ -109,57 +127,73 @@ class TestJournalEntry:
         assert entry1 != entry3  # Different IDs
 
         # Same ID means equal
-        entry4 = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Market observation about trends."),
-            id="same-id",
+        entry4 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Market observation about trends."))
+            .with_id("same-id")
+            .build()
         )
-        entry5 = JournalEntry(
-            entry_date=date(2024, 2, 20),  # Different date
-            content=JournalContent("Completely different content."),
-            portfolio_id="portfolio-id-2",
-            stock_id="stock-id-2",
-            id="same-id",
+        entry5 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 2, 20))  # Different date
+            .with_content(JournalContent("Completely different content."))
+            .with_portfolio_id("portfolio-id-2")
+            .with_stock_id("stock-id-2")
+            .with_id("same-id")
+            .build()
         )
         assert entry4 == entry5  # Same ID, even with different attributes
 
     def test_journal_entry_hash(self) -> None:
         """Should hash consistently based on ID."""
-        entry1 = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Market observation."),
+        entry1 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Market observation."))
+            .build()
         )
 
-        entry2 = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Market observation."),
-            portfolio_id="portfolio-id-1",  # Different metadata
+        entry2 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Market observation."))
+            .with_portfolio_id("portfolio-id-1")  # Different metadata
+            .build()
         )
 
         # Different IDs should have different hashes (likely but not guaranteed)
         assert hash(entry1) != hash(entry2)  # Different IDs
 
         # Same ID should have same hash
-        entry3 = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Market observation."),
-            id="same-id",
+        entry3 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Market observation."))
+            .with_id("same-id")
+            .build()
         )
-        entry4 = JournalEntry(
-            entry_date=date(2024, 2, 20),
-            content=JournalContent("Different content."),
-            portfolio_id="portfolio-id-2",
-            id="same-id",
+        entry4 = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 2, 20))
+            .with_content(JournalContent("Different content."))
+            .with_portfolio_id("portfolio-id-2")
+            .with_id("same-id")
+            .build()
         )
         assert hash(entry3) == hash(entry4)  # Same ID, same hash
 
     def test_journal_entry_string_representation(self) -> None:
         """Should have informative string representation."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent(
-                "This is a longer journal entry with significant market observations and analysis."
-            ),
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(
+                JournalContent(
+                    "This is a longer journal entry with significant market observations and analysis."
+                )
+            )
+            .build()
         )
 
         str_repr = str(entry)
@@ -168,9 +202,11 @@ class TestJournalEntry:
 
     def test_journal_entry_repr(self) -> None:
         """Should have detailed repr representation."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content."),
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test content."))
+            .build()
         )
 
         expected = "JournalEntry(date=2024-01-15)"
@@ -179,15 +215,19 @@ class TestJournalEntry:
     # Business behavior tests
     def test_journal_entry_is_related_to_portfolio(self) -> None:
         """Should check if entry is related to a portfolio."""
-        portfolio_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Portfolio analysis."),
-            portfolio_id="portfolio-id-1",
+        portfolio_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Portfolio analysis."))
+            .with_portfolio_id("portfolio-id-1")
+            .build()
         )
 
-        general_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("General market thoughts."),
+        general_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("General market thoughts."))
+            .build()
         )
 
         assert portfolio_entry.is_related_to_portfolio() is True
@@ -195,15 +235,19 @@ class TestJournalEntry:
 
     def test_journal_entry_is_related_to_stock(self) -> None:
         """Should check if entry is related to a stock."""
-        stock_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Stock analysis."),
-            stock_id="stock-id-1",
+        stock_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Stock analysis."))
+            .with_stock_id("stock-id-1")
+            .build()
         )
 
-        general_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("General market thoughts."),
+        general_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("General market thoughts."))
+            .build()
         )
 
         assert stock_entry.is_related_to_stock() is True
@@ -211,15 +255,19 @@ class TestJournalEntry:
 
     def test_journal_entry_is_related_to_transaction(self) -> None:
         """Should check if entry is related to a transaction."""
-        transaction_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Transaction analysis."),
-            transaction_id="transaction-id-1",
+        transaction_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Transaction analysis."))
+            .with_transaction_id("transaction-id-1")
+            .build()
         )
 
-        general_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("General market thoughts."),
+        general_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("General market thoughts."))
+            .build()
         )
 
         assert transaction_entry.is_related_to_transaction() is True
@@ -227,16 +275,22 @@ class TestJournalEntry:
 
     def test_journal_entry_get_content_preview(self) -> None:
         """Should provide content preview for display."""
-        short_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Short content."),
+        short_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Short content."))
+            .build()
         )
 
-        long_entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent(
-                "This is a very long journal entry that contains extensive market analysis and observations that should be truncated for preview purposes."
-            ),
+        long_entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(
+                JournalContent(
+                    "This is a very long journal entry that contains extensive market analysis and observations that should be truncated for preview purposes."
+                )
+            )
+            .build()
         )
 
         assert short_entry.get_content_preview() == "Short content."
@@ -246,9 +300,11 @@ class TestJournalEntry:
 
     def test_journal_entry_update_content(self) -> None:
         """Should be able to update entry content."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Original content."),
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Original content."))
+            .build()
         )
 
         # Update with JournalContent value object
@@ -262,20 +318,24 @@ class TestJournalEntry:
     def test_journal_entry_create_with_id(self) -> None:
         """Should create journal entry with provided ID."""
         test_id = "journal-entry-id-123"
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content."),
-            id=test_id,
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test content."))
+            .with_id(test_id)
+            .build()
         )
 
         assert entry.id == test_id
 
     def test_journal_entry_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content."),
-            id="test-id-1",
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test content."))
+            .with_id("test-id-1")
+            .build()
         )
 
         # ID property should not have a setter
@@ -285,11 +345,13 @@ class TestJournalEntry:
     def test_journal_entry_from_persistence(self) -> None:
         """Should create journal entry from persistence with existing ID."""
         test_id = "persistence-id-456"
-        entry = JournalEntry.from_persistence(
-            test_id,
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content from database."),
-            portfolio_id="portfolio-id-1",
+        entry = (
+            JournalEntry.Builder()
+            .with_id(test_id)
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test content from database."))
+            .with_portfolio_id("portfolio-id-1")
+            .build()
         )
 
         assert entry.id == test_id
@@ -339,11 +401,13 @@ class TestJournalContent:
 
     def test_journal_entry_equality_with_non_journal_entry_object(self) -> None:
         """Test that journal entry equality returns False for non-JournalEntry objects."""
-        entry = JournalEntry(
-            entry_date=date(2024, 1, 15),
-            content=JournalContent("Test content"),
-            portfolio_id="portfolio-1",
-            stock_id="stock-1",
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test content"))
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .build()
         )
 
         # Test equality with different types - should return False (covers line 103)
@@ -351,3 +415,101 @@ class TestJournalContent:
         assert entry != 123
         assert entry is not None
         assert entry != {"entry_date": date(2024, 1, 15), "content": "Test content"}
+
+
+class TestJournalEntryBuilder:
+    """Test cases for JournalEntry.Builder pattern."""
+
+    def test_builder_creates_journal_entry_with_all_fields(self) -> None:
+        """Test that Builder can create a journal entry with all fields."""
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test observation"))
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-2")
+            .with_transaction_id("transaction-3")
+            .with_id("entry-id")
+            .build()
+        )
+
+        assert entry.entry_date == date(2024, 1, 15)
+        assert entry.content.value == "Test observation"
+        assert entry.portfolio_id == "portfolio-1"
+        assert entry.stock_id == "stock-2"
+        assert entry.transaction_id == "transaction-3"
+        assert entry.id == "entry-id"
+
+    def test_builder_creates_journal_entry_with_minimal_fields(self) -> None:
+        """Test that Builder can create a journal entry with only required fields."""
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Minimal entry"))
+            .build()
+        )
+
+        assert entry.entry_date == date(2024, 1, 15)
+        assert entry.content.value == "Minimal entry"
+        assert entry.portfolio_id is None
+        assert entry.stock_id is None
+        assert entry.transaction_id is None
+
+    def test_builder_raises_error_when_required_fields_missing(self) -> None:
+        """Test that Builder raises error when required fields are missing."""
+        # Missing entry_date
+        with pytest.raises(ValueError, match="Entry date is required"):
+            _ = JournalEntry.Builder().with_content(JournalContent("Test")).build()
+
+        # Missing content
+        with pytest.raises(ValueError, match="Content is required"):
+            _ = JournalEntry.Builder().with_entry_date(date(2024, 1, 15)).build()
+
+    def test_builder_validates_portfolio_id(self) -> None:
+        """Test that Builder validates portfolio_id."""
+        builder = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test"))
+        )
+
+        # Empty string should raise error
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
+            _ = builder.with_portfolio_id("").build()
+
+    def test_builder_validates_stock_id(self) -> None:
+        """Test that Builder validates stock_id."""
+        builder = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test"))
+        )
+
+        # Empty string should raise error
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
+            _ = builder.with_stock_id("").build()
+
+    def test_builder_validates_transaction_id(self) -> None:
+        """Test that Builder validates transaction_id."""
+        builder = (
+            JournalEntry.Builder()
+            .with_entry_date(date(2024, 1, 15))
+            .with_content(JournalContent("Test"))
+        )
+
+        # Empty string should raise error
+        with pytest.raises(
+            ValueError, match="Transaction ID must be a non-empty string"
+        ):
+            _ = builder.with_transaction_id("").build()
+
+    def test_builder_method_chaining(self) -> None:
+        """Test that all builder methods return self for chaining."""
+        builder = JournalEntry.Builder()
+
+        assert builder.with_entry_date(date(2024, 1, 15)) is builder
+        assert builder.with_content(JournalContent("Test")) is builder
+        assert builder.with_portfolio_id("p1") is builder
+        assert builder.with_stock_id("s1") is builder
+        assert builder.with_transaction_id("t1") is builder
+        assert builder.with_id("id1") is builder

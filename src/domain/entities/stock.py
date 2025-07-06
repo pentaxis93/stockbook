@@ -5,7 +5,9 @@ Represents a stock/security in the trading system with business logic
 and validation rules encapsulated within the entity.
 """
 
-from typing import Any
+from __future__ import annotations
+
+from typing import Any, Self
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import (
@@ -34,36 +36,76 @@ class Stock(Entity):
     _grade: Grade | None
     _notes: Notes
 
-    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments,too-many-locals
-        # Rationale: Stock is a rich domain entity with multiple business attributes.
-        # Each parameter represents a distinct aspect of the stock (symbol, name, classification,
-        # grade, notes) that cannot be further simplified without losing domain expressiveness.
-        # Using a parameter object here would reduce clarity and add unnecessary complexity
-        # for what is fundamentally a data-rich domain concept.
-        self,
-        symbol: StockSymbol,
-        company_name: CompanyName | None = None,
-        sector: Sector | None = None,
-        industry_group: IndustryGroup | None = None,
-        grade: Grade | None = None,
-        notes: Notes | None = None,
-        id: str | None = None,
-    ):
-        """
-        Initialize Stock entity with value objects.
+    class Builder:
+        """Builder for Stock to manage multiple parameters elegantly."""
 
-        Args:
-            symbol: Stock symbol (value object)
-            company_name: Company name value object (optional)
-            sector: Sector classification value object
-            industry_group: Industry classification value object (must belong to sector if provided)
-            grade: Stock grade value object (A/B/C/D/F or None)
-            notes: Additional notes value object
-            id: Entity ID (string)
+        def __init__(self) -> None:
+            """Initialize builder with default values."""
+            self.symbol: StockSymbol | None = None
+            self.company_name: CompanyName | None = None
+            self.sector: Sector | None = None
+            self.industry_group: IndustryGroup | None = None
+            self.grade: Grade | None = None
+            self.notes: Notes | None = None
+            self.entity_id: str | None = None
 
-        Raises:
-            ValueError: If any validation fails
-        """
+        def with_symbol(self, symbol: StockSymbol) -> Self:
+            """Set the stock symbol."""
+            self.symbol = symbol
+            return self
+
+        def with_company_name(self, company_name: CompanyName | None) -> Self:
+            """Set the company name."""
+            self.company_name = company_name
+            return self
+
+        def with_sector(self, sector: Sector | None) -> Self:
+            """Set the sector."""
+            self.sector = sector
+            return self
+
+        def with_industry_group(self, industry_group: IndustryGroup | None) -> Self:
+            """Set the industry group."""
+            self.industry_group = industry_group
+            return self
+
+        def with_grade(self, grade: Grade | None) -> Self:
+            """Set the grade."""
+            self.grade = grade
+            return self
+
+        def with_notes(self, notes: Notes | None) -> Self:
+            """Set the notes."""
+            self.notes = notes
+            return self
+
+        def with_id(self, entity_id: str | None) -> Self:
+            """Set the entity ID."""
+            self.entity_id = entity_id
+            return self
+
+        def build(self) -> Stock:
+            """Build and return the Stock instance."""
+            return Stock(_builder_instance=self)
+
+    def __init__(self, *, _builder_instance: Stock.Builder | None = None):
+        """Initialize Stock entity through builder pattern."""
+        if _builder_instance is None:
+            raise ValueError("Stock must be created through Builder")
+
+        # Extract values from builder
+        symbol = _builder_instance.symbol
+        company_name = _builder_instance.company_name
+        sector = _builder_instance.sector
+        industry_group = _builder_instance.industry_group
+        grade = _builder_instance.grade
+        notes = _builder_instance.notes
+        entity_id = _builder_instance.entity_id
+
+        # Validate required fields
+        if symbol is None:
+            raise ValueError("Symbol is required")
+
         # Initialize sector industry service for validation (import here to avoid circular imports)
         from src.domain.services.sector_industry_service import (  # pylint: disable=import-outside-toplevel; Rationale: This import must be inside the method to prevent circular dependencies; between domain entities and domain services. The Stock entity needs SectorIndustryService; for validation, but the service may also reference Stock, creating a circular import.
             SectorIndustryService,
@@ -71,8 +113,10 @@ class Stock(Entity):
 
         self._sector_industry_service = SectorIndustryService()
 
+        # Initialize parent
+        super().__init__(id=entity_id)
+
         # Store value objects directly (they're already validated)
-        super().__init__(id=id)
         self._symbol = symbol
         self._company_name = company_name
         self._sector = sector

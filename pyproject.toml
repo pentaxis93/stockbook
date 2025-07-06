@@ -42,7 +42,6 @@ select = [
 
 ignore = [
   # Matching current pylint disables
-  "PLR0913", # too-many-arguments (was max-args = 7)
 
   # Line length and formatting - handled by black
   "E501", # line-too-long
@@ -90,7 +89,6 @@ lines-after-imports = 2
 "tests/*" = [
   "S101",    # assert statements allowed in tests
   "PLR2004", # magic values allowed in tests
-  "PLR0913", # too-many-arguments allowed in tests
   "D",       # docstrings not required in tests
   "PLC0415", # import-outside-toplevel allowed in tests
   "PLR0914", # too-many-locals allowed in tests (was max-locals=15)
@@ -108,11 +106,11 @@ lines-after-imports = 2
   "SIM117",  # nested-with allowed in tests
   "RUF001",  # ambiguous-unicode-character allowed in tests
   "S108",    # hardcoded-temp-file allowed in tests
+  "PLR0913", # too-many-arguments allowed in test helpers and fixtures
 ]
 
 "dependency_injection/*" = [
   # These files already have inline disables
-  "PLR0913", # too-many-arguments
   "PLR0917", # too-many-positional-arguments
 ]
 
@@ -134,7 +132,6 @@ lines-after-imports = 2
 
 "src/presentation/*" = [
   "PLR0914", # too-many-locals
-  "PLR0913", # too-many-arguments
   "PLR0915", # too-many-statements
   "PLR0912", # too-many-branches
   "B008",    # function-call-in-default-argument (needed for FastAPI Depends)
@@ -142,7 +139,7 @@ lines-after-imports = 2
 ]
 
 "src/application/*" = [
-  "PLR0913", # too-many-arguments
+  "PLR0913", # too-many-arguments (commands need multiple parameters)
 ]
 
 [tool.ruff.format]
@@ -220,6 +217,7 @@ exclude_lines = [
   "class .*\\bProtocol\\):",
   "@(abc\\.)?abstractmethod",
   ".*pass.*",
+  "if TYPE_CHECKING:",
 ]
 
 [tool.pyright]

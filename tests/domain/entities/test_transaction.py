@@ -15,6 +15,169 @@ from src.domain.value_objects import Money, Notes, Quantity
 from src.domain.value_objects.transaction_type import TransactionType
 
 
+class TestTransactionBuilder:
+    """Test cases for Transaction.Builder pattern."""
+
+    def test_builder_creates_transaction_with_all_fields(self) -> None:
+        """Test that Builder can create a transaction with all fields."""
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("150.25")))
+            .with_transaction_date(date(2024, 1, 15))
+            .with_notes(Notes("Initial purchase"))
+            .with_id("transaction-id")
+            .build()
+        )
+
+        assert transaction.portfolio_id == "portfolio-1"
+        assert transaction.stock_id == "stock-1"
+        assert transaction.transaction_type.value == "buy"
+        assert transaction.quantity.value == 100
+        assert transaction.price.amount == Decimal("150.25")
+        assert transaction.transaction_date == date(2024, 1, 15)
+        assert transaction.notes.value == "Initial purchase"
+        assert transaction.id == "transaction-id"
+
+    def test_builder_creates_transaction_with_minimal_fields(self) -> None:
+        """Test that Builder can create a transaction with only required fields."""
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_transaction_type(TransactionType("sell"))
+            .with_quantity(Quantity(50))
+            .with_price(Money(Decimal("175.50")))
+            .with_transaction_date(date(2024, 2, 1))
+            .build()
+        )
+
+        assert transaction.portfolio_id == "portfolio-1"
+        assert transaction.stock_id == "stock-1"
+        assert transaction.transaction_type.value == "sell"
+        assert transaction.quantity.value == 50
+        assert transaction.price.amount == Decimal("175.50")
+        assert transaction.transaction_date == date(2024, 2, 1)
+        assert transaction.notes.value == ""  # Default
+
+    def test_builder_raises_error_when_required_fields_missing(self) -> None:
+        """Test that Builder raises error when required fields are missing."""
+        # Missing portfolio_id
+        with pytest.raises(ValueError, match="Portfolio ID is required"):
+            _ = (
+                Transaction.Builder()
+                .with_stock_id("stock-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("100.00")))
+                .with_transaction_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing stock_id
+        with pytest.raises(ValueError, match="Stock ID is required"):
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("100.00")))
+                .with_transaction_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing transaction_type
+        with pytest.raises(ValueError, match="Transaction type is required"):
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("100.00")))
+                .with_transaction_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing quantity
+        with pytest.raises(ValueError, match="Quantity is required"):
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_price(Money(Decimal("100.00")))
+                .with_transaction_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing price
+        with pytest.raises(ValueError, match="Price is required"):
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_transaction_date(date(2024, 1, 15))
+                .build()
+            )
+
+        # Missing transaction_date
+        with pytest.raises(ValueError, match="Transaction date is required"):
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-1")
+                .with_stock_id("stock-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("100.00")))
+                .build()
+            )
+
+    def test_builder_validates_empty_ids(self) -> None:
+        """Test that Builder validates empty ID strings."""
+        builder = (
+            Transaction.Builder()
+            .with_stock_id("stock-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date(2024, 1, 15))
+        )
+
+        # Empty portfolio_id should raise error
+        with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
+            _ = builder.with_portfolio_id("").build()
+
+        # Empty stock_id should raise error
+        _ = builder.with_portfolio_id("portfolio-1")
+        with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
+            _ = builder.with_stock_id("").build()
+
+    def test_builder_method_chaining(self) -> None:
+        """Test that all builder methods return self for chaining."""
+        builder = Transaction.Builder()
+
+        assert builder.with_portfolio_id("p1") is builder
+        assert builder.with_stock_id("s1") is builder
+        assert builder.with_transaction_type(TransactionType("buy")) is builder
+        assert builder.with_quantity(Quantity(100)) is builder
+        assert builder.with_price(Money(Decimal("100.00"))) is builder
+        assert builder.with_transaction_date(date(2024, 1, 15)) is builder
+        assert builder.with_notes(Notes("test")) is builder
+        assert builder.with_id("id1") is builder
+
+    def test_transaction_constructor_requires_builder(self) -> None:
+        """Test that Transaction constructor requires a builder instance."""
+        with pytest.raises(
+            ValueError, match="Transaction must be created through Builder"
+        ):
+            _ = Transaction(_builder_instance=None)
+
+
 class TestTransaction:
     """Test suite for Transaction domain entity."""
 
@@ -28,14 +191,16 @@ class TestTransaction:
         transaction_date = date(2024, 1, 15)
         notes = Notes("Initial purchase")
 
-        transaction = Transaction(
-            portfolio_id=portfolio_id,
-            stock_id=stock_id,
-            transaction_type=transaction_type,
-            quantity=quantity,
-            price=price,
-            transaction_date=transaction_date,
-            notes=notes,
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id(portfolio_id)
+            .with_stock_id(stock_id)
+            .with_transaction_type(transaction_type)
+            .with_quantity(quantity)
+            .with_price(price)
+            .with_transaction_date(transaction_date)
+            .with_notes(notes)
+            .build()
         )
 
         assert transaction.portfolio_id == portfolio_id
@@ -57,13 +222,15 @@ class TestTransaction:
         price = Money(Decimal("175.50"))
         transaction_date = date(2024, 2, 1)
 
-        transaction = Transaction(
-            portfolio_id=portfolio_id,
-            stock_id=stock_id,
-            transaction_type=transaction_type,
-            quantity=quantity,
-            price=price,
-            transaction_date=transaction_date,
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id(portfolio_id)
+            .with_stock_id(stock_id)
+            .with_transaction_type(transaction_type)
+            .with_quantity(quantity)
+            .with_price(price)
+            .with_transaction_date(transaction_date)
+            .build()
         )
 
         assert transaction.portfolio_id == portfolio_id
@@ -81,14 +248,16 @@ class TestTransaction:
         price = Money(Decimal("200.00"))
         notes = Notes("Test transaction")
 
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=transaction_type,
-            quantity=quantity,
-            price=price,
-            transaction_date=date.today(),
-            notes=notes,
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(transaction_type)
+            .with_quantity(quantity)
+            .with_price(price)
+            .with_transaction_date(date.today())
+            .with_notes(notes)
+            .build()
         )
 
         # Should return the exact same value objects
@@ -105,14 +274,16 @@ class TestTransaction:
 
     def test_create_transaction_with_none_notes_allowed(self) -> None:
         """Should allow creating transaction with None for notes."""
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
-            notes=None,
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .with_notes(None)
+            .build()
         )
 
         assert transaction.notes.value == ""  # Notes defaults to empty when None
@@ -131,54 +302,64 @@ class TestTransaction:
     def test_create_transaction_with_invalid_portfolio_id_raises_error(self) -> None:
         """Should raise error for invalid portfolio ID."""
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = Transaction(
-                portfolio_id="",  # Invalid empty string
-                stock_id="stock-id-1",
-                transaction_type=TransactionType("buy"),
-                quantity=Quantity(100),
-                price=Money(Decimal("100.00")),
-                transaction_date=date.today(),
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("")
+                .with_stock_id("stock-id-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("100.00")))
+                .with_transaction_date(date.today())
+                .build()
             )
 
     def test_create_transaction_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = Transaction(
-                portfolio_id="portfolio-id-1",
-                stock_id="",  # Invalid empty string
-                transaction_type=TransactionType("buy"),
-                quantity=Quantity(100),
-                price=Money(Decimal("100.00")),
-                transaction_date=date.today(),
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-id-1")
+                .with_stock_id("")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("100.00")))
+                .with_transaction_date(date.today())
+                .build()
             )
 
     def test_transaction_equality(self) -> None:
         """Should compare transactions based on ID."""
-        transaction1 = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date(2024, 1, 1),
+        transaction1 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date(2024, 1, 1))
+            .build()
         )
 
-        transaction2 = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date(2024, 1, 1),
+        transaction2 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date(2024, 1, 1))
+            .build()
         )
 
-        transaction3 = Transaction(
-            portfolio_id="portfolio-id-2",  # Different portfolio
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date(2024, 1, 1),
+        transaction3 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-2")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date(2024, 1, 1))
+            .build()
         )
 
         # Different instances with same attributes but different IDs are NOT equal
@@ -186,35 +367,41 @@ class TestTransaction:
         assert transaction1 != transaction3  # Different IDs
 
         # Same ID means equal
-        transaction4 = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date(2024, 1, 1),
-            id="same-id",
+        transaction4 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date(2024, 1, 1))
+            .with_id("same-id")
+            .build()
         )
-        transaction5 = Transaction(
-            portfolio_id="portfolio-id-2",  # Different attributes
-            stock_id="stock-id-2",
-            transaction_type=TransactionType("sell"),
-            quantity=Quantity(200),
-            price=Money(Decimal("200.00")),
-            transaction_date=date(2024, 2, 1),
-            id="same-id",
+        transaction5 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-2")
+            .with_stock_id("stock-id-2")
+            .with_transaction_type(TransactionType("sell"))
+            .with_quantity(Quantity(200))
+            .with_price(Money(Decimal("200.00")))
+            .with_transaction_date(date(2024, 2, 1))
+            .with_id("same-id")
+            .build()
         )
         assert transaction4 == transaction5  # Same ID, even with different attributes
 
     def test_transaction_string_representation(self) -> None:
         """Should have meaningful string representation."""
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("150.50")),
-            transaction_date=date(2024, 1, 15),
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("150.50")))
+            .with_transaction_date(date(2024, 1, 15))
+            .build()
         )
 
         expected = "buy 100 @ $150.50 on 2024-01-15"
@@ -222,13 +409,15 @@ class TestTransaction:
 
     def test_transaction_repr(self) -> None:
         """Should have detailed repr representation."""
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-2",
-            transaction_type=TransactionType("sell"),
-            quantity=Quantity(50),
-            price=Money(Decimal("200.00")),
-            transaction_date=date(2024, 2, 1),
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-2")
+            .with_transaction_type(TransactionType("sell"))
+            .with_quantity(Quantity(50))
+            .with_price(Money(Decimal("200.00")))
+            .with_transaction_date(date(2024, 2, 1))
+            .build()
         )
 
         expected = "Transaction(portfolio_id=portfolio-id-1, stock_id=stock-id-2, type='sell', quantity=50, price=$200.00)"
@@ -236,13 +425,15 @@ class TestTransaction:
 
     def test_calculate_total_value(self) -> None:
         """Should calculate total transaction value."""
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("150.50")),
-            transaction_date=date.today(),
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("150.50")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
         total_value = transaction.calculate_total_value()
@@ -252,22 +443,26 @@ class TestTransaction:
 
     def test_is_buy_transaction(self) -> None:
         """Should check if transaction is a buy."""
-        buy_transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
+        buy_transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
-        sell_transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("sell"),
-            quantity=Quantity(50),
-            price=Money(Decimal("110.00")),
-            transaction_date=date.today(),
+        sell_transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("sell"))
+            .with_quantity(Quantity(50))
+            .with_price(Money(Decimal("110.00")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
         assert buy_transaction.is_buy() is True
@@ -275,22 +470,26 @@ class TestTransaction:
 
     def test_is_sell_transaction(self) -> None:
         """Should check if transaction is a sell."""
-        buy_transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
+        buy_transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
-        sell_transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("sell"),
-            quantity=Quantity(50),
-            price=Money(Decimal("110.00")),
-            transaction_date=date.today(),
+        sell_transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("sell"))
+            .with_quantity(Quantity(50))
+            .with_price(Money(Decimal("110.00")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
         assert buy_transaction.is_sell() is False
@@ -298,23 +497,27 @@ class TestTransaction:
 
     def test_has_notes(self) -> None:
         """Should check if transaction has notes."""
-        transaction_with_notes = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
-            notes=Notes("Important transaction"),
+        transaction_with_notes = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .with_notes(Notes("Important transaction"))
+            .build()
         )
 
-        transaction_without_notes = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
+        transaction_without_notes = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
         assert transaction_with_notes.has_notes() is True
@@ -323,28 +526,32 @@ class TestTransaction:
     def test_transaction_create_with_id(self) -> None:
         """Should create transaction with provided ID."""
         test_id = "transaction-id-123"
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
-            id=test_id,
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .with_id(test_id)
+            .build()
         )
 
         assert transaction.id == test_id
 
     def test_transaction_id_immutability(self) -> None:
         """Should not be able to change ID after creation."""
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
-            id="test-id-1",
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .with_id("test-id-1")
+            .build()
         )
 
         # ID property should not have a setter
@@ -354,14 +561,16 @@ class TestTransaction:
     def test_transaction_from_persistence(self) -> None:
         """Should create transaction from persistence with existing ID."""
         test_id = "persistence-id-456"
-        transaction = Transaction.from_persistence(
-            test_id,
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("100.00")),
-            transaction_date=date.today(),
+        transaction = (
+            Transaction.Builder()
+            .with_id(test_id)
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("100.00")))
+            .with_transaction_date(date.today())
+            .build()
         )
 
         assert transaction.id == test_id
@@ -399,13 +608,15 @@ class TestTransactionType:
     def test_transaction_equality_and_hash_with_non_transaction_object(self) -> None:
         """Test that transaction equality and hash work correctly."""
 
-        transaction = Transaction(
-            portfolio_id="portfolio-1",
-            stock_id="stock-1",
-            transaction_date=date(2024, 1, 15),
-            transaction_type=TransactionType("buy"),
-            price=Money(Decimal("100.00")),
-            quantity=Quantity(10),
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_type(TransactionType("buy"))
+            .with_price(Money(Decimal("100.00")))
+            .with_quantity(Quantity(10))
+            .build()
         )
 
         # Test equality with different types - should return False (covers line 109)
@@ -419,34 +630,40 @@ class TestTransactionType:
         assert isinstance(transaction_hash, int)
 
         # Test that transactions with different IDs have different hashes (likely but not guaranteed)
-        same_transaction = Transaction(
-            portfolio_id="portfolio-1",
-            stock_id="stock-1",
-            transaction_date=date(2024, 1, 15),
-            transaction_type=TransactionType("buy"),
-            price=Money(Decimal("100.00")),
-            quantity=Quantity(10),
+        same_transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_type(TransactionType("buy"))
+            .with_price(Money(Decimal("100.00")))
+            .with_quantity(Quantity(10))
+            .build()
         )
         assert hash(transaction) != hash(same_transaction)  # Different IDs
 
         # Test that transactions with same ID have same hash
-        transaction_with_id1 = Transaction(
-            portfolio_id="portfolio-1",
-            stock_id="stock-1",
-            transaction_date=date(2024, 1, 15),
-            transaction_type=TransactionType("buy"),
-            price=Money(Decimal("100.00")),
-            quantity=Quantity(10),
-            id="same-id",
+        transaction_with_id1 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-1")
+            .with_stock_id("stock-1")
+            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_type(TransactionType("buy"))
+            .with_price(Money(Decimal("100.00")))
+            .with_quantity(Quantity(10))
+            .with_id("same-id")
+            .build()
         )
-        transaction_with_id2 = Transaction(
-            portfolio_id="portfolio-2",  # Different attributes
-            stock_id="stock-2",
-            transaction_date=date(2024, 2, 20),
-            transaction_type=TransactionType("sell"),
-            price=Money(Decimal("200.00")),
-            quantity=Quantity(20),
-            id="same-id",
+        transaction_with_id2 = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-2")  # Different attributes
+            .with_stock_id("stock-2")
+            .with_transaction_date(date(2024, 2, 20))
+            .with_transaction_type(TransactionType("sell"))
+            .with_price(Money(Decimal("200.00")))
+            .with_quantity(Quantity(20))
+            .with_id("same-id")
+            .build()
         )
         assert hash(transaction_with_id1) == hash(
             transaction_with_id2

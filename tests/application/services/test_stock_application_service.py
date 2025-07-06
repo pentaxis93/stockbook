@@ -114,10 +114,12 @@ class TestStockApplicationService:
         command = CreateStockCommand(symbol="AAPL", name="Apple Inc.")
 
         # Mock repository to return existing stock
-        existing_stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Existing Apple Inc."),
-            id="stock-id-456",
+        existing_stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Existing Apple Inc."))
+            .with_id("stock-id-456")
+            .build()
         )
         self.mock_stock_repository.get_by_symbol.return_value = existing_stock
 
@@ -148,14 +150,16 @@ class TestStockApplicationService:
         """Should retrieve stock by symbol successfully."""
         # Arrange
         symbol = "AAPL"
-        stock_entity = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("A"),
-            notes=Notes("Great company"),
-            id="stock-id-123",
+        stock_entity = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes("Great company"))
+            .with_id("stock-id-123")
+            .build()
         )
         self.mock_stock_repository.get_by_symbol.return_value = stock_entity
 
@@ -197,15 +201,19 @@ class TestStockApplicationService:
     def test_get_all_stocks_success(self) -> None:
         """Should retrieve all stocks successfully."""
         # Arrange
-        stock1 = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            id="stock-1",
+        stock1 = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_id("stock-1")
+            .build()
         )
-        stock2 = Stock(
-            symbol=StockSymbol("MSFT"),
-            company_name=CompanyName("Microsoft Corp."),
-            id="stock-2",
+        stock2 = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("MSFT"))
+            .with_company_name(CompanyName("Microsoft Corp."))
+            .with_id("stock-2")
+            .build()
         )
 
         self.mock_stock_repository.get_all.return_value = [stock1, stock2]
@@ -278,15 +286,15 @@ class TestStockApplicationService:
         industry_filter = "Tech"
 
         mock_entities = [
-            Stock(
-                id="stock-1",
-                symbol=StockSymbol("AAPL"),
-                company_name=CompanyName("Apple Inc."),
-                sector=Sector("Technology"),
-                industry_group=IndustryGroup("Software"),
-                grade=Grade("A"),
-                notes=Notes(""),
-            ),
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes(""))
+            .build(),
         ]
         self.mock_stock_repository.search_stocks.return_value = mock_entities
 
@@ -313,24 +321,24 @@ class TestStockApplicationService:
         """Should search stocks without any filters."""
         # Arrange
         mock_entities = [
-            Stock(
-                id="stock-1",
-                symbol=StockSymbol("AAPL"),
-                company_name=CompanyName("Apple Inc."),
-                sector=Sector("Technology"),
-                industry_group=IndustryGroup("Software"),
-                grade=Grade("A"),
-                notes=Notes(""),
-            ),
-            Stock(
-                id="stock-2",
-                symbol=StockSymbol("GOOGL"),
-                company_name=CompanyName("Alphabet Inc."),
-                sector=Sector("Technology"),
-                industry_group=IndustryGroup("Software"),
-                grade=Grade("A"),
-                notes=Notes(""),
-            ),
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes(""))
+            .build(),
+            Stock.Builder()
+            .with_id("stock-2")
+            .with_symbol(StockSymbol("GOOGL"))
+            .with_company_name(CompanyName("Alphabet Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes(""))
+            .build(),
         ]
         self.mock_stock_repository.search_stocks.return_value = mock_entities
 
@@ -378,14 +386,16 @@ class TestStockApplicationService:
             notes="Updated notes",
         )
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("B"),
-            notes=Notes("Old notes"),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("B"))
+            .with_notes(Notes("Old notes"))
+            .build()
         )
 
         # Mock repository responses
@@ -417,14 +427,16 @@ class TestStockApplicationService:
             grade="A",  # Only updating grade
         )
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("B"),
-            notes=Notes("Existing notes"),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("B"))
+            .with_notes(Notes("Existing notes"))
+            .build()
         )
 
         # Mock repository responses
@@ -470,11 +482,13 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            grade=Grade("B"),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_grade(Grade("B"))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock
@@ -492,11 +506,13 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", grade="A")
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            grade=Grade("B"),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_grade(Grade("B"))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock
@@ -514,17 +530,21 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", symbol="MSFT")
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         # Another stock with the target symbol already exists
-        another_stock = Stock(
-            id="stock-2",
-            symbol=StockSymbol("MSFT"),
-            company_name=CompanyName("Microsoft Corporation"),
+        another_stock = (
+            Stock.Builder()
+            .with_id("stock-2")
+            .with_symbol(StockSymbol("MSFT"))
+            .with_company_name(CompanyName("Microsoft Corporation"))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock
@@ -542,11 +562,13 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", symbol="AAPL", grade="A")
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            grade=Grade("B"),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_grade(Grade("B"))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock
@@ -568,10 +590,12 @@ class TestStockApplicationService:
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", symbol="APLE")
 
-        existing_stock = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        existing_stock = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = existing_stock
@@ -630,10 +654,12 @@ class TestStockApplicationService:
         """Should validate command and retrieve stock through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock_entity = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = stock_entity
@@ -670,10 +696,12 @@ class TestStockApplicationService:
         """Should apply updates and save through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock_entity = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = stock_entity
@@ -692,10 +720,12 @@ class TestStockApplicationService:
         """Should raise error when repository update fails through update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock_entity = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = stock_entity
@@ -769,10 +799,12 @@ class TestStockApplicationService:
         """Should handle commit failure in update_stock."""
         # Arrange
         command = UpdateStockCommand(stock_id="stock-1", name="Updated Apple Inc.")
-        stock_entity = Stock(
-            id="stock-1",
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
+        stock_entity = (
+            Stock.Builder()
+            .with_id("stock-1")
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .build()
         )
 
         self.mock_stock_repository.get_by_id.return_value = stock_entity
@@ -795,14 +827,16 @@ class TestStockApplicationService:
         """Should retrieve stock by ID successfully."""
         # Arrange
         stock_id = "stock-id-123"
-        stock_entity = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("A"),
-            notes=Notes("Great company"),
-            id="stock-id-123",
+        stock_entity = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes("Great company"))
+            .with_id("stock-id-123")
+            .build()
         )
         self.mock_stock_repository.get_by_id.return_value = stock_entity
 

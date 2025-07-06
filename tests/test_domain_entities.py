@@ -28,13 +28,15 @@ class TestStock:
         from src.domain.value_objects import IndustryGroup, Notes
         from src.domain.value_objects.sector import Sector
 
-        stock = Stock(
-            symbol=StockSymbol("AAPL"),
-            company_name=CompanyName("Apple Inc."),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
-            grade=Grade("A"),
-            notes=Notes("Great company"),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("AAPL"))
+            .with_company_name(CompanyName("Apple Inc."))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .with_grade(Grade("A"))
+            .with_notes(Notes("Great company"))
+            .build()
         )
         assert stock.symbol.value == "AAPL"
         assert stock.company_name is not None
@@ -49,9 +51,11 @@ class TestStock:
 
     def test_minimal_stock_creation(self) -> None:
         """Test creating stock with only required fields"""
-        stock = Stock(
-            symbol=StockSymbol("MSFT"),
-            company_name=CompanyName("Microsoft Corporation"),
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("MSFT"))
+            .with_company_name(CompanyName("Microsoft Corporation"))
+            .build()
         )
         assert stock.symbol.value == "MSFT"
         assert stock.company_name is not None
@@ -69,10 +73,12 @@ class TestStock:
         """Test that valid grades A, B, C, D, F are accepted"""
         for grade_str in ["A", "B", "C", "D", "F"]:
             grade = Grade(grade_str)
-            stock = Stock(
-                symbol=StockSymbol("TEST"),
-                company_name=CompanyName("Test Stock"),
-                grade=grade,
+            stock = (
+                Stock.Builder()
+                .with_symbol(StockSymbol("TEST"))
+                .with_company_name(CompanyName("Test Stock"))
+                .with_grade(grade)
+                .build()
             )
             assert stock.grade == grade
             assert stock.grade is not None
@@ -80,7 +86,12 @@ class TestStock:
 
     def test_empty_name_allowed(self) -> None:
         """Test that empty name is now allowed (users can create stock with only symbol)"""
-        stock = Stock(symbol=StockSymbol("TEST"), company_name=CompanyName(""))
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("TEST"))
+            .with_company_name(CompanyName(""))
+            .build()
+        )
         assert stock.company_name is not None
         assert stock.company_name.value == ""
         assert stock.symbol.value == "TEST"
@@ -143,14 +154,16 @@ class TestTransaction:
         """Test creating a valid buy transaction"""
         from src.domain.value_objects import Notes, TransactionType
 
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("buy"),
-            quantity=Quantity(100),
-            price=Money(Decimal("150.25")),
-            transaction_date=date(2024, 1, 15),
-            notes=Notes("Initial purchase"),
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("buy"))
+            .with_quantity(Quantity(100))
+            .with_price(Money(Decimal("150.25")))
+            .with_transaction_date(date(2024, 1, 15))
+            .with_notes(Notes("Initial purchase"))
+            .build()
         )
         assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 100
@@ -161,13 +174,15 @@ class TestTransaction:
         """Test creating a valid sell transaction"""
         from src.domain.value_objects import TransactionType
 
-        transaction = Transaction(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            transaction_type=TransactionType("sell"),
-            quantity=Quantity(50),
-            price=Money(Decimal("175.00")),
-            transaction_date=date(2024, 2, 15),
+        transaction = (
+            Transaction.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_transaction_type(TransactionType("sell"))
+            .with_quantity(Quantity(50))
+            .with_price(Money(Decimal("175.00")))
+            .with_transaction_date(date(2024, 2, 15))
+            .build()
         )
         assert transaction.transaction_type.value == "sell"
         assert transaction.quantity.value == 50
@@ -187,13 +202,15 @@ class TestTransaction:
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Portfolio ID must be a non-empty string"):
-            _ = Transaction(
-                portfolio_id="",
-                stock_id="stock-id-1",
-                transaction_type=TransactionType("buy"),
-                quantity=Quantity(100),
-                price=Money(Decimal("150.00")),
-                transaction_date=date.today(),
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("")
+                .with_stock_id("stock-id-1")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("150.00")))
+                .with_transaction_date(date.today())
+                .build()
             )
 
     def test_invalid_stock_id_rejected(self) -> None:
@@ -201,13 +218,15 @@ class TestTransaction:
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            _ = Transaction(
-                portfolio_id="portfolio-id-1",
-                stock_id="",
-                transaction_type=TransactionType("buy"),
-                quantity=Quantity(100),
-                price=Money(Decimal("150.00")),
-                transaction_date=date.today(),
+            _ = (
+                Transaction.Builder()
+                .with_portfolio_id("portfolio-id-1")
+                .with_stock_id("")
+                .with_transaction_type(TransactionType("buy"))
+                .with_quantity(Quantity(100))
+                .with_price(Money(Decimal("150.00")))
+                .with_transaction_date(date.today())
+                .build()
             )
 
 
@@ -218,13 +237,15 @@ class TestTarget:
         """Test that Target can be instantiated with value objects"""
         from src.domain.value_objects import TargetStatus
 
-        target = Target(
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-1",
-            pivot_price=Money(Decimal("100.00")),
-            failure_price=Money(Decimal("80.00")),
-            status=TargetStatus("active"),
-            created_date=date.today(),
+        target = (
+            Target.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-1")
+            .with_pivot_price(Money(Decimal("100.00")))
+            .with_failure_price(Money(Decimal("80.00")))
+            .with_status(TargetStatus("active"))
+            .with_created_date(date.today())
+            .build()
         )
         assert target.portfolio_id == "portfolio-id-1"
         assert target.stock_id == "stock-id-1"
@@ -240,13 +261,15 @@ class TestPortfolioBalance:
         """Test that PortfolioBalance can be instantiated with value objects"""
         from src.domain.value_objects import IndexChange
 
-        balance = PortfolioBalance(
-            portfolio_id="portfolio-id-1",
-            balance_date=date.today(),
-            final_balance=Money(Decimal("10000.00")),
-            deposits=Money(Decimal("1000.00")),
-            withdrawals=Money(Decimal("500.00")),
-            index_change=IndexChange(5.25),
+        balance = (
+            PortfolioBalance.Builder()
+            .with_portfolio_id("portfolio-id-1")
+            .with_balance_date(date.today())
+            .with_final_balance(Money(Decimal("10000.00")))
+            .with_deposits(Money(Decimal("1000.00")))
+            .with_withdrawals(Money(Decimal("500.00")))
+            .with_index_change(IndexChange(5.25))
+            .build()
         )
         assert balance.portfolio_id == "portfolio-id-1"
         assert balance.final_balance.amount == Decimal("10000.00")
@@ -263,13 +286,15 @@ class TestJournalEntry:
         """Test that JournalEntry can be instantiated with value objects"""
         from src.domain.value_objects import JournalContent
 
-        entry = JournalEntry(
-            entry_date=date.today(),
-            content=JournalContent(
-                "This is a detailed market analysis and observations."
-            ),
-            portfolio_id="portfolio-id-1",
-            stock_id="stock-id-2",
+        entry = (
+            JournalEntry.Builder()
+            .with_entry_date(date.today())
+            .with_content(
+                JournalContent("This is a detailed market analysis and observations.")
+            )
+            .with_portfolio_id("portfolio-id-1")
+            .with_stock_id("stock-id-2")
+            .build()
         )
         assert entry.entry_date == date.today()
         assert (

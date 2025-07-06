@@ -32,12 +32,14 @@ def create_test_stock(
     symbol: str = "AAPL", price: float = 100.00, quantity: int = 10, grade: str = "B"
 ) -> tuple[Stock, Quantity, Money]:
     """Helper to create test stock with position."""
-    stock = Stock(
-        symbol=StockSymbol(symbol),
-        company_name=CompanyName(f"{symbol} Corp"),
-        sector=Sector("Technology"),
-        industry_group=IndustryGroup("Software"),
-        grade=Grade(grade),
+    stock = (
+        Stock.Builder()
+        .with_symbol(StockSymbol(symbol))
+        .with_company_name(CompanyName(f"{symbol} Corp"))
+        .with_sector(Sector("Technology"))
+        .with_industry_group(IndustryGroup("Software"))
+        .with_grade(Grade(grade))
+        .build()
     )
     return stock, Quantity(quantity), Money(Decimal(str(price)))
 
@@ -188,12 +190,14 @@ class TestPortfolioCalculationEdgeCases:
             price_value = Decimal("100.00") + (i % 100)  # Prices from $100 to $199
             quantity_value = 10 + (i % 20)  # Quantities from 10 to 29
 
-            stock = Stock(
-                symbol=StockSymbol(symbol),
-                company_name=CompanyName(f"Test Company {i}"),
-                sector=Sector("Technology"),
-                industry_group=IndustryGroup("Software"),
-                grade=Grade("A"),
+            stock = (
+                Stock.Builder()
+                .with_symbol(StockSymbol(symbol))
+                .with_company_name(CompanyName(f"Test Company {i}"))
+                .with_sector(Sector("Technology"))
+                .with_industry_group(IndustryGroup("Software"))
+                .with_grade(Grade("A"))
+                .build()
             )
 
             quantity = Quantity(quantity_value)
@@ -278,11 +282,12 @@ class TestPortfolioCalculationEdgeCases:
         service = PortfolioCalculationService()
 
         # Create stock without industry group
-        stock = Stock(
-            symbol=StockSymbol("UNKNW"),
-            company_name=CompanyName("Unknown Industry Corp"),
-            sector=Sector("Technology"),
-            # No industry_group specified
+        stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("UNKNW"))
+            .with_company_name(CompanyName("Unknown Industry Corp"))
+            .with_sector(Sector("Technology"))
+            .build()
         )
 
         portfolio = [(stock, Quantity(10))]
@@ -299,18 +304,22 @@ class TestPortfolioCalculationEdgeCases:
         service = PortfolioCalculationService()
 
         # Create stocks in different industries
-        tech_stock = Stock(
-            symbol=StockSymbol("TECH"),
-            company_name=CompanyName("Tech Corp"),
-            sector=Sector("Technology"),
-            industry_group=IndustryGroup("Software"),
+        tech_stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("TECH"))
+            .with_company_name(CompanyName("Tech Corp"))
+            .with_sector(Sector("Technology"))
+            .with_industry_group(IndustryGroup("Software"))
+            .build()
         )
 
-        finance_stock = Stock(
-            symbol=StockSymbol("BANK"),
-            company_name=CompanyName("Big Bank"),
-            sector=Sector("Financial Services"),
-            industry_group=IndustryGroup("Banks"),
+        finance_stock = (
+            Stock.Builder()
+            .with_symbol(StockSymbol("BANK"))
+            .with_company_name(CompanyName("Big Bank"))
+            .with_sector(Sector("Financial Services"))
+            .with_industry_group(IndustryGroup("Banks"))
+            .build()
         )
 
         portfolio = [
