@@ -50,7 +50,7 @@ class TargetStatus:
         """Developer representation of the target status."""
         return f"TargetStatus({self._value!r})"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check equality based on value."""
         if not isinstance(other, TargetStatus):
             return False

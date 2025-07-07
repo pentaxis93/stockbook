@@ -53,7 +53,7 @@ class PortfolioName:
         """Developer representation of the portfolio name."""
         return f"PortfolioName({self._value!r})"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check equality based on value."""
         if not isinstance(other, PortfolioName):
             return False

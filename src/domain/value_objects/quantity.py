@@ -17,7 +17,7 @@ class Quantity(BaseNumericValueObject):
     numeric values without complex mathematical operations.
     """
 
-    def __init__(self, value: int | float | str | Decimal) -> None:
+    def __init__(self, value: float | str | Decimal) -> None:
         """Initialize Quantity with a numeric value.
 
         Args:
@@ -55,11 +55,11 @@ class Quantity(BaseNumericValueObject):
 
         return Quantity(result_value)
 
-    def __mul__(self, scalar: int | float | Decimal) -> "Quantity":
+    def __mul__(self, scalar: float | Decimal) -> "Quantity":
         """Multiply Quantity by a scalar."""
         return Quantity(self._value * Decimal(str(scalar)))
 
-    def __truediv__(self, scalar: int | float | Decimal) -> "Quantity":
+    def __truediv__(self, scalar: float | Decimal) -> "Quantity":
         """Divide Quantity by a scalar."""
         if scalar == 0:
             msg = "Cannot divide by zero"

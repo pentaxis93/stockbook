@@ -6,7 +6,7 @@ using SQLAlchemy for transaction management and repository coordination.
 
 # pyright: reportUnknownMemberType=false
 
-from typing import Any
+import types
 
 from sqlalchemy.engine import Connection, Engine
 
@@ -75,9 +75,9 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
 
     def __exit__(
         self,
-        exc_type: type | None,
-        exc_val: Exception | None,
-        exc_tb: Any | None,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
     ) -> bool | None:
         """Exit the unit of work context.
 

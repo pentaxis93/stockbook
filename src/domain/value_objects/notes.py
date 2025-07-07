@@ -70,7 +70,7 @@ class BaseTextValueObject(ABC):
         """Developer representation of the value."""
         return f"{self.__class__.__name__}({self._value!r})"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check equality based on value."""
         if not isinstance(other, self.__class__):
             return False

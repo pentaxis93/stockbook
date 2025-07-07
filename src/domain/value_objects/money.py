@@ -21,7 +21,7 @@ class BaseNumericValueObject(ABC):
 
     def __init__(
         self,
-        value: int | float | str | Decimal,
+        value: float | str | Decimal,
         allow_negative: bool = True,
     ) -> None:
         """Initialize numeric value object with validation.
@@ -57,7 +57,7 @@ class BaseNumericValueObject(ABC):
         """Developer representation."""
         return f"{self.__class__.__name__}({self._value})"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Equality comparison."""
         if not isinstance(other, self.__class__):
             return False
@@ -128,15 +128,15 @@ class BaseNumericValueObject(ABC):
 
         return self.__class__(result_value)
 
-    def __mul__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
+    def __mul__(self, scalar: float | Decimal) -> "BaseNumericValueObject":
         """Multiply by a scalar."""
         return self.__class__(self._value * Decimal(str(scalar)))
 
-    def __rmul__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
+    def __rmul__(self, scalar: float | Decimal) -> "BaseNumericValueObject":
         """Right multiplication (scalar * instance)."""
         return self.__mul__(scalar)
 
-    def __truediv__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
+    def __truediv__(self, scalar: float | Decimal) -> "BaseNumericValueObject":
         """Divide by a scalar."""
         if scalar == 0:
             msg = "Cannot divide by zero"
@@ -176,7 +176,7 @@ class Money(BaseNumericValueObject):
     complexity or advanced allocation features.
     """
 
-    def __init__(self, amount: int | float | str | Decimal) -> None:
+    def __init__(self, amount: float | str | Decimal) -> None:
         """Initialize Money with USD amount.
 
         Args:
@@ -218,11 +218,11 @@ class Money(BaseNumericValueObject):
             raise TypeError(msg)
         return Money(self._value - other._value)
 
-    def __mul__(self, scalar: int | float | Decimal) -> "Money":
+    def __mul__(self, scalar: float | Decimal) -> "Money":
         """Multiply Money by a scalar."""
         return Money(self._value * Decimal(str(scalar)))
 
-    def __truediv__(self, scalar: int | float | Decimal) -> "Money":
+    def __truediv__(self, scalar: float | Decimal) -> "Money":
         """Divide Money by a scalar."""
         if scalar == 0:
             msg = "Cannot divide by zero"

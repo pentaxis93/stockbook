@@ -343,7 +343,7 @@ class Config:
         default: dict[str, Any] = {}
         return validation_rules_map.get(entity_type, default)
 
-    def format_currency(self, amount: int | float) -> str:
+    def format_currency(self, amount: float) -> str:
         """Format amount as currency string."""
         formatted = f"{amount:,.{self.decimal_places}f}"
         return f"{self.currency_symbol}{formatted}"

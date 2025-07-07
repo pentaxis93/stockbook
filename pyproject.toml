@@ -37,6 +37,7 @@ select = [
   "PLW",   # Pylint Warning rules
   "PT",    # flake8-pytest-style (pytest style)
   "PTH",   # flake8-use-pathlib (pathlib usage)
+  "PYI",   # flake8-pyi (type annotations)
   "Q",     # flake8-quotes (quotes)
   "RET",   # flake8-return (return statement checks)
   "RSE",   # flake8-raise (raise Exception)

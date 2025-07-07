@@ -129,7 +129,7 @@ class UpdateStockCommand:
             raise AttributeError(msg)
         super().__setattr__(name, value)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check equality based on all properties."""
         if not isinstance(other, UpdateStockCommand):
             return False

@@ -35,7 +35,7 @@ class Entity(ABC):  # noqa: B024
         # This will call the subclass constructor with the id parameter
         return cls(id=id, **kwargs)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Entities are equal if they are the same type and have the same ID."""
         if not isinstance(other, self.__class__):
             return False

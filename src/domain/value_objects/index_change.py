@@ -17,7 +17,7 @@ class IndexChange:
     MAX_CHANGE = 100.0
     _value: float
 
-    def __init__(self, value: int | float) -> None:
+    def __init__(self, value: float) -> None:
         """Initialize IndexChange with validation.
 
         Args:
@@ -65,7 +65,7 @@ class IndexChange:
         """Developer representation of the index change."""
         return f"IndexChange({self._value})"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check equality based on value."""
         if not isinstance(other, IndexChange):
             return False

@@ -31,7 +31,7 @@ class StockRequest(BaseModel):
     name: str | None = None
     sector: str | None = None
     industry_group: str | None = None
-    grade: Literal["A", "B", "C", "D", "F"] | str | None = None
+    grade: str | None = None
     notes: str = ""
 
     model_config = ConfigDict(
@@ -281,7 +281,7 @@ class StockUpdateRequest(BaseModel):
     name: str | None = None
     sector: str | None = None
     industry_group: str | None = None
-    grade: Literal["A", "B", "C", "D", "F"] | str | None = None
+    grade: str | None = None
     notes: str = ""
 
     model_config = ConfigDict(

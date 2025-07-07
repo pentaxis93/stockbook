@@ -53,7 +53,7 @@ class Grade:
         """Developer representation of the grade."""
         return f"Grade({self._value!r})"
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         """Check equality based on value."""
         if not isinstance(other, Grade):
             return False

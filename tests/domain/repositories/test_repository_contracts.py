@@ -5,8 +5,8 @@ This module tests the repository interface contracts to ensure they define
 proper abstractions for data persistence operations in the domain layer.
 """
 
+import types
 from abc import ABC
-from typing import Any
 
 import pytest
 
@@ -151,7 +151,12 @@ class MockUnitOfWork(IUnitOfWork):
         self.entered = True
         return self
 
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> bool | None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
+    ) -> bool | None:
         if exc_type is not None:
             self.rollback()
 
