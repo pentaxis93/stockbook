@@ -14,9 +14,12 @@ select = [
   "E",     # pycodestyle errors (replaces flake8 E codes)
   "ERA",   # eradicate (commented-out code)
   "F",     # Pyflakes (replaces flake8 F codes)
+  "FA",    # flake8-future-annotations (future annotations)
   "FLY",   # flynt (f-string conversions)
   "FURB",  # refurb (modernize Python code)
+  "G",     # flake8-logging-format (logging format)
   "I",     # isort (import sorting)
+  "ICN",   # flake8-import-conventions (import conventions)
   "LOG",   # flake8-logging (logging best practices)
   "N",     # pep8-naming (naming conventions)
   "PERF",  # Perflint (performance anti-patterns)
@@ -25,7 +28,9 @@ select = [
   "PLR",   # Pylint Refactor rules
   "PLW",   # Pylint Warning rules
   "PTH",   # flake8-use-pathlib (pathlib usage)
+  "Q",     # flake8-quotes (quotes)
   "RET",   # flake8-return (return statement checks)
+  "RSE",   # flake8-raise (raise Exception)
   "RUF",   # Ruff-specific rules
   "S",     # flake8-bandit (security)
   "SIM",   # flake8-simplify (code simplification)
