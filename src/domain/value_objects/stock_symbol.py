@@ -25,7 +25,7 @@ class StockSymbol:
     # Private attributes for type checking
     _value: str
 
-    def __init__(self, symbol: str):
+    def __init__(self, symbol: str) -> None:
         """Initialize StockSymbol with validation and normalization.
 
         Args:

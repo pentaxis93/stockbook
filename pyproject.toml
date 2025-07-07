@@ -8,6 +8,7 @@ unsafe-fixes = true
 select = [
   "A",     # flake8-builtins (shadowing builtins)
   "ASYNC", # flake8-async (async/await best practices)
+  "ANN",   # flake8-annotations (type annotations)
   "B",     # flake8-bugbear (common bugs)
   "C",     # flake8-comprehensions (list/dict/set comprehensions)
   "D",     # pydocstyle (docstring checks)
@@ -46,6 +47,7 @@ select = [
 
 ignore = [
   "A002",   # builtin-argument-shadowing (for 'id' parameter)
+  "ANN401", # missing-type-parameters (missing type parameters)
   "D105",   # missing-magic-method-docstring
   "FIX002", # line-contains-todo
 ]

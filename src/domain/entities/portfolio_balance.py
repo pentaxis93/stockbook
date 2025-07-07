@@ -74,7 +74,9 @@ class PortfolioBalance(Entity):
             """Build and return the PortfolioBalance instance."""
             return PortfolioBalance(_builder_instance=self)
 
-    def __init__(self, *, _builder_instance: PortfolioBalance.Builder | None = None):
+    def __init__(
+        self, *, _builder_instance: PortfolioBalance.Builder | None = None
+    ) -> None:
         """Initialize portfolio balance through builder pattern."""
         if _builder_instance is None:
             raise ValueError("PortfolioBalance must be created through Builder")

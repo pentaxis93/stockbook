@@ -15,7 +15,7 @@ class IndustryGroup:
     MAX_LENGTH = 100
     _value: str
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize IndustryGroup with validation.
 
         Args:

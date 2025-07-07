@@ -80,7 +80,7 @@ class Transaction(Entity):
             """Build and return the Transaction instance."""
             return Transaction(_builder_instance=self)
 
-    def __init__(self, *, _builder_instance: Transaction.Builder | None = None):
+    def __init__(self, *, _builder_instance: Transaction.Builder | None = None) -> None:
         """Initialize transaction through builder pattern."""
         if _builder_instance is None:
             raise ValueError("Transaction must be created through Builder")

@@ -16,7 +16,7 @@ class DomainEvent:
     that other parts of the system may need to react to.
     """
 
-    def __init__(self, occurred_at: datetime | None = None):
+    def __init__(self, occurred_at: datetime | None = None) -> None:
         """Initialize domain event.
 
         Args:

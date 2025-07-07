@@ -17,7 +17,7 @@ class IndexChange:
     MAX_CHANGE = 100.0
     _value: float
 
-    def __init__(self, value: int | float):
+    def __init__(self, value: int | float) -> None:
         """Initialize IndexChange with validation.
 
         Args:

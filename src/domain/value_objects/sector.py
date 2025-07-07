@@ -15,7 +15,7 @@ class Sector:
     MAX_LENGTH = 100
     _value: str
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize Sector with validation.
 
         Args:

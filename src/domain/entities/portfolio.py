@@ -28,7 +28,7 @@ class Portfolio(Entity):
         created_date: date | None = None,
         is_active: bool = True,
         id: str | None = None,
-    ):
+    ) -> None:
         """Initialize portfolio with required value objects and validation."""
         # Store validated attributes
         super().__init__(id=id)

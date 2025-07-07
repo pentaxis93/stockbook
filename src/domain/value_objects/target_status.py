@@ -16,7 +16,7 @@ class TargetStatus:
     VALID_STATUSES: ClassVar[set[str]] = {"active", "hit", "failed", "cancelled"}
     _value: str
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize TargetStatus with validation.
 
         Args:

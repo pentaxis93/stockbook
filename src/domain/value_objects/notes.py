@@ -18,7 +18,7 @@ class BaseTextValueObject(ABC):
 
     def __init__(
         self, value: str, max_length: int | None = None, allow_empty: bool = True
-    ):
+    ) -> None:
         """Initialize text value object with validation.
 
         Args:
@@ -92,7 +92,7 @@ class Notes(BaseTextValueObject):
 
     MAX_LENGTH = 1000
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize Notes with validation.
 
         Args:

@@ -19,7 +19,9 @@ class BaseNumericValueObject(ABC):
 
     _value: Decimal
 
-    def __init__(self, value: int | float | str | Decimal, allow_negative: bool = True):
+    def __init__(
+        self, value: int | float | str | Decimal, allow_negative: bool = True
+    ) -> None:
         """Initialize numeric value object with validation.
 
         Args:
@@ -165,7 +167,7 @@ class Money(BaseNumericValueObject):
     complexity or advanced allocation features.
     """
 
-    def __init__(self, amount: int | float | str | Decimal):
+    def __init__(self, amount: int | float | str | Decimal) -> None:
         """Initialize Money with USD amount.
 
         Args:

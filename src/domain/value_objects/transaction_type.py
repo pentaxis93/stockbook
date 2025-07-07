@@ -16,7 +16,7 @@ class TransactionType:
     VALID_TYPES: ClassVar[set[str]] = {"buy", "sell"}
     _value: str
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize TransactionType with validation.
 
         Args:

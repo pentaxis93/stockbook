@@ -34,7 +34,7 @@ class RegistrationInfo:  # pylint: disable=too-few-public-methods
         service_type: type[Any],
         implementation_type: type[Any],
         lifetime: Lifetime,
-    ):
+    ) -> None:
         """Initialize registration info with service details."""
         self.service_type = service_type
         self.implementation_type = implementation_type

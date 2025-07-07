@@ -14,7 +14,7 @@ class CompanyName(BaseTextValueObject):
 
     MAX_LENGTH = 200
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize CompanyName with validation.
 
         Args:

@@ -15,7 +15,7 @@ class DomainServiceError(Exception):
     All domain service exceptions should inherit from this class.
     """
 
-    def __init__(self, message: str, context: dict[str, Any] | None = None):
+    def __init__(self, message: str, context: dict[str, Any] | None = None) -> None:
         """Initialize domain service error with message and optional context.
 
         Args:
@@ -34,7 +34,9 @@ class ValidationError(DomainServiceError):
     Includes optional field and value context for debugging.
     """
 
-    def __init__(self, message: str, field: str | None = None, value: Any = None):
+    def __init__(
+        self, message: str, field: str | None = None, value: Any = None
+    ) -> None:
         """Initialize validation error with field and value context.
 
         Args:
@@ -57,7 +59,7 @@ class CalculationError(DomainServiceError):
     due to invalid inputs, missing data, or calculation constraints.
     """
 
-    def __init__(self, message: str, operation: str | None = None):
+    def __init__(self, message: str, operation: str | None = None) -> None:
         """Initialize calculation error with operation context.
 
         Args:
@@ -75,7 +77,7 @@ class InsufficientDataError(DomainServiceError):
     due to missing required information.
     """
 
-    def __init__(self, message: str, required_fields: list[str] | None = None):
+    def __init__(self, message: str, required_fields: list[str] | None = None) -> None:
         """Initialize insufficient data error with required fields context.
 
         Args:

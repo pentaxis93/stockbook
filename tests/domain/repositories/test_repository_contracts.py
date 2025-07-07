@@ -34,7 +34,7 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 class MockStockRepository(IStockRepository):
     """Mock implementation of IStockRepository for contract testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.stocks: dict[str, Stock] = {}
         self.next_id = 1
 
@@ -107,7 +107,7 @@ class MockStockRepository(IStockRepository):
 class MockPortfolioRepository(IPortfolioRepository):
     """Mock implementation of IPortfolioRepository for contract testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.portfolios: dict[str, Portfolio] = {}
         self.next_id = 1
 
@@ -142,7 +142,7 @@ class MockPortfolioRepository(IPortfolioRepository):
 class MockUnitOfWork(IUnitOfWork):
     """Mock implementation of IUnitOfWork for contract testing."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.committed = False
         self.rolled_back = False
         self.entered = False

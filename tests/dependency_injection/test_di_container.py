@@ -32,7 +32,7 @@ class MockTestRepository(ITestRepository):
 
 
 class MockTestService:
-    def __init__(self, repository: ITestRepository):
+    def __init__(self, repository: ITestRepository) -> None:
         self.repository = repository
 
     def process(self) -> str:
@@ -40,7 +40,7 @@ class MockTestService:
 
 
 class MockTestController:
-    def __init__(self, service: MockTestService):
+    def __init__(self, service: MockTestService) -> None:
         self.service = service
 
     def handle_request(self) -> str:
@@ -49,26 +49,26 @@ class MockTestController:
 
 # Circular dependency test classes
 class MockServiceA:
-    def __init__(self, service_b: "MockServiceB"):
+    def __init__(self, service_b: "MockServiceB") -> None:
         self.service_b = service_b
 
 
 class MockServiceB:
-    def __init__(self, service_a: MockServiceA):
+    def __init__(self, service_a: MockServiceA) -> None:
         self.service_a = service_a
 
 
 class MockSimpleService:
     """Service with no dependencies."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.value = "simple"
 
 
 class MockServiceWithOptionalDep:
     """Service with optional dependency (default parameter)."""
 
-    def __init__(self, repository: ITestRepository | None = None):
+    def __init__(self, repository: ITestRepository | None = None) -> None:
         self.repository = repository
 
 

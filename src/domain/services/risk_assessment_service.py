@@ -43,7 +43,7 @@ class RiskAssessmentService:
     HIGH_RISK_THRESHOLD = 3
     MEDIUM_RISK_THRESHOLD = 10
 
-    def __init__(self, config: RiskAssessmentConfig | None = None):
+    def __init__(self, config: RiskAssessmentConfig | None = None) -> None:
         """Initialize risk assessment service with optional configuration.
 
         Args:

@@ -15,7 +15,7 @@ class JournalContent(BaseTextValueObject):
 
     MAX_LENGTH = 10000
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize JournalContent with validation.
 
         Args:

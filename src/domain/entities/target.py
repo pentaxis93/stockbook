@@ -80,7 +80,7 @@ class Target(Entity):
             """Build and return the Target instance."""
             return Target(_builder_instance=self)
 
-    def __init__(self, *, _builder_instance: Target.Builder | None = None):
+    def __init__(self, *, _builder_instance: Target.Builder | None = None) -> None:
         """Initialize target through builder pattern."""
         if _builder_instance is None:
             raise ValueError("Target must be created through Builder")

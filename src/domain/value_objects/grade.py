@@ -15,7 +15,7 @@ class Grade:
     VALID_GRADES: ClassVar[set[str]] = {"A", "B", "C", "D", "F"}
     _value: str
 
-    def __init__(self, value: str):
+    def __init__(self, value: str) -> None:
         """Initialize Grade with validation.
 
         Args:

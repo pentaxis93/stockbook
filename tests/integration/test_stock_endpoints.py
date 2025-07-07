@@ -34,7 +34,7 @@ class TestStockEndpoints:
         from src.presentation.web.routers import stock_router
 
         # Override the dependency
-        def mock_get_stock_service():
+        def mock_get_stock_service() -> Mock:
             return mock_stock_service
 
         app.dependency_overrides[stock_router.get_stock_service] = (

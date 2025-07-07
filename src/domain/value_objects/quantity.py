@@ -17,7 +17,7 @@ class Quantity(BaseNumericValueObject):
     numeric values without complex mathematical operations.
     """
 
-    def __init__(self, value: int | float | str | Decimal):
+    def __init__(self, value: int | float | str | Decimal) -> None:
         """Initialize Quantity with a numeric value.
 
         Args:

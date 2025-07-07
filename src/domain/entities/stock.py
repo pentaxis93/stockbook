@@ -86,7 +86,7 @@ class Stock(Entity):
             """Build and return the Stock instance."""
             return Stock(_builder_instance=self)
 
-    def __init__(self, *, _builder_instance: Stock.Builder | None = None):
+    def __init__(self, *, _builder_instance: Stock.Builder | None = None) -> None:
         """Initialize Stock entity through builder pattern."""
         if _builder_instance is None:
             raise ValueError("Stock must be created through Builder")

@@ -603,7 +603,7 @@ class TestDomainEventArchitecturalConcerns:
 
         # Should support event wrapper patterns
         class EventWrapper:
-            def __init__(self, event: DomainEvent, context: dict[str, Any]):
+            def __init__(self, event: DomainEvent, context: dict[str, Any]) -> None:
                 self.event = event
                 self.context = context
 

@@ -37,7 +37,7 @@ class PortfolioCalculationService:
     aggregated portfolio insights and metrics.
     """
 
-    def __init__(self, config: PortfolioCalculationConfig | None = None):
+    def __init__(self, config: PortfolioCalculationConfig | None = None) -> None:
         """Initialize portfolio calculation service with optional configuration.
 
         Args:

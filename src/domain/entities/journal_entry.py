@@ -68,7 +68,9 @@ class JournalEntry(Entity):
             """Build and return the JournalEntry instance."""
             return JournalEntry(_builder_instance=self)
 
-    def __init__(self, *, _builder_instance: JournalEntry.Builder | None = None):
+    def __init__(
+        self, *, _builder_instance: JournalEntry.Builder | None = None
+    ) -> None:
         """Initialize journal entry through builder pattern."""
         if _builder_instance is None:
             raise ValueError("JournalEntry must be created through Builder")

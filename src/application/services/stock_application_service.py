@@ -23,7 +23,7 @@ class StockApplicationService:
     coordinating between domain entities and repositories.
     """
 
-    def __init__(self, unit_of_work: IStockBookUnitOfWork):
+    def __init__(self, unit_of_work: IStockBookUnitOfWork) -> None:
         """Initialize service with unit of work.
 
         Args:

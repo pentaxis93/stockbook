@@ -22,7 +22,7 @@ class StockAddedEvent(DomainEvent):
         stock_name: str,
         stock_id: int,
         occurred_at: datetime | None = None,
-    ):
+    ) -> None:
         """Initialize StockAddedEvent.
 
         Args:
