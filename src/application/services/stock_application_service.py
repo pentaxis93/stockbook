@@ -47,11 +47,7 @@ class StockApplicationService:
             with self._unit_of_work:
                 # Check if stock already exists
                 symbol_vo = StockSymbol(command.symbol)
-                existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
-
-                if existing_stock is not None:
-                    msg = f"Stock with symbol {command.symbol} already exists"
-                    raise ValueError(msg)
+                self._ensure_stock_does_not_exist(symbol_vo, command.symbol)
 
                 # Create domain entity
                 builder = Stock.Builder().with_symbol(symbol_vo)
@@ -237,4 +233,19 @@ class StockApplicationService:
 
         if not update_success:
             msg = "Failed to update stock"
+            raise ValueError(msg)
+
+    def _ensure_stock_does_not_exist(self, symbol_vo: StockSymbol, symbol: str) -> None:
+        """Ensure that a stock with the given symbol does not already exist.
+
+        Args:
+            symbol_vo: The StockSymbol value object
+            symbol: The symbol string for error message
+
+        Raises:
+            ValueError: If stock with symbol already exists
+        """
+        existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
+        if existing_stock is not None:
+            msg = f"Stock with symbol {symbol} already exists"
             raise ValueError(msg)

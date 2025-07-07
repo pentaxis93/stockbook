@@ -78,13 +78,13 @@ def handle_stock_errors(func: F) -> F:
         except Exception as e:
             # Log error based on function name for compatibility with tests
             if func.__name__ == "get_stocks":
-                logger.error("Error retrieving stocks: %s", str(e))
+                logger.exception("Error retrieving stocks")
             elif func.__name__ == "update_stock":
-                logger.error("Error updating stock: %s", str(e))
+                logger.exception("Error updating stock")
             elif func.__name__ == "create_stock":
-                logger.error("Error creating stock: %s", str(e))
+                logger.exception("Error creating stock")
             else:
-                logger.error("Unexpected error in %s: %s", func.__name__, str(e))
+                logger.exception("Unexpected error in %s", func.__name__)
 
             # Use function-specific error messages for compatibility
             detail = ERROR_MESSAGES.get(func.__name__, "An unexpected error occurred")

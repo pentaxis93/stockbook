@@ -140,8 +140,8 @@ class TestDatabaseInitializer:
             initialize_database("invalid://url")
 
         # Should log the error
-        mock_logger.error.assert_called_once()
-        error_message = mock_logger.error.call_args[0][0]
+        mock_logger.exception.assert_called_once()
+        error_message = mock_logger.exception.call_args[0][0]
         assert "failed" in error_message.lower()
 
     def test_initialize_database_with_file_url(self, temp_db_path: str) -> None:

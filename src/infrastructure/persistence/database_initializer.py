@@ -114,6 +114,6 @@ def initialize_database(
 
         logger.info("Database initialized successfully")
 
-    except Exception as e:
-        logger.error("Failed to initialize database: %s", str(e))
+    except Exception:
+        logger.exception("Failed to initialize database")
         raise

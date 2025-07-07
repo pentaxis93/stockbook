@@ -97,10 +97,7 @@ class TestUnitOfWorkIntegration:
         command = CreateStockCommand(inputs)
 
         # Act
-        try:
-            stock_dto = stock_service.create_stock(command)
-        except Exception:
-            raise
+        stock_dto = stock_service.create_stock(command)
 
         # Assert - Verify stock was returned
         assert stock_dto.symbol == "AAPL"

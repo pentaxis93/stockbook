@@ -51,8 +51,7 @@ class TestErrorHandlerEdgeCases:
         assert response.json() == {"detail": "An unexpected error occurred"}
 
         # Verify the generic error log for unknown function name
-        mock_logger.error.assert_called_once_with(
-            "Unexpected error in %s: %s",
+        mock_logger.exception.assert_called_once_with(
+            "Unexpected error in %s",
             "_unknown_function_name",
-            "Test error",
         )

@@ -74,14 +74,14 @@ class SqlAlchemyStockRepository(IStockRepository):
         try:
             # Execute the insert
             self._connection.execute(stmt)
-            return stock.id
-
         except exc.IntegrityError as e:
             # Check if it's a unique constraint violation on symbol
             if "symbol" in str(e):
                 msg = f"Stock with symbol {stock.symbol.value} already exists"
                 raise ValueError(msg) from e
             raise
+        else:
+            return stock.id
 
     def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
         """Retrieve stock by symbol.

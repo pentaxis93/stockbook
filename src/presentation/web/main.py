@@ -54,12 +54,12 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
         fastapi_app.state.di_container = di_container
         logger.info("Dependency injection configured")
 
-    except (ValueError, TypeError, OSError, RuntimeError) as e:
+    except (ValueError, TypeError, OSError, RuntimeError):
         # These are the exceptions that could be raised during database initialization:
         # - ValueError/TypeError from database_factory validation
         # - OSError from file system operations
         # - RuntimeError from SQLAlchemy configuration issues
-        logger.error("Database initialization failed: %s", str(e))
+        logger.exception("Database initialization failed")
         logger.warning("Application starting without database initialization")
 
     # Yield control to the application

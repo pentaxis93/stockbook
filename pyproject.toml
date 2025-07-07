@@ -49,6 +49,7 @@ select = [
   "SLF",   # flake8-self (private member access)
   "TCH",   # flake8-type-checking (type checking imports)
   "TID",   # flake8-tidy-imports (import conventions)
+  "TRY",   # tryceratops (try-except-cleanup)
   "UP",    # pyupgrade (Python version upgrade syntax)
   "W",     # pycodestyle warnings (replaces flake8 W codes)
 ]
@@ -82,6 +83,7 @@ convention = "google"
   "SIM103",  # return-in-try-except-finally allowed in tests
   "SIM117",  # nested-with allowed in tests
   "S108",    # hardcoded-temp-file allowed in tests
+  "TRY301",  # abstract-raise-to-inner-function allowed in tests
 ]
 
 "scripts/test_all.py" = [

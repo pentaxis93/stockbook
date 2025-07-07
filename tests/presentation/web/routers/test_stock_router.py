@@ -307,11 +307,9 @@ class TestStockRouter:
         assert response.status_code == 500
 
         # Verify error was logged
-        mock_logger.error.assert_called_once()
-        log_message = mock_logger.error.call_args[0][0]
-        log_args = mock_logger.error.call_args[0][1]
-        assert "Error retrieving stocks:" in log_message
-        assert log_args == error_msg
+        mock_logger.exception.assert_called_once()
+        log_message = mock_logger.exception.call_args[0][0]
+        assert "Error retrieving stocks" in log_message
 
     def test_update_stock_partial_update_success(
         self,
@@ -764,8 +762,6 @@ class TestStockRouter:
         assert response.status_code == 500
 
         # Verify error was logged
-        mock_logger.error.assert_called_once()
-        log_message = mock_logger.error.call_args[0][0]
-        log_args = mock_logger.error.call_args[0][1]
+        mock_logger.exception.assert_called_once()
+        log_message = mock_logger.exception.call_args[0][0]
         assert "Error updating stock" in log_message
-        assert log_args == error_msg

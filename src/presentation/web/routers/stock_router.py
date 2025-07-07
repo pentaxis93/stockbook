@@ -5,7 +5,7 @@ to the application layer for business logic.
 """
 
 import logging
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
@@ -19,6 +19,22 @@ from src.presentation.web.models.stock_models import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _raise_not_found(stock_id: str) -> NoReturn:
+    """Raise HTTPException for stock not found.
+
+    Args:
+        stock_id: The ID of the stock that was not found
+
+    Raises:
+        HTTPException: 404 Not Found
+    """
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"Stock with ID {stock_id} not found",
+    )
+
 
 # Create router instance
 router = APIRouter(
@@ -123,10 +139,7 @@ async def get_stock_by_id(
         # Check if stock exists
         if stock_dto is None:
             logger.warning("Stock with ID %s not found", stock_id)
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Stock with ID {stock_id} not found",
-            )
+            _raise_not_found(stock_id)
 
         # Convert DTO to response model
         return StockResponse.from_dto(stock_dto)
@@ -135,7 +148,7 @@ async def get_stock_by_id(
         # Re-raise HTTP exceptions as-is
         raise
     except Exception as e:
-        logger.error("Error retrieving stock %s: %s", stock_id, str(e))
+        logger.exception("Error retrieving stock %s", stock_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to retrieve stock",

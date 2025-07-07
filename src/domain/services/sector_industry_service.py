@@ -103,9 +103,10 @@ class SectorIndustryService:
         """
         try:
             valid_industries = self.get_industry_groups_for_sector(sector)
-            return industry_group in valid_industries
         except ValueError:
             return False
+        else:
+            return industry_group in valid_industries
 
     def validate_sector_industry_combination_strict(
         self,

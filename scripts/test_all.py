@@ -166,21 +166,20 @@ def run_command(
                 for line in lines:
                     if line.strip():
                         logger.error("  %s", line.strip())
-
-        return result.returncode, output
     except (subprocess.SubprocessError, OSError) as e:
         elapsed = time.time() - start_time
-        logger.error(
-            "%s[%d/%d] %s: ✗ Error (%.1fs): %s%s",
+        logger.exception(
+            "%s[%d/%d] %s: ✗ Error (%.1fs)%s",
             RED,
             current,
             total,
             description,
             elapsed,
-            e,
             NC,
         )
         return 1, str(e)
+    else:
+        return result.returncode, output
 
 
 def main() -> None:
