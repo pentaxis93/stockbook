@@ -72,7 +72,7 @@ class Config:
     def _setup_application_settings(self) -> None:
         """Setup application settings."""
         self.app_name = self._get_env_str("STOCKBOOK_APP_NAME", "StockBook")
-        self.DEBUG = self._get_env_bool("STOCKBOOK_DEBUG", False)
+        self.DEBUG = self._get_env_bool("STOCKBOOK_DEBUG", default=False)
 
     def _setup_database(self) -> None:
         """Setup database configuration."""
@@ -91,7 +91,7 @@ class Config:
         self.db_connection_timeout = self._get_env_int("STOCKBOOK_DB_TIMEOUT", 30)
         self.db_foreign_keys_enabled = self._get_env_bool(
             "STOCKBOOK_DB_FOREIGN_KEYS",
-            True,
+            default=True,
         )
         self.db_row_factory = self._get_env_str("STOCKBOOK_DB_ROW_FACTORY", "dict")
 
@@ -173,25 +173,40 @@ class Config:
         """Setup feature flags for different development phases."""
         self.features = {
             # Core features (Phase 1-2)
-            "stock_management": self._get_env_bool("STOCKBOOK_FEATURE_STOCKS", True),
+            "stock_management": self._get_env_bool(
+                "STOCKBOOK_FEATURE_STOCKS",
+                default=True,
+            ),
             "portfolio_management": self._get_env_bool(
                 "STOCKBOOK_FEATURE_PORTFOLIOS",
-                True,
+                default=True,
             ),
             "transaction_recording": self._get_env_bool(
                 "STOCKBOOK_FEATURE_TRANSACTIONS",
-                True,
+                default=True,
             ),
             # Advanced features (Phase 3)
-            "target_management": self._get_env_bool("STOCKBOOK_FEATURE_TARGETS", False),
-            "journal_system": self._get_env_bool("STOCKBOOK_FEATURE_JOURNAL", False),
-            "analytics": self._get_env_bool("STOCKBOOK_FEATURE_ANALYTICS", False),
+            "target_management": self._get_env_bool(
+                "STOCKBOOK_FEATURE_TARGETS",
+                default=False,
+            ),
+            "journal_system": self._get_env_bool(
+                "STOCKBOOK_FEATURE_JOURNAL",
+                default=False,
+            ),
+            "analytics": self._get_env_bool(
+                "STOCKBOOK_FEATURE_ANALYTICS",
+                default=False,
+            ),
             # Future features (Phase 4)
             "multi_account": self._get_env_bool(
                 "STOCKBOOK_FEATURE_MULTI_ACCOUNT",
-                False,
+                default=False,
             ),
-            "api_integration": self._get_env_bool("STOCKBOOK_FEATURE_API", False),
+            "api_integration": self._get_env_bool(
+                "STOCKBOOK_FEATURE_API",
+                default=False,
+            ),
         }
 
     def _get_env_str(self, key: str, default: str) -> str:
@@ -220,7 +235,7 @@ class Config:
             msg = f"Invalid float value for {key}: {value}"
             raise ConfigError(msg) from exc
 
-    def _get_env_bool(self, key: str, default: bool) -> bool:
+    def _get_env_bool(self, key: str, *, default: bool) -> bool:
         """Get boolean value from environment with default."""
         value = os.getenv(key)
         if value is None:
@@ -234,7 +249,7 @@ class Config:
             return default
         return [item.strip() for item in value.split(",")]
 
-    def validate(self, skip_file_checks: bool = False) -> None:
+    def validate(self, *, skip_file_checks: bool = False) -> None:
         """Validate configuration settings.
 
         Args:

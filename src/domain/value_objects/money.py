@@ -22,6 +22,7 @@ class BaseNumericValueObject(ABC):
     def __init__(
         self,
         value: float | str | Decimal,
+        *,
         allow_negative: bool = True,
     ) -> None:
         """Initialize numeric value object with validation.

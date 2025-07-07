@@ -21,6 +21,7 @@ select = [
   "ERA",   # eradicate (commented-out code)
   "F",     # Pyflakes (replaces flake8 F codes)
   "FA",    # flake8-future-annotations (future annotations)
+  "FBT",   # flake8-boolean-trap (boolean trap)
   "FLY",   # flynt (f-string conversions)
   "FURB",  # refurb (modernize Python code)
   "G",     # flake8-logging-format (logging format)

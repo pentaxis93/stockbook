@@ -23,6 +23,7 @@ from config import Config
 
 def create_engine(
     db_path: str | Path,
+    *,
     echo: bool = False,
     **kwargs: Any,
 ) -> Engine:
@@ -84,7 +85,7 @@ def create_engine(
     return engine
 
 
-def create_engine_from_config(use_test_db: bool = False) -> Engine:
+def create_engine_from_config(*, use_test_db: bool = False) -> Engine:
     """Create a SQLAlchemy engine using application configuration.
 
     Args:
@@ -117,6 +118,7 @@ def get_database_url(db_path: str | Path) -> str:
 
 def configure_sqlite_pragmas(
     connection: Any,
+    *,
     enable_foreign_keys: bool = True,
     journal_mode: str | None = None,
 ) -> None:

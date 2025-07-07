@@ -20,6 +20,7 @@ class BaseTextValueObject(ABC):
         self,
         value: str,
         max_length: int | None = None,
+        *,
         allow_empty: bool = True,
     ) -> None:
         """Initialize text value object with validation.

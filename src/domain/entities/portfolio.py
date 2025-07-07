@@ -26,6 +26,7 @@ class Portfolio(Entity):
         name: PortfolioName,
         description: Notes | None = None,
         created_date: datetime | None = None,
+        *,
         is_active: bool = True,
         id: str | None = None,
     ) -> None:

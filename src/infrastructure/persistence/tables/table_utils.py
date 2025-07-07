@@ -18,6 +18,7 @@ def id_column() -> Column[Any]:
 def foreign_key_column(
     column_name: str,
     referenced_table: str,
+    *,
     nullable: bool = False,
 ) -> Column[Any]:
     """Create a foreign key column.
