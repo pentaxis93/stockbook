@@ -269,7 +269,7 @@ class TestTarget:
         object."""
         with pytest.raises(ValueError, match="Target status must be one of"):
             _ = TargetStatus(
-                "invalid_status"
+                "invalid_status",
             )  # Error happens at TargetStatus construction
 
     def test_target_equality(self) -> None:

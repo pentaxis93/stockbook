@@ -36,7 +36,8 @@ class TestMainApp:
         assert data["version"] == "1.0.0"
 
     def test_database_initialization_on_startup(
-        self, mock_database_initializer: Mock
+        self,
+        mock_database_initializer: Mock,
     ) -> None:
         """Test that database is initialized during app startup."""
         # Import and trigger startup by creating the app
@@ -53,7 +54,8 @@ class TestMainApp:
 
             # Should be called with the database path from environment
             expected_path = os.getenv(
-                "DATABASE_PATH", "/app/data/database/stockbook.db"
+                "DATABASE_PATH",
+                "/app/data/database/stockbook.db",
             )
             assert call_args[0] == expected_path
 
@@ -118,7 +120,10 @@ class TestMainApp:
         ],
     )
     def test_endpoint_availability(
-        self, client: TestClient, endpoint: str, expected_status: int
+        self,
+        client: TestClient,
+        endpoint: str,
+        expected_status: int,
     ) -> None:
         """Test that various endpoints return expected status codes."""
         response = client.get(endpoint)

@@ -41,7 +41,9 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio(
-        self, portfolio_id: str, limit: int | None = None
+        self,
+        portfolio_id: str,
+        limit: int | None = None,
     ) -> list[Transaction]:
         """Retrieve transactions for a specific portfolio.
 
@@ -55,7 +57,9 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_stock(
-        self, stock_id: str, portfolio_id: str | None = None
+        self,
+        stock_id: str,
+        portfolio_id: str | None = None,
     ) -> list[Transaction]:
         """Retrieve transactions for a specific stock.
 
@@ -69,7 +73,10 @@ class ITransactionRepository(ABC):
 
     @abstractmethod
     def get_by_date_range(
-        self, start_date: date, end_date: date, portfolio_id: str | None = None
+        self,
+        start_date: date,
+        end_date: date,
+        portfolio_id: str | None = None,
     ) -> list[Transaction]:
         """Retrieve transactions within a date range.
 

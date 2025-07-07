@@ -184,7 +184,7 @@ class TestStockApplicationService:
 
         # Verify repository interaction
         self.mock_stock_repository.get_by_symbol.assert_called_once_with(
-            StockSymbol("AAPL")
+            StockSymbol("AAPL"),
         )
 
     def test_get_stock_by_symbol_not_found(self) -> None:
@@ -201,7 +201,7 @@ class TestStockApplicationService:
 
         # Verify repository interaction
         self.mock_stock_repository.get_by_symbol.assert_called_once_with(
-            StockSymbol("NFND")
+            StockSymbol("NFND"),
         )
 
     def test_get_all_stocks_success(self) -> None:
@@ -264,7 +264,7 @@ class TestStockApplicationService:
 
         # Verify repository interaction
         self.mock_stock_repository.exists_by_symbol.assert_called_once_with(
-            StockSymbol("AAPL")
+            StockSymbol("AAPL"),
         )
 
     def test_stock_exists_false(self) -> None:
@@ -281,7 +281,7 @@ class TestStockApplicationService:
 
         # Verify repository interaction
         self.mock_stock_repository.exists_by_symbol.assert_called_once_with(
-            StockSymbol("NFND")
+            StockSymbol("NFND"),
         )
 
     def test_search_stocks_with_filters(self) -> None:
@@ -640,7 +640,7 @@ class TestStockApplicationService:
 
         # Mock StockSymbol to raise an error during creation
         with patch(
-            "src.application.services.stock_application_service.StockSymbol"
+            "src.application.services.stock_application_service.StockSymbol",
         ) as mock_symbol_class:
             mock_symbol_class.side_effect = ValueError("Invalid symbol format")
 
@@ -734,7 +734,8 @@ class TestStockApplicationService:
         # Assert
         assert result.name == "Updated Apple Inc."
         self.mock_stock_repository.update.assert_called_once_with(
-            "stock-1", stock_entity
+            "stock-1",
+            stock_entity,
         )
 
     def test_update_stock_raises_when_repository_update_fails(self) -> None:
@@ -761,7 +762,7 @@ class TestStockApplicationService:
         """Should handle invalid symbol format in get_stock_by_symbol."""
         # This tests the case where StockSymbol creation might fail
         with patch(
-            "src.application.services.stock_application_service.StockSymbol"
+            "src.application.services.stock_application_service.StockSymbol",
         ) as mock_symbol_class:
             mock_symbol_class.side_effect = ValueError("Invalid symbol format")
 
@@ -773,7 +774,7 @@ class TestStockApplicationService:
         """Should handle invalid symbol format in stock_exists."""
         # This tests the case where StockSymbol creation might fail
         with patch(
-            "src.application.services.stock_application_service.StockSymbol"
+            "src.application.services.stock_application_service.StockSymbol",
         ) as mock_symbol_class:
             mock_symbol_class.side_effect = ValueError("Invalid symbol format")
 
@@ -785,7 +786,7 @@ class TestStockApplicationService:
         """Should handle repository errors in search_stocks."""
         # Arrange
         self.mock_stock_repository.search_stocks.side_effect = Exception(
-            "Database error"
+            "Database error",
         )
 
         # Act & Assert

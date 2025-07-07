@@ -69,7 +69,8 @@ class TestTransactionTypeCreation:
 
         for invalid_type in invalid_types:
             with pytest.raises(
-                ValueError, match="Transaction type must be 'buy' or 'sell'"
+                ValueError,
+                match="Transaction type must be 'buy' or 'sell'",
             ):
                 _ = TransactionType(invalid_type)
 
@@ -79,7 +80,8 @@ class TestTransactionTypeCreation:
 
         for partial_match in partial_matches:
             with pytest.raises(
-                ValueError, match="Transaction type must be 'buy' or 'sell'"
+                ValueError,
+                match="Transaction type must be 'buy' or 'sell'",
             ):
                 _ = TransactionType(partial_match)
 

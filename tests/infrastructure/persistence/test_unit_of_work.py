@@ -207,7 +207,9 @@ class TestSqlAlchemyUnitOfWorkRepositoryProperties:
 
     @patch("src.infrastructure.persistence.unit_of_work._SqlAlchemyPortfolioRepository")
     def test_portfolios_property_returns_portfolio_repository(
-        self, mock_repo_class: Mock, active_uow: Any
+        self,
+        mock_repo_class: Mock,
+        active_uow: Any,
     ) -> None:
         """Should return IPortfolioRepository instance."""
         # Arrange
@@ -225,10 +227,12 @@ class TestSqlAlchemyUnitOfWorkRepositoryProperties:
         assert active_uow.portfolios is repository
 
     @patch(
-        "src.infrastructure.persistence.unit_of_work._SqlAlchemyTransactionRepository"
+        "src.infrastructure.persistence.unit_of_work._SqlAlchemyTransactionRepository",
     )
     def test_transactions_property_returns_transaction_repository(
-        self, mock_repo_class: Mock, active_uow: Any
+        self,
+        mock_repo_class: Mock,
+        active_uow: Any,
     ) -> None:
         """Should return ITransactionRepository instance."""
         # Arrange
@@ -247,7 +251,9 @@ class TestSqlAlchemyUnitOfWorkRepositoryProperties:
 
     @patch("src.infrastructure.persistence.unit_of_work._SqlAlchemyTargetRepository")
     def test_targets_property_returns_target_repository(
-        self, mock_repo_class: Mock, active_uow: Any
+        self,
+        mock_repo_class: Mock,
+        active_uow: Any,
     ) -> None:
         """Should return ITargetRepository instance."""
         # Arrange
@@ -266,7 +272,9 @@ class TestSqlAlchemyUnitOfWorkRepositoryProperties:
 
     @patch("src.infrastructure.persistence.unit_of_work._SqlAlchemyBalanceRepository")
     def test_balances_property_returns_balance_repository(
-        self, mock_repo_class: Mock, active_uow: Any
+        self,
+        mock_repo_class: Mock,
+        active_uow: Any,
     ) -> None:
         """Should return IPortfolioBalanceRepository instance."""
         # Arrange
@@ -285,7 +293,9 @@ class TestSqlAlchemyUnitOfWorkRepositoryProperties:
 
     @patch("src.infrastructure.persistence.unit_of_work._SqlAlchemyJournalRepository")
     def test_journal_property_returns_journal_repository(
-        self, mock_repo_class: Mock, active_uow: Any
+        self,
+        mock_repo_class: Mock,
+        active_uow: Any,
     ) -> None:
         """Should return IJournalRepository instance."""
         # Arrange
@@ -332,7 +342,7 @@ class TestSqlAlchemyUnitOfWorkTransactionMethods:
 
         # Use the unit of work in context manager to test commit
         with patch(
-            "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection"
+            "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection",
         ) as mock_conn:
             mock_conn.return_value = mock_db_connection
             mock_connection.__exit__ = Mock(return_value=None)
@@ -359,7 +369,7 @@ class TestSqlAlchemyUnitOfWorkTransactionMethods:
 
         # Use the unit of work in context manager to test rollback
         with patch(
-            "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection"
+            "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection",
         ) as mock_conn:
             mock_conn.return_value = mock_db_connection
             mock_connection.__exit__ = Mock(return_value=None)
@@ -432,7 +442,9 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
         # Arrange
         mock_engine = Mock(spec=Engine)
         mock_engine.connect.side_effect = DatabaseError(
-            "Cannot connect", params={}, orig=Exception()
+            "Cannot connect",
+            params={},
+            orig=Exception(),
         )
 
         uow = SqlAlchemyUnitOfWork(mock_engine)
@@ -449,7 +461,9 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
 
         mock_engine.connect.return_value = mock_connection
         mock_connection.begin.side_effect = DatabaseError(
-            "Cannot begin transaction", params={}, orig=Exception()
+            "Cannot begin transaction",
+            params={},
+            orig=Exception(),
         )
         mock_connection.__enter__ = Mock(return_value=mock_connection)
         mock_connection.__exit__ = Mock(return_value=None)
@@ -477,14 +491,15 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
 
         # Act & Assert
         with patch(
-            "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection"
+            "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection",
         ) as mock_conn:
             mock_db_connection = Mock(spec=SqlAlchemyConnection)
             mock_conn.return_value = mock_db_connection
 
             with uow:
                 with pytest.raises(
-                    RuntimeError, match="Unit of work is already active"
+                    RuntimeError,
+                    match="Unit of work is already active",
                 ):
                     with uow:  # Nested usage
                         pass

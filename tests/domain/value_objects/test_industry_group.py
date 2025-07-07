@@ -54,7 +54,8 @@ class TestIndustryGroup:
         too_long_industry = "A" * 101
 
         with pytest.raises(
-            ValueError, match="Industry group cannot exceed 100 characters"
+            ValueError,
+            match="Industry group cannot exceed 100 characters",
         ):
             _ = IndustryGroup(too_long_industry)
 

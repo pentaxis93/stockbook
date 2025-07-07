@@ -41,35 +41,42 @@ class TestSectorIndustryService:
     def test_validate_sector_industry_combination_valid(self) -> None:
         """Test validating valid sector-industry combination."""
         assert self.service.validate_sector_industry_combination(
-            "Technology", "Software"
+            "Technology",
+            "Software",
         )
         assert self.service.validate_sector_industry_combination(
-            "Healthcare", "Pharmaceuticals"
+            "Healthcare",
+            "Pharmaceuticals",
         )
 
     def test_validate_sector_industry_combination_invalid_industry(self) -> None:
         """Test validating invalid industry for valid sector."""
         assert not self.service.validate_sector_industry_combination(
-            "Technology", "Pharmaceuticals"
+            "Technology",
+            "Pharmaceuticals",
         )
         assert not self.service.validate_sector_industry_combination(
-            "Healthcare", "Software"
+            "Healthcare",
+            "Software",
         )
 
     def test_validate_sector_industry_combination_invalid_sector(self) -> None:
         """Test validating combination with invalid sector."""
         assert not self.service.validate_sector_industry_combination(
-            "InvalidSector", "Software"
+            "InvalidSector",
+            "Software",
         )
 
     def test_validate_sector_industry_combination_strict_valid(self) -> None:
         """Test strict validation with valid combination."""
         # Should not raise exception
         self.service.validate_sector_industry_combination_strict(
-            "Technology", "Software"
+            "Technology",
+            "Software",
         )
         self.service.validate_sector_industry_combination_strict(
-            "Healthcare", "Pharmaceuticals"
+            "Healthcare",
+            "Pharmaceuticals",
         )
 
     def test_validate_sector_industry_combination_strict_invalid_industry(self) -> None:
@@ -82,14 +89,16 @@ class TestSectorIndustryService:
             ),
         ):
             self.service.validate_sector_industry_combination_strict(
-                "Technology", "Pharmaceuticals"
+                "Technology",
+                "Pharmaceuticals",
             )
 
     def test_validate_sector_industry_combination_strict_invalid_sector(self) -> None:
         """Test strict validation with invalid sector raises ValueError."""
         with pytest.raises(ValueError, match="Invalid sector 'InvalidSector'"):
             self.service.validate_sector_industry_combination_strict(
-                "InvalidSector", "Software"
+                "InvalidSector",
+                "Software",
             )
 
     def test_get_sector_for_industry_group_valid(self) -> None:
@@ -106,7 +115,8 @@ class TestSectorIndustryService:
     def test_get_sector_for_industry_group_invalid(self) -> None:
         """Test getting sector for invalid industry group raises ValueError."""
         with pytest.raises(
-            ValueError, match="Industry group 'InvalidIndustry' not found in any sector"
+            ValueError,
+            match="Industry group 'InvalidIndustry' not found in any sector",
         ):
             _ = self.service.get_sector_for_industry_group("InvalidIndustry")
 
@@ -140,5 +150,5 @@ class TestSectorIndustryService:
         # Check for duplicates
         unique_industries: set[str] = set(all_industries)
         assert len(all_industries) == len(
-            unique_industries
+            unique_industries,
         ), "Found duplicate industry groups across sectors"

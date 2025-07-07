@@ -56,7 +56,8 @@ class TestCompanyName:
         too_long_company = "A" * 201
 
         with pytest.raises(
-            ValueError, match="Company name cannot exceed 200 characters"
+            ValueError,
+            match="Company name cannot exceed 200 characters",
         ):
             _ = CompanyName(too_long_company)
 
@@ -126,7 +127,7 @@ class TestCompanyName:
 
         # Mock the parent class to raise an unexpected ValueError
         with patch(
-            "src.domain.value_objects.company_name.BaseTextValueObject.__init__"
+            "src.domain.value_objects.company_name.BaseTextValueObject.__init__",
         ) as mock_init:
             mock_init.side_effect = ValueError("Unexpected error from parent")
 

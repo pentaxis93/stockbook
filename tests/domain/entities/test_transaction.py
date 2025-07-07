@@ -175,7 +175,8 @@ class TestTransactionBuilder:
     def test_transaction_constructor_requires_builder(self) -> None:
         """Test that Transaction constructor requires a builder instance."""
         with pytest.raises(
-            ValueError, match="Transaction must be created through Builder"
+            ValueError,
+            match="Transaction must be created through Builder",
         ):
             _ = Transaction(_builder_instance=None)
 
@@ -296,10 +297,11 @@ class TestTransaction:
         """Should raise error for invalid transaction type through TransactionType
         value object."""
         with pytest.raises(
-            ValueError, match="Transaction type must be 'buy' or 'sell'"
+            ValueError,
+            match="Transaction type must be 'buy' or 'sell'",
         ):
             _ = TransactionType(
-                "transfer"
+                "transfer",
             )  # Error happens at TransactionType construction
 
     def test_create_transaction_with_invalid_portfolio_id_raises_error(self) -> None:
@@ -673,5 +675,5 @@ class TestTransactionType:
             .build()
         )
         assert hash(transaction_with_id1) == hash(
-            transaction_with_id2
+            transaction_with_id2,
         )  # Same ID, same hash

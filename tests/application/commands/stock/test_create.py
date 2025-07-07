@@ -158,7 +158,8 @@ class TestCreateStockCommand:
             industry_group="Software",  # No sector provided
         )
         with pytest.raises(
-            ValueError, match="Sector must be provided when industry_group is specified"
+            ValueError,
+            match="Sector must be provided when industry_group is specified",
         ):
             _ = CreateStockCommand(inputs)
 
@@ -237,7 +238,8 @@ class TestCreateStockCommand:
             industry_group="Banking",  # Invalid combination
         )
         with pytest.raises(
-            ValueError, match="Industry group 'Banking' is not valid for sector"
+            ValueError,
+            match="Industry group 'Banking' is not valid for sector",
         ):
             _ = CreateStockCommand(inputs)
 

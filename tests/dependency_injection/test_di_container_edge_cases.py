@@ -39,7 +39,7 @@ class TestRegistrationExceptions:
 
         # Mock the provider creation to raise an exception
         with patch(
-            "dependency_injection.di_container.providers.Singleton"
+            "dependency_injection.di_container.providers.Singleton",
         ) as mock_provider:
             mock_provider.side_effect = Exception("Provider creation failed")
 
@@ -55,7 +55,7 @@ class TestRegistrationExceptions:
 
         # Mock the provider creation to raise an exception
         with patch(
-            "dependency_injection.di_container.providers.Factory"
+            "dependency_injection.di_container.providers.Factory",
         ) as mock_provider:
             mock_provider.side_effect = Exception("Factory creation failed")
 
@@ -72,7 +72,7 @@ class TestRegistrationExceptions:
 
         # Mock the provider creation to raise an exception
         with patch(
-            "dependency_injection.di_container.providers.Object"
+            "dependency_injection.di_container.providers.Object",
         ) as mock_provider:
             mock_provider.side_effect = Exception("Object provider failed")
 
@@ -91,7 +91,7 @@ class TestRegistrationExceptions:
 
         # Mock the provider creation to raise an exception
         with patch(
-            "dependency_injection.di_container.providers.Callable"
+            "dependency_injection.di_container.providers.Callable",
         ) as mock_provider:
             mock_provider.side_effect = Exception("Callable provider failed")
 
@@ -145,7 +145,7 @@ class TestRegistrationExceptions:
             container.register_instance(MockService, wrong_instance)
 
         assert "NotAService is not compatible with service type MockService" in str(
-            exc_info.value
+            exc_info.value,
         )
 
 
@@ -224,7 +224,7 @@ class TestContainerState:
 
         # Try to register with an error
         with patch(
-            "dependency_injection.di_container.providers.Singleton"
+            "dependency_injection.di_container.providers.Singleton",
         ) as mock_provider:
             mock_provider.side_effect = Exception("Failed")
 

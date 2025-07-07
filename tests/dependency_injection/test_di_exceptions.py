@@ -24,7 +24,8 @@ class TestDependencyResolutionError:
     def test_basic_error_message(self) -> None:
         """Should create error with basic message."""
         error = DependencyResolutionError(
-            MockService, "MockService is not registered in the container"
+            MockService,
+            "MockService is not registered in the container",
         )
 
         assert "MockService is not registered" in str(error)
@@ -119,7 +120,8 @@ class TestInvalidRegistrationError:
     def test_invalid_implementation_type_error(self) -> None:
         """Should validate implementation type matches interface."""
         error = InvalidRegistrationError(
-            MockService, "TestRepository does not implement MockService"
+            MockService,
+            "TestRepository does not implement MockService",
         )
 
         error_str = str(error)
@@ -143,7 +145,8 @@ class TestInvalidRegistrationError:
     def test_none_implementation_error(self) -> None:
         """Should reject None as implementation."""
         error = InvalidRegistrationError(
-            MockService, "Implementation type cannot be None"
+            MockService,
+            "Implementation type cannot be None",
         )
 
         assert "cannot be None" in str(error)

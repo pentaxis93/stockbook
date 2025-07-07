@@ -71,7 +71,8 @@ class TestMockRepositoryFixtures:
         assert rollback_mock.call_count == 1
 
     def test_mock_repositories_can_be_configured(
-        self, mock_stock_repository: Mock
+        self,
+        mock_stock_repository: Mock,
     ) -> None:
         """Should allow configuring mock behavior."""
         # Configure custom behavior
@@ -160,7 +161,8 @@ class TestSampleStocksFixture:
     """Test the sample stocks fixture."""
 
     def test_sample_stocks_provides_diverse_data(
-        self, sample_stocks: list[Stock]
+        self,
+        sample_stocks: list[Stock],
     ) -> None:
         """Should provide diverse test stock data."""
         assert len(sample_stocks) == 4
@@ -179,7 +181,8 @@ class TestSQLAlchemyFixtures:
     """Test the SQLAlchemy-based database fixtures."""
 
     def test_sqlalchemy_engine_creates_all_tables(
-        self, sqlalchemy_in_memory_engine: Engine
+        self,
+        sqlalchemy_in_memory_engine: Engine,
     ) -> None:
         """Should create all tables from metadata."""
         from sqlalchemy import inspect
@@ -199,7 +202,8 @@ class TestSQLAlchemyFixtures:
         assert expected_tables.issubset(table_names)
 
     def test_sqlalchemy_connection_rollback(
-        self, sqlalchemy_connection: Connection
+        self,
+        sqlalchemy_connection: Connection,
     ) -> None:
         """Should rollback changes after test completes."""
         # stock_table already imported at module level
@@ -214,14 +218,15 @@ class TestSQLAlchemyFixtures:
 
         # Verify it exists in this transaction
         result = sqlalchemy_connection.execute(
-            select(stock_table).where(stock_table.c.symbol == "ROLL")  # type: ignore[arg-type]
+            select(stock_table).where(stock_table.c.symbol == "ROLL"),  # type: ignore[arg-type]
         )
         assert result.fetchone() is not None
 
         # Note: After the test, the transaction will be rolled back
 
     def test_sqlalchemy_fixtures_enforce_constraints(
-        self, sqlalchemy_connection: Connection
+        self,
+        sqlalchemy_connection: Connection,
     ) -> None:
         """Should enforce foreign key constraints."""
         from datetime import UTC, datetime
@@ -247,7 +252,9 @@ class TestSQLAlchemyFixtures:
             sqlalchemy_connection.execute(stmt)
 
     def test_sqlalchemy_seeding_functions(
-        self, sqlalchemy_connection: Connection, sample_stocks: list[Stock]
+        self,
+        sqlalchemy_connection: Connection,
+        sample_stocks: list[Stock],
     ) -> None:
         """Should seed data using SQLAlchemy functions."""
         # Seed stocks
@@ -260,14 +267,15 @@ class TestSQLAlchemyFixtures:
 
         # Verify specific stock
         result = sqlalchemy_connection.execute(
-            select(stock_table).where(stock_table.c.symbol == "MSFT")  # type: ignore[arg-type]
+            select(stock_table).where(stock_table.c.symbol == "MSFT"),  # type: ignore[arg-type]
         )
         row = result.fetchone()
         assert row is not None  # Type guard
         assert row.company_name == "Microsoft Corporation"
 
     def test_sqlalchemy_portfolio_seeding(
-        self, sqlalchemy_connection: Connection
+        self,
+        sqlalchemy_connection: Connection,
     ) -> None:
         """Should seed portfolio data using SQLAlchemy."""
         from src.infrastructure.persistence.tables.portfolio_table import (
@@ -276,12 +284,13 @@ class TestSQLAlchemyFixtures:
 
         # Seed portfolio
         portfolio_id = seed_test_portfolio_sqlalchemy(
-            sqlalchemy_connection, "Test Portfolio"
+            sqlalchemy_connection,
+            "Test Portfolio",
         )
 
         # Verify portfolio was created
         result = sqlalchemy_connection.execute(
-            select(portfolio_table).where(portfolio_table.c.id == portfolio_id)  # type: ignore[arg-type]
+            select(portfolio_table).where(portfolio_table.c.id == portfolio_id),  # type: ignore[arg-type]
         )
         row = result.fetchone()
         assert row is not None

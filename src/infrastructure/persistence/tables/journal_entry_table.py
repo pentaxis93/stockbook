@@ -35,7 +35,9 @@ journal_entry_table: Table = Table(
     *timestamp_columns(),
     # Check constraint for entry type
     enum_check_constraint(
-        "entry_type", ["RESEARCH", "DECISION", "REVIEW", "NOTE"], "ck_entry_type"
+        "entry_type",
+        ["RESEARCH", "DECISION", "REVIEW", "NOTE"],
+        "ck_entry_type",
     ),
     # Indexes for common queries
     Index("idx_portfolio_entries", "portfolio_id"),

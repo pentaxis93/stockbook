@@ -51,7 +51,10 @@ class TestPositionAllocation:
         quantity = 10
 
         allocation = PositionAllocation(
-            symbol=symbol, value=value, percentage=percentage, quantity=quantity
+            symbol=symbol,
+            value=value,
+            percentage=percentage,
+            quantity=quantity,
         )
 
         assert allocation.symbol == symbol
@@ -106,7 +109,8 @@ class TestPortfolioAllocation:
         total_value = Money(Decimal("10000.00"))
 
         portfolio_allocation = PortfolioAllocation(
-            allocations=allocations, total_value=total_value
+            allocations=allocations,
+            total_value=total_value,
         )
 
         assert portfolio_allocation.allocations == allocations
@@ -119,7 +123,8 @@ class TestPortfolioAllocation:
             "Healthcare": Decimal("30.0"),
         }
         portfolio_allocation = PortfolioAllocation(
-            allocations=allocations, total_value=Money(Decimal("10000.00"))
+            allocations=allocations,
+            total_value=Money(Decimal("10000.00")),
         )
 
         percentage = portfolio_allocation.get_allocation_percentage("Technology")
@@ -130,7 +135,8 @@ class TestPortfolioAllocation:
         """Test getting allocation percentage for non-existent category."""
         allocations: dict[str, Decimal] = {"Technology": Decimal("40.0")}
         portfolio_allocation = PortfolioAllocation(
-            allocations=allocations, total_value=Money(Decimal("10000.00"))
+            allocations=allocations,
+            total_value=Money(Decimal("10000.00")),
         )
 
         percentage = portfolio_allocation.get_allocation_percentage("Energy")
@@ -195,7 +201,8 @@ class TestPortfolioMetrics:
             position_count=2,
             position_allocations=position_allocations,
             industry_allocation=PortfolioAllocation(
-                allocations={}, total_value=Money(Decimal("10000.00"))
+                allocations={},
+                total_value=Money(Decimal("10000.00")),
             ),
         )
 
@@ -212,7 +219,8 @@ class TestPortfolioMetrics:
             position_count=0,
             position_allocations=[],  # Empty list
             industry_allocation=PortfolioAllocation(
-                allocations={}, total_value=Money(Decimal("0.00"))
+                allocations={},
+                total_value=Money(Decimal("0.00")),
             ),
         )
 
@@ -259,7 +267,8 @@ class TestPortfolioMetrics:
             position_count=5,  # >= 5 positions
             position_allocations=position_allocations,
             industry_allocation=PortfolioAllocation(
-                allocations={}, total_value=Money(Decimal("12500.00"))
+                allocations={},
+                total_value=Money(Decimal("12500.00")),
             ),
         )
 
@@ -286,7 +295,8 @@ class TestPortfolioMetrics:
             position_count=2,  # Less than 5 positions
             position_allocations=position_allocations,
             industry_allocation=PortfolioAllocation(
-                allocations={}, total_value=Money(Decimal("10000.00"))
+                allocations={},
+                total_value=Money(Decimal("10000.00")),
             ),
         )
 
@@ -331,7 +341,8 @@ class TestPortfolioMetrics:
             position_count=5,  # >= 5 positions
             position_allocations=position_allocations,
             industry_allocation=PortfolioAllocation(
-                allocations={}, total_value=Money(Decimal("10000.00"))
+                allocations={},
+                total_value=Money(Decimal("10000.00")),
             ),
         )
 

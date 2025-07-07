@@ -80,7 +80,9 @@ class TestSetupConfiguration:
     @patch("setuptools.setup")
     @patch("setuptools.find_packages")
     def test_setup_function_arguments(
-        self, mock_find_packages: Mock, mock_setup: Mock
+        self,
+        mock_find_packages: Mock,
+        mock_setup: Mock,
     ) -> None:
         """Test that setup() is called with correct arguments when executed."""
         # Mock find_packages to return expected value

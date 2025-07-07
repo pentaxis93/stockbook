@@ -34,7 +34,7 @@ class IndexChange:
         if normalized_value < self.MIN_CHANGE or normalized_value > self.MAX_CHANGE:
             raise ValueError(
                 f"Index change cannot exceed {self.MAX_CHANGE}% or be less than "
-                + f"{self.MIN_CHANGE}%"
+                + f"{self.MIN_CHANGE}%",
             )
 
         # Store as private attribute to prevent mutation

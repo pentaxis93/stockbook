@@ -112,14 +112,17 @@ class TestDatabaseInitializer:
         with engine.connect() as conn:
             assert isinstance(conn, Connection)
             result = conn.execute(
-                sa.text("SELECT symbol FROM stocks WHERE id = :id"), {"id": "test-id"}
+                sa.text("SELECT symbol FROM stocks WHERE id = :id"),
+                {"id": "test-id"},
             ).fetchone()
             assert result is not None
             assert result[0] == "AAPL"
 
     @patch("src.infrastructure.persistence.database_initializer.logger")
     def test_initialize_database_logs_success(
-        self, mock_logger: Mock, temp_db_path: str
+        self,
+        mock_logger: Mock,
+        temp_db_path: str,
     ) -> None:
         """Test that successful initialization is logged."""
         initialize_database(f"sqlite:///{temp_db_path}")

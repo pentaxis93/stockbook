@@ -119,7 +119,10 @@ def extract_metrics(cmd: list[str], output: str) -> str:
 
 
 def run_command(
-    cmd: list[str], description: str, current: int, total: int
+    cmd: list[str],
+    description: str,
+    current: int,
+    total: int,
 ) -> tuple[int, str]:
     """Run a command and return its exit code and output."""
     logger.info("\n%s[%d/%d] %s: Running...%s", BLUE, current, total, description, NC)

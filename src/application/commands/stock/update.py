@@ -103,7 +103,7 @@ class UpdateStockCommand:
                 self._industry_group is not None,
                 self._grade is not None,
                 self._notes is not None,
-            ]
+            ],
         )
 
     def get_update_fields(self) -> dict[str, Any]:
@@ -155,7 +155,7 @@ class UpdateStockCommand:
                 self.industry_group,
                 self.grade,
                 self.notes,
-            )
+            ),
         )
 
     def __str__(self) -> str:
@@ -173,7 +173,8 @@ class UpdateStockCommand:
         )
 
     def _validate_and_normalize_inputs(
-        self, inputs: UpdateStockInputs
+        self,
+        inputs: UpdateStockInputs,
     ) -> dict[str, Any]:
         """Validate and normalize all inputs, returning normalized values."""
         # Validate stock_id

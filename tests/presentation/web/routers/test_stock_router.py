@@ -77,7 +77,10 @@ class TestStockRouter:
         assert str(exc_info.value) == "DI container not configured in app state"
 
     def test_get_stocks_no_filters_calls_get_all(
-        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
     ) -> None:
         """Should call get_all_stocks when no filters are provided."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
@@ -99,7 +102,10 @@ class TestStockRouter:
         mock_service.search_stocks.assert_not_called()
 
     def test_get_stocks_with_symbol_filter(
-        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
     ) -> None:
         """Should call search_stocks with symbol filter."""
         filtered_stocks = [sample_stock_dtos[0]]  # Just AAPL
@@ -123,7 +129,9 @@ class TestStockRouter:
         )
 
     def test_get_stocks_with_multiple_filters(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should call search_stocks with all provided filters."""
         filtered_stock = [
@@ -133,7 +141,7 @@ class TestStockRouter:
                 name="Alphabet Inc.",
                 sector="Technology",
                 grade="A",
-            )
+            ),
         ]
         mock_service.search_stocks.return_value = filtered_stock
 
@@ -156,7 +164,10 @@ class TestStockRouter:
         )
 
     def test_get_stocks_empty_string_filters_ignored(
-        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
     ) -> None:
         """Should treat empty string filters as None and call get_all_stocks."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
@@ -173,7 +184,9 @@ class TestStockRouter:
         mock_service.search_stocks.assert_not_called()
 
     def test_get_stocks_whitespace_trimmed_from_filters(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should trim whitespace from filter values."""
         mock_service.search_stocks.return_value = []
@@ -196,7 +209,9 @@ class TestStockRouter:
         )
 
     def test_get_stocks_service_exception_returns_500(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should return 500 error when service raises exception."""
         mock_service.get_all_stocks.side_effect = Exception("Database error")
@@ -210,7 +225,9 @@ class TestStockRouter:
         assert response.json()["detail"] == "Failed to retrieve stocks"
 
     def test_get_stocks_service_exception_with_filters(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should handle service exceptions when using filters."""
         mock_service.search_stocks.side_effect = ValueError("Invalid filter")
@@ -225,7 +242,10 @@ class TestStockRouter:
         assert response.json()["detail"] == "Invalid filter"
 
     def test_get_stocks_response_format(
-        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
     ) -> None:
         """Should return proper StockListResponse format."""
         mock_service.get_all_stocks.return_value = sample_stock_dtos
@@ -270,7 +290,10 @@ class TestStockRouter:
 
     @patch("src.presentation.web.middleware.error_handlers.logger")
     def test_get_stocks_logs_errors(
-        self, mock_logger: Mock, mock_service: Mock, app: FastAPI
+        self,
+        mock_logger: Mock,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should log errors when exceptions occur."""
         error_msg = "Test error"
@@ -291,7 +314,10 @@ class TestStockRouter:
         assert log_args == error_msg
 
     def test_update_stock_partial_update_success(
-        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
     ) -> None:
         """Should successfully update only specified fields."""
         # Arrange
@@ -317,7 +343,8 @@ class TestStockRouter:
         # Act
         with TestClient(app) as client:
             response = client.put(
-                f"/stocks/{stock_id}", json={"grade": "B", "notes": "Updated notes"}
+                f"/stocks/{stock_id}",
+                json={"grade": "B", "notes": "Updated notes"},
             )
 
         # Assert
@@ -337,7 +364,9 @@ class TestStockRouter:
         assert command.notes == "Updated notes"
 
     def test_update_stock_full_update_success(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should successfully update all updatable fields including symbol."""
         # Arrange
@@ -387,7 +416,10 @@ class TestStockRouter:
         mock_service.update_stock.assert_called_once()
 
     def test_update_stock_symbol_change(
-        self, mock_service: Mock, sample_stock_dtos: list[StockDto], app: FastAPI
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
     ) -> None:
         """Should successfully change stock symbol."""
         # Arrange
@@ -420,13 +452,15 @@ class TestStockRouter:
         assert data["symbol"] == "APPL"
 
     def test_update_stock_duplicate_symbol(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should return 400 when changing to an existing symbol."""
         # Arrange
         stock_id = "stock-001"
         mock_service.update_stock.side_effect = ValueError(
-            "Stock with symbol MSFT already exists"
+            "Stock with symbol MSFT already exists",
         )
 
         # Mock service is already set up in the app fixture
@@ -447,7 +481,7 @@ class TestStockRouter:
         # Arrange
         stock_id = "non-existent-id"
         mock_service.update_stock.side_effect = ValueError(
-            f"Stock with ID {stock_id} not found"
+            f"Stock with ID {stock_id} not found",
         )
 
         # Mock service is already set up in the app fixture
@@ -464,7 +498,9 @@ class TestStockRouter:
         assert "not found" in data["detail"]
 
     def test_update_stock_empty_request_body(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should return 422 for empty update request."""
         # Arrange
@@ -527,13 +563,15 @@ class TestStockRouter:
                 assert response.status_code == 422
 
     def test_update_stock_sector_industry_validation(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should validate sector-industry relationship."""
         # Arrange
         stock_id = "stock-001"
         mock_service.update_stock.side_effect = ValueError(
-            "Industry group 'Banking' does not belong to sector 'Technology'"
+            "Industry group 'Banking' does not belong to sector 'Technology'",
         )
 
         # Mock service is already set up in the app fixture
@@ -553,7 +591,9 @@ class TestStockRouter:
         assert "does not belong to sector" in data["detail"]
 
     def test_update_stock_clear_industry_when_sector_changes(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should handle domain logic for sector change clearing industry."""
         # Arrange
@@ -605,7 +645,9 @@ class TestStockRouter:
         assert data["detail"] == "Failed to update stock"
 
     def test_update_stock_whitespace_trimming(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should trim whitespace from all string fields."""
         # Arrange
@@ -651,7 +693,9 @@ class TestStockRouter:
         assert command.notes == "Trimmed notes"
 
     def test_update_stock_empty_strings_as_none(
-        self, mock_service: Mock, app: FastAPI
+        self,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should treat empty strings as None for optional fields."""
         # Arrange
@@ -697,7 +741,10 @@ class TestStockRouter:
 
     @patch("src.presentation.web.middleware.error_handlers.logger")
     def test_update_stock_logs_errors(
-        self, mock_logger: Mock, mock_service: Mock, app: FastAPI
+        self,
+        mock_logger: Mock,
+        mock_service: Mock,
+        app: FastAPI,
     ) -> None:
         """Should log errors when exceptions occur."""
         # Arrange

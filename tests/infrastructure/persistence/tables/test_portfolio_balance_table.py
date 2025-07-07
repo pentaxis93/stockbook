@@ -131,7 +131,8 @@ class TestPortfolioBalanceTable:
         assert portfolio_balance_table.metadata is metadata
 
     def test_portfolio_balance_table_can_be_created(
-        self, temp_database: Engine
+        self,
+        temp_database: Engine,
     ) -> None:
         """Test that portfolio_balance table can be created in a database."""
         # Need to create referenced tables first

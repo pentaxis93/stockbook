@@ -41,17 +41,20 @@ class TestStockSymbol:
     def test_create_stock_symbol_with_invalid_characters_raises_error(self) -> None:
         """Should raise error for symbols with invalid characters."""
         with pytest.raises(
-            ValueError, match="Stock symbol must be between 1 and 5 characters"
+            ValueError,
+            match="Stock symbol must be between 1 and 5 characters",
         ):
             _ = StockSymbol("AAPL123")  # Too long takes precedence
 
         with pytest.raises(
-            ValueError, match="Stock symbol must contain only uppercase letters"
+            ValueError,
+            match="Stock symbol must contain only uppercase letters",
         ):
             _ = StockSymbol("AA-PL")
 
         with pytest.raises(
-            ValueError, match="Stock symbol must contain only uppercase letters"
+            ValueError,
+            match="Stock symbol must contain only uppercase letters",
         ):
             _ = StockSymbol("AA.PL")
 
@@ -63,7 +66,8 @@ class TestStockSymbol:
     def test_create_stock_symbol_with_too_long_symbol_raises_error(self) -> None:
         """Should raise error for symbols that are too long."""
         with pytest.raises(
-            ValueError, match="Stock symbol must be between 1 and 5 characters"
+            ValueError,
+            match="Stock symbol must be between 1 and 5 characters",
         ):
             _ = StockSymbol("TOOLONG")
 

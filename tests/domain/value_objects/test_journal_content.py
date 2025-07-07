@@ -16,7 +16,7 @@ class TestJournalContentCreation:
     def test_create_valid_journal_content(self) -> None:
         """Should create valid journal content."""
         content = JournalContent(
-            "This is a valid journal entry about my trading strategy."
+            "This is a valid journal entry about my trading strategy.",
         )
 
         assert (
@@ -27,7 +27,7 @@ class TestJournalContentCreation:
     def test_create_with_whitespace_strips_whitespace(self) -> None:
         """Should strip leading and trailing whitespace."""
         content_with_whitespace = JournalContent(
-            "  Journal entry with whitespace  \n\t"
+            "  Journal entry with whitespace  \n\t",
         )
 
         assert content_with_whitespace.value == "Journal entry with whitespace"
@@ -70,7 +70,8 @@ class TestJournalContentCreation:
         long_content = "A" * (JournalContent.MAX_LENGTH + 1)
 
         with pytest.raises(
-            ValueError, match="Journal content cannot exceed 10000 characters"
+            ValueError,
+            match="Journal content cannot exceed 10000 characters",
         ):
             _ = JournalContent(long_content)
 
@@ -105,7 +106,7 @@ class TestJournalContentBusinessLogic:
         """Should truncate content to default preview length (50 chars)."""
         long_content = JournalContent(
             "This is a very long journal entry that definitely exceeds fifty "
-            + "characters in length"
+            + "characters in length",
         )
 
         preview = long_content.get_preview()
@@ -258,7 +259,7 @@ class TestJournalContentStringRepresentation:
         short_content = JournalContent("Short entry")
         long_content = JournalContent(
             "This is a very long journal entry that will definitely be "
-            + "truncated in the repr"
+            + "truncated in the repr",
         )
 
         assert repr(short_content) == "JournalContent('Short entry')"
@@ -302,7 +303,7 @@ class TestJournalContentEdgeCases:
     def test_create_with_unicode_content(self) -> None:
         """Should handle unicode characters correctly."""
         unicode_content = JournalContent(
-            "Journal with émojis 📈 and ünïcödé characters 中文"
+            "Journal with émojis 📈 and ünïcödé characters 中文",
         )
 
         assert (
@@ -314,7 +315,7 @@ class TestJournalContentEdgeCases:
     def test_create_with_special_characters(self) -> None:
         """Should handle special characters correctly."""
         special_content = JournalContent(
-            "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?"
+            "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?",
         )
 
         assert special_content.value == "Special chars: !@#$%^&*()_+-=[]{}|;':\",./<>?"
@@ -374,7 +375,7 @@ class TestJournalContentEdgeCases:
         # Mock the parent class to raise an unexpected ValueError (not "cannot be
         # empty" or "cannot exceed")
         with patch(
-            "src.domain.value_objects.journal_content.BaseTextValueObject.__init__"
+            "src.domain.value_objects.journal_content.BaseTextValueObject.__init__",
         ) as mock_init:
             mock_init.side_effect = ValueError("Unexpected validation error")
 

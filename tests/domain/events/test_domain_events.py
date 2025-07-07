@@ -96,7 +96,9 @@ class TestStockAddedEvent:
         """Should create StockAddedEvent with stock information."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
-            stock_symbol=symbol, stock_name="Apple Inc.", stock_id=123
+            stock_symbol=symbol,
+            stock_name="Apple Inc.",
+            stock_id=123,
         )
 
         assert event.stock_symbol == symbol
@@ -114,14 +116,18 @@ class TestStockAddedEvent:
 
         with pytest.raises(ValueError, match="Stock ID must be positive"):
             _ = StockAddedEvent(
-                stock_symbol=symbol, stock_name="Apple Inc.", stock_id=0
+                stock_symbol=symbol,
+                stock_name="Apple Inc.",
+                stock_id=0,
             )
 
     def test_stock_added_event_string_representation(self) -> None:
         """Should have meaningful string representation."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
-            stock_symbol=symbol, stock_name="Apple Inc.", stock_id=123
+            stock_symbol=symbol,
+            stock_name="Apple Inc.",
+            stock_id=123,
         )
 
         str_repr = str(event)
@@ -133,7 +139,9 @@ class TestStockAddedEvent:
         """Should have detailed repr representation."""
         symbol = StockSymbol("AAPL")
         event = StockAddedEvent(
-            stock_symbol=symbol, stock_name="Apple Inc.", stock_id=123
+            stock_symbol=symbol,
+            stock_name="Apple Inc.",
+            stock_id=123,
         )
 
         repr_str = repr(event)
@@ -153,7 +161,9 @@ class TestDomainEventLifecycle:
         stock_name = "Apple Inc."
         stock_id = 1
         event = StockAddedEvent(
-            stock_symbol=stock_symbol, stock_name=stock_name, stock_id=stock_id
+            stock_symbol=stock_symbol,
+            stock_name=stock_name,
+            stock_id=stock_id,
         )
 
         # Verify event metadata
@@ -171,7 +181,9 @@ class TestDomainEventLifecycle:
     def test_event_immutability(self) -> None:
         """Should ensure events are immutable after creation."""
         event = StockAddedEvent(
-            stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
+            stock_symbol=StockSymbol("TEST"),
+            stock_name="Test Company",
+            stock_id=1,
         )
 
         # Should not be able to modify event after creation
@@ -211,7 +223,9 @@ class TestDomainEventLifecycle:
     def test_event_serialization_properties(self) -> None:
         """Should have properties suitable for serialization."""
         event = StockAddedEvent(
-            stock_symbol=StockSymbol("GOOGL"), stock_name="Alphabet Inc.", stock_id=1
+            stock_symbol=StockSymbol("GOOGL"),
+            stock_name="Alphabet Inc.",
+            stock_id=1,
         )
 
         # Event should have string representation
@@ -233,7 +247,9 @@ class TestDomainEventConsistency:
         stock_symbol = StockSymbol("TSLA")
 
         event = StockAddedEvent(
-            stock_symbol=stock_symbol, stock_name="Tesla Inc.", stock_id=1
+            stock_symbol=stock_symbol,
+            stock_name="Tesla Inc.",
+            stock_id=1,
         )
 
         # Event data should remain consistent
@@ -250,7 +266,9 @@ class TestDomainEventConsistency:
         # Create multiple events
         for _ in range(100):
             event = StockAddedEvent(
-                stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
+                stock_symbol=StockSymbol("TEST"),
+                stock_name="Test Company",
+                stock_id=1,
             )
             events.append(event)
 
@@ -269,7 +287,9 @@ class TestDomainEventConsistency:
         # Create events in sequence
         for i in range(10):
             event = StockAddedEvent(
-                stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
+                stock_symbol=StockSymbol("TEST"),
+                stock_name="Test Company",
+                stock_id=1,
             )
             events.append(event)
 
@@ -293,14 +313,18 @@ class TestDomainEventPatterns:
         # Create diverse events
         events.append(
             StockAddedEvent(
-                stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
-            )
+                stock_symbol=StockSymbol("TEST"),
+                stock_name="Test Company",
+                stock_id=1,
+            ),
         )
 
         events.append(
             StockAddedEvent(
-                stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
-            )
+                stock_symbol=StockSymbol("TEST"),
+                stock_name="Test Company",
+                stock_id=1,
+            ),
         )
 
         # Events should work in lists
@@ -357,7 +381,7 @@ class TestDomainEventPatterns:
             event_time = base_time + timedelta(minutes=i * 5)
             event = StockAddedEvent(
                 stock_symbol=StockSymbol(
-                    chr(ord("A") + (i % 26)) + chr(ord("A") + ((i // 26) % 26))
+                    chr(ord("A") + (i % 26)) + chr(ord("A") + ((i // 26) % 26)),
                 ),
                 stock_name=f"Aggregated Company {i}",
                 stock_id=i + 1,
@@ -453,7 +477,9 @@ class TestDomainEventEdgeCases:
         """Should handle extreme data values in events."""
         # Test with minimal symbol
         minimal_event = StockAddedEvent(
-            stock_symbol=StockSymbol("A"), stock_name="Test Company", stock_id=1
+            stock_symbol=StockSymbol("A"),
+            stock_name="Test Company",
+            stock_id=1,
         )
 
         # Test with maximal symbol (at symbol length limit of 5)
@@ -542,7 +568,9 @@ class TestDomainEventArchitecturalConcerns:
         """Should verify base event class provides proper contract."""
         # All events should inherit from DomainEvent
         stock_event = StockAddedEvent(
-            stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
+            stock_symbol=StockSymbol("TEST"),
+            stock_name="Test Company",
+            stock_id=1,
         )
 
         assert isinstance(stock_event, DomainEvent)
@@ -562,7 +590,9 @@ class TestDomainEventArchitecturalConcerns:
 
         # Add different types of events to same collection
         stock_event = StockAddedEvent(
-            stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
+            stock_symbol=StockSymbol("TEST"),
+            stock_name="Test Company",
+            stock_id=1,
         )
         events.append(stock_event)
 
@@ -583,7 +613,9 @@ class TestDomainEventArchitecturalConcerns:
     def test_event_extensibility_patterns(self) -> None:
         """Should support event extensibility for future enhancements."""
         event = StockAddedEvent(
-            stock_symbol=StockSymbol("TEST"), stock_name="Test Company", stock_id=1
+            stock_symbol=StockSymbol("TEST"),
+            stock_name="Test Company",
+            stock_id=1,
         )
 
         # Event should support metadata attachment (conceptually)

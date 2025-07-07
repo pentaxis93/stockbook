@@ -80,7 +80,9 @@ class TestUnitOfWorkIntegration:
         assert rows[0].id == stock_id
 
     def test_create_stock_commits_to_database(
-        self, stock_service: StockApplicationService, test_engine: Engine
+        self,
+        stock_service: StockApplicationService,
+        test_engine: Engine,
     ) -> None:
         """Should create stock and commit to database."""
         # Arrange
@@ -115,7 +117,7 @@ class TestUnitOfWorkIntegration:
         # Also verify with direct database query
         with test_engine.connect() as conn:
             result = conn.execute(
-                select(stock_table.c).where(stock_table.c.symbol == "AAPL")
+                select(stock_table.c).where(stock_table.c.symbol == "AAPL"),
             )
             row = result.fetchone()
 
@@ -128,7 +130,9 @@ class TestUnitOfWorkIntegration:
         assert row.notes == "Test stock"
 
     def test_rollback_on_error_leaves_database_unchanged(
-        self, unit_of_work: IStockBookUnitOfWork, test_engine: Engine
+        self,
+        unit_of_work: IStockBookUnitOfWork,
+        test_engine: Engine,
     ) -> None:
         """Should rollback transaction on error."""
         # Arrange - Create a stock directly
@@ -162,7 +166,7 @@ class TestUnitOfWorkIntegration:
         # Assert - Original stock unchanged
         with test_engine.connect() as conn:
             result = conn.execute(
-                select(stock_table.c).where(stock_table.c.symbol == "MSFT")
+                select(stock_table.c).where(stock_table.c.symbol == "MSFT"),
             )
             rows = result.fetchall()
 
@@ -171,7 +175,9 @@ class TestUnitOfWorkIntegration:
         assert rows[0].grade == "A"
 
     def test_multiple_operations_in_single_transaction(
-        self, unit_of_work: IStockBookUnitOfWork, test_engine: Engine
+        self,
+        unit_of_work: IStockBookUnitOfWork,
+        test_engine: Engine,
     ) -> None:
         """Should handle multiple operations in single transaction."""
         # Act
@@ -206,7 +212,8 @@ class TestUnitOfWorkIntegration:
         assert symbols == {"GOOG", "AMZN"}
 
     def test_repository_operations_share_connection(
-        self, unit_of_work: IStockBookUnitOfWork
+        self,
+        unit_of_work: IStockBookUnitOfWork,
     ) -> None:
         """Should ensure repositories share same connection."""
         with unit_of_work:
@@ -298,7 +305,7 @@ class TestDependencyInjectionIntegration:
         # Verify in database
         with engine.connect() as conn:
             result = conn.execute(
-                select(stock_table.c).where(stock_table.c.symbol == "TSLA")
+                select(stock_table.c).where(stock_table.c.symbol == "TSLA"),
             )
             row = result.fetchone()
 
@@ -338,7 +345,9 @@ class TestTransactionIsolation:
             assert retrieved.company_name.value == "Netflix"
 
     def test_error_in_nested_operation_rolls_back_all(
-        self, unit_of_work: IStockBookUnitOfWork, test_engine: Engine
+        self,
+        unit_of_work: IStockBookUnitOfWork,
+        test_engine: Engine,
     ) -> None:
         """Should rollback all operations on error."""
         # Act & Assert

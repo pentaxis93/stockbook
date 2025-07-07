@@ -88,7 +88,9 @@ class SectorIndustryService:
         return self.SECTOR_INDUSTRY_MAPPING[sector]
 
     def validate_sector_industry_combination(
-        self, sector: str, industry_group: str
+        self,
+        sector: str,
+        industry_group: str,
     ) -> bool:
         """Validate that an industry group belongs to the specified sector.
 
@@ -106,7 +108,9 @@ class SectorIndustryService:
             return False
 
     def validate_sector_industry_combination_strict(
-        self, sector: str, industry_group: str
+        self,
+        sector: str,
+        industry_group: str,
     ) -> None:
         """Validate sector-industry combination with exceptions.
 
@@ -123,7 +127,7 @@ class SectorIndustryService:
             raise ValueError(
                 f"Industry group {industry_group!r} is not valid for sector "
                 + f"{sector!r}. Valid industry groups for this sector: "
-                + f"{valid_industries_str}"
+                + f"{valid_industries_str}",
             )
 
     def get_sector_for_industry_group(self, industry_group: str) -> str:
@@ -150,5 +154,5 @@ class SectorIndustryService:
         available_industries = ", ".join(sorted(all_industries))
         raise ValueError(
             f"Industry group {industry_group!r} not found in any sector. "
-            + f"Available industry groups: {available_industries}"
+            + f"Available industry groups: {available_industries}",
         )

@@ -77,7 +77,9 @@ class CompositionRoot:
 
     @classmethod
     def _configure_infrastructure_layer(
-        cls, container: DIContainer, db_path: str
+        cls,
+        container: DIContainer,
+        db_path: str,
     ) -> None:
         """Configure infrastructure layer dependencies.
 

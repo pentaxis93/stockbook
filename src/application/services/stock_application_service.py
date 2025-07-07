@@ -62,7 +62,7 @@ class StockApplicationService:
                     builder = builder.with_sector(Sector(command.sector))
                 if command.industry_group:
                     builder = builder.with_industry_group(
-                        IndustryGroup(command.industry_group)
+                        IndustryGroup(command.industry_group),
                     )
                 if command.grade:
                     builder = builder.with_grade(Grade(command.grade))
@@ -196,7 +196,8 @@ class StockApplicationService:
             raise
 
     def _validate_update_command_and_get_stock(
-        self, command: UpdateStockCommand
+        self,
+        command: UpdateStockCommand,
     ) -> Stock:
         """Validate update command and retrieve stock entity."""
         # Check if stock exists
@@ -222,7 +223,9 @@ class StockApplicationService:
         return stock_entity
 
     def _apply_updates_and_save(
-        self, command: UpdateStockCommand, stock_entity: Stock
+        self,
+        command: UpdateStockCommand,
+        stock_entity: Stock,
     ) -> None:
         """Apply updates to stock entity and save to repository."""
         # Get the fields to update and apply them to the entity

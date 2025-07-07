@@ -57,7 +57,9 @@ class DIContainer:
         self._resolution_chain: list[str] = []
 
     def register_singleton(
-        self, service_type: type[T], implementation_type: type[T] | None = None
+        self,
+        service_type: type[T],
+        implementation_type: type[T] | None = None,
     ) -> None:
         """Register a type as singleton (single instance shared).
 
@@ -73,7 +75,8 @@ class DIContainer:
 
         if self.is_registered(service_type):
             raise DuplicateRegistrationError(
-                service_type, f"Service {service_type.__name__} is already registered"
+                service_type,
+                f"Service {service_type.__name__} is already registered",
             )
 
         self._validate_registration(service_type, implementation_type)
@@ -86,7 +89,9 @@ class DIContainer:
 
             # Track registration
             self._registrations[service_type] = RegistrationInfo(
-                service_type, implementation_type, Lifetime.SINGLETON
+                service_type,
+                implementation_type,
+                Lifetime.SINGLETON,
             )
 
         except Exception as e:
@@ -96,7 +101,9 @@ class DIContainer:
             ) from e
 
     def register_transient(
-        self, service_type: type[T], implementation_type: type[T] | None = None
+        self,
+        service_type: type[T],
+        implementation_type: type[T] | None = None,
     ) -> None:
         """Register a type as transient (new instance each time).
 
@@ -112,7 +119,8 @@ class DIContainer:
 
         if self.is_registered(service_type):
             raise DuplicateRegistrationError(
-                service_type, f"Service {service_type.__name__} is already registered"
+                service_type,
+                f"Service {service_type.__name__} is already registered",
             )
 
         self._validate_registration(service_type, implementation_type)
@@ -125,7 +133,9 @@ class DIContainer:
 
             # Track registration
             self._registrations[service_type] = RegistrationInfo(
-                service_type, implementation_type, Lifetime.TRANSIENT
+                service_type,
+                implementation_type,
+                Lifetime.TRANSIENT,
             )
 
         except Exception as e:
@@ -147,7 +157,8 @@ class DIContainer:
         """
         if self.is_registered(service_type):
             raise DuplicateRegistrationError(
-                service_type, f"Service {service_type.__name__} is already registered"
+                service_type,
+                f"Service {service_type.__name__} is already registered",
             )
 
         if not isinstance(instance, service_type):
@@ -164,7 +175,9 @@ class DIContainer:
 
             # Track registration
             self._registrations[service_type] = RegistrationInfo(
-                service_type, type(instance), Lifetime.SINGLETON
+                service_type,
+                type(instance),
+                Lifetime.SINGLETON,
             )
 
         except Exception as e:
@@ -186,12 +199,14 @@ class DIContainer:
         """
         if self.is_registered(service_type):
             raise DuplicateRegistrationError(
-                service_type, f"Service {service_type.__name__} is already registered"
+                service_type,
+                f"Service {service_type.__name__} is already registered",
             )
 
         if not callable(factory):
             raise InvalidRegistrationError(
-                service_type, f"Factory for {service_type.__name__} is not callable"
+                service_type,
+                f"Factory for {service_type.__name__} is not callable",
             )
 
         try:
@@ -201,7 +216,9 @@ class DIContainer:
 
             # Track registration (assume transient behavior for factories)
             self._registrations[service_type] = RegistrationInfo(
-                service_type, service_type, Lifetime.TRANSIENT
+                service_type,
+                service_type,
+                Lifetime.TRANSIENT,
             )
 
         except Exception as e:
@@ -300,7 +317,9 @@ class DIContainer:
         return self._registrations.get(service_type)
 
     def _validate_registration(
-        self, service_type: type[Any], implementation_type: type[Any]
+        self,
+        service_type: type[Any],
+        implementation_type: type[Any],
     ) -> None:
         """Validate that implementation_type can be used for service_type."""
         if not inspect.isclass(implementation_type):

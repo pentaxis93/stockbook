@@ -29,7 +29,10 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 
 # Test data helpers
 def create_test_stock(
-    symbol: str = "AAPL", price: float = 100.00, quantity: int = 10, grade: str = "B"
+    symbol: str = "AAPL",
+    price: float = 100.00,
+    quantity: int = 10,
+    grade: str = "B",
 ) -> tuple[Stock, Quantity, Money]:
     """Helper to create test stock with position."""
     stock = (
@@ -82,7 +85,9 @@ class TestPortfolioValueCalculations:
         stock, quantity, current_price = create_test_stock("AAPL", 150.00, 10)
 
         position_value = service.calculate_position_value(
-            stock, quantity, current_price
+            stock,
+            quantity,
+            current_price,
         )
 
         expected = Money(Decimal("1500.00"))
@@ -205,7 +210,8 @@ class TestPortfolioCalculationEdgeCases:
         empty_prices: dict[str, Money] = {}
 
         allocations = service.calculate_position_allocations(
-            empty_portfolio, empty_prices
+            empty_portfolio,
+            empty_prices,
         )
 
         assert not allocations
@@ -257,7 +263,8 @@ class TestPortfolioCalculationEdgeCases:
         empty_prices: dict[str, Money] = {}
 
         industry_allocations = service.calculate_industry_allocations(
-            empty_portfolio, empty_prices
+            empty_portfolio,
+            empty_prices,
         )
 
         assert industry_allocations.total_value == Money.zero()
@@ -318,10 +325,10 @@ class TestPortfolioCalculationEdgeCases:
 
         assert industry_allocations.total_value == Money("1500.00")
         assert abs(
-            industry_allocations.allocations["Software"] - Decimal("33.33")
+            industry_allocations.allocations["Software"] - Decimal("33.33"),
         ) < Decimal("0.01")
         assert abs(
-            industry_allocations.allocations["Banks"] - Decimal("66.67")
+            industry_allocations.allocations["Banks"] - Decimal("66.67"),
         ) < Decimal("0.01")
 
     def test_calculate_position_value_with_fractional_shares(self) -> None:
@@ -334,7 +341,9 @@ class TestPortfolioCalculationEdgeCases:
         price = Money("100.00")
 
         position_value = service.calculate_position_value(
-            stock, fractional_quantity, price
+            stock,
+            fractional_quantity,
+            price,
         )
 
         assert position_value == Money("250.00")

@@ -46,5 +46,5 @@ def test_forward_reference_not_found() -> None:
         _ = container.resolve(ServiceWithForwardRef)
 
     assert "No registered type found for forward reference 'UnknownService'" in str(
-        exc_info.value
+        exc_info.value,
     )

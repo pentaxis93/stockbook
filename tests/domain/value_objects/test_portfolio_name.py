@@ -80,7 +80,8 @@ class TestPortfolioNameCreation:
         long_name = "A" * (PortfolioName.MAX_LENGTH + 1)
 
         with pytest.raises(
-            ValueError, match="Portfolio name cannot exceed 100 characters"
+            ValueError,
+            match="Portfolio name cannot exceed 100 characters",
         ):
             _ = PortfolioName(long_name)
 
@@ -89,7 +90,8 @@ class TestPortfolioNameCreation:
         very_long_name = "A" * 200
 
         with pytest.raises(
-            ValueError, match="Portfolio name cannot exceed 100 characters"
+            ValueError,
+            match="Portfolio name cannot exceed 100 characters",
         ):
             _ = PortfolioName(very_long_name)
 
@@ -213,7 +215,8 @@ class TestPortfolioNameConstants:
 
         # This should fail
         with pytest.raises(
-            ValueError, match="Portfolio name cannot exceed 100 characters"
+            ValueError,
+            match="Portfolio name cannot exceed 100 characters",
         ):
             _ = PortfolioName("A" * (PortfolioName.MAX_LENGTH + 1))
 
@@ -337,7 +340,9 @@ class TestPortfolioNameEdgeCases:
         ]
 
         for name_str, expected in zip(
-            names_with_internal_whitespace, expected_results, strict=False
+            names_with_internal_whitespace,
+            expected_results,
+            strict=False,
         ):
             name = PortfolioName(name_str)
             assert name.value == expected
@@ -355,7 +360,8 @@ class TestPortfolioNameEdgeCases:
 
         # Should fail when exceeding max length
         with pytest.raises(
-            ValueError, match="Portfolio name cannot exceed 100 characters"
+            ValueError,
+            match="Portfolio name cannot exceed 100 characters",
         ):
             _ = PortfolioName(too_long_unicode_name)
 

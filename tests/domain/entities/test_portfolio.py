@@ -222,11 +222,13 @@ class TestPortfolio:
     def test_is_active_portfolio(self) -> None:
         """Should check if portfolio is active."""
         active_portfolio = Portfolio(
-            name=PortfolioName("Active Portfolio"), is_active=True
+            name=PortfolioName("Active Portfolio"),
+            is_active=True,
         )
 
         inactive_portfolio = Portfolio(
-            name=PortfolioName("Inactive Portfolio"), is_active=False
+            name=PortfolioName("Inactive Portfolio"),
+            is_active=False,
         )
 
         assert active_portfolio.is_active_portfolio() is True
@@ -249,7 +251,8 @@ class TestPortfolio:
         )
 
         with pytest.raises(
-            ValueError, match="Created date is already set and cannot be changed"
+            ValueError,
+            match="Created date is already set and cannot be changed",
         ):
             portfolio.set_created_date(datetime(2024, 1, 15, tzinfo=UTC))
 
@@ -285,7 +288,8 @@ class TestPortfolioName:
         """Test that excessively long portfolio names are rejected."""
         long_name = "A" * 101  # Max is 100 characters
         with pytest.raises(
-            ValueError, match="Portfolio name cannot exceed 100 characters"
+            ValueError,
+            match="Portfolio name cannot exceed 100 characters",
         ):
             _ = PortfolioName(long_name)
 

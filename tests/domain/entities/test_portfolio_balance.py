@@ -69,7 +69,7 @@ class TestPortfolioBalance:
         )
 
         assert balance.withdrawals.amount == Decimal(
-            "0.00"
+            "0.00",
         )  # Defaults to zero when None
         assert balance.deposits.amount == Decimal("0.00")  # Defaults to zero when None
         assert balance.index_change is None  # Remains None
@@ -94,7 +94,7 @@ class TestPortfolioBalance:
         object."""
         with pytest.raises(ValueError, match="Index change cannot exceed"):
             _ = IndexChange(
-                150.0
+                150.0,
             )  # Error happens at IndexChange construction (over 100%)
 
     def test_portfolio_balance_equality(self) -> None:

@@ -316,7 +316,8 @@ class TestConfigValidation:
         # Invalid decimal places
         config.decimal_places = -1
         with pytest.raises(
-            ValidationError, match="decimal_places must be non-negative"
+            ValidationError,
+            match="decimal_places must be non-negative",
         ):
             config.validate(skip_file_checks=True)
 
@@ -336,7 +337,8 @@ class TestConfigValidation:
         config.min_price = 0.01  # Reset to valid
         config.max_price = 0.005  # Less than min_price
         with pytest.raises(
-            ValidationError, match="max_price must be greater than min_price"
+            ValidationError,
+            match="max_price must be greater than min_price",
         ):
             config.validate(skip_file_checks=True)
 
@@ -356,7 +358,8 @@ class TestConfigValidation:
         config.table_page_size = 20  # Reset to valid
         config.max_rows_display = 10  # Less than table_page_size
         with pytest.raises(
-            ValidationError, match="max_rows_display must be >= table_page_size"
+            ValidationError,
+            match="max_rows_display must be >= table_page_size",
         ):
             config.validate(skip_file_checks=True)
 

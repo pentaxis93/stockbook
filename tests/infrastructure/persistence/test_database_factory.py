@@ -213,7 +213,9 @@ class TestDatabaseFactoryHelpers:
 
         # Act
         configure_sqlite_pragmas(
-            mock_connection, enable_foreign_keys=True, journal_mode="WAL"
+            mock_connection,
+            enable_foreign_keys=True,
+            journal_mode="WAL",
         )
 
         # Assert

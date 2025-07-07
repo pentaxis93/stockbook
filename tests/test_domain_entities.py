@@ -149,7 +149,8 @@ class TestPortfolio:
 
         long_name = "A" * 101
         with pytest.raises(
-            ValueError, match="Portfolio name cannot exceed 100 characters"
+            ValueError,
+            match="Portfolio name cannot exceed 100 characters",
         ):
             _ = PortfolioName(long_name)  # Error happens at value object level
 
@@ -200,7 +201,8 @@ class TestTransaction:
         from src.domain.value_objects import TransactionType
 
         with pytest.raises(
-            ValueError, match="Transaction type must be 'buy' or 'sell'"
+            ValueError,
+            match="Transaction type must be 'buy' or 'sell'",
         ):
             _ = TransactionType("transfer")  # Error happens at value object level
 
@@ -297,7 +299,7 @@ class TestJournalEntry:
             JournalEntry.Builder()
             .with_entry_date(datetime.now(UTC))
             .with_content(
-                JournalContent("This is a detailed market analysis and observations.")
+                JournalContent("This is a detailed market analysis and observations."),
             )
             .with_portfolio_id("portfolio-id-1")
             .with_stock_id("stock-id-2")

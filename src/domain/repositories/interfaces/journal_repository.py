@@ -51,7 +51,9 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio(
-        self, portfolio_id: str, limit: int | None = None
+        self,
+        portfolio_id: str,
+        limit: int | None = None,
     ) -> list[JournalEntry]:
         """Retrieve journal entries for a specific portfolio.
 
@@ -65,7 +67,9 @@ class IJournalRepository(ABC):
 
     @abstractmethod
     def get_by_stock(
-        self, stock_id: str, limit: int | None = None
+        self,
+        stock_id: str,
+        limit: int | None = None,
     ) -> list[JournalEntry]:
         """Retrieve journal entries for a specific stock.
 

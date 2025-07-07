@@ -47,7 +47,7 @@ def get_stock_service(request: Request) -> StockApplicationService:
         msg = "DI container not configured in app state"
         raise RuntimeError(msg)
     service: StockApplicationService = request.app.state.di_container.resolve(
-        StockApplicationService
+        StockApplicationService,
     )
     return service
 
@@ -60,7 +60,8 @@ stock_service_dependency = Depends(get_stock_service)
 @handle_stock_errors
 async def get_stocks(
     symbol: Annotated[
-        str | None, Query(description="Filter by stock symbol (partial match)")
+        str | None,
+        Query(description="Filter by stock symbol (partial match)"),
     ] = None,
     service: StockApplicationService = stock_service_dependency,
 ) -> StockListResponse:

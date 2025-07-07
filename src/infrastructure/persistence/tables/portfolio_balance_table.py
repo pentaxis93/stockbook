@@ -20,7 +20,8 @@ portfolio_balance_table: Table = Table(
     Column(
         "quantity",
         Numeric(
-            precision=15, scale=4
+            precision=15,
+            scale=4,
         ),  # Support large quantities with fractional shares
         nullable=False,
         server_default=text("0"),

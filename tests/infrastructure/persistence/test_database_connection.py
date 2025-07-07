@@ -97,7 +97,9 @@ class TestSqlAlchemyConnectionExecute:
         # Arrange
         mock_connection = Mock(spec=Connection)
         mock_connection.execute.side_effect = DatabaseError(
-            "Connection lost", params={}, orig=Exception()
+            "Connection lost",
+            params={},
+            orig=Exception(),
         )
 
         adapter = SqlAlchemyConnection(mock_connection)
@@ -200,7 +202,9 @@ class TestSqlAlchemyConnectionClose:
         # Arrange
         mock_connection = Mock(spec=Connection)
         mock_connection.close.side_effect = DatabaseError(
-            "Cannot close", params={}, orig=Exception()
+            "Cannot close",
+            params={},
+            orig=Exception(),
         )
 
         adapter = SqlAlchemyConnection(mock_connection)

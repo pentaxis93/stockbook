@@ -217,7 +217,9 @@ class Stock(Entity):
         return temp_values
 
     def _create_symbol(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Create symbol value object if present."""
         if "symbol" in kwargs:
@@ -225,7 +227,9 @@ class Stock(Entity):
             temp_values["symbol"] = StockSymbol(symbol)
 
     def _create_company_name(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Create company name value object if present."""
         if "name" in kwargs:
@@ -233,7 +237,9 @@ class Stock(Entity):
             temp_values["company_name"] = CompanyName(name) if name else None
 
     def _create_sector(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Create sector value object if present."""
         if "sector" in kwargs:
@@ -241,7 +247,9 @@ class Stock(Entity):
             temp_values["sector"] = Sector(sector) if sector is not None else None
 
     def _create_industry_group(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Create industry group value object if present."""
         if "industry_group" in kwargs:
@@ -251,7 +259,9 @@ class Stock(Entity):
             )
 
     def _create_grade(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Create grade value object if present."""
         if "grade" in kwargs:
@@ -261,19 +271,24 @@ class Stock(Entity):
             )
 
     def _create_notes(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Create notes value object if present."""
         if "notes" in kwargs:
             temp_values["notes"] = Notes(kwargs["notes"])
 
     def _validate_and_adjust_sector_industry(
-        self, kwargs: dict[str, Any], temp_values: dict[str, Any]
+        self,
+        kwargs: dict[str, Any],
+        temp_values: dict[str, Any],
     ) -> None:
         """Validate sector-industry combination and adjust if needed."""
         new_sector = kwargs.get("sector", self.sector.value if self.sector else None)
         new_industry_group = kwargs.get(
-            "industry_group", self.industry_group.value if self.industry_group else None
+            "industry_group",
+            self.industry_group.value if self.industry_group else None,
         )
 
         # Special logic: if changing sector, check if current industry_group
@@ -290,14 +305,16 @@ class Stock(Entity):
         self._validate_sector_industry_combination(new_sector, new_industry_group)
 
     def _should_clear_industry_group_for_new_sector(
-        self, new_sector: str | None
+        self,
+        new_sector: str | None,
     ) -> bool:
         """Check if current industry group should be cleared for new sector."""
         return (
             self.industry_group is not None
             and new_sector is not None
             and not self._sector_industry_service.validate_sector_industry_combination(
-                new_sector, self.industry_group.value
+                new_sector,
+                self.industry_group.value,
             )
         )
 
@@ -319,7 +336,9 @@ class Stock(Entity):
                 setattr(self, attr, temp_values[field])
 
     def _validate_sector_industry_combination(
-        self, sector: str | None, industry_group: str | None
+        self,
+        sector: str | None,
+        industry_group: str | None,
     ) -> None:
         """Validate that sector and industry_group combination is valid.
 
@@ -341,5 +360,6 @@ class Stock(Entity):
 
         # Validate the combination using domain service
         self._sector_industry_service.validate_sector_industry_combination_strict(
-            sector, industry_group
+            sector,
+            industry_group,
         )

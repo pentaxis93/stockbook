@@ -11,14 +11,16 @@ class TestEntityConstructorErrors:
     def test_journal_entry_constructor_requires_builder(self) -> None:
         """Test that JournalEntry constructor requires a builder instance."""
         with pytest.raises(
-            ValueError, match="JournalEntry must be created through Builder"
+            ValueError,
+            match="JournalEntry must be created through Builder",
         ):
             _ = JournalEntry(_builder_instance=None)
 
     def test_portfolio_balance_constructor_requires_builder(self) -> None:
         """Test that PortfolioBalance constructor requires a builder instance."""
         with pytest.raises(
-            ValueError, match="PortfolioBalance must be created through Builder"
+            ValueError,
+            match="PortfolioBalance must be created through Builder",
         ):
             _ = PortfolioBalance(_builder_instance=None)
 

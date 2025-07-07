@@ -16,7 +16,9 @@ def id_column() -> Column[Any]:
 
 
 def foreign_key_column(
-    column_name: str, referenced_table: str, nullable: bool = False
+    column_name: str,
+    referenced_table: str,
+    nullable: bool = False,
 ) -> Column[Any]:
     """Create a foreign key column.
 
@@ -59,7 +61,9 @@ def timestamp_columns() -> list[Column[Any]]:
 
 
 def enum_check_constraint(
-    column_name: str, allowed_values: list[str], constraint_name: str
+    column_name: str,
+    allowed_values: list[str],
+    constraint_name: str,
 ) -> CheckConstraint:
     """Create a check constraint for enum-like columns.
 

@@ -216,7 +216,8 @@ class TestRiskAssessmentEdgeCases:
         empty_prices: dict[str, Money] = {}
 
         with pytest.raises(
-            InsufficientDataError, match="Cannot assess risk of empty portfolio"
+            InsufficientDataError,
+            match="Cannot assess risk of empty portfolio",
         ):
             _ = service.assess_portfolio_risk(empty_portfolio, empty_prices)
 
@@ -460,10 +461,12 @@ class TestRiskAssessmentAlgorithms:
         diversified_prices = create_test_prices(diversified)
 
         undiversified_risk = service.assess_portfolio_risk(
-            undiversified, undiversified_prices
+            undiversified,
+            undiversified_prices,
         )
         diversified_risk = service.assess_portfolio_risk(
-            diversified, diversified_prices
+            diversified,
+            diversified_prices,
         )
 
         # Diversified portfolio should generally have lower risk
@@ -496,10 +499,12 @@ class TestRiskAssessmentAlgorithms:
         concentrated_prices = create_test_prices(concentrated_portfolio)
 
         balanced_risk = service.assess_portfolio_risk(
-            balanced_portfolio, balanced_prices
+            balanced_portfolio,
+            balanced_prices,
         )
         concentrated_risk = service.assess_portfolio_risk(
-            concentrated_portfolio, concentrated_prices
+            concentrated_portfolio,
+            concentrated_prices,
         )
 
         # Both should return valid assessments

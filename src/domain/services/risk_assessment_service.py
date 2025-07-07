@@ -23,10 +23,10 @@ class RiskAssessmentConfig:
 
     var_confidence_level: Decimal = field(default_factory=lambda: Decimal("0.95"))
     concentration_threshold: Decimal = field(
-        default_factory=lambda: Decimal("0.15")
+        default_factory=lambda: Decimal("0.15"),
     )  # 15% max per position
     high_volatility_threshold: Decimal = field(
-        default_factory=lambda: Decimal("0.30")
+        default_factory=lambda: Decimal("0.30"),
     )  # 30% annual volatility
     high_beta_threshold: Decimal = field(default_factory=lambda: Decimal("1.5"))
 
@@ -83,7 +83,8 @@ class RiskAssessmentService:
         # Check concentration risk
         if len(portfolio) < self.MIN_DIVERSIFICATION:
             risk_factors.append(
-                f"Insufficient diversification (< {self.MIN_DIVERSIFICATION} positions)"
+                "Insufficient diversification "
+                + f"(< {self.MIN_DIVERSIFICATION} positions)",
             )
 
         # Simple risk score based on portfolio size for now

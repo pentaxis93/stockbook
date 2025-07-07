@@ -31,7 +31,8 @@ class TestErrorHandlerEdgeCases:
 
     @patch("src.presentation.web.middleware.error_handlers.logger")
     def test_handle_stock_errors_logs_unknown_function_name(
-        self, mock_logger: Mock
+        self,
+        mock_logger: Mock,
     ) -> None:
         """Test that unknown function names are logged with generic message."""
         app = FastAPI()
@@ -51,5 +52,7 @@ class TestErrorHandlerEdgeCases:
 
         # Verify the generic error log for unknown function name
         mock_logger.error.assert_called_once_with(
-            "Unexpected error in %s: %s", "_unknown_function_name", "Test error"
+            "Unexpected error in %s: %s",
+            "_unknown_function_name",
+            "Test error",
         )

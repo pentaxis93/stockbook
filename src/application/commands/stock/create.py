@@ -114,7 +114,7 @@ class CreateStockCommand:
                 self.industry_group,
                 self.grade,
                 self.notes,
-            )
+            ),
         )
 
     def __str__(self) -> str:
@@ -130,7 +130,8 @@ class CreateStockCommand:
         )
 
     def _normalize_and_validate_inputs(
-        self, inputs: CreateStockInputs
+        self,
+        inputs: CreateStockInputs,
     ) -> dict[str, Any]:
         """Normalize and validate all inputs, returning normalized values."""
         # Normalize inputs
@@ -229,7 +230,8 @@ class CreateStockCommand:
 
     @staticmethod
     def _validate_sector_industry_combination(
-        sector: str | None, industry_group: str | None
+        sector: str | None,
+        industry_group: str | None,
     ) -> None:
         """Validate sector-industry combination."""
         # If no industry group, sector can be anything (or None)

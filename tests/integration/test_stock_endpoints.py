@@ -80,7 +80,9 @@ class TestStockEndpoints:
         ]
 
     def test_get_stocks_empty_list(
-        self, client: TestClient, mock_stock_service: Mock
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
     ) -> None:
         """Should return empty list with total=0 when no stocks exist."""
         # Arrange
@@ -195,7 +197,8 @@ class TestStockEndpoints:
 
         # Act
         response = client.get(
-            "/stocks", params={"invalid_param": "value", "another": "test"}
+            "/stocks",
+            params={"invalid_param": "value", "another": "test"},
         )
 
         # Assert
@@ -289,7 +292,9 @@ class TestStockEndpoints:
             assert "notes" in stock
 
     def test_get_stocks_with_all_filters_combined(
-        self, client: TestClient, mock_stock_service: Mock
+        self,
+        client: TestClient,
+        mock_stock_service: Mock,
     ) -> None:
         """Should handle all filter parameters combined."""
         # Arrange
@@ -654,7 +659,7 @@ class TestStockEndpoints:
 
         # Mock service to raise ValueError (domain validation)
         mock_stock_service.create_stock.side_effect = ValueError(
-            "Company name cannot be empty"
+            "Company name cannot be empty",
         )
 
         # Act
@@ -679,7 +684,7 @@ class TestStockEndpoints:
 
         # Mock service to raise ValueError (domain validation)
         mock_stock_service.create_stock.side_effect = ValueError(
-            "Company name is required"
+            "Company name is required",
         )
 
         # Act
@@ -706,7 +711,7 @@ class TestStockEndpoints:
 
         # Mock service to raise ValueError (domain validation)
         mock_stock_service.create_stock.side_effect = ValueError(
-            "Company name cannot exceed 200 characters"
+            "Company name cannot exceed 200 characters",
         )
 
         # Act
@@ -752,7 +757,7 @@ class TestStockEndpoints:
 
         # Mock service to raise ValueError for duplicate
         mock_stock_service.create_stock.side_effect = ValueError(
-            "Stock with symbol AAPL already exists"
+            "Stock with symbol AAPL already exists",
         )
 
         # Act
@@ -899,7 +904,7 @@ class TestStockEndpoints:
 
         # Mock service to raise unexpected error
         mock_stock_service.create_stock.side_effect = RuntimeError(
-            "Database connection failed"
+            "Database connection failed",
         )
 
         # Act
@@ -939,7 +944,8 @@ class TestStockEndpoints:
 
         # Act
         response = client.put(
-            f"/stocks/{stock_id}", json={"grade": "B", "notes": "Updated notes"}
+            f"/stocks/{stock_id}",
+            json={"grade": "B", "notes": "Updated notes"},
         )
 
         # Assert
@@ -1012,7 +1018,7 @@ class TestStockEndpoints:
         # Arrange
         stock_id = "non-existent-id"
         mock_stock_service.update_stock.side_effect = ValueError(
-            f"Stock with ID {stock_id} not found"
+            f"Stock with ID {stock_id} not found",
         )
 
         # Act
@@ -1033,7 +1039,7 @@ class TestStockEndpoints:
         # Arrange
         stock_id = "stock-001"
         mock_stock_service.update_stock.side_effect = ValueError(
-            "Stock with symbol MSFT already exists"
+            "Stock with symbol MSFT already exists",
         )
 
         # Act

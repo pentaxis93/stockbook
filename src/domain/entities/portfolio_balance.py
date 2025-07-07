@@ -75,7 +75,9 @@ class PortfolioBalance(Entity):
             return PortfolioBalance(_builder_instance=self)
 
     def __init__(
-        self, *, _builder_instance: PortfolioBalance.Builder | None = None
+        self,
+        *,
+        _builder_instance: PortfolioBalance.Builder | None = None,
     ) -> None:
         """Initialize portfolio balance through builder pattern."""
         if _builder_instance is None:

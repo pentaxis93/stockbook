@@ -301,13 +301,15 @@ class TestQuantityEdgeCases:
 
         # Test addition with invalid type
         with pytest.raises(
-            TypeError, match="Can only add Quantity or numeric types to Quantity"
+            TypeError,
+            match="Can only add Quantity or numeric types to Quantity",
         ):
             _ = qty + "invalid"
 
         # Test subtraction with invalid type
         with pytest.raises(
-            TypeError, match="Can only subtract Quantity or numeric types from Quantity"
+            TypeError,
+            match="Can only subtract Quantity or numeric types from Quantity",
         ):
             _ = qty - "invalid"
 

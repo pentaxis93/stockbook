@@ -23,8 +23,8 @@ class TestJournalEntry:
             .with_entry_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_content(
                 JournalContent(
-                    "This is an important market observation about the current trends."
-                )
+                    "This is an important market observation about the current trends.",
+                ),
             )
             .with_portfolio_id("portfolio-id-1")
             .with_stock_id("stock-id-2")
@@ -83,7 +83,8 @@ class TestJournalEntry:
     ) -> None:
         """Should raise error for invalid transaction ID."""
         with pytest.raises(
-            ValueError, match="Transaction ID must be a non-empty string"
+            ValueError,
+            match="Transaction ID must be a non-empty string",
         ):
             _ = (
                 JournalEntry.Builder()
@@ -192,8 +193,8 @@ class TestJournalEntry:
             .with_content(
                 JournalContent(
                     "This is a longer journal entry with significant market "
-                    + "observations and analysis."
-                )
+                    + "observations and analysis.",
+                ),
             )
             .build()
         )
@@ -291,8 +292,8 @@ class TestJournalEntry:
                 JournalContent(
                     "This is a very long journal entry that contains extensive "
                     + "market analysis and observations that should be truncated for "
-                    + "preview purposes."
-                )
+                    + "preview purposes.",
+                ),
             )
             .build()
         )
@@ -392,7 +393,8 @@ class TestJournalContent:
         """Test that excessively long journal content is rejected."""
         long_content = "A" * 10001  # Max is 10000 characters
         with pytest.raises(
-            ValueError, match="Journal content cannot exceed 10000 characters"
+            ValueError,
+            match="Journal content cannot exceed 10000 characters",
         ):
             _ = JournalContent(long_content)
 
@@ -511,7 +513,8 @@ class TestJournalEntryBuilder:
 
         # Empty string should raise error
         with pytest.raises(
-            ValueError, match="Transaction ID must be a non-empty string"
+            ValueError,
+            match="Transaction ID must be a non-empty string",
         ):
             _ = builder.with_transaction_id("").build()
 

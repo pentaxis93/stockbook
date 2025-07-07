@@ -22,10 +22,10 @@ class PortfolioCalculationConfig:
     """Configuration for portfolio calculation rules."""
 
     concentration_threshold: Decimal = field(
-        default_factory=lambda: Decimal("0.15")
+        default_factory=lambda: Decimal("0.15"),
     )  # 15% max per position
     minimum_diversification_score: Decimal = field(
-        default_factory=lambda: Decimal("0.6")
+        default_factory=lambda: Decimal("0.6"),
     )
     default_currency: str = "USD"
 
@@ -73,13 +73,18 @@ class PortfolioCalculationService:
         return Money(total_amount)
 
     def calculate_position_value(
-        self, _stock: Stock, quantity: Quantity, current_price: Money
+        self,
+        _stock: Stock,
+        quantity: Quantity,
+        current_price: Money,
     ) -> Money:
         """Calculate individual position value."""
         return Money(current_price.amount * Decimal(str(quantity.value)))
 
     def calculate_position_allocations(
-        self, portfolio: list[tuple[Stock, Quantity]], prices: dict[str, Money]
+        self,
+        portfolio: list[tuple[Stock, Quantity]],
+        prices: dict[str, Money],
     ) -> list[PositionAllocation]:
         """Calculate allocation percentage for each position."""
         if not portfolio:
@@ -92,7 +97,10 @@ class PortfolioCalculationService:
         allocations: list[PositionAllocation] = []
         for stock, quantity in portfolio:
             allocation = self._calculate_single_position_allocation(
-                stock, quantity, prices, total_value
+                stock,
+                quantity,
+                prices,
+                total_value,
             )
             allocations.append(allocation)
 
@@ -119,7 +127,9 @@ class PortfolioCalculationService:
         )
 
     def calculate_industry_allocations(
-        self, portfolio: list[tuple[Stock, Quantity]], prices: dict[str, Money]
+        self,
+        portfolio: list[tuple[Stock, Quantity]],
+        prices: dict[str, Money],
     ) -> PortfolioAllocation:
         """Calculate allocation by industry sectors."""
         if not portfolio:
@@ -128,13 +138,16 @@ class PortfolioCalculationService:
         total_value = self.calculate_total_value(portfolio, prices)
         industry_values = self._calculate_industry_values(portfolio, prices)
         industry_percentages = self._convert_to_percentages(
-            industry_values, total_value
+            industry_values,
+            total_value,
         )
 
         return PortfolioAllocation(industry_percentages, total_value)
 
     def _calculate_industry_values(
-        self, portfolio: list[tuple[Stock, Quantity]], prices: dict[str, Money]
+        self,
+        portfolio: list[tuple[Stock, Quantity]],
+        prices: dict[str, Money],
     ) -> dict[str, Decimal]:
         """Calculate total values by industry."""
         industry_values: dict[str, Decimal] = {}
@@ -144,7 +157,9 @@ class PortfolioCalculationService:
             symbol_str = str(stock.symbol)
             current_price = prices[symbol_str]
             position_value = self.calculate_position_value(
-                stock, quantity, current_price
+                stock,
+                quantity,
+                current_price,
             )
 
             if industry not in industry_values:
@@ -154,7 +169,9 @@ class PortfolioCalculationService:
         return industry_values
 
     def _convert_to_percentages(
-        self, industry_values: dict[str, Decimal], total_value: Money
+        self,
+        industry_values: dict[str, Decimal],
+        total_value: Money,
     ) -> dict[str, Decimal]:
         """Convert industry values to percentages."""
         industry_percentages: dict[str, Decimal] = {}

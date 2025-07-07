@@ -21,7 +21,8 @@ def test_configure_with_extra_registrations() -> None:
 
     # Configure with extra registrations
     container = CompositionRoot.configure(
-        database_path=":memory:", extra_registrations=extra_registrations
+        database_path=":memory:",
+        extra_registrations=extra_registrations,
     )
 
     # Should have the extra service registered

@@ -243,7 +243,8 @@ class TestRepositoryContractDefinitions:
 
         for repo_class in repositories:
             assert issubclass(
-                repo_class, ABC
+                repo_class,
+                ABC,
             ), f"{repo_class.__name__} should inherit from ABC"
 
 

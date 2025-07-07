@@ -496,7 +496,8 @@ def seed_test_stocks_sqlalchemy(conn: Connection, stocks: list[Stock]) -> None:
 
 
 def seed_test_portfolio_sqlalchemy(
-    conn: Connection, name: str = "Test Portfolio"
+    conn: Connection,
+    name: str = "Test Portfolio",
 ) -> str:
     """
     Seed the test database with a portfolio using SQLAlchemy.

@@ -44,7 +44,7 @@ class StockSymbol:
         if len(normalized) < 1 or len(normalized) > self.MAX_SYMBOL_LENGTH:
             raise ValueError(
                 f"Stock symbol must be between 1 and {self.MAX_SYMBOL_LENGTH} "
-                + "characters"
+                + "characters",
             )
         if not self.SYMBOL_PATTERN.match(normalized):
             msg = "Stock symbol must contain only uppercase letters"

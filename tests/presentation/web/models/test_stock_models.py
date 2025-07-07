@@ -160,7 +160,10 @@ class TestStockRequest:
     def test_stock_request_empty_optional_fields_become_none(self) -> None:
         """Should convert empty optional string fields to None."""
         request = StockRequest(
-            symbol="AAPL", name="Apple Inc.", sector="", industry_group=""
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="",
+            industry_group="",
         )
 
         assert request.sector is None
@@ -169,7 +172,10 @@ class TestStockRequest:
     def test_stock_request_whitespace_only_optional_fields_become_none(self) -> None:
         """Should convert whitespace-only optional fields to None."""
         request = StockRequest(
-            symbol="AAPL", name="Apple Inc.", sector="   ", industry_group="   "
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="   ",
+            industry_group="   ",
         )
 
         assert request.sector is None
@@ -182,13 +188,15 @@ class TestStockRequest:
         sector."""
         with pytest.raises(ValidationError) as exc_info:
             _ = StockRequest(
-                symbol="AAPL", name="Apple Inc.", industry_group="Software"
+                symbol="AAPL",
+                name="Apple Inc.",
+                industry_group="Software",
             )
 
         errors = exc_info.value.errors()
         assert len(errors) == 1
         assert "Sector must be provided when industry_group is specified" in str(
-            errors[0]["msg"]
+            errors[0]["msg"],
         )
 
     def test_stock_request_to_command_conversion(self) -> None:
@@ -929,7 +937,7 @@ class TestStockUpdateRequest:
         with pytest.raises(ValidationError) as exc_info:
             _ = StockUpdateRequest(industry_group="Software")
         assert "Sector must be provided when industry_group is specified" in str(
-            exc_info.value
+            exc_info.value,
         )
 
     def test_stock_update_request_to_command(self) -> None:

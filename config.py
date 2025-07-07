@@ -77,19 +77,21 @@ class Config:
     def _setup_database(self) -> None:
         """Setup database configuration."""
         self.db_path = Path(
-            self._get_env_str("STOCKBOOK_DB_PATH", "data/database/stockbook.db")
+            self._get_env_str("STOCKBOOK_DB_PATH", "data/database/stockbook.db"),
         )
         self.schema_path = Path(
-            self._get_env_str("STOCKBOOK_SCHEMA_PATH", "data/database/schema.sql")
+            self._get_env_str("STOCKBOOK_SCHEMA_PATH", "data/database/schema.sql"),
         )
         self.test_db_path = Path(
             self._get_env_str(
-                "STOCKBOOK_TEST_DB_PATH", "data/database/test_stockbook.db"
-            )
+                "STOCKBOOK_TEST_DB_PATH",
+                "data/database/test_stockbook.db",
+            ),
         )
         self.db_connection_timeout = self._get_env_int("STOCKBOOK_DB_TIMEOUT", 30)
         self.db_foreign_keys_enabled = self._get_env_bool(
-            "STOCKBOOK_DB_FOREIGN_KEYS", True
+            "STOCKBOOK_DB_FOREIGN_KEYS",
+            True,
         )
         self.db_row_factory = self._get_env_str("STOCKBOOK_DB_ROW_FACTORY", "dict")
 
@@ -97,7 +99,7 @@ class Config:
         """Setup directory paths."""
         self.data_dir = Path(self._get_env_str("STOCKBOOK_DATA_DIR", "data"))
         self.backup_dir = Path(
-            self._get_env_str("STOCKBOOK_BACKUP_DIR", "data/backups")
+            self._get_env_str("STOCKBOOK_BACKUP_DIR", "data/backups"),
         )
         self.logs_dir = Path(self._get_env_str("STOCKBOOK_LOGS_DIR", "data/logs"))
 
@@ -105,7 +107,8 @@ class Config:
         """Setup display preferences."""
         self.date_format = self._get_env_str("STOCKBOOK_DATE_FORMAT", "%Y-%m-%d")
         self.datetime_format = self._get_env_str(
-            "STOCKBOOK_DATETIME_FORMAT", "%Y-%m-%d %H:%M:%S"
+            "STOCKBOOK_DATETIME_FORMAT",
+            "%Y-%m-%d %H:%M:%S",
         )
         self.currency_symbol = self._get_env_str("STOCKBOOK_CURRENCY_SYMBOL", "$")
         self.decimal_places = self._get_env_int("STOCKBOOK_DECIMAL_PLACES", 2)
@@ -121,20 +124,24 @@ class Config:
         """Setup validation rules for different data types."""
         # Stock symbol validation
         self.stock_symbol_pattern = self._get_env_str(
-            "STOCKBOOK_SYMBOL_PATTERN", r"^[A-Z]{1,5}(\.[A-Z]{1,2})?$"
+            "STOCKBOOK_SYMBOL_PATTERN",
+            r"^[A-Z]{1,5}(\.[A-Z]{1,2})?$",
         )
         self.stock_symbol_max_length = self._get_env_int(
-            "STOCKBOOK_SYMBOL_MAX_LENGTH", 10
+            "STOCKBOOK_SYMBOL_MAX_LENGTH",
+            10,
         )
 
         # Valid stock grades
         self.valid_grades = self._get_env_list(
-            "STOCKBOOK_VALID_GRADES", ["A", "B", "C"]
+            "STOCKBOOK_VALID_GRADES",
+            ["A", "B", "C"],
         )
 
         # Transaction validation
         self.valid_transaction_types = self._get_env_list(
-            "STOCKBOOK_TRANSACTION_TYPES", ["buy", "sell"]
+            "STOCKBOOK_TRANSACTION_TYPES",
+            ["buy", "sell"],
         )
         self.min_price = self._get_env_float("STOCKBOOK_MIN_PRICE", 0.01)
         self.max_price = self._get_env_float("STOCKBOOK_MAX_PRICE", 100000.0)
@@ -143,10 +150,12 @@ class Config:
 
         # Portfolio validation
         self.portfolio_name_max_length = self._get_env_int(
-            "STOCKBOOK_PORTFOLIO_NAME_MAX_LENGTH", 100
+            "STOCKBOOK_PORTFOLIO_NAME_MAX_LENGTH",
+            100,
         )
         self.max_risk_per_trade_limit = self._get_env_float(
-            "STOCKBOOK_MAX_RISK_LIMIT", 10.0
+            "STOCKBOOK_MAX_RISK_LIMIT",
+            10.0,
         )
 
     def _setup_portfolio_defaults(self) -> None:
@@ -154,7 +163,8 @@ class Config:
         self.portfolio_defaults = {
             "max_positions": self._get_env_int("STOCKBOOK_MAX_POSITIONS", 10),
             "max_risk_per_trade": self._get_env_float(
-                "STOCKBOOK_MAX_RISK_PER_TRADE", 2.0
+                "STOCKBOOK_MAX_RISK_PER_TRADE",
+                2.0,
             ),
             "name_prefix": self._get_env_str("STOCKBOOK_PORTFOLIO_PREFIX", "Portfolio"),
         }
@@ -165,10 +175,12 @@ class Config:
             # Core features (Phase 1-2)
             "stock_management": self._get_env_bool("STOCKBOOK_FEATURE_STOCKS", True),
             "portfolio_management": self._get_env_bool(
-                "STOCKBOOK_FEATURE_PORTFOLIOS", True
+                "STOCKBOOK_FEATURE_PORTFOLIOS",
+                True,
             ),
             "transaction_recording": self._get_env_bool(
-                "STOCKBOOK_FEATURE_TRANSACTIONS", True
+                "STOCKBOOK_FEATURE_TRANSACTIONS",
+                True,
             ),
             # Advanced features (Phase 3)
             "target_management": self._get_env_bool("STOCKBOOK_FEATURE_TARGETS", False),
@@ -176,7 +188,8 @@ class Config:
             "analytics": self._get_env_bool("STOCKBOOK_FEATURE_ANALYTICS", False),
             # Future features (Phase 4)
             "multi_account": self._get_env_bool(
-                "STOCKBOOK_FEATURE_MULTI_ACCOUNT", False
+                "STOCKBOOK_FEATURE_MULTI_ACCOUNT",
+                False,
             ),
             "api_integration": self._get_env_bool("STOCKBOOK_FEATURE_API", False),
         }

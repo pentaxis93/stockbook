@@ -35,7 +35,10 @@ class ValidationError(DomainServiceError):
     """
 
     def __init__(
-        self, message: str, field: str | None = None, value: Any = None
+        self,
+        message: str,
+        field: str | None = None,
+        value: Any = None,
     ) -> None:
         """Initialize validation error with field and value context.
 

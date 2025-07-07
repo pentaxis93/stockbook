@@ -20,7 +20,9 @@ class BaseNumericValueObject(ABC):
     _value: Decimal
 
     def __init__(
-        self, value: int | float | str | Decimal, allow_negative: bool = True
+        self,
+        value: int | float | str | Decimal,
+        allow_negative: bool = True,
     ) -> None:
         """Initialize numeric value object with validation.
 
@@ -109,7 +111,7 @@ class BaseNumericValueObject(ABC):
             return self.__class__(self._value + Decimal(str(other)))
         raise TypeError(
             f"Can only add {self.__class__.__name__} to {self.__class__.__name__} "
-            + "or numeric types"
+            + "or numeric types",
         )
 
     def __sub__(self, other: Any) -> "BaseNumericValueObject":
@@ -121,7 +123,7 @@ class BaseNumericValueObject(ABC):
         else:
             raise TypeError(
                 f"Can only subtract {self.__class__.__name__} or numeric types "
-                + f"from {self.__class__.__name__}"
+                + f"from {self.__class__.__name__}",
             )
 
         return self.__class__(result_value)

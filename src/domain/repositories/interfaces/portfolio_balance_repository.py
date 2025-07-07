@@ -40,7 +40,9 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_by_portfolio_and_date(
-        self, portfolio_id: str, balance_date: date
+        self,
+        portfolio_id: str,
+        balance_date: date,
     ) -> PortfolioBalance | None:
         """Retrieve portfolio balance for a specific date.
 
@@ -54,7 +56,9 @@ class IPortfolioBalanceRepository(ABC):
 
     @abstractmethod
     def get_history(
-        self, portfolio_id: str, limit: int | None = None
+        self,
+        portfolio_id: str,
+        limit: int | None = None,
     ) -> list[PortfolioBalance]:
         """Retrieve balance history for a portfolio.
 

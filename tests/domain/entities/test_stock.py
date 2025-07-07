@@ -229,7 +229,8 @@ class TestStock:
         long_name = "A" * 201  # Max is 200 characters
 
         with pytest.raises(
-            ValueError, match="Company name cannot exceed 200 characters"
+            ValueError,
+            match="Company name cannot exceed 200 characters",
         ):
             _ = CompanyName(long_name)  # Error happens at CompanyName construction
 
@@ -239,10 +240,11 @@ class TestStock:
         long_industry = "A" * 101  # Max is 100 characters
 
         with pytest.raises(
-            ValueError, match="Industry group cannot exceed 100 characters"
+            ValueError,
+            match="Industry group cannot exceed 100 characters",
         ):
             _ = IndustryGroup(
-                long_industry
+                long_industry,
             )  # Error happens at IndustryGroup construction
 
     def test_create_stock_with_too_long_notes_raises_error(self) -> None:
@@ -518,14 +520,16 @@ class TestStock:
         # Test name too long
         long_name = "A" * 201
         with pytest.raises(
-            ValueError, match="Company name cannot exceed 200 characters"
+            ValueError,
+            match="Company name cannot exceed 200 characters",
         ):
             stock.update_fields(name=long_name)
 
         # Test industry too long
         long_industry = "A" * 101
         with pytest.raises(
-            ValueError, match="Industry group cannot exceed 100 characters"
+            ValueError,
+            match="Industry group cannot exceed 100 characters",
         ):
             stock.update_fields(sector="Technology", industry_group=long_industry)
 
@@ -649,7 +653,7 @@ class TestStock:
         company_name = CompanyName("Apple Inc.")
         sector = Sector("Technology")
         industry_group = IndustryGroup(
-            "Pharmaceuticals"
+            "Pharmaceuticals",
         )  # Invalid for Technology sector
 
         with pytest.raises(
@@ -675,7 +679,8 @@ class TestStock:
         industry_group = IndustryGroup("Software")  # No sector provided
 
         with pytest.raises(
-            ValueError, match="Sector must be provided when industry_group is specified"
+            ValueError,
+            match="Sector must be provided when industry_group is specified",
         ):
             _ = (
                 Stock.Builder()
@@ -820,7 +825,8 @@ class TestStock:
         )
 
         with pytest.raises(
-            ValueError, match="Sector must be provided when industry_group is specified"
+            ValueError,
+            match="Sector must be provided when industry_group is specified",
         ):
             stock.update_fields(industry_group="Software")
 
@@ -922,7 +928,8 @@ class TestStockLifecycle:
 
         # Quarter 1: Upgrade after good performance
         stock.update_fields(
-            grade="A", notes="Upgraded to A after excellent Q1 earnings"
+            grade="A",
+            notes="Upgraded to A after excellent Q1 earnings",
         )
         assert stock.grade is not None
         assert stock.grade.value == "A"
@@ -990,18 +997,18 @@ class TestStockLifecycle:
             .with_symbol(StockSymbol(persisted_data["symbol"]))
             .with_company_name(CompanyName(persisted_data["company_name"]))
             .with_sector(
-                Sector(persisted_data["sector"]) if persisted_data["sector"] else None
+                Sector(persisted_data["sector"]) if persisted_data["sector"] else None,
             )
             .with_industry_group(
                 IndustryGroup(persisted_data["industry_group"])
                 if persisted_data["industry_group"]
-                else None
+                else None,
             )
             .with_grade(
-                Grade(persisted_data["grade"]) if persisted_data["grade"] else None
+                Grade(persisted_data["grade"]) if persisted_data["grade"] else None,
             )
             .with_notes(
-                Notes(persisted_data["notes"]) if persisted_data["notes"] else None
+                Notes(persisted_data["notes"]) if persisted_data["notes"] else None,
             )
             .build()
         )
@@ -1087,10 +1094,11 @@ class TestStockDomainInvariants:
 
         # Invalid updates should fail and maintain consistency
         with pytest.raises(
-            ValueError, match="Industry group .* is not valid for sector"
+            ValueError,
+            match="Industry group .* is not valid for sector",
         ):
             stock.update_fields(
-                industry_group="Pharmaceuticals"
+                industry_group="Pharmaceuticals",
             )  # Invalid for Technology
 
         # Stock should maintain valid state after failed update
@@ -1315,7 +1323,7 @@ class TestStockConcurrencyScenarios:
             .with_company_name(CompanyName("Apple Inc."))
             .with_sector(Sector("Technology"))
             .with_industry_group(
-                IndustryGroup("Software")
+                IndustryGroup("Software"),
             )  # Valid for Technology sector
             .with_grade(Grade("A"))
             .build()

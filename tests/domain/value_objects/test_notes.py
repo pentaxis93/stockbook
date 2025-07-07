@@ -145,7 +145,7 @@ class TestNotes:
 
         # Mock the parent class to raise an unexpected ValueError
         with patch(
-            "src.domain.value_objects.notes.BaseTextValueObject.__init__"
+            "src.domain.value_objects.notes.BaseTextValueObject.__init__",
         ) as mock_init:
             mock_init.side_effect = ValueError("Unexpected error from parent")
 
