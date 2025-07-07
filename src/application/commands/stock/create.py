@@ -86,7 +86,8 @@ class CreateStockCommand:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_symbol"):  # Object is already initialized
-            raise AttributeError("Cannot modify immutable CreateStockCommand")
+            msg = "Cannot modify immutable CreateStockCommand"
+            raise AttributeError(msg)
         super().__setattr__(name, value)
 
     def __eq__(self, other: Any) -> bool:
@@ -204,11 +205,13 @@ class CreateStockCommand:
     def _validate_symbol(symbol: str) -> None:
         """Validate symbol format."""
         if not symbol:
-            raise ValueError("Symbol cannot be empty")
+            msg = "Symbol cannot be empty"
+            raise ValueError(msg)
 
         # Use StockSymbol validation
         if not StockSymbol.is_valid(symbol):
-            raise ValueError("Invalid symbol format")
+            msg = "Invalid symbol format"
+            raise ValueError(msg)
 
     @staticmethod
     def _validate_name(name: str | None) -> None:
@@ -221,9 +224,8 @@ class CreateStockCommand:
         if grade is not None:
             valid_grades = {"A", "B", "C"}
             if grade not in valid_grades:
-                raise ValueError(
-                    f"Invalid grade. Must be one of {valid_grades} or None"
-                )
+                msg = f"Invalid grade. Must be one of {valid_grades} or None"
+                raise ValueError(msg)
 
     @staticmethod
     def _validate_sector_industry_combination(
@@ -236,7 +238,8 @@ class CreateStockCommand:
 
         # If industry group is provided, sector must also be provided
         if sector is None:
-            raise ValueError("Sector must be provided when industry_group is specified")
+            msg = "Sector must be provided when industry_group is specified"
+            raise ValueError(msg)
 
         # Validate the combination using domain service
         service = SectorIndustryService()

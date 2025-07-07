@@ -79,7 +79,8 @@ class PortfolioBalance(Entity):
     ) -> None:
         """Initialize portfolio balance through builder pattern."""
         if _builder_instance is None:
-            raise ValueError("PortfolioBalance must be created through Builder")
+            msg = "PortfolioBalance must be created through Builder"
+            raise ValueError(msg)
 
         # Extract values from builder
         portfolio_id = _builder_instance.portfolio_id
@@ -92,15 +93,19 @@ class PortfolioBalance(Entity):
 
         # Validate required fields
         if portfolio_id is None:
-            raise ValueError("Portfolio ID is required")
+            msg = "Portfolio ID is required"
+            raise ValueError(msg)
         if balance_date is None:
-            raise ValueError("Balance date is required")
+            msg = "Balance date is required"
+            raise ValueError(msg)
         if final_balance is None:
-            raise ValueError("Final balance is required")
+            msg = "Final balance is required"
+            raise ValueError(msg)
 
         # Validate foreign key ID is not empty
         if not portfolio_id:
-            raise ValueError("Portfolio ID must be a non-empty string")
+            msg = "Portfolio ID must be a non-empty string"
+            raise ValueError(msg)
 
         # Initialize parent
         super().__init__(id=entity_id)

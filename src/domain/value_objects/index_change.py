@@ -78,5 +78,6 @@ class IndexChange:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError("IndexChange is immutable")
+            msg = "IndexChange is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)

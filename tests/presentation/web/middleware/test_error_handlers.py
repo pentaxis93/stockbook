@@ -40,7 +40,8 @@ class TestErrorHandlerEdgeCases:
         @handle_stock_errors
         async def _unknown_function_name() -> dict[str, str]:
             """Test endpoint with unknown function name."""
-            raise RuntimeError("Test error")
+            msg = "Test error"
+            raise RuntimeError(msg)
 
         client = TestClient(app)
         response = client.get("/test")

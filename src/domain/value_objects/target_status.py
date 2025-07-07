@@ -31,7 +31,8 @@ class TargetStatus:
 
         if normalized_value not in self.VALID_STATUSES:
             valid_list = ", ".join(sorted(self.VALID_STATUSES))
-            raise ValueError(f"Target status must be one of: {valid_list}")
+            msg = f"Target status must be one of: {valid_list}"
+            raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
         object.__setattr__(self, "_value", normalized_value)
@@ -62,5 +63,6 @@ class TargetStatus:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError("TargetStatus is immutable")
+            msg = "TargetStatus is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)

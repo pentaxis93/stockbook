@@ -82,9 +82,8 @@ class SectorIndustryService:
         """
         if sector not in self.SECTOR_INDUSTRY_MAPPING:
             available_sectors = ", ".join(self.get_available_sectors())
-            raise ValueError(
-                f"Invalid sector {sector!r}. Available sectors: {available_sectors}"
-            )
+            msg = f"Invalid sector {sector!r}. Available sectors: {available_sectors}"
+            raise ValueError(msg)
 
         return self.SECTOR_INDUSTRY_MAPPING[sector]
 

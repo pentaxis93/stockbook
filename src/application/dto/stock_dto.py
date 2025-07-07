@@ -29,10 +29,12 @@ class StockDto:
     def __post_init__(self) -> None:
         """Validate DTO data after initialization."""
         if not self.symbol:
-            raise ValueError("Symbol cannot be empty")
+            msg = "Symbol cannot be empty"
+            raise ValueError(msg)
 
         if self.id is not None and not self.id:
-            raise ValueError("ID must be a string")
+            msg = "ID must be a string"
+            raise ValueError(msg)
 
     @classmethod
     def from_entity(cls, entity: Any) -> "StockDto":
@@ -45,7 +47,8 @@ class StockDto:
             StockDto instance
         """
         if not isinstance(entity, Stock):
-            raise TypeError("Expected Stock instance")
+            msg = "Expected Stock instance"
+            raise TypeError(msg)
 
         return cls(
             id=entity.id,

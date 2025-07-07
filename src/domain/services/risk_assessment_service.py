@@ -71,8 +71,9 @@ class RiskAssessmentService:
     ) -> RiskAssessment:
         """Calculate overall portfolio risk level."""
         if not portfolio:
+            msg = "Cannot assess risk of empty portfolio"
             raise InsufficientDataError(
-                "Cannot assess risk of empty portfolio",
+                msg,
                 required_fields=["portfolio_positions"],
             )
 

@@ -193,7 +193,8 @@ class Config:
         try:
             return int(value)
         except ValueError as exc:
-            raise ConfigError(f"Invalid integer value for {key}: {value}") from exc
+            msg = f"Invalid integer value for {key}: {value}"
+            raise ConfigError(msg) from exc
 
     def _get_env_float(self, key: str, default: float) -> float:
         """Get float value from environment with default."""
@@ -203,7 +204,8 @@ class Config:
         try:
             return float(value)
         except ValueError as exc:
-            raise ConfigError(f"Invalid float value for {key}: {value}") from exc
+            msg = f"Invalid float value for {key}: {value}"
+            raise ConfigError(msg) from exc
 
     def _get_env_bool(self, key: str, default: bool) -> bool:
         """Get boolean value from environment with default."""
@@ -237,7 +239,8 @@ class Config:
         """Validate file and directory paths."""
         # Schema file must exist
         if not self.schema_path.exists():
-            raise ValidationError(f"Schema file does not exist: {self.schema_path}")
+            msg = f"Schema file does not exist: {self.schema_path}"
+            raise ValidationError(msg)
 
     def _validate_values(self) -> None:
         """Validate configuration values."""
@@ -248,35 +251,41 @@ class Config:
     def _validate_numeric_values(self) -> None:
         """Validate numeric configuration values."""
         if self.decimal_places < 0:
-            raise ValidationError("decimal_places must be non-negative")
+            msg = "decimal_places must be non-negative"
+            raise ValidationError(msg)
         if self.min_price <= 0:
-            raise ValidationError("min_price must be positive")
+            msg = "min_price must be positive"
+            raise ValidationError(msg)
         if self.max_price <= self.min_price:
-            raise ValidationError("max_price must be greater than min_price")
+            msg = "max_price must be greater than min_price"
+            raise ValidationError(msg)
         if self.min_quantity <= 0:
-            raise ValidationError("min_quantity must be positive")
+            msg = "min_quantity must be positive"
+            raise ValidationError(msg)
 
     def _validate_portfolio_values(self) -> None:
         """Validate portfolio configuration values."""
         max_positions = self.portfolio_defaults.get("max_positions", 0)
         if isinstance(max_positions, int) and max_positions <= 0:
-            raise ValidationError("max_positions must be positive")
+            msg = "max_positions must be positive"
+            raise ValidationError(msg)
 
     def _validate_display_values(self) -> None:
         """Validate display configuration values."""
         if self.table_page_size <= 0:
-            raise ValidationError("table_page_size must be positive")
+            msg = "table_page_size must be positive"
+            raise ValidationError(msg)
         if self.max_rows_display < self.table_page_size:
-            raise ValidationError("max_rows_display must be >= table_page_size")
+            msg = "max_rows_display must be >= table_page_size"
+            raise ValidationError(msg)
 
     def _validate_patterns(self) -> None:
         """Validate regex patterns."""
         try:
             re.compile(self.stock_symbol_pattern)
         except re.error as e:
-            raise ValidationError(
-                f"Invalid regex pattern for stock symbols: {e}"
-            ) from e
+            msg = f"Invalid regex pattern for stock symbols: {e}"
+            raise ValidationError(msg) from e
 
     def get_db_connection_string(self) -> str:
         """Get database connection string."""

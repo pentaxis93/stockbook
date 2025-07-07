@@ -408,9 +408,8 @@ class TestDomainEventPatterns:
                 # Simulate processing logic
                 if "FAILS" in event.stock_symbol.value:
                     # Simulate processing failure
-                    raise ValueError(
-                        f"Processing failed for {event.stock_symbol.value}"
-                    )
+                    msg = f"Processing failed for {event.stock_symbol.value}"
+                    raise ValueError(msg)
 
                 # Successful processing
                 processed_events.append(event)

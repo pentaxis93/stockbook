@@ -16,7 +16,8 @@ class Entity(ABC):  # noqa: B024
     def __new__(cls, *_args: Any, **_kwargs: Any) -> Self:
         """Prevent direct instantiation of Entity base class."""
         if cls is Entity:
-            raise TypeError("Can't instantiate abstract class Entity directly")
+            msg = "Can't instantiate abstract class Entity directly"
+            raise TypeError(msg)
         return super().__new__(cls)
 
     def __init__(self, id: str | None = None) -> None:

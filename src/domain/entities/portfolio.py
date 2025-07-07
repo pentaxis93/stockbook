@@ -85,7 +85,8 @@ class Portfolio(Entity):
     def set_created_date(self, created_date: datetime) -> None:
         """Set created date (for persistence layer)."""
         if self._created_date is not None:
-            raise ValueError("Created date is already set and cannot be changed")
+            msg = "Created date is already set and cannot be changed"
+            raise ValueError(msg)
         self._created_date = created_date
 
     # Representation

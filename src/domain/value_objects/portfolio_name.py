@@ -30,12 +30,12 @@ class PortfolioName:
         normalized_value = value.strip()
 
         if not normalized_value:
-            raise ValueError("Portfolio name cannot be empty")
+            msg = "Portfolio name cannot be empty"
+            raise ValueError(msg)
 
         if len(normalized_value) > self.MAX_LENGTH:
-            raise ValueError(
-                f"Portfolio name cannot exceed {self.MAX_LENGTH} characters"
-            )
+            msg = f"Portfolio name cannot exceed {self.MAX_LENGTH} characters"
+            raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
         object.__setattr__(self, "_value", normalized_value)
@@ -66,5 +66,6 @@ class PortfolioName:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError("PortfolioName is immutable")
+            msg = "PortfolioName is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)

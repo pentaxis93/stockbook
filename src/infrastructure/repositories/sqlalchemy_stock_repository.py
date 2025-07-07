@@ -79,9 +79,8 @@ class SqlAlchemyStockRepository(IStockRepository):
         except exc.IntegrityError as e:
             # Check if it's a unique constraint violation on symbol
             if "symbol" in str(e):
-                raise ValueError(
-                    f"Stock with symbol {stock.symbol.value} already exists"
-                ) from e
+                msg = f"Stock with symbol {stock.symbol.value} already exists"
+                raise ValueError(msg) from e
             raise
 
     def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
@@ -246,9 +245,8 @@ class SqlAlchemyStockRepository(IStockRepository):
         except exc.IntegrityError as e:
             # Check if it's a unique constraint violation on symbol
             if "symbol" in str(e):
-                raise ValueError(
-                    f"Stock with symbol {stock.symbol.value} already exists"
-                ) from e
+                msg = f"Stock with symbol {stock.symbol.value} already exists"
+                raise ValueError(msg) from e
             raise
 
     def delete(self, stock_id: str) -> bool:

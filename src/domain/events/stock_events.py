@@ -38,10 +38,12 @@ class StockAddedEvent(DomainEvent):
 
         # Validate inputs
         if not stock_name or not stock_name.strip():
-            raise ValueError("Stock name cannot be empty")
+            msg = "Stock name cannot be empty"
+            raise ValueError(msg)
 
         if stock_id <= 0:
-            raise ValueError("Stock ID must be positive")
+            msg = "Stock ID must be positive"
+            raise ValueError(msg)
 
         self._stock_symbol = stock_symbol
         self._stock_name = stock_name.strip()

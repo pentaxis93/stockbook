@@ -83,7 +83,8 @@ class Target(Entity):
     def __init__(self, *, _builder_instance: Target.Builder | None = None) -> None:
         """Initialize target through builder pattern."""
         if _builder_instance is None:
-            raise ValueError("Target must be created through Builder")
+            msg = "Target must be created through Builder"
+            raise ValueError(msg)
 
         # Extract values from builder
         portfolio_id = _builder_instance.portfolio_id
@@ -97,23 +98,31 @@ class Target(Entity):
 
         # Validate required fields
         if portfolio_id is None:
-            raise ValueError("Portfolio ID is required")
+            msg = "Portfolio ID is required"
+            raise ValueError(msg)
         if stock_id is None:
-            raise ValueError("Stock ID is required")
+            msg = "Stock ID is required"
+            raise ValueError(msg)
         if pivot_price is None:
-            raise ValueError("Pivot price is required")
+            msg = "Pivot price is required"
+            raise ValueError(msg)
         if failure_price is None:
-            raise ValueError("Failure price is required")
+            msg = "Failure price is required"
+            raise ValueError(msg)
         if status is None:
-            raise ValueError("Status is required")
+            msg = "Status is required"
+            raise ValueError(msg)
         if created_date is None:
-            raise ValueError("Created date is required")
+            msg = "Created date is required"
+            raise ValueError(msg)
 
         # Validate foreign key IDs are not empty
         if not portfolio_id:
-            raise ValueError("Portfolio ID must be a non-empty string")
+            msg = "Portfolio ID must be a non-empty string"
+            raise ValueError(msg)
         if not stock_id:
-            raise ValueError("Stock ID must be a non-empty string")
+            msg = "Stock ID must be a non-empty string"
+            raise ValueError(msg)
 
         # Store validated attributes
         super().__init__(id=entity_id)

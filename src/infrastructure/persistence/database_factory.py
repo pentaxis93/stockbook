@@ -43,11 +43,13 @@ def create_engine(
     # Validate input type (needed for runtime safety even though type checker
     # knows the types)
     if not isinstance(db_path, str | Path):  # pyright: ignore[reportUnnecessaryIsInstance]
-        raise TypeError("Database path must be a string or Path object")
+        msg = "Database path must be a string or Path object"
+        raise TypeError(msg)
 
     db_path_str = str(db_path)
     if not db_path_str:
-        raise ValueError("Database path cannot be empty")
+        msg = "Database path cannot be empty"
+        raise ValueError(msg)
 
     # Build database URL
     url = get_database_url(db_path_str)

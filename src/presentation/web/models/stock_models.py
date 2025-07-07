@@ -58,16 +58,17 @@ class StockRequest(BaseModel):
 
         # Check not empty
         if not normalized:
-            raise ValueError("Symbol cannot be empty")
+            msg = "Symbol cannot be empty"
+            raise ValueError(msg)
 
         # Check format (letters only) - do this first
         if not normalized.isalpha():
-            raise ValueError("Stock symbol must contain only uppercase letters")
+            msg = "Stock symbol must contain only uppercase letters"
+            raise ValueError(msg)
         # Check length after format
         if len(normalized) < 1 or len(normalized) > MAX_SYMBOL_LENGTH:
-            raise ValueError(
-                f"Stock symbol must be between 1 and {MAX_SYMBOL_LENGTH} characters"
-            )
+            msg = f"Stock symbol must be between 1 and {MAX_SYMBOL_LENGTH} characters"
+            raise ValueError(msg)
 
         return normalized
 
@@ -129,7 +130,8 @@ class StockRequest(BaseModel):
             if normalized in ["A", "B", "C", "D", "F"]:
                 return normalized  # type: ignore[return-value]
         # If we get here, it's an invalid grade
-        raise ValueError("Grade must be one of A, B, C, D, F or None")
+        msg = "Grade must be one of A, B, C, D, F or None"
+        raise ValueError(msg)
 
     @model_validator(mode="after")
     def validate_sector_industry_relationship(self) -> Self:
@@ -142,7 +144,8 @@ class StockRequest(BaseModel):
             ValueError: If industry_group provided without sector
         """
         if self.industry_group is not None and self.sector is None:
-            raise ValueError("Sector must be provided when industry_group is specified")
+            msg = "Sector must be provided when industry_group is specified"
+            raise ValueError(msg)
         return self
 
     def to_command(self) -> CreateStockCommand:
@@ -197,7 +200,8 @@ class StockResponse(BaseModel):
             ValueError: If string is empty
         """
         if not value or not value.strip():
-            raise ValueError("Symbol cannot be empty")
+            msg = "Symbol cannot be empty"
+            raise ValueError(msg)
         return value
 
     @field_validator("name")
@@ -311,12 +315,12 @@ class StockUpdateRequest(BaseModel):
 
         # Check format (letters only) - do this first
         if not normalized.isalpha():
-            raise ValueError("Stock symbol must contain only uppercase letters")
+            msg = "Stock symbol must contain only uppercase letters"
+            raise ValueError(msg)
         # Check length after format
         if len(normalized) < 1 or len(normalized) > MAX_SYMBOL_LENGTH:
-            raise ValueError(
-                f"Stock symbol must be between 1 and {MAX_SYMBOL_LENGTH} characters"
-            )
+            msg = f"Stock symbol must be between 1 and {MAX_SYMBOL_LENGTH} characters"
+            raise ValueError(msg)
 
         return normalized
 
@@ -378,7 +382,8 @@ class StockUpdateRequest(BaseModel):
             if normalized in ["A", "B", "C", "D", "F"]:
                 return normalized  # type: ignore[return-value]
         # If we get here, it's an invalid grade
-        raise ValueError("Grade must be one of A, B, C, D, F or None")
+        msg = "Grade must be one of A, B, C, D, F or None"
+        raise ValueError(msg)
 
     @field_validator("notes")
     @classmethod
@@ -404,7 +409,8 @@ class StockUpdateRequest(BaseModel):
             ValueError: If industry_group provided without sector
         """
         if self.industry_group is not None and self.sector is None:
-            raise ValueError("Sector must be provided when industry_group is specified")
+            msg = "Sector must be provided when industry_group is specified"
+            raise ValueError(msg)
         return self
 
     def to_command(self, stock_id: str) -> UpdateStockCommand:

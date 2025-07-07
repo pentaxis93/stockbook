@@ -63,7 +63,8 @@ def _extract_db_path(database_url: str) -> str:
         if database_url.startswith("sqlite:///"):
             return database_url.replace("sqlite:///", "")
         # For non-SQLite databases or invalid URLs
-        raise ValueError(f"Unsupported database URL: {database_url}")
+        msg = f"Unsupported database URL: {database_url}"
+        raise ValueError(msg)
     # It's a file path
     return database_url
 

@@ -73,7 +73,8 @@ class JournalEntry(Entity):
     ) -> None:
         """Initialize journal entry through builder pattern."""
         if _builder_instance is None:
-            raise ValueError("JournalEntry must be created through Builder")
+            msg = "JournalEntry must be created through Builder"
+            raise ValueError(msg)
 
         # Extract values from builder
         entry_date = _builder_instance.entry_date
@@ -85,17 +86,22 @@ class JournalEntry(Entity):
 
         # Validate required fields
         if entry_date is None:
-            raise ValueError("Entry date is required")
+            msg = "Entry date is required"
+            raise ValueError(msg)
         if content is None:
-            raise ValueError("Content is required")
+            msg = "Content is required"
+            raise ValueError(msg)
 
         # Validate optional foreign key IDs
         if portfolio_id is not None and not portfolio_id:
-            raise ValueError("Portfolio ID must be a non-empty string")
+            msg = "Portfolio ID must be a non-empty string"
+            raise ValueError(msg)
         if stock_id is not None and not stock_id:
-            raise ValueError("Stock ID must be a non-empty string")
+            msg = "Stock ID must be a non-empty string"
+            raise ValueError(msg)
         if transaction_id is not None and not transaction_id:
-            raise ValueError("Transaction ID must be a non-empty string")
+            msg = "Transaction ID must be a non-empty string"
+            raise ValueError(msg)
 
         # Initialize parent
         super().__init__(id=entity_id)

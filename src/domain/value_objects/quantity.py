@@ -36,7 +36,8 @@ class Quantity(BaseNumericValueObject):
         if isinstance(other, int | float | Decimal):
             return Quantity(self._value + Decimal(str(other)))
 
-        raise TypeError("Can only add Quantity or numeric types to Quantity")
+        msg = "Can only add Quantity or numeric types to Quantity"
+        raise TypeError(msg)
 
     def __sub__(self, other: Any) -> "Quantity":
         """Subtract Quantity from this Quantity."""
@@ -45,10 +46,12 @@ class Quantity(BaseNumericValueObject):
         elif isinstance(other, int | float | Decimal):
             result_value = self._value - Decimal(str(other))
         else:
-            raise TypeError("Can only subtract Quantity or numeric types from Quantity")
+            msg = "Can only subtract Quantity or numeric types from Quantity"
+            raise TypeError(msg)
 
         if result_value < 0:
-            raise ValueError("Resulting quantity cannot be negative")
+            msg = "Resulting quantity cannot be negative"
+            raise ValueError(msg)
 
         return Quantity(result_value)
 
@@ -59,7 +62,8 @@ class Quantity(BaseNumericValueObject):
     def __truediv__(self, scalar: int | float | Decimal) -> "Quantity":
         """Divide Quantity by a scalar."""
         if scalar == 0:
-            raise ZeroDivisionError("Cannot divide by zero")
+            msg = "Cannot divide by zero"
+            raise ZeroDivisionError(msg)
         return Quantity(self._value / Decimal(str(scalar)))
 
     def is_whole(self) -> bool:

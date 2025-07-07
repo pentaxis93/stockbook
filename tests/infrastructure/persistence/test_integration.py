@@ -355,7 +355,8 @@ class TestTransactionIsolation:
                 _ = unit_of_work.stocks.create(stock1)
 
                 # Simulate error
-                raise ValueError("Simulated error")
+                msg = "Simulated error"
+                raise ValueError(msg)
 
         # Assert - Nothing should be committed
         with test_engine.connect() as conn:

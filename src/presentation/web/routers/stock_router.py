@@ -44,7 +44,8 @@ def get_stock_service(request: Request) -> StockApplicationService:
         RuntimeError: If DI container not configured in app state
     """
     if not hasattr(request.app.state, "di_container"):
-        raise RuntimeError("DI container not configured in app state")
+        msg = "DI container not configured in app state"
+        raise RuntimeError(msg)
     service: StockApplicationService = request.app.state.di_container.resolve(
         StockApplicationService
     )

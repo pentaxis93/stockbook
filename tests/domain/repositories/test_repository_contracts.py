@@ -513,7 +513,8 @@ class TestUnitOfWorkContract:
         """Should rollback when exiting context with exceptions."""
         try:
             with self.unit_of_work:
-                raise ValueError("Test exception")
+                msg = "Test exception"
+                raise ValueError(msg)
         except ValueError:
             pass
 

@@ -29,9 +29,8 @@ class IndustryGroup:
 
         # Validate length
         if len(normalized_value) > self.MAX_LENGTH:
-            raise ValueError(
-                f"Industry group cannot exceed {self.MAX_LENGTH} characters"
-            )
+            msg = f"Industry group cannot exceed {self.MAX_LENGTH} characters"
+            raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
         object.__setattr__(self, "_value", normalized_value)
@@ -62,5 +61,6 @@ class IndustryGroup:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError("IndustryGroup is immutable")
+            msg = "IndustryGroup is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)

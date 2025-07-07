@@ -29,11 +29,11 @@ class JournalContent(BaseTextValueObject):
             super().__init__(value, max_length=self.MAX_LENGTH, allow_empty=False)
         except ValueError as e:
             if "cannot be empty" in str(e):
-                raise ValueError("Journal content cannot be empty") from e
+                msg = "Journal content cannot be empty"
+                raise ValueError(msg) from e
             if "cannot exceed" in str(e):
-                raise ValueError(
-                    f"Journal content cannot exceed {self.MAX_LENGTH} characters"
-                ) from e
+                msg = f"Journal content cannot exceed {self.MAX_LENGTH} characters"
+                raise ValueError(msg) from e
             raise
 
     def get_preview(self, max_length: int = 50) -> str:

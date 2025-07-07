@@ -83,7 +83,8 @@ class Transaction(Entity):
     def __init__(self, *, _builder_instance: Transaction.Builder | None = None) -> None:
         """Initialize transaction through builder pattern."""
         if _builder_instance is None:
-            raise ValueError("Transaction must be created through Builder")
+            msg = "Transaction must be created through Builder"
+            raise ValueError(msg)
 
         # Extract values from builder
         portfolio_id = _builder_instance.portfolio_id
@@ -97,23 +98,31 @@ class Transaction(Entity):
 
         # Validate required fields
         if portfolio_id is None:
-            raise ValueError("Portfolio ID is required")
+            msg = "Portfolio ID is required"
+            raise ValueError(msg)
         if stock_id is None:
-            raise ValueError("Stock ID is required")
+            msg = "Stock ID is required"
+            raise ValueError(msg)
         if transaction_type is None:
-            raise ValueError("Transaction type is required")
+            msg = "Transaction type is required"
+            raise ValueError(msg)
         if quantity is None:
-            raise ValueError("Quantity is required")
+            msg = "Quantity is required"
+            raise ValueError(msg)
         if price is None:
-            raise ValueError("Price is required")
+            msg = "Price is required"
+            raise ValueError(msg)
         if transaction_date is None:
-            raise ValueError("Transaction date is required")
+            msg = "Transaction date is required"
+            raise ValueError(msg)
 
         # Validate foreign key IDs are not empty
         if not portfolio_id:
-            raise ValueError("Portfolio ID must be a non-empty string")
+            msg = "Portfolio ID must be a non-empty string"
+            raise ValueError(msg)
         if not stock_id:
-            raise ValueError("Stock ID must be a non-empty string")
+            msg = "Stock ID must be a non-empty string"
+            raise ValueError(msg)
 
         # Store validated attributes
         super().__init__(id=entity_id)

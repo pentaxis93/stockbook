@@ -241,22 +241,27 @@ class TestExceptionHierarchy:
     def test_exception_can_be_caught_as_domain_service_error(self) -> None:
         """Should allow catching specific exceptions as base type."""
         # Test that specific exceptions can be caught as DomainServiceError
+        msg = "Validation failed"
         with pytest.raises(DomainServiceError):
-            raise ValidationError("Validation failed")
+            raise ValidationError(msg)
 
+        msg = "Calculation failed"
         with pytest.raises(DomainServiceError):
-            raise CalculationError("Calculation failed")
+            raise CalculationError(msg)
 
+        msg = "Data missing"
         with pytest.raises(DomainServiceError):
-            raise InsufficientDataError("Data missing")
+            raise InsufficientDataError(msg)
 
     def test_exception_can_be_caught_as_base_exception(self) -> None:
         """Should allow catching all exceptions as base Exception."""
+        msg = "Base error"
         with pytest.raises(Exception, match="Base error"):
-            raise DomainServiceError("Base error")
+            raise DomainServiceError(msg)
 
+        msg = "Validation error"
         with pytest.raises(Exception, match="Validation error"):
-            raise ValidationError("Validation error")
+            raise ValidationError(msg)
 
 
 class TestExceptionUsagePatterns:
@@ -264,10 +269,11 @@ class TestExceptionUsagePatterns:
 
     def test_validation_error_with_field_and_value_pattern(self) -> None:
         """Should support common validation error pattern."""
+        # Simulate validation failure
+        msg = "Stock symbol must be 1-10 characters"
         with pytest.raises(ValidationError) as exc_info:
-            # Simulate validation failure
             raise ValidationError(
-                "Stock symbol must be 1-10 characters",
+                msg,
                 field="symbol",
                 value="VERY_LONG_SYMBOL_NAME",
             )
@@ -277,10 +283,11 @@ class TestExceptionUsagePatterns:
 
     def test_calculation_error_with_operation_pattern(self) -> None:
         """Should support common calculation error pattern."""
+        # Simulate calculation failure
+        msg = "Cannot calculate portfolio value with negative holdings"
         with pytest.raises(CalculationError) as exc_info:
-            # Simulate calculation failure
             raise CalculationError(
-                "Cannot calculate portfolio value with negative holdings",
+                msg,
                 operation="portfolio_valuation",
             )
 
@@ -288,10 +295,11 @@ class TestExceptionUsagePatterns:
 
     def test_insufficient_data_error_with_multiple_fields_pattern(self) -> None:
         """Should support common insufficient data pattern."""
+        # Simulate missing data error
+        msg = "Cannot analyze portfolio without required data"
         with pytest.raises(InsufficientDataError) as exc_info:
-            # Simulate missing data error
             raise InsufficientDataError(
-                "Cannot analyze portfolio without required data",
+                msg,
                 required_fields=["current_price", "shares", "purchase_date"],
             )
 

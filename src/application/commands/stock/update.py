@@ -125,7 +125,8 @@ class UpdateStockCommand:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent modification after initialization (immutability)."""
         if hasattr(self, "_stock_id"):  # Object is already initialized
-            raise AttributeError("Cannot modify immutable UpdateStockCommand")
+            msg = "Cannot modify immutable UpdateStockCommand"
+            raise AttributeError(msg)
         super().__setattr__(name, value)
 
     def __eq__(self, other: Any) -> bool:
@@ -229,7 +230,8 @@ class UpdateStockCommand:
     def _validate_stock_id(stock_id: str) -> None:
         """Validate stock ID."""
         if not stock_id.strip():
-            raise ValueError("Stock ID must be a non-empty string")
+            msg = "Stock ID must be a non-empty string"
+            raise ValueError(msg)
 
     @staticmethod
     def _normalize_symbol(symbol: str) -> str:
@@ -241,11 +243,13 @@ class UpdateStockCommand:
     def _validate_symbol(symbol: str) -> None:
         """Validate symbol format."""
         if not symbol:
-            raise ValueError("Symbol cannot be empty")
+            msg = "Symbol cannot be empty"
+            raise ValueError(msg)
 
         # Use StockSymbol validation
         if not StockSymbol.is_valid(symbol):
-            raise ValueError("Invalid symbol format")
+            msg = "Invalid symbol format"
+            raise ValueError(msg)
 
     @staticmethod
     def _normalize_name(name: str | None) -> str | None:
@@ -288,6 +292,5 @@ class UpdateStockCommand:
         if grade is not None:
             valid_grades = {"A", "B", "C"}
             if grade not in valid_grades:
-                raise ValueError(
-                    f"Invalid grade. Must be one of {valid_grades} or None"
-                )
+                msg = f"Invalid grade. Must be one of {valid_grades} or None"
+                raise ValueError(msg)

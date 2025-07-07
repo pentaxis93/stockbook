@@ -32,10 +32,12 @@ class TransactionType:
         normalized_value = value.strip().lower()
 
         if not normalized_value:
-            raise ValueError("Transaction type cannot be empty")
+            msg = "Transaction type cannot be empty"
+            raise ValueError(msg)
 
         if normalized_value not in self.VALID_TYPES:
-            raise ValueError("Transaction type must be 'buy' or 'sell'")
+            msg = "Transaction type must be 'buy' or 'sell'"
+            raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
         object.__setattr__(self, "_value", normalized_value)
@@ -82,5 +84,6 @@ class TransactionType:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError("TransactionType is immutable")
+            msg = "TransactionType is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)

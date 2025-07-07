@@ -60,8 +60,9 @@ class PortfolioCalculationService:
         for stock, quantity in portfolio:
             symbol_str = str(stock.symbol)
             if symbol_str not in prices:
+                msg = f"Stock {stock.symbol} missing current price"
                 raise CalculationError(
-                    f"Stock {stock.symbol} missing current price",
+                    msg,
                     operation="total_value",
                 )
 

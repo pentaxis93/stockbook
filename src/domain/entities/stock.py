@@ -89,7 +89,8 @@ class Stock(Entity):
     def __init__(self, *, _builder_instance: Stock.Builder | None = None) -> None:
         """Initialize Stock entity through builder pattern."""
         if _builder_instance is None:
-            raise ValueError("Stock must be created through Builder")
+            msg = "Stock must be created through Builder"
+            raise ValueError(msg)
 
         # Extract values from builder
         symbol = _builder_instance.symbol
@@ -102,7 +103,8 @@ class Stock(Entity):
 
         # Validate required fields
         if symbol is None:
-            raise ValueError("Symbol is required")
+            msg = "Symbol is required"
+            raise ValueError(msg)
 
         # Initialize sector industry service for validation
         # (import here to avoid circular imports)
@@ -334,7 +336,8 @@ class Stock(Entity):
 
         # If industry group is provided, sector must also be provided
         if sector is None:
-            raise ValueError("Sector must be provided when industry_group is specified")
+            msg = "Sector must be provided when industry_group is specified"
+            raise ValueError(msg)
 
         # Validate the combination using domain service
         self._sector_industry_service.validate_sector_industry_combination_strict(

@@ -29,11 +29,13 @@ class Grade:
 
         # Validate not empty
         if not normalized_value:
-            raise ValueError("Grade cannot be empty")
+            msg = "Grade cannot be empty"
+            raise ValueError(msg)
 
         # Validate grade is valid
         if normalized_value not in self.VALID_GRADES:
-            raise ValueError(f"Grade must be one of {self.VALID_GRADES}")
+            msg = f"Grade must be one of {self.VALID_GRADES}"
+            raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
         object.__setattr__(self, "_value", normalized_value)
@@ -64,5 +66,6 @@ class Grade:
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError("Grade is immutable")
+            msg = "Grade is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)

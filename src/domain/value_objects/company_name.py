@@ -27,7 +27,6 @@ class CompanyName(BaseTextValueObject):
             super().__init__(value, max_length=self.MAX_LENGTH, allow_empty=True)
         except ValueError as e:
             if "cannot exceed" in str(e):
-                raise ValueError(
-                    f"Company name cannot exceed {self.MAX_LENGTH} characters"
-                ) from e
+                msg = f"Company name cannot exceed {self.MAX_LENGTH} characters"
+                raise ValueError(msg) from e
             raise

@@ -35,10 +35,12 @@ class BaseNumericValueObject(ABC):
         try:
             self._value = Decimal(str(value))
         except (ValueError, TypeError, decimal.InvalidOperation) as e:
-            raise TypeError(f"Value must be numeric, got {type(value).__name__}") from e
+            msg = f"Value must be numeric, got {type(value).__name__}"
+            raise TypeError(msg) from e
 
         if not allow_negative and self._value < 0:
-            raise ValueError(f"{self.__class__.__name__} cannot be negative")
+            msg = f"{self.__class__.__name__} cannot be negative"
+            raise ValueError(msg)
 
     @property
     def value(self) -> Decimal:
@@ -66,33 +68,37 @@ class BaseNumericValueObject(ABC):
     def __lt__(self, other: Any) -> bool:
         """Less than comparison."""
         if not isinstance(other, self.__class__):
-            raise TypeError(
+            msg = (
                 f"Cannot compare {self.__class__.__name__} with {type(other).__name__}"
             )
+            raise TypeError(msg)
         return self._value < other._value
 
     def __le__(self, other: Any) -> bool:
         """Less than or equal comparison."""
         if not isinstance(other, self.__class__):
-            raise TypeError(
+            msg = (
                 f"Cannot compare {self.__class__.__name__} with {type(other).__name__}"
             )
+            raise TypeError(msg)
         return self._value <= other._value
 
     def __gt__(self, other: Any) -> bool:
         """Greater than comparison."""
         if not isinstance(other, self.__class__):
-            raise TypeError(
+            msg = (
                 f"Cannot compare {self.__class__.__name__} with {type(other).__name__}"
             )
+            raise TypeError(msg)
         return self._value > other._value
 
     def __ge__(self, other: Any) -> bool:
         """Greater than or equal comparison."""
         if not isinstance(other, self.__class__):
-            raise TypeError(
+            msg = (
                 f"Cannot compare {self.__class__.__name__} with {type(other).__name__}"
             )
+            raise TypeError(msg)
         return self._value >= other._value
 
     def __add__(self, other: Any) -> "BaseNumericValueObject":
@@ -131,7 +137,8 @@ class BaseNumericValueObject(ABC):
     def __truediv__(self, scalar: int | float | Decimal) -> "BaseNumericValueObject":
         """Divide by a scalar."""
         if scalar == 0:
-            raise ZeroDivisionError("Cannot divide by zero")
+            msg = "Cannot divide by zero"
+            raise ZeroDivisionError(msg)
         return self.__class__(self._value / Decimal(str(scalar)))
 
     def __neg__(self) -> "BaseNumericValueObject":
@@ -198,13 +205,15 @@ class Money(BaseNumericValueObject):
     def __add__(self, other: Any) -> "Money":
         """Add two Money instances."""
         if not isinstance(other, Money):
-            raise TypeError("Can only add Money to Money")
+            msg = "Can only add Money to Money"
+            raise TypeError(msg)
         return Money(self._value + other._value)
 
     def __sub__(self, other: Any) -> "Money":
         """Subtract two Money instances."""
         if not isinstance(other, Money):
-            raise TypeError("Can only subtract Money from Money")
+            msg = "Can only subtract Money from Money"
+            raise TypeError(msg)
         return Money(self._value - other._value)
 
     def __mul__(self, scalar: int | float | Decimal) -> "Money":
@@ -214,7 +223,8 @@ class Money(BaseNumericValueObject):
     def __truediv__(self, scalar: int | float | Decimal) -> "Money":
         """Divide Money by a scalar."""
         if scalar == 0:
-            raise ZeroDivisionError("Cannot divide by zero")
+            msg = "Cannot divide by zero"
+            raise ZeroDivisionError(msg)
         return Money(self._value / Decimal(str(scalar)))
 
     def __neg__(self) -> "Money":

@@ -35,13 +35,13 @@ class BaseTextValueObject(ABC):
 
         # Check empty constraint
         if not allow_empty and not normalized_value:
-            raise ValueError(f"{self.__class__.__name__} cannot be empty")
+            msg = f"{self.__class__.__name__} cannot be empty"
+            raise ValueError(msg)
 
         # Check length constraint
         if max_length is not None and len(normalized_value) > max_length:
-            raise ValueError(
-                f"{self.__class__.__name__} cannot exceed {max_length} characters"
-            )
+            msg = f"{self.__class__.__name__} cannot exceed {max_length} characters"
+            raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
         object.__setattr__(self, "_value", normalized_value)
@@ -80,7 +80,8 @@ class BaseTextValueObject(ABC):
     def __setattr__(self, name: str, value: Any) -> None:
         """Prevent mutation after initialization."""
         if hasattr(self, "_value"):
-            raise AttributeError(f"{self.__class__.__name__} is immutable")
+            msg = f"{self.__class__.__name__} is immutable"
+            raise AttributeError(msg)
         super().__setattr__(name, value)
 
 
@@ -105,7 +106,6 @@ class Notes(BaseTextValueObject):
             super().__init__(value, max_length=self.MAX_LENGTH, allow_empty=True)
         except ValueError as e:
             if "cannot exceed" in str(e):
-                raise ValueError(
-                    f"Notes cannot exceed {self.MAX_LENGTH} characters"
-                ) from e
+                msg = f"Notes cannot exceed {self.MAX_LENGTH} characters"
+                raise ValueError(msg) from e
             raise

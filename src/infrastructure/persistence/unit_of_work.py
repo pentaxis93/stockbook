@@ -61,7 +61,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             RuntimeError: If unit of work is already active (nested usage)
         """
         if self._connection is not None:
-            raise RuntimeError("Unit of work is already active")
+            msg = "Unit of work is already active"
+            raise RuntimeError(msg)
 
         # Create connection and begin transaction
         self._connection = self._engine.connect()
@@ -117,7 +118,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # _ensure_active guarantees _db_connection is not None
             # Use type guard to satisfy type checker and avoid assert
             if self._db_connection is None:  # pragma: no cover
-                raise RuntimeError("Database connection unexpectedly None")
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
             self._stocks = SqlAlchemyStockRepository(self._db_connection)
         return self._stocks
 
@@ -129,7 +131,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # _ensure_active guarantees _db_connection is not None
             # Use type guard to satisfy type checker and avoid assert
             if self._db_connection is None:  # pragma: no cover
-                raise RuntimeError("Database connection unexpectedly None")
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
             # TODO: Replace with actual implementation when available
             self._portfolios = _SqlAlchemyPortfolioRepository(self._db_connection)  # type: ignore[assignment]
         return self._portfolios  # type: ignore[return-value]
@@ -142,7 +145,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # _ensure_active guarantees _db_connection is not None
             # Use type guard to satisfy type checker and avoid assert
             if self._db_connection is None:  # pragma: no cover
-                raise RuntimeError("Database connection unexpectedly None")
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
             # TODO: Replace with actual implementation when available
             self._transactions = _SqlAlchemyTransactionRepository(self._db_connection)  # type: ignore[assignment]
         return self._transactions  # type: ignore[return-value]
@@ -155,7 +159,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # _ensure_active guarantees _db_connection is not None
             # Use type guard to satisfy type checker and avoid assert
             if self._db_connection is None:  # pragma: no cover
-                raise RuntimeError("Database connection unexpectedly None")
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
             # TODO: Replace with actual implementation when available
             self._targets = _SqlAlchemyTargetRepository(self._db_connection)  # type: ignore[assignment]
         return self._targets  # type: ignore[return-value]
@@ -168,7 +173,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # _ensure_active guarantees _db_connection is not None
             # Use type guard to satisfy type checker and avoid assert
             if self._db_connection is None:  # pragma: no cover
-                raise RuntimeError("Database connection unexpectedly None")
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
             # TODO: Replace with actual implementation when available
             self._balances = _SqlAlchemyBalanceRepository(self._db_connection)  # type: ignore[assignment]
         return self._balances  # type: ignore[return-value]
@@ -181,7 +187,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # _ensure_active guarantees _db_connection is not None
             # Use type guard to satisfy type checker and avoid assert
             if self._db_connection is None:  # pragma: no cover
-                raise RuntimeError("Database connection unexpectedly None")
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
             # TODO: Replace with actual implementation when available
             self._journal = _SqlAlchemyJournalRepository(self._db_connection)  # type: ignore[assignment]
         return self._journal  # type: ignore[return-value]
@@ -217,7 +224,8 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             RuntimeError: If unit of work is not active
         """
         if self._connection is None or self._db_connection is None:
-            raise RuntimeError("Unit of work is not active")
+            msg = "Unit of work is not active"
+            raise RuntimeError(msg)
 
 
 # Placeholder repository classes - will be replaced with actual implementations

@@ -50,9 +50,8 @@ class StockApplicationService:
                 existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
 
                 if existing_stock is not None:
-                    raise ValueError(
-                        f"Stock with symbol {command.symbol} already exists"
-                    )
+                    msg = f"Stock with symbol {command.symbol} already exists"
+                    raise ValueError(msg)
 
                 # Create domain entity
                 builder = Stock.Builder().with_symbol(symbol_vo)
@@ -204,18 +203,21 @@ class StockApplicationService:
         stock_entity = self._unit_of_work.stocks.get_by_id(command.stock_id)
 
         if stock_entity is None:
-            raise ValueError(f"Stock with ID {command.stock_id} not found")
+            msg = f"Stock with ID {command.stock_id} not found"
+            raise ValueError(msg)
 
         # Validate that there are fields to update
         if not command.has_updates():
-            raise ValueError("No fields to update")
+            msg = "No fields to update"
+            raise ValueError(msg)
 
         # Check for duplicate symbol if symbol is being changed
         if command.symbol and command.symbol != stock_entity.symbol.value:
             symbol_vo = StockSymbol(command.symbol)
             existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
             if existing_stock is not None and existing_stock.id != command.stock_id:
-                raise ValueError(f"Stock with symbol {command.symbol} already exists")
+                msg = f"Stock with symbol {command.symbol} already exists"
+                raise ValueError(msg)
 
         return stock_entity
 
@@ -231,4 +233,5 @@ class StockApplicationService:
         update_success = self._unit_of_work.stocks.update(stock_entity.id, stock_entity)
 
         if not update_success:
-            raise ValueError("Failed to update stock")
+            msg = "Failed to update stock"
+            raise ValueError(msg)

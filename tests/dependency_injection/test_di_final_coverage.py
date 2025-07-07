@@ -11,7 +11,8 @@ class FailingService:
     """Service that fails during injection."""
 
     def __init__(self) -> None:
-        raise DIError("Injection failed during construction")
+        msg = "Injection failed during construction"
+        raise DIError(msg)
 
 
 def test_provider_di_error_wrapped() -> None:
