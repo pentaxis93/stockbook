@@ -3,7 +3,7 @@ Tests for domain entities - replacing legacy Pydantic model tests.
 Following TDD approach with focus on business logic and validation.
 """
 
-from datetime import date
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -168,14 +168,14 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("150.25")))
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_notes(Notes("Initial purchase"))
             .build()
         )
         assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 100
         assert transaction.price.amount == Decimal("150.25")
-        assert transaction.transaction_date == date(2024, 1, 15)
+        assert transaction.transaction_date == datetime(2024, 1, 15, tzinfo=UTC)
 
     def test_valid_sell_transaction(self) -> None:
         """Test creating a valid sell transaction"""
@@ -188,7 +188,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("sell"))
             .with_quantity(Quantity(50))
             .with_price(Money(Decimal("175.00")))
-            .with_transaction_date(date(2024, 2, 15))
+            .with_transaction_date(datetime(2024, 2, 15, tzinfo=UTC))
             .build()
         )
         assert transaction.transaction_type.value == "sell"
@@ -216,7 +216,7 @@ class TestTransaction:
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("150.00")))
-                .with_transaction_date(date.today())
+                .with_transaction_date(datetime.now(UTC))
                 .build()
             )
 
@@ -232,7 +232,7 @@ class TestTransaction:
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("150.00")))
-                .with_transaction_date(date.today())
+                .with_transaction_date(datetime.now(UTC))
                 .build()
             )
 
@@ -251,7 +251,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
         assert target.portfolio_id == "portfolio-id-1"
@@ -271,7 +271,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date.today())
+            .with_balance_date(datetime.now(UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_deposits(Money(Decimal("1000.00")))
             .with_withdrawals(Money(Decimal("500.00")))
@@ -295,7 +295,7 @@ class TestJournalEntry:
 
         entry = (
             JournalEntry.Builder()
-            .with_entry_date(date.today())
+            .with_entry_date(datetime.now(UTC))
             .with_content(
                 JournalContent("This is a detailed market analysis and observations.")
             )
@@ -303,7 +303,8 @@ class TestJournalEntry:
             .with_stock_id("stock-id-2")
             .build()
         )
-        assert entry.entry_date == date.today()
+        # Check that entry_date is set to today (comparing just the date part)
+        assert entry.entry_date.date() == datetime.now(UTC).date()
         assert (
             entry.content.value
             == "This is a detailed market analysis and observations."

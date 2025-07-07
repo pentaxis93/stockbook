@@ -13,6 +13,7 @@ select = [
   "B",     # flake8-bugbear (common bugs)
   "C",     # flake8-comprehensions (list/dict/set comprehensions)
   "D",     # pydocstyle (docstring checks)
+  "DTZ",   # flake8-datetimez (datetimez)
   "E",     # pycodestyle errors (replaces flake8 E codes)
   "ERA",   # eradicate (commented-out code)
   "F",     # Pyflakes (replaces flake8 F codes)

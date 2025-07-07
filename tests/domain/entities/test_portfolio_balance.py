@@ -5,7 +5,7 @@ Following TDD approach with focus on value object purity and business logic.
 Tests define expected behavior before implementation.
 """
 
-from datetime import date
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -22,7 +22,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_withdrawals(Money(Decimal("500.00")))
             .with_deposits(Money(Decimal("1000.00")))
             .with_final_balance(Money(Decimal("10500.00")))
@@ -31,7 +31,7 @@ class TestPortfolioBalance:
         )
 
         assert balance.portfolio_id == "portfolio-id-1"
-        assert balance.balance_date == date(2024, 1, 15)
+        assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert balance.withdrawals.amount == Decimal("500.00")
         assert balance.deposits.amount == Decimal("1000.00")
         assert balance.final_balance.amount == Decimal("10500.00")
@@ -43,13 +43,13 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
 
         assert balance.portfolio_id == "portfolio-id-1"
-        assert balance.balance_date == date(2024, 1, 15)
+        assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert balance.final_balance.amount == Decimal("10000.00")
         assert balance.withdrawals.amount == Decimal("0.00")  # Defaults to zero
         assert balance.deposits.amount == Decimal("0.00")  # Defaults to zero
@@ -60,7 +60,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_withdrawals(None)
             .with_deposits(None)
@@ -82,7 +82,7 @@ class TestPortfolioBalance:
             _ = (
                 PortfolioBalance.Builder()
                 .with_portfolio_id("")  # Invalid empty string
-                .with_balance_date(date(2024, 1, 15))
+                .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .with_final_balance(Money(Decimal("10000.00")))
                 .build()
             )
@@ -102,7 +102,7 @@ class TestPortfolioBalance:
         balance1 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -110,7 +110,7 @@ class TestPortfolioBalance:
         balance2 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("15000.00")))
             .build()
         )
@@ -118,7 +118,7 @@ class TestPortfolioBalance:
         balance3 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-2")
-            .with_balance_date(date(2024, 1, 16))  # Different date
+            .with_balance_date(datetime(2024, 1, 16, tzinfo=UTC))  # Different date
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -131,7 +131,7 @@ class TestPortfolioBalance:
         balance4 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_id("same-id")
             .build()
@@ -139,7 +139,7 @@ class TestPortfolioBalance:
         balance5 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-2")
-            .with_balance_date(date(2024, 2, 20))  # Different date
+            .with_balance_date(datetime(2024, 2, 20, tzinfo=UTC))  # Different date
             .with_final_balance(Money(Decimal("20000.00")))
             .with_withdrawals(Money(Decimal("1000.00")))
             .with_deposits(Money(Decimal("2000.00")))
@@ -154,7 +154,7 @@ class TestPortfolioBalance:
         balance1 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -162,7 +162,7 @@ class TestPortfolioBalance:
         balance2 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("20000.00")))
             .build()
         )
@@ -174,7 +174,7 @@ class TestPortfolioBalance:
         balance3 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_id("same-id")
             .build()
@@ -182,7 +182,7 @@ class TestPortfolioBalance:
         balance4 = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-2")
-            .with_balance_date(date(2024, 2, 20))
+            .with_balance_date(datetime(2024, 2, 20, tzinfo=UTC))
             .with_final_balance(Money(Decimal("30000.00")))
             .with_withdrawals(Money(Decimal("5000.00")))
             .with_deposits(Money(Decimal("10000.00")))
@@ -197,7 +197,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10500.00")))
             .build()
         )
@@ -210,13 +210,14 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10500.00")))
             .build()
         )
 
-        expected = "PortfolioBalance(portfolio_id=portfolio-id-1, date=2024-01-15)"
-        assert repr(balance) == expected
+        repr_str = repr(balance)
+        assert "PortfolioBalance(portfolio_id=portfolio-id-1" in repr_str
+        assert "date=2024-01-15 00:00:00+00:00)" in repr_str
 
     # Business behavior tests
     def test_portfolio_balance_calculate_net_flow(self) -> None:
@@ -224,7 +225,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_withdrawals(Money(Decimal("500.00")))
             .with_deposits(Money(Decimal("1000.00")))
             .with_final_balance(Money(Decimal("10500.00")))
@@ -239,7 +240,7 @@ class TestPortfolioBalance:
         positive_balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10500.00")))
             .with_index_change(IndexChange(5.25))
             .build()
@@ -248,7 +249,7 @@ class TestPortfolioBalance:
         negative_balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("9500.00")))
             .with_index_change(IndexChange(-2.5))
             .build()
@@ -257,7 +258,7 @@ class TestPortfolioBalance:
         no_change_balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -271,7 +272,7 @@ class TestPortfolioBalance:
         negative_balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("9500.00")))
             .with_index_change(IndexChange(-2.5))
             .build()
@@ -280,7 +281,7 @@ class TestPortfolioBalance:
         positive_balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10500.00")))
             .with_index_change(IndexChange(5.25))
             .build()
@@ -294,7 +295,7 @@ class TestPortfolioBalance:
         balance_with_deposits = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_deposits(Money(Decimal("1000.00")))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
@@ -303,7 +304,7 @@ class TestPortfolioBalance:
         balance_without_deposits = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -316,7 +317,7 @@ class TestPortfolioBalance:
         balance_with_withdrawals = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_withdrawals(Money(Decimal("500.00")))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
@@ -325,7 +326,7 @@ class TestPortfolioBalance:
         balance_without_withdrawals = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -339,7 +340,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_id(test_id)
             .build()
@@ -352,7 +353,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_id("test-id-1")
             .build()
@@ -369,7 +370,7 @@ class TestPortfolioBalance:
             PortfolioBalance.Builder()
             .with_id(test_id)
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -381,7 +382,7 @@ class TestPortfolioBalance:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-id-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
@@ -431,7 +432,7 @@ class TestIndexChange:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .with_index_change(IndexChange(2.5))
             .build()
@@ -443,7 +444,7 @@ class TestIndexChange:
         assert balance is not None
         assert balance != {
             "portfolio_id": "portfolio-1",
-            "balance_date": date(2024, 1, 15),
+            "balance_date": datetime(2024, 1, 15, tzinfo=UTC),
         }
 
 
@@ -455,7 +456,7 @@ class TestPortfolioBalanceBuilder:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10500.00")))
             .with_withdrawals(Money(Decimal("500.00")))
             .with_deposits(Money(Decimal("1000.00")))
@@ -465,7 +466,7 @@ class TestPortfolioBalanceBuilder:
         )
 
         assert balance.portfolio_id == "portfolio-1"
-        assert balance.balance_date == date(2024, 1, 15)
+        assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert balance.final_balance.amount == Decimal("10500.00")
         assert balance.withdrawals.amount == Decimal("500.00")
         assert balance.deposits.amount == Decimal("1000.00")
@@ -479,13 +480,13 @@ class TestPortfolioBalanceBuilder:
         balance = (
             PortfolioBalance.Builder()
             .with_portfolio_id("portfolio-1")
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
             .build()
         )
 
         assert balance.portfolio_id == "portfolio-1"
-        assert balance.balance_date == date(2024, 1, 15)
+        assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert balance.final_balance.amount == Decimal("10000.00")
         assert balance.withdrawals.amount == Decimal("0")  # Default
         assert balance.deposits.amount == Decimal("0")  # Default
@@ -497,7 +498,7 @@ class TestPortfolioBalanceBuilder:
         with pytest.raises(ValueError, match="Portfolio ID is required"):
             _ = (
                 PortfolioBalance.Builder()
-                .with_balance_date(date(2024, 1, 15))
+                .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .with_final_balance(Money(Decimal("10000.00")))
                 .build()
             )
@@ -516,7 +517,7 @@ class TestPortfolioBalanceBuilder:
             _ = (
                 PortfolioBalance.Builder()
                 .with_portfolio_id("portfolio-1")
-                .with_balance_date(date(2024, 1, 15))
+                .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -524,7 +525,7 @@ class TestPortfolioBalanceBuilder:
         """Test that Builder validates portfolio_id."""
         builder = (
             PortfolioBalance.Builder()
-            .with_balance_date(date(2024, 1, 15))
+            .with_balance_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_final_balance(Money(Decimal("10000.00")))
         )
 
@@ -537,7 +538,7 @@ class TestPortfolioBalanceBuilder:
         builder = PortfolioBalance.Builder()
 
         assert builder.with_portfolio_id("p1") is builder
-        assert builder.with_balance_date(date(2024, 1, 15)) is builder
+        assert builder.with_balance_date(datetime(2024, 1, 15, tzinfo=UTC)) is builder
         assert builder.with_final_balance(Money(Decimal("10000.00"))) is builder
         assert builder.with_withdrawals(Money(Decimal("500.00"))) is builder
         assert builder.with_deposits(Money(Decimal("1000.00"))) is builder

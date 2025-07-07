@@ -31,7 +31,7 @@ class TestDomainEvent:
 
     def test_domain_event_with_custom_timestamp(self) -> None:
         """Should allow setting custom timestamp."""
-        custom_time = datetime(2024, 1, 15, 10, 30, 0)
+        custom_time = datetime(2024, 1, 15, 10, 30, 0, tzinfo=UTC)
         event = DomainEvent(occurred_at=custom_time)
 
         assert event.occurred_at == custom_time
@@ -179,7 +179,7 @@ class TestDomainEventLifecycle:
             event.event_id = "different-id"  # type: ignore[misc]
 
         with pytest.raises(AttributeError):
-            event.occurred_at = datetime.now()  # type: ignore[misc]
+            event.occurred_at = datetime.now(UTC)  # type: ignore[misc]
 
     def test_event_ordering_by_timestamp(self) -> None:
         """Should support chronological ordering of events."""

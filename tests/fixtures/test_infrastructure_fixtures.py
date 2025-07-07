@@ -224,7 +224,7 @@ class TestSQLAlchemyFixtures:
         self, sqlalchemy_connection: Connection
     ) -> None:
         """Should enforce foreign key constraints."""
-        from datetime import datetime
+        from datetime import UTC, datetime
 
         from sqlalchemy.exc import IntegrityError
 
@@ -240,7 +240,7 @@ class TestSQLAlchemyFixtures:
             transaction_type="BUY",
             quantity=100,
             price=150.00,
-            transaction_date=datetime(2024, 1, 1),
+            transaction_date=datetime(2024, 1, 1, tzinfo=UTC),
         )
 
         with pytest.raises(IntegrityError):

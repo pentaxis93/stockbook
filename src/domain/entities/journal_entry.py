@@ -12,7 +12,7 @@ from src.domain.entities.entity import Entity
 from src.domain.value_objects import JournalContent
 
 if TYPE_CHECKING:
-    from datetime import date
+    from datetime import datetime
 
 
 class JournalEntry(Entity):
@@ -27,14 +27,14 @@ class JournalEntry(Entity):
 
         def __init__(self) -> None:
             """Initialize builder with default values."""
-            self.entry_date: date | None = None
+            self.entry_date: datetime | None = None
             self.content: JournalContent | None = None
             self.portfolio_id: str | None = None
             self.stock_id: str | None = None
             self.transaction_id: str | None = None
             self.entity_id: str | None = None
 
-        def with_entry_date(self, entry_date: date) -> Self:
+        def with_entry_date(self, entry_date: datetime) -> Self:
             """Set the entry date."""
             self.entry_date = entry_date
             return self
@@ -109,7 +109,7 @@ class JournalEntry(Entity):
 
     # Core attributes
     @property
-    def entry_date(self) -> date:
+    def entry_date(self) -> datetime:
         """Get entry date."""
         return self._entry_date
 

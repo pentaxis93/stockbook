@@ -12,7 +12,7 @@ from src.domain.entities.entity import Entity
 from src.domain.value_objects import IndexChange, Money
 
 if TYPE_CHECKING:
-    from datetime import date
+    from datetime import datetime
 
 
 class PortfolioBalance(Entity):
@@ -28,7 +28,7 @@ class PortfolioBalance(Entity):
         def __init__(self) -> None:
             """Initialize builder with default values."""
             self.portfolio_id: str | None = None
-            self.balance_date: date | None = None
+            self.balance_date: datetime | None = None
             self.final_balance: Money | None = None
             self.withdrawals: Money | None = None
             self.deposits: Money | None = None
@@ -40,7 +40,7 @@ class PortfolioBalance(Entity):
             self.portfolio_id = portfolio_id
             return self
 
-        def with_balance_date(self, balance_date: date) -> Self:
+        def with_balance_date(self, balance_date: datetime) -> Self:
             """Set the balance date."""
             self.balance_date = balance_date
             return self
@@ -120,7 +120,7 @@ class PortfolioBalance(Entity):
 
     # Core attributes
     @property
-    def balance_date(self) -> date:
+    def balance_date(self) -> datetime:
         """Get balance date."""
         return self._balance_date
 

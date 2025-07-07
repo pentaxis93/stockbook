@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the rich Portfolio entity with business logic.
 """
 
-from datetime import date
+from datetime import UTC, datetime
 
 import pytest
 
@@ -21,7 +21,7 @@ class TestPortfolio:
         """Should create Portfolio entity with value objects only."""
         name = PortfolioName("Growth Portfolio")
         description = Notes("Long-term growth strategy portfolio")
-        created_date = date(2024, 1, 1)
+        created_date = datetime(2024, 1, 1, tzinfo=UTC)
 
         portfolio = Portfolio(
             name=name,
@@ -236,7 +236,7 @@ class TestPortfolio:
         """Should allow setting created date."""
         portfolio = Portfolio(name=PortfolioName("Test Portfolio"))
 
-        creation_date = date(2024, 1, 15)
+        creation_date = datetime(2024, 1, 15, tzinfo=UTC)
         portfolio.set_created_date(creation_date)
 
         assert portfolio.created_date == creation_date
@@ -244,13 +244,14 @@ class TestPortfolio:
     def test_set_created_date_when_already_set_raises_error(self) -> None:
         """Should raise error when trying to change existing created date."""
         portfolio = Portfolio(
-            name=PortfolioName("Test Portfolio"), created_date=date(2024, 1, 1)
+            name=PortfolioName("Test Portfolio"),
+            created_date=datetime(2024, 1, 1, tzinfo=UTC),
         )
 
         with pytest.raises(
             ValueError, match="Created date is already set and cannot be changed"
         ):
-            portfolio.set_created_date(date(2024, 1, 15))
+            portfolio.set_created_date(datetime(2024, 1, 15, tzinfo=UTC))
 
 
 class TestPortfolioName:

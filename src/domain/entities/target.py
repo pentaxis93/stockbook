@@ -12,7 +12,7 @@ from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, TargetStatus
 
 if TYPE_CHECKING:
-    from datetime import date
+    from datetime import datetime
 
 
 class Target(Entity):
@@ -32,7 +32,7 @@ class Target(Entity):
             self.pivot_price: Money | None = None
             self.failure_price: Money | None = None
             self.status: TargetStatus | None = None
-            self.created_date: date | None = None
+            self.created_date: datetime | None = None
             self.notes: Notes | None = None
             self.entity_id: str | None = None
 
@@ -61,7 +61,7 @@ class Target(Entity):
             self.status = status
             return self
 
-        def with_created_date(self, created_date: date) -> Self:
+        def with_created_date(self, created_date: datetime) -> Self:
             """Set the created date."""
             self.created_date = created_date
             return self
@@ -152,7 +152,7 @@ class Target(Entity):
         return self._status
 
     @property
-    def created_date(self) -> date:
+    def created_date(self) -> datetime:
         """Get created date."""
         return self._created_date
 

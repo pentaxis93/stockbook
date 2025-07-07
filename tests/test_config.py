@@ -15,7 +15,7 @@ Following TDD approach - tests are written first to define expected behavior.
 import os
 import tempfile
 from collections.abc import Iterator
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -251,7 +251,7 @@ class TestDateTimeConfiguration:
         config = Config()
 
         # Test formats are valid Python datetime formats
-        test_date = datetime(2023, 12, 25, 15, 30, 45)
+        test_date = datetime(2023, 12, 25, 15, 30, 45, tzinfo=UTC)
 
         formatted_date = test_date.strftime(config.date_format)
         formatted_datetime = test_date.strftime(config.datetime_format)
@@ -494,7 +494,7 @@ class TestConfigIntegration:
     def test_format_date_method(self) -> None:
         """Test format_date method."""
         config = Config()
-        test_date = datetime(2023, 12, 25)
+        test_date = datetime(2023, 12, 25, tzinfo=UTC)
 
         formatted = config.format_date(test_date)
         assert formatted == "2023-12-25"
@@ -502,7 +502,7 @@ class TestConfigIntegration:
     def test_format_datetime_method(self) -> None:
         """Test format_datetime method."""
         config = Config()
-        test_datetime = datetime(2023, 12, 25, 15, 30, 45)
+        test_datetime = datetime(2023, 12, 25, 15, 30, 45, tzinfo=UTC)
 
         formatted = config.format_datetime(test_datetime)
         assert formatted == "2023-12-25 15:30:45"

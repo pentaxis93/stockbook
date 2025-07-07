@@ -12,7 +12,7 @@ from src.domain.entities.entity import Entity
 from src.domain.value_objects import Money, Notes, Quantity, TransactionType
 
 if TYPE_CHECKING:
-    from datetime import date
+    from datetime import datetime
 
 
 class Transaction(Entity):
@@ -32,7 +32,7 @@ class Transaction(Entity):
             self.transaction_type: TransactionType | None = None
             self.quantity: Quantity | None = None
             self.price: Money | None = None
-            self.transaction_date: date | None = None
+            self.transaction_date: datetime | None = None
             self.notes: Notes | None = None
             self.entity_id: str | None = None
 
@@ -61,7 +61,7 @@ class Transaction(Entity):
             self.price = price
             return self
 
-        def with_transaction_date(self, transaction_date: date) -> Self:
+        def with_transaction_date(self, transaction_date: datetime) -> Self:
             """Set the transaction date."""
             self.transaction_date = transaction_date
             return self
@@ -152,7 +152,7 @@ class Transaction(Entity):
         return self._price
 
     @property
-    def transaction_date(self) -> date:
+    def transaction_date(self) -> datetime:
         """Get transaction date."""
         return self._transaction_date
 

@@ -4,7 +4,7 @@ Rich domain entity implementing clean architecture with value objects.
 Follows Domain-Driven Design principles with business logic encapsulation.
 """
 
-from datetime import date
+from datetime import datetime
 
 from src.domain.entities.entity import Entity
 from src.domain.value_objects import Notes, PortfolioName
@@ -25,7 +25,7 @@ class Portfolio(Entity):
         self,
         name: PortfolioName,
         description: Notes | None = None,
-        created_date: date | None = None,
+        created_date: datetime | None = None,
         is_active: bool = True,
         id: str | None = None,
     ) -> None:
@@ -49,7 +49,7 @@ class Portfolio(Entity):
         return self._description
 
     @property
-    def created_date(self) -> date | None:
+    def created_date(self) -> datetime | None:
         """Get created date."""
         return self._created_date
 
@@ -82,7 +82,7 @@ class Portfolio(Entity):
         else:
             self._description = description
 
-    def set_created_date(self, created_date: date) -> None:
+    def set_created_date(self, created_date: datetime) -> None:
         """Set created date (for persistence layer)."""
         if self._created_date is not None:
             raise ValueError("Created date is already set and cannot be changed")

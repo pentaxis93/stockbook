@@ -5,7 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of the rich Transaction entity with business logic.
 """
 
-from datetime import date
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -27,7 +27,7 @@ class TestTransactionBuilder:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("150.25")))
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_notes(Notes("Initial purchase"))
             .with_id("transaction-id")
             .build()
@@ -38,7 +38,7 @@ class TestTransactionBuilder:
         assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 100
         assert transaction.price.amount == Decimal("150.25")
-        assert transaction.transaction_date == date(2024, 1, 15)
+        assert transaction.transaction_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert transaction.notes.value == "Initial purchase"
         assert transaction.id == "transaction-id"
 
@@ -51,7 +51,7 @@ class TestTransactionBuilder:
             .with_transaction_type(TransactionType("sell"))
             .with_quantity(Quantity(50))
             .with_price(Money(Decimal("175.50")))
-            .with_transaction_date(date(2024, 2, 1))
+            .with_transaction_date(datetime(2024, 2, 1, tzinfo=UTC))
             .build()
         )
 
@@ -60,7 +60,7 @@ class TestTransactionBuilder:
         assert transaction.transaction_type.value == "sell"
         assert transaction.quantity.value == 50
         assert transaction.price.amount == Decimal("175.50")
-        assert transaction.transaction_date == date(2024, 2, 1)
+        assert transaction.transaction_date == datetime(2024, 2, 1, tzinfo=UTC)
         assert transaction.notes.value == ""  # Default
 
     def test_builder_raises_error_when_required_fields_missing(self) -> None:
@@ -73,7 +73,7 @@ class TestTransactionBuilder:
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("100.00")))
-                .with_transaction_date(date(2024, 1, 15))
+                .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -85,7 +85,7 @@ class TestTransactionBuilder:
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("100.00")))
-                .with_transaction_date(date(2024, 1, 15))
+                .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -97,7 +97,7 @@ class TestTransactionBuilder:
                 .with_stock_id("stock-1")
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("100.00")))
-                .with_transaction_date(date(2024, 1, 15))
+                .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -109,7 +109,7 @@ class TestTransactionBuilder:
                 .with_stock_id("stock-1")
                 .with_transaction_type(TransactionType("buy"))
                 .with_price(Money(Decimal("100.00")))
-                .with_transaction_date(date(2024, 1, 15))
+                .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -121,7 +121,7 @@ class TestTransactionBuilder:
                 .with_stock_id("stock-1")
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
-                .with_transaction_date(date(2024, 1, 15))
+                .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -145,7 +145,7 @@ class TestTransactionBuilder:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
         )
 
         # Empty portfolio_id should raise error
@@ -166,7 +166,9 @@ class TestTransactionBuilder:
         assert builder.with_transaction_type(TransactionType("buy")) is builder
         assert builder.with_quantity(Quantity(100)) is builder
         assert builder.with_price(Money(Decimal("100.00"))) is builder
-        assert builder.with_transaction_date(date(2024, 1, 15)) is builder
+        assert (
+            builder.with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC)) is builder
+        )
         assert builder.with_notes(Notes("test")) is builder
         assert builder.with_id("id1") is builder
 
@@ -188,7 +190,7 @@ class TestTransaction:
         transaction_type = TransactionType("buy")
         quantity = Quantity(100)
         price = Money(Decimal("150.25"))
-        transaction_date = date(2024, 1, 15)
+        transaction_date = datetime(2024, 1, 15, tzinfo=UTC)
         notes = Notes("Initial purchase")
 
         transaction = (
@@ -220,7 +222,7 @@ class TestTransaction:
         transaction_type = TransactionType("sell")
         quantity = Quantity(50)
         price = Money(Decimal("175.50"))
-        transaction_date = date(2024, 2, 1)
+        transaction_date = datetime(2024, 2, 1, tzinfo=UTC)
 
         transaction = (
             Transaction.Builder()
@@ -255,7 +257,7 @@ class TestTransaction:
             .with_transaction_type(transaction_type)
             .with_quantity(quantity)
             .with_price(price)
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .with_notes(notes)
             .build()
         )
@@ -281,7 +283,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .with_notes(None)
             .build()
         )
@@ -310,7 +312,7 @@ class TestTransaction:
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("100.00")))
-                .with_transaction_date(date.today())
+                .with_transaction_date(datetime.now(UTC))
                 .build()
             )
 
@@ -324,7 +326,7 @@ class TestTransaction:
                 .with_transaction_type(TransactionType("buy"))
                 .with_quantity(Quantity(100))
                 .with_price(Money(Decimal("100.00")))
-                .with_transaction_date(date.today())
+                .with_transaction_date(datetime.now(UTC))
                 .build()
             )
 
@@ -337,7 +339,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date(2024, 1, 1))
+            .with_transaction_date(datetime(2024, 1, 1, tzinfo=UTC))
             .build()
         )
 
@@ -348,7 +350,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date(2024, 1, 1))
+            .with_transaction_date(datetime(2024, 1, 1, tzinfo=UTC))
             .build()
         )
 
@@ -359,7 +361,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date(2024, 1, 1))
+            .with_transaction_date(datetime(2024, 1, 1, tzinfo=UTC))
             .build()
         )
 
@@ -375,7 +377,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date(2024, 1, 1))
+            .with_transaction_date(datetime(2024, 1, 1, tzinfo=UTC))
             .with_id("same-id")
             .build()
         )
@@ -386,7 +388,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("sell"))
             .with_quantity(Quantity(200))
             .with_price(Money(Decimal("200.00")))
-            .with_transaction_date(date(2024, 2, 1))
+            .with_transaction_date(datetime(2024, 2, 1, tzinfo=UTC))
             .with_id("same-id")
             .build()
         )
@@ -401,11 +403,11 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("150.50")))
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
             .build()
         )
 
-        expected = "buy 100 @ $150.50 on 2024-01-15"
+        expected = "buy 100 @ $150.50 on 2024-01-15 00:00:00+00:00"
         assert str(transaction) == expected
 
     def test_transaction_repr(self) -> None:
@@ -417,7 +419,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("sell"))
             .with_quantity(Quantity(50))
             .with_price(Money(Decimal("200.00")))
-            .with_transaction_date(date(2024, 2, 1))
+            .with_transaction_date(datetime(2024, 2, 1, tzinfo=UTC))
             .build()
         )
 
@@ -436,7 +438,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("150.50")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -454,7 +456,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -465,7 +467,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("sell"))
             .with_quantity(Quantity(50))
             .with_price(Money(Decimal("110.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -481,7 +483,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -492,7 +494,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("sell"))
             .with_quantity(Quantity(50))
             .with_price(Money(Decimal("110.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -508,7 +510,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .with_notes(Notes("Important transaction"))
             .build()
         )
@@ -520,7 +522,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -537,7 +539,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .with_id(test_id)
             .build()
         )
@@ -553,7 +555,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .with_id("test-id-1")
             .build()
         )
@@ -573,7 +575,7 @@ class TestTransaction:
             .with_transaction_type(TransactionType("buy"))
             .with_quantity(Quantity(100))
             .with_price(Money(Decimal("100.00")))
-            .with_transaction_date(date.today())
+            .with_transaction_date(datetime.now(UTC))
             .build()
         )
 
@@ -616,7 +618,7 @@ class TestTransactionType:
             Transaction.Builder()
             .with_portfolio_id("portfolio-1")
             .with_stock_id("stock-1")
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_transaction_type(TransactionType("buy"))
             .with_price(Money(Decimal("100.00")))
             .with_quantity(Quantity(10))
@@ -639,7 +641,7 @@ class TestTransactionType:
             Transaction.Builder()
             .with_portfolio_id("portfolio-1")
             .with_stock_id("stock-1")
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_transaction_type(TransactionType("buy"))
             .with_price(Money(Decimal("100.00")))
             .with_quantity(Quantity(10))
@@ -652,7 +654,7 @@ class TestTransactionType:
             Transaction.Builder()
             .with_portfolio_id("portfolio-1")
             .with_stock_id("stock-1")
-            .with_transaction_date(date(2024, 1, 15))
+            .with_transaction_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_transaction_type(TransactionType("buy"))
             .with_price(Money(Decimal("100.00")))
             .with_quantity(Quantity(10))
@@ -663,7 +665,7 @@ class TestTransactionType:
             Transaction.Builder()
             .with_portfolio_id("portfolio-2")  # Different attributes
             .with_stock_id("stock-2")
-            .with_transaction_date(date(2024, 2, 20))
+            .with_transaction_date(datetime(2024, 2, 20, tzinfo=UTC))
             .with_transaction_type(TransactionType("sell"))
             .with_price(Money(Decimal("200.00")))
             .with_quantity(Quantity(20))

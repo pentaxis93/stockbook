@@ -5,7 +5,7 @@ Following TDD approach with focus on value object purity and business logic.
 Tests define expected behavior before implementation.
 """
 
-from datetime import date
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -26,7 +26,7 @@ class TestTargetBuilder:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_notes(Notes("Important target"))
             .with_id("target-id")
             .build()
@@ -37,7 +37,7 @@ class TestTargetBuilder:
         assert target.pivot_price.amount == Decimal("100.00")
         assert target.failure_price.amount == Decimal("80.00")
         assert target.status.value == "active"
-        assert target.created_date == date(2024, 1, 15)
+        assert target.created_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert target.notes.value == "Important target"
         assert target.id == "target-id"
 
@@ -50,7 +50,7 @@ class TestTargetBuilder:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
             .build()
         )
 
@@ -59,7 +59,7 @@ class TestTargetBuilder:
         assert target.pivot_price.amount == Decimal("100.00")
         assert target.failure_price.amount == Decimal("80.00")
         assert target.status.value == "active"
-        assert target.created_date == date(2024, 1, 15)
+        assert target.created_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert target.notes.value == ""  # Default
 
     def test_builder_raises_error_when_required_fields_missing(self) -> None:
@@ -72,7 +72,7 @@ class TestTargetBuilder:
                 .with_pivot_price(Money(Decimal("100.00")))
                 .with_failure_price(Money(Decimal("80.00")))
                 .with_status(TargetStatus("active"))
-                .with_created_date(date(2024, 1, 15))
+                .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -84,7 +84,7 @@ class TestTargetBuilder:
                 .with_pivot_price(Money(Decimal("100.00")))
                 .with_failure_price(Money(Decimal("80.00")))
                 .with_status(TargetStatus("active"))
-                .with_created_date(date(2024, 1, 15))
+                .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -96,7 +96,7 @@ class TestTargetBuilder:
                 .with_stock_id("stock-1")
                 .with_failure_price(Money(Decimal("80.00")))
                 .with_status(TargetStatus("active"))
-                .with_created_date(date(2024, 1, 15))
+                .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -108,7 +108,7 @@ class TestTargetBuilder:
                 .with_stock_id("stock-1")
                 .with_pivot_price(Money(Decimal("100.00")))
                 .with_status(TargetStatus("active"))
-                .with_created_date(date(2024, 1, 15))
+                .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -120,7 +120,7 @@ class TestTargetBuilder:
                 .with_stock_id("stock-1")
                 .with_pivot_price(Money(Decimal("100.00")))
                 .with_failure_price(Money(Decimal("80.00")))
-                .with_created_date(date(2024, 1, 15))
+                .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
                 .build()
             )
 
@@ -144,7 +144,7 @@ class TestTargetBuilder:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
         )
 
         # Empty portfolio_id should raise error
@@ -165,7 +165,7 @@ class TestTargetBuilder:
         assert builder.with_pivot_price(Money(Decimal("100.00"))) is builder
         assert builder.with_failure_price(Money(Decimal("80.00"))) is builder
         assert builder.with_status(TargetStatus("active")) is builder
-        assert builder.with_created_date(date(2024, 1, 15)) is builder
+        assert builder.with_created_date(datetime(2024, 1, 15, tzinfo=UTC)) is builder
         assert builder.with_notes(Notes("test")) is builder
         assert builder.with_id("id1") is builder
 
@@ -187,7 +187,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
             .with_notes(Notes("Important target level"))
             .build()
         )
@@ -197,7 +197,7 @@ class TestTarget:
         assert target.pivot_price.amount == Decimal("100.00")
         assert target.failure_price.amount == Decimal("80.00")
         assert target.status.value == "active"
-        assert target.created_date == date(2024, 1, 15)
+        assert target.created_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert target.notes.value == "Important target level"
 
     def test_create_target_with_minimal_data(self) -> None:
@@ -209,7 +209,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("150.00")))
             .with_failure_price(Money(Decimal("120.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -229,7 +229,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .with_notes(None)
             .build()
         )
@@ -246,7 +246,7 @@ class TestTarget:
                 .with_pivot_price(Money(Decimal("100.00")))
                 .with_failure_price(Money(Decimal("80.00")))
                 .with_status(TargetStatus("active"))
-                .with_created_date(date.today())
+                .with_created_date(datetime.now(UTC))
                 .build()
             )
 
@@ -260,7 +260,7 @@ class TestTarget:
                 .with_pivot_price(Money(Decimal("100.00")))
                 .with_failure_price(Money(Decimal("80.00")))
                 .with_status(TargetStatus("active"))
-                .with_created_date(date.today())
+                .with_created_date(datetime.now(UTC))
                 .build()
             )
 
@@ -281,7 +281,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -292,7 +292,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("110.00")))
             .with_failure_price(Money(Decimal("85.00")))
             .with_status(TargetStatus("hit"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -303,7 +303,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -319,7 +319,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .with_id("same-id")
             .build()
         )
@@ -330,7 +330,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("200.00")))
             .with_failure_price(Money(Decimal("150.00")))
             .with_status(TargetStatus("hit"))
-            .with_created_date(date(2024, 2, 1))
+            .with_created_date(datetime(2024, 2, 1, tzinfo=UTC))
             .with_id("same-id")
             .build()
         )
@@ -345,7 +345,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -356,7 +356,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("150.00")))
             .with_failure_price(Money(Decimal("120.00")))
             .with_status(TargetStatus("hit"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -371,7 +371,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .with_id("same-id")
             .build()
         )
@@ -382,7 +382,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("200.00")))
             .with_failure_price(Money(Decimal("150.00")))
             .with_status(TargetStatus("cancelled"))
-            .with_created_date(date(2024, 3, 1))
+            .with_created_date(datetime(2024, 3, 1, tzinfo=UTC))
             .with_id("same-id")
             .build()
         )
@@ -397,7 +397,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -414,7 +414,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -433,7 +433,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("cancelled"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -449,7 +449,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -465,7 +465,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -481,7 +481,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -497,7 +497,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -508,7 +508,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("hit"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -524,7 +524,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("hit"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -535,7 +535,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -551,7 +551,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .with_notes(Notes("Important target"))
             .build()
         )
@@ -563,7 +563,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -579,7 +579,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -601,7 +601,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .with_id(test_id)
             .build()
         )
@@ -617,7 +617,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .with_id("test-id-1")
             .build()
         )
@@ -637,7 +637,7 @@ class TestTarget:
             .with_pivot_price(Money(Decimal("100.00")))
             .with_failure_price(Money(Decimal("80.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date.today())
+            .with_created_date(datetime.now(UTC))
             .build()
         )
 
@@ -684,7 +684,7 @@ class TestTargetStatus:
             .with_failure_price(Money(Decimal("90.00")))
             .with_pivot_price(Money(Decimal("110.00")))
             .with_status(TargetStatus("failed"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
             .build()
         )
         assert failed_target.is_failed()
@@ -698,7 +698,7 @@ class TestTargetStatus:
             .with_failure_price(Money(Decimal("90.00")))
             .with_pivot_price(Money(Decimal("110.00")))
             .with_status(TargetStatus("cancelled"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
             .build()
         )
         assert cancelled_target.is_cancelled()
@@ -714,7 +714,7 @@ class TestTargetStatus:
             .with_failure_price(Money(Decimal("90.00")))
             .with_pivot_price(Money(Decimal("110.00")))
             .with_status(TargetStatus("active"))
-            .with_created_date(date(2024, 1, 15))
+            .with_created_date(datetime(2024, 1, 15, tzinfo=UTC))
             .build()
         )
 
