@@ -178,6 +178,7 @@ reportImplicitStringConcatenation = true
 
 [tool.importlinter]
 root_package = "src"
+include_external_packages = true
 
 # Contract 1: Domain layer must be completely independent
 [[tool.importlinter.contracts]]
@@ -209,3 +210,17 @@ name = "Application layer independence from presentation"
 type = "forbidden"
 source_modules = ["src.application"]
 forbidden_modules = ["src.presentation"]
+
+# Contract 5: Domain should not use external libraries directly
+[[tool.importlinter.contracts]]
+name = "Domain purity - no framework dependencies"
+type = "forbidden"
+source_modules = ["src.domain"]
+forbidden_modules = [
+  "sqlalchemy",
+  "fastapi",
+  "pydantic",
+  "pytest",
+  "httpx",
+  "requests",
+]
