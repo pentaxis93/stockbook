@@ -160,7 +160,7 @@ class TestStockEndpoints:
         self,
         client: TestClient,
         mock_stock_service: Mock,
-        sample_stock_dtos: list[StockDto],
+        sample_stock_dtos: list[StockDto],  # noqa: ARG002
     ) -> None:
         """Should return empty list when no stocks match the filter."""
         # Arrange
@@ -565,7 +565,6 @@ class TestStockEndpoints:
     def test_create_stock_empty_symbol(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should return 422 when symbol is empty."""
         # Arrange
@@ -587,7 +586,6 @@ class TestStockEndpoints:
     def test_create_stock_missing_symbol(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should return 422 when symbol is missing."""
         # Arrange
@@ -606,7 +604,6 @@ class TestStockEndpoints:
     def test_create_stock_invalid_symbol_format(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should return 422 when symbol contains non-alphabetic characters."""
         # Arrange
@@ -629,7 +626,6 @@ class TestStockEndpoints:
     def test_create_stock_symbol_too_long(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should return 422 when symbol exceeds 5 characters."""
         # Arrange
@@ -727,7 +723,6 @@ class TestStockEndpoints:
     def test_create_stock_invalid_grade(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should return 422 when grade is not A, B, C, D, or F."""
         # Arrange
@@ -1054,7 +1049,6 @@ class TestStockEndpoints:
     def test_update_stock_invalid_grade(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should return 422 for invalid grade values."""
         # Arrange
@@ -1089,7 +1083,6 @@ class TestStockEndpoints:
     def test_update_stock_symbol_validation(
         self,
         client: TestClient,
-        mock_stock_service: Mock,
     ) -> None:
         """Should validate symbol format."""
         # Arrange

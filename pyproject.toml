@@ -9,6 +9,7 @@ select = [
   "A",     # flake8-builtins (shadowing builtins)
   "ASYNC", # flake8-async (async/await best practices)
   "ANN",   # flake8-annotations (type annotations)
+  "ARG",   # flake8-unused-arguments (unused arguments)
   "B",     # flake8-bugbear (common bugs)
   "C",     # flake8-comprehensions (list/dict/set comprehensions)
   "D",     # pydocstyle (docstring checks)

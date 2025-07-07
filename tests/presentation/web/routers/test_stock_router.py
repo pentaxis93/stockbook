@@ -484,7 +484,7 @@ class TestStockRouter:
         data = response.json()
         assert "No fields to update" in data["detail"]
 
-    def test_update_stock_invalid_grade(self, mock_service: Mock, app: FastAPI) -> None:
+    def test_update_stock_invalid_grade(self, app: FastAPI) -> None:
         """Should return 422 for invalid grade values."""
         # Arrange
         stock_id = "stock-001"
@@ -503,9 +503,7 @@ class TestStockRouter:
         assert "detail" in data
         # Should be caught by Pydantic validation
 
-    def test_update_stock_invalid_symbol_format(
-        self, mock_service: Mock, app: FastAPI
-    ) -> None:
+    def test_update_stock_invalid_symbol_format(self, app: FastAPI) -> None:
         """Should return 422 for invalid symbol format."""
         # Arrange
         stock_id = "stock-001"

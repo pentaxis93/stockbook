@@ -67,7 +67,7 @@ class RiskAssessmentService:
     def assess_portfolio_risk(
         self,
         portfolio: list[tuple[Stock, Quantity]],
-        prices: dict[str, Money],  # pylint: disable=unused-argument
+        _prices: dict[str, Money],
     ) -> RiskAssessment:
         """Calculate overall portfolio risk level."""
         if not portfolio:

@@ -13,7 +13,7 @@ T = TypeVar("T", bound="Entity")
 class Entity(ABC):  # noqa: B024
     """Base class for all domain entities with immutable string IDs."""
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> Self:
+    def __new__(cls, *_args: Any, **_kwargs: Any) -> Self:
         """Prevent direct instantiation of Entity base class."""
         if cls is Entity:
             raise TypeError("Can't instantiate abstract class Entity directly")

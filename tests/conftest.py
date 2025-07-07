@@ -94,7 +94,7 @@ def sample_stock_data() -> dict[str, dict[str, str]]:
 
 
 @pytest.fixture
-def sample_portfolio(test_db: Path) -> dict[str, Any]:
+def sample_portfolio(_test_db: Path) -> dict[str, Any]:
     """
     Create a sample portfolio with some test data.
 

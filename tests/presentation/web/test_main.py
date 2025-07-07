@@ -18,7 +18,7 @@ class TestMainApp:
             yield mock
 
     @pytest.fixture
-    def client(self, mock_database_initializer: Mock) -> TestClient:
+    def client(self) -> TestClient:
         """Create a test client for the FastAPI app."""
         # Import here to ensure mocks are in place
         from src.presentation.web.main import app

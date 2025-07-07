@@ -31,11 +31,11 @@ from src.domain.value_objects.stock_symbol import StockSymbol
 # Test data helpers
 def create_test_stock(
     symbol: str,
-    price: float,
+    _price: float,
     grade: str,
     industry: str = "Technology",
-    volatility: float = 0.2,
-    beta: float = 1.0,
+    _volatility: float = 0.2,
+    _beta: float = 1.0,
 ) -> Stock:
     """Helper to create test stock with risk attributes."""
     # Map industries to sector + industry_group combinations
