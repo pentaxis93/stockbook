@@ -6,44 +6,39 @@ unsafe-fixes = true
 
 [tool.ruff.lint]
 select = [
-  # Core rules from replaced tools
-  "E",    # pycodestyle errors (replaces flake8 E codes)
-  "W",    # pycodestyle warnings (replaces flake8 W codes)
-  "F",    # Pyflakes (replaces flake8 F codes)
-  "I",    # isort (import sorting)
-  "D",    # pydocstyle (docstring checks)
-  "S",    # flake8-bandit (security)
-  "C901", # McCabe complexity (replaces flake8 complexity)
-
-  # Pylint equivalents
-  "PLC", # Pylint Convention rules
-  "PLE", # Pylint Error rules
-  "PLR", # Pylint Refactor rules
-  "PLW", # Pylint Warning rules
-
-  # Additional helpful rules
-  "B",     # flake8-bugbear (common bugs)
   "A",     # flake8-builtins (shadowing builtins)
   "ASYNC", # flake8-async (async/await best practices)
+  "B",     # flake8-bugbear (common bugs)
+  "C",     # flake8-comprehensions (list/dict/set comprehensions)
+  "D",     # pydocstyle (docstring checks)
+  "E",     # pycodestyle errors (replaces flake8 E codes)
   "ERA",   # eradicate (commented-out code)
+  "F",     # Pyflakes (replaces flake8 F codes)
   "FLY",   # flynt (f-string conversions)
+  "FURB",  # refurb (modernize Python code)
+  "I",     # isort (import sorting)
   "LOG",   # flake8-logging (logging best practices)
   "PERF",  # Perflint (performance anti-patterns)
+  "PLC",   # Pylint Convention rules
+  "PLE",   # Pylint Error rules
+  "PLR",   # Pylint Refactor rules
+  "PLW",   # Pylint Warning rules
   "PTH",   # flake8-use-pathlib (pathlib usage)
   "RET",   # flake8-return (return statement checks)
+  "RUF",   # Ruff-specific rules
+  "S",     # flake8-bandit (security)
   "SIM",   # flake8-simplify (code simplification)
-  "UP",    # pyupgrade (Python version upgrade syntax)
+  "SLF",   # flake8-self (private member access)
   "TCH",   # flake8-type-checking (type checking imports)
   "TID",   # flake8-tidy-imports (import conventions)
-  "FURB",  # refurb (modernize Python code)
-  "RUF",   # Ruff-specific rules
-  "SLF",   # flake8-self (private member access)
+  "UP",    # pyupgrade (Python version upgrade syntax)
+  "W",     # pycodestyle warnings (replaces flake8 W codes)
 ]
 
 ignore = [
+  "A002",   # builtin-argument-shadowing (for 'id' parameter)
   "D105",   # missing-magic-method-docstring
   "FIX002", # line-contains-todo
-  "A002",   # builtin-argument-shadowing (for 'id' parameter)
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -51,33 +46,30 @@ convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
-  "PLR2004", # magic values allowed in tests
+  "A001",    # builtin shadowing allowed in tests (id)
+  "B007",    # unused-loop-control-variable allowed in tests
+  "B017",    # pytest.raises(Exception) allowed in tests
   "D",       # docstrings not required in tests
+  "PLR0124", # comparison-with-itself allowed for equality tests
   "PLR0914", # too-many-locals allowed in tests (was max-locals=15)
   "PLR0915", # too-many-statements allowed in tests (was max-statements=30)
   "PLR0911", # too-many-return-statements
   "PLR0912", # too-many-branches
-  "B017",    # pytest.raises(Exception) allowed in tests
+  "PLR0913", # too-many-arguments allowed in test helpers and fixtures
+  "PLR2004", # magic values allowed in tests
+  "RUF001",  # ambiguous-unicode-character allowed in tests
   "S101",    # assert-used (needed in tests)
   "S608",    # SQL injection not a concern in test fixtures
-  "A001",    # builtin shadowing allowed in tests (id)
-  "PLR0124", # comparison-with-itself allowed for equality tests
-  "B007",    # unused-loop-control-variable allowed in tests
   "SIM103",  # return-in-try-except-finally allowed in tests
   "SIM117",  # nested-with allowed in tests
-  "RUF001",  # ambiguous-unicode-character allowed in tests
   "S108",    # hardcoded-temp-file allowed in tests
-  "PLR0913", # too-many-arguments allowed in test helpers and fixtures
 ]
 
 "scripts/test_all.py" = [
-  # Script files have different requirements
   "S603", # subprocess calls are intentional in this controlled script
 ]
 
 [tool.pytest.ini_options]
-# Test discovery and execution
-# testpaths = ["tests"]  # Commented out to allow pytest to search from project root
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
