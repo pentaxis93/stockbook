@@ -212,7 +212,9 @@ class TestPortfolioNameConstants:
         assert len(valid_name.value) == PortfolioName.MAX_LENGTH
 
         # This should fail
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match="Portfolio name cannot exceed 100 characters"
+        ):
             _ = PortfolioName("A" * (PortfolioName.MAX_LENGTH + 1))
 
 

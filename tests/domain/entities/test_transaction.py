@@ -606,7 +606,7 @@ class TestTransactionType:
         """Test that invalid transaction types are rejected."""
         invalid_types = ["transfer", "dividend", "split", "", "INVALID"]
         for invalid_type in invalid_types:
-            with pytest.raises(ValueError):
+            with pytest.raises(ValueError, match="Transaction type"):
                 _ = TransactionType(invalid_type)
 
     def test_transaction_equality_and_hash_with_non_transaction_object(self) -> None:

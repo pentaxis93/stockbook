@@ -415,7 +415,7 @@ class TestIndexChange:
         """Test that extreme index changes are rejected."""
         extreme_changes = [150.0, -150.0, 200.0, -200.0]
         for change in extreme_changes:
-            with pytest.raises(ValueError):
+            with pytest.raises(ValueError, match="Index change cannot exceed"):
                 _ = IndexChange(change)
 
     def test_index_change_precision(self) -> None:

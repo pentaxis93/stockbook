@@ -23,8 +23,7 @@ class TestStockEndpoints:
     def mock_stock_service(self) -> Generator[Mock, None, None]:
         """Mock the stock application service."""
         # Since the endpoint doesn't exist yet, we'll mock at the router level
-        mock_instance = Mock(spec=StockApplicationService)
-        yield mock_instance
+        return Mock(spec=StockApplicationService)
 
     @pytest.fixture
     def client(self, mock_stock_service: Mock) -> Generator[TestClient, None, None]:
@@ -402,9 +401,8 @@ class TestStockEndpoints:
                 assert response.status_code == status.HTTP_404_NOT_FOUND
                 data = response.json()
                 assert "detail" in data
-                assert (
-                    "Stock with ID" in data["detail"] and "not found" in data["detail"]
-                )
+                assert "Stock with ID" in data["detail"]
+                assert "not found" in data["detail"]
 
     def test_get_stock_by_id_service_error(
         self,

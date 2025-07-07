@@ -80,8 +80,8 @@ class TestCreateStockCommand:
 
     def test_create_stock_command_with_empty_symbol_raises_error(self) -> None:
         """Should raise error for empty symbol."""
+        inputs = CreateStockInputs(symbol="", name="Apple Inc.")
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
-            inputs = CreateStockInputs(symbol="", name="Apple Inc.")
             _ = CreateStockCommand(inputs)
 
     def test_create_stock_command_with_empty_name_allowed(self) -> None:
@@ -92,14 +92,14 @@ class TestCreateStockCommand:
 
     def test_create_stock_command_with_invalid_symbol_raises_error(self) -> None:
         """Should raise error for invalid symbol format."""
+        inputs = CreateStockInputs(symbol="AAPL123", name="Apple Inc.")
         with pytest.raises(ValueError, match="Invalid symbol format"):
-            inputs = CreateStockInputs(symbol="AAPL123", name="Apple Inc.")
             _ = CreateStockCommand(inputs)
 
     def test_create_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
+        inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.", grade="Z")
         with pytest.raises(ValueError, match="Invalid grade"):
-            inputs = CreateStockInputs(symbol="AAPL", name="Apple Inc.", grade="Z")
             _ = CreateStockCommand(inputs)
 
     def test_create_stock_command_equality(self) -> None:
@@ -152,14 +152,14 @@ class TestCreateStockCommand:
 
     def test_create_stock_command_industry_group_without_sector_error(self) -> None:
         """Should raise ValueError when industry_group provided without sector."""
+        inputs = CreateStockInputs(
+            symbol="AAPL",
+            name="Apple Inc.",
+            industry_group="Software",  # No sector provided
+        )
         with pytest.raises(
             ValueError, match="Sector must be provided when industry_group is specified"
         ):
-            inputs = CreateStockInputs(
-                symbol="AAPL",
-                name="Apple Inc.",
-                industry_group="Software",  # No sector provided
-            )
             _ = CreateStockCommand(inputs)
 
     def test_create_stock_command_repr_representation(self) -> None:
@@ -230,13 +230,15 @@ class TestCreateStockCommand:
     ) -> None:
         """Should raise error for invalid sector-industry combinations."""
         # This should trigger the domain service validation
-        with pytest.raises(ValueError):
-            inputs = CreateStockInputs(
-                symbol="AAPL",
-                name="Apple Inc.",
-                sector="Technology",
-                industry_group="Banking",  # Invalid combination
-            )
+        inputs = CreateStockInputs(
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group="Banking",  # Invalid combination
+        )
+        with pytest.raises(
+            ValueError, match="Industry group 'Banking' is not valid for sector"
+        ):
             _ = CreateStockCommand(inputs)
 
     def test_create_stock_command_grade_validation_valid_grades(self) -> None:

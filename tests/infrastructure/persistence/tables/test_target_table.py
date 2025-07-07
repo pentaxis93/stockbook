@@ -90,12 +90,10 @@ class TestTargetTable:
 
         # Should be Numeric with precision for percentages (e.g., 99.99%)
         assert isinstance(percentage_type, sa.Numeric)
-        assert (
-            percentage_type.precision is not None and percentage_type.precision >= 5
-        )  # Total digits
-        assert (
-            percentage_type.scale is not None and percentage_type.scale >= 2
-        )  # Decimal places
+        assert percentage_type.precision is not None
+        assert percentage_type.precision >= 5
+        assert percentage_type.scale is not None
+        assert percentage_type.scale >= 2
 
     def test_target_table_defaults(self) -> None:
         """Test that target table has correct default values."""

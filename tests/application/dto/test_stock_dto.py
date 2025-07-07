@@ -5,6 +5,7 @@ Following TDD approach - these tests define the expected behavior
 of StockDto used for transferring data between layers.
 """
 
+from dataclasses import FrozenInstanceError
 from unittest.mock import Mock
 
 import pytest
@@ -204,12 +205,10 @@ class TestStockDto:
         """DTO should be immutable after creation."""
         dto = StockDto(id=None, symbol="AAPL", name="Apple Inc.")
 
-        with pytest.raises(
-            Exception
-        ):  # dataclass frozen=True raises FrozenInstanceError
+        with pytest.raises(FrozenInstanceError):
             dto.symbol = "MSFT"  # type: ignore[misc]
 
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             dto.name = "Microsoft"  # type: ignore[misc]
 
     def test_stock_dto_string_representation(self) -> None:
@@ -341,10 +340,10 @@ class TestStockDto:
         dto = StockDto(id=None, symbol="TEST", name="Test Company")
 
         # Test that it's actually frozen using dataclass mechanism
-        with pytest.raises(Exception):  # FrozenInstanceError or AttributeError
+        with pytest.raises(FrozenInstanceError):
             dto.symbol = "CHANGED"  # type: ignore[misc]
 
-        with pytest.raises(Exception):  # FrozenInstanceError or AttributeError
+        with pytest.raises(FrozenInstanceError):
             dto.name = "Changed Company"  # type: ignore[misc]
 
     def test_stock_dto_equality_with_all_field_combinations(self) -> None:

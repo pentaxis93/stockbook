@@ -144,16 +144,20 @@ class TestUnitOfWorkIntegration:
             unit_of_work.commit()
 
         # Act - Try to create duplicate (should fail)
-        with pytest.raises(Exception), unit_of_work:
-            duplicate = (
-                Stock.Builder()
-                .with_symbol(StockSymbol("MSFT"))
-                .with_company_name(CompanyName("Microsoft Duplicate"))
-                .with_grade(Grade("B"))
-                .build()
-            )
-            _ = unit_of_work.stocks.create(duplicate)
-            unit_of_work.commit()  # Should fail due to unique constraint
+        with pytest.raises(  # noqa: PT012
+            ValueError,
+            match="Stock with symbol MSFT already exists",
+        ):
+            with unit_of_work:
+                duplicate = (
+                    Stock.Builder()
+                    .with_symbol(StockSymbol("MSFT"))
+                    .with_company_name(CompanyName("Microsoft Duplicate"))
+                    .with_grade(Grade("B"))
+                    .build()
+                )
+                _ = unit_of_work.stocks.create(duplicate)
+                unit_of_work.commit()  # Should fail due to unique constraint
 
         # Assert - Original stock unchanged
         with test_engine.connect() as conn:
@@ -338,19 +342,20 @@ class TestTransactionIsolation:
     ) -> None:
         """Should rollback all operations on error."""
         # Act & Assert
-        with pytest.raises(ValueError), unit_of_work:
-            # Create first stock
-            stock1 = (
-                Stock.Builder()
-                .with_symbol(StockSymbol("META"))
-                .with_company_name(CompanyName("Meta"))
-                .with_grade(Grade("B"))
-                .build()
-            )
-            _ = unit_of_work.stocks.create(stock1)
+        with pytest.raises(ValueError, match="Simulated error"):  # noqa: PT012
+            with unit_of_work:
+                # Create first stock
+                stock1 = (
+                    Stock.Builder()
+                    .with_symbol(StockSymbol("META"))
+                    .with_company_name(CompanyName("Meta"))
+                    .with_grade(Grade("B"))
+                    .build()
+                )
+                _ = unit_of_work.stocks.create(stock1)
 
-            # Simulate error
-            raise ValueError("Simulated error")
+                # Simulate error
+                raise ValueError("Simulated error")
 
         # Assert - Nothing should be committed
         with test_engine.connect() as conn:

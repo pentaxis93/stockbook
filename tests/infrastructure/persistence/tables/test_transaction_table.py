@@ -116,28 +116,26 @@ class TestTransactionTable:
         # Quantity precision
         quantity_type = columns["quantity"].type
         assert isinstance(quantity_type, sa.Numeric)
-        assert (
-            quantity_type.precision is not None and quantity_type.precision >= 10
-        )  # Support large share counts
-        assert (
-            quantity_type.scale is not None and quantity_type.scale >= 4
-        )  # Support fractional shares
+        assert quantity_type.precision is not None
+        assert quantity_type.precision >= 10
+        assert quantity_type.scale is not None
+        assert quantity_type.scale >= 4
 
         # Price precision
         price_type = columns["price"].type
         assert isinstance(price_type, sa.Numeric)
-        assert (
-            price_type.precision is not None and price_type.precision >= 10
-        )  # Support high-priced stocks
-        assert (
-            price_type.scale is not None and price_type.scale >= 4
-        )  # Support precise pricing
+        assert price_type.precision is not None
+        assert price_type.precision >= 10
+        assert price_type.scale is not None
+        assert price_type.scale >= 4
 
         # Commission precision
         commission_type = columns["commission"].type
         assert isinstance(commission_type, sa.Numeric)
-        assert commission_type.precision is not None and commission_type.precision >= 8
-        assert commission_type.scale is not None and commission_type.scale >= 2
+        assert commission_type.precision is not None
+        assert commission_type.precision >= 8
+        assert commission_type.scale is not None
+        assert commission_type.scale >= 2
 
     def test_transaction_table_defaults(self) -> None:
         """Test that transaction table has correct default values."""

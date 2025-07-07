@@ -252,10 +252,10 @@ class TestExceptionHierarchy:
 
     def test_exception_can_be_caught_as_base_exception(self) -> None:
         """Should allow catching all exceptions as base Exception."""
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="Base error"):
             raise DomainServiceError("Base error")
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="Validation error"):
             raise ValidationError("Validation error")
 
 
@@ -264,39 +264,39 @@ class TestExceptionUsagePatterns:
 
     def test_validation_error_with_field_and_value_pattern(self) -> None:
         """Should support common validation error pattern."""
-        try:
+        with pytest.raises(ValidationError) as exc_info:
             # Simulate validation failure
             raise ValidationError(
                 "Stock symbol must be 1-10 characters",
                 field="symbol",
                 value="VERY_LONG_SYMBOL_NAME",
             )
-        except ValidationError as e:
-            assert "symbol" in e.context["field"]
-            assert "VERY_LONG_SYMBOL_NAME" in e.context["value"]
+
+        assert "symbol" in exc_info.value.context["field"]
+        assert "VERY_LONG_SYMBOL_NAME" in exc_info.value.context["value"]
 
     def test_calculation_error_with_operation_pattern(self) -> None:
         """Should support common calculation error pattern."""
-        try:
+        with pytest.raises(CalculationError) as exc_info:
             # Simulate calculation failure
             raise CalculationError(
                 "Cannot calculate portfolio value with negative holdings",
                 operation="portfolio_valuation",
             )
-        except CalculationError as e:
-            assert e.context["operation"] == "portfolio_valuation"
+
+        assert exc_info.value.context["operation"] == "portfolio_valuation"
 
     def test_insufficient_data_error_with_multiple_fields_pattern(self) -> None:
         """Should support common insufficient data pattern."""
-        try:
+        with pytest.raises(InsufficientDataError) as exc_info:
             # Simulate missing data error
             raise InsufficientDataError(
                 "Cannot analyze portfolio without required data",
                 required_fields=["current_price", "shares", "purchase_date"],
             )
-        except InsufficientDataError as e:
-            required = e.context["required_fields"]
-            assert "current_price" in required
-            assert "shares" in required
-            assert "purchase_date" in required
-            assert len(required) == 3
+
+        required = exc_info.value.context["required_fields"]
+        assert "current_price" in required
+        assert "shares" in required
+        assert "purchase_date" in required
+        assert len(required) == 3

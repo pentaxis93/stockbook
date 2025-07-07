@@ -670,7 +670,7 @@ class TestTargetStatus:
         """Test that invalid target statuses are rejected."""
         invalid_statuses = ["pending", "unknown", "", "INVALID"]
         for status in invalid_statuses:
-            with pytest.raises(ValueError):
+            with pytest.raises(ValueError, match="Target status must be one of"):
                 _ = TargetStatus(status)
 
     def test_target_status_checks_failed_and_cancelled(self) -> None:

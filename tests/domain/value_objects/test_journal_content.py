@@ -292,7 +292,7 @@ class TestJournalContentConstants:
         assert len(valid_content.value) == JournalContent.MAX_LENGTH
 
         # This should fail
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Journal content cannot exceed"):
             _ = JournalContent("A" * (JournalContent.MAX_LENGTH + 1))
 
 

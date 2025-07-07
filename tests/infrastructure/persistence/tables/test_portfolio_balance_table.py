@@ -99,22 +99,18 @@ class TestPortfolioBalanceTable:
         # Quantity precision
         quantity_type = columns["quantity"].type
         assert isinstance(quantity_type, sa.Numeric)
-        assert (
-            quantity_type.precision is not None and quantity_type.precision >= 10
-        )  # Support large share counts
-        assert (
-            quantity_type.scale is not None and quantity_type.scale >= 4
-        )  # Support fractional shares
+        assert quantity_type.precision is not None
+        assert quantity_type.precision >= 10
+        assert quantity_type.scale is not None
+        assert quantity_type.scale >= 4
 
         # Average cost precision
         avg_cost_type = columns["average_cost"].type
         assert isinstance(avg_cost_type, sa.Numeric)
-        assert (
-            avg_cost_type.precision is not None and avg_cost_type.precision >= 10
-        )  # Support high-priced stocks
-        assert (
-            avg_cost_type.scale is not None and avg_cost_type.scale >= 4
-        )  # Support precise pricing
+        assert avg_cost_type.precision is not None
+        assert avg_cost_type.precision >= 10
+        assert avg_cost_type.scale is not None
+        assert avg_cost_type.scale >= 4
 
     def test_portfolio_balance_table_defaults(self) -> None:
         """Test that portfolio_balance table has correct default values."""

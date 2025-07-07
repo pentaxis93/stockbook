@@ -88,7 +88,7 @@ class TestDatabaseInitializer:
 
     def test_initialize_database_with_invalid_url(self) -> None:
         """Test that initialize_database handles invalid database URLs gracefully."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError, match="Unsupported database URL"):
             initialize_database("invalid://url")
 
     def test_initialize_database_with_existing_data(self, temp_db_path: str) -> None:
@@ -133,7 +133,7 @@ class TestDatabaseInitializer:
     @patch("src.infrastructure.persistence.database_initializer.logger")
     def test_initialize_database_logs_errors(self, mock_logger: Mock) -> None:
         """Test that initialization errors are logged."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError, match="Unsupported database URL"):
             initialize_database("invalid://url")
 
         # Should log the error

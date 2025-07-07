@@ -130,7 +130,7 @@ class TestSqlAlchemyUnitOfWorkContextManager:
         uow = SqlAlchemyUnitOfWork(mock_engine)
 
         # Act & Assert
-        with pytest.raises(ValueError), uow:
+        with pytest.raises(ValueError, match="Test error"), uow:
             raise ValueError("Test error")
 
         # The connection's __exit__ should be called with exception info

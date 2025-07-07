@@ -102,7 +102,13 @@ class TestStock:
         # Invalid symbols should be rejected by StockSymbol
         invalid_symbols = ["123", "AA-PL", "TOOLONG", ""]
         for symbol in invalid_symbols:
-            with pytest.raises(ValueError):
+            with pytest.raises(
+                ValueError,
+                match=(
+                    r"Stock symbol (must contain only uppercase letters|"
+                    r"must be between 1 and 5 characters|cannot be empty)"
+                ),
+            ):
                 _ = StockSymbol(symbol)
 
 
@@ -327,7 +333,13 @@ class TestStockSymbol:
         """Test that invalid symbols are rejected"""
         invalid_symbols = ["123", "AA-PL", "TOOLONG", "", "AA PL"]
         for symbol in invalid_symbols:
-            with pytest.raises(ValueError):
+            with pytest.raises(
+                ValueError,
+                match=(
+                    r"Stock symbol (must contain only uppercase letters|"
+                    r"must be between 1 and 5 characters|cannot be empty)"
+                ),
+            ):
                 _ = StockSymbol(symbol)
 
 
@@ -346,7 +358,7 @@ class TestSharedKernelValueObjects:
 
     def test_negative_quantity_rejected(self) -> None:
         """Test that negative quantities are rejected"""
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Quantity cannot be negative"):
             _ = Quantity(-100)
 
     def test_zero_quantity_rejected(self) -> None:

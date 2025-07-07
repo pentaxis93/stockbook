@@ -110,7 +110,7 @@ class TestMainApp:
         assert "access-control-allow-methods" in response.headers
 
     @pytest.mark.parametrize(
-        "endpoint,expected_status",
+        ("endpoint", "expected_status"),
         [
             ("/health", 200),
             ("/", 200),

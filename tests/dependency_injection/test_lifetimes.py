@@ -50,9 +50,8 @@ class TestLifetimeEnum:
 
     def test_lifetime_invalid_value(self) -> None:
         """Should raise error for invalid lifetime value."""
-        with pytest.raises(ValueError) as exc_info:
+        with pytest.raises(ValueError, match="invalid"):
             _ = Lifetime("invalid")
-        assert "invalid" in str(exc_info.value)
 
     def test_lifetime_iteration(self) -> None:
         """Should be iterable."""

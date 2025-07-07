@@ -75,18 +75,18 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_with_invalid_stock_id_raises_error(self) -> None:
         """Should raise error for invalid stock ID."""
+        inputs = UpdateStockInputs(stock_id="")
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            inputs = UpdateStockInputs(stock_id="")
             _ = UpdateStockCommand(inputs)
 
+        inputs = UpdateStockInputs(stock_id="   ")  # whitespace-only string
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            inputs = UpdateStockInputs(stock_id="   ")  # whitespace-only string
             _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_with_invalid_grade_raises_error(self) -> None:
         """Should raise error for invalid grade."""
+        inputs = UpdateStockInputs(stock_id="test-stock-1", grade="Z")
         with pytest.raises(ValueError, match="Invalid grade"):
-            inputs = UpdateStockInputs(stock_id="test-stock-1", grade="Z")
             _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_with_empty_name_allowed(self) -> None:
@@ -263,8 +263,8 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_whitespace_only_stock_id_validation(self) -> None:
         """Should validate stock_id for whitespace-only strings."""
+        inputs = UpdateStockInputs(stock_id="   ")  # Whitespace-only
         with pytest.raises(ValueError, match="Stock ID must be a non-empty string"):
-            inputs = UpdateStockInputs(stock_id="   ")  # Whitespace-only
             _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_whitespace_only_name_validation(self) -> None:
@@ -420,17 +420,17 @@ class TestUpdateStockCommand:
 
     def test_update_stock_command_invalid_symbol(self) -> None:
         """Should reject invalid symbols."""
+        inputs = UpdateStockInputs(
+            stock_id="test-stock-1",
+            symbol="123ABC",  # Contains numbers
+        )
         with pytest.raises(ValueError, match="Invalid symbol format"):
-            inputs = UpdateStockInputs(
-                stock_id="test-stock-1",
-                symbol="123ABC",  # Contains numbers
-            )
             _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_empty_symbol(self) -> None:
         """Should reject empty symbols."""
+        inputs = UpdateStockInputs(stock_id="test-stock-1", symbol="")
         with pytest.raises(ValueError, match="Symbol cannot be empty"):
-            inputs = UpdateStockInputs(stock_id="test-stock-1", symbol="")
             _ = UpdateStockCommand(inputs)
 
     def test_update_stock_command_symbol_in_equality(self) -> None:

@@ -1086,7 +1086,9 @@ class TestStockDomainInvariants:
         assert stock.industry_group.value == "Hardware"
 
         # Invalid updates should fail and maintain consistency
-        with pytest.raises(ValueError):
+        with pytest.raises(
+            ValueError, match="Industry group .* is not valid for sector"
+        ):
             stock.update_fields(
                 industry_group="Pharmaceuticals"
             )  # Invalid for Technology
@@ -1246,7 +1248,7 @@ class TestStockConcurrencyScenarios:
         original_notes = stock.notes.value
 
         # Attempt update that will fail due to invalid grade
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Grade must be"):
             stock.update_fields(
                 name="Updated Corp",
                 sector="Healthcare",
