@@ -23,6 +23,7 @@ select = [
   "LOG",   # flake8-logging (logging best practices)
   "N",     # pep8-naming (naming conventions)
   "PERF",  # Perflint (performance anti-patterns)
+  "PIE",   # flake8-pie (pie)
   "PLC",   # Pylint Convention rules
   "PLE",   # Pylint Error rules
   "PLR",   # Pylint Refactor rules

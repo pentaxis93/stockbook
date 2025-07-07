@@ -25,7 +25,6 @@ class IPortfolioRepository(ABC):
             ValidationError: If portfolio data is invalid
             DatabaseError: If creation fails
         """
-        pass
 
     @abstractmethod
     def get_by_id(self, portfolio_id: str) -> Portfolio | None:
@@ -37,7 +36,6 @@ class IPortfolioRepository(ABC):
         Returns:
             Portfolio domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_all_active(self) -> list[Portfolio]:
@@ -46,7 +44,6 @@ class IPortfolioRepository(ABC):
         Returns:
             List of active Portfolio domain models
         """
-        pass
 
     @abstractmethod
     def get_all(self) -> list[Portfolio]:
@@ -55,7 +52,6 @@ class IPortfolioRepository(ABC):
         Returns:
             List of all Portfolio domain models
         """
-        pass
 
     @abstractmethod
     def update(self, portfolio_id: str, portfolio: Portfolio) -> bool:
@@ -72,7 +68,6 @@ class IPortfolioRepository(ABC):
             ValidationError: If portfolio data is invalid
             DatabaseError: If update fails
         """
-        pass
 
     @abstractmethod
     def deactivate(self, portfolio_id: str) -> bool:
@@ -84,4 +79,3 @@ class IPortfolioRepository(ABC):
         Returns:
             True if deactivation successful, False otherwise
         """
-        pass

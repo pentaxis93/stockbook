@@ -17,8 +17,6 @@ from dependency_injection.exceptions import (
 class MockService:
     """Mock service for testing."""
 
-    pass
-
 
 class TestDependencyResolutionError:
     """Test dependency resolution error messages."""

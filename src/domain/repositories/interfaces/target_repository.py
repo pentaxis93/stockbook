@@ -25,7 +25,6 @@ class ITargetRepository(ABC):
             ValidationError: If target data is invalid
             DatabaseError: If creation fails
         """
-        pass
 
     @abstractmethod
     def get_by_id(self, target_id: str) -> Target | None:
@@ -37,7 +36,6 @@ class ITargetRepository(ABC):
         Returns:
             Target domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_active_by_portfolio(self, portfolio_id: str) -> list[Target]:
@@ -49,7 +47,6 @@ class ITargetRepository(ABC):
         Returns:
             List of active Target domain models
         """
-        pass
 
     @abstractmethod
     def get_active_by_stock(self, stock_id: str) -> list[Target]:
@@ -61,7 +58,6 @@ class ITargetRepository(ABC):
         Returns:
             List of active Target domain models
         """
-        pass
 
     @abstractmethod
     def get_all_active(self) -> list[Target]:
@@ -70,7 +66,6 @@ class ITargetRepository(ABC):
         Returns:
             List of active Target domain models
         """
-        pass
 
     @abstractmethod
     def update(self, target_id: str, target: Target) -> bool:
@@ -87,7 +82,6 @@ class ITargetRepository(ABC):
             ValidationError: If target data is invalid
             DatabaseError: If update fails
         """
-        pass
 
     @abstractmethod
     def update_status(self, target_id: str, status: str) -> bool:
@@ -100,4 +94,3 @@ class ITargetRepository(ABC):
         Returns:
             True if update successful, False otherwise
         """
-        pass

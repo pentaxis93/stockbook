@@ -28,7 +28,6 @@ class IUnitOfWork(ABC):
         Returns:
             Self for use in context manager
         """
-        pass
 
     @abstractmethod
     def __exit__(
@@ -47,7 +46,6 @@ class IUnitOfWork(ABC):
         Returns:
             Optional[bool]: True to suppress exceptions, False or None to propagate them
         """
-        pass
 
     @abstractmethod
     def commit(self) -> None:
@@ -56,7 +54,6 @@ class IUnitOfWork(ABC):
         Raises:
             Exception: If commit fails for any reason
         """
-        pass
 
     @abstractmethod
     def rollback(self) -> None:
@@ -65,7 +62,6 @@ class IUnitOfWork(ABC):
         This should restore the system to the state it was in
         before this unit of work began.
         """
-        pass
 
 
 class IStockBookUnitOfWork(IUnitOfWork):
@@ -80,34 +76,28 @@ class IStockBookUnitOfWork(IUnitOfWork):
     @abstractmethod
     def stocks(self) -> IStockRepository:
         """Get stock repository instance."""
-        pass
 
     @property
     @abstractmethod
     def portfolios(self) -> IPortfolioRepository:
         """Get portfolio repository instance."""
-        pass
 
     @property
     @abstractmethod
     def transactions(self) -> ITransactionRepository:
         """Get transaction repository instance."""
-        pass
 
     @property
     @abstractmethod
     def targets(self) -> ITargetRepository:
         """Get target repository instance."""
-        pass
 
     @property
     @abstractmethod
     def balances(self) -> IPortfolioBalanceRepository:
         """Get portfolio balance repository instance."""
-        pass
 
     @property
     @abstractmethod
     def journal(self) -> IJournalRepository:
         """Get journal repository instance."""
-        pass

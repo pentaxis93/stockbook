@@ -18,8 +18,6 @@ from dependency_injection.exceptions import (
 class MockService:
     """Mock service for testing."""
 
-    pass
-
 
 class MockImplementation(MockService):
     """Mock implementation for testing."""
@@ -30,8 +28,6 @@ class MockImplementation(MockService):
 
 class NotAService:
     """Class that doesn't implement MockService."""
-
-    pass
 
 
 class TestRegistrationExceptions:

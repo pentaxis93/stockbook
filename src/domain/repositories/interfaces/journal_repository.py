@@ -26,7 +26,6 @@ class IJournalRepository(ABC):
             ValidationError: If entry data is invalid
             DatabaseError: If creation fails
         """
-        pass
 
     @abstractmethod
     def get_by_id(self, entry_id: str) -> JournalEntry | None:
@@ -38,7 +37,6 @@ class IJournalRepository(ABC):
         Returns:
             JournalEntry domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_recent(self, limit: int | None = None) -> list[JournalEntry]:
@@ -50,7 +48,6 @@ class IJournalRepository(ABC):
         Returns:
             List of JournalEntry domain models, ordered by date (newest first)
         """
-        pass
 
     @abstractmethod
     def get_by_portfolio(
@@ -65,7 +62,6 @@ class IJournalRepository(ABC):
         Returns:
             List of JournalEntry domain models
         """
-        pass
 
     @abstractmethod
     def get_by_stock(
@@ -80,7 +76,6 @@ class IJournalRepository(ABC):
         Returns:
             List of JournalEntry domain models
         """
-        pass
 
     @abstractmethod
     def get_by_transaction(self, transaction_id: str) -> list[JournalEntry]:
@@ -92,7 +87,6 @@ class IJournalRepository(ABC):
         Returns:
             List of JournalEntry domain models
         """
-        pass
 
     @abstractmethod
     def get_by_date_range(self, start_date: date, end_date: date) -> list[JournalEntry]:
@@ -105,7 +99,6 @@ class IJournalRepository(ABC):
         Returns:
             List of JournalEntry domain models
         """
-        pass
 
     @abstractmethod
     def update(self, entry_id: str, entry: JournalEntry) -> bool:
@@ -122,7 +115,6 @@ class IJournalRepository(ABC):
             ValidationError: If entry data is invalid
             DatabaseError: If update fails
         """
-        pass
 
     @abstractmethod
     def delete(self, entry_id: str) -> bool:
@@ -137,4 +129,3 @@ class IJournalRepository(ABC):
         Raises:
             DatabaseError: If deletion fails
         """
-        pass

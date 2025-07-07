@@ -81,7 +81,6 @@ class TestCompositionRoot:
         # Act
 
         # Assert
-        pass
 
     def test_complete_object_graph_wiring(self) -> None:
         """Should wire complete dependency chain correctly."""
@@ -90,7 +89,6 @@ class TestCompositionRoot:
         # Act - resolve top-level component
 
         # Assert - verify entire chain is wired
-        pass
 
     def test_singleton_configuration(self) -> None:
         """Should configure singleton lifetimes correctly."""
@@ -135,7 +133,6 @@ class TestCompositionRootConfiguration:
         # Act
 
         # Assert
-        pass
 
     def test_configure_with_custom_config(self) -> None:
         """Should allow custom configuration overrides."""
@@ -144,7 +141,6 @@ class TestCompositionRootConfiguration:
         # Act
 
         # Assert
-        pass
 
     def test_register_additional_services(self) -> None:
         """Should allow registering additional services."""
@@ -153,7 +149,6 @@ class TestCompositionRootConfiguration:
         # Act
 
         # Assert
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -163,13 +158,11 @@ class TestBootstrapIntegration:
     def test_bootstrap_app_with_di(self) -> None:
         """Should bootstrap complete application with DI."""
         # This tests the main app.py integration point
-        pass
 
     def test_fastapi_integration_ready(self) -> None:
         """Should provide components ready for FastAPI integration."""
         # Test that service can be used in FastAPI context
         # This validates the wiring is correct for actual usage
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -180,14 +173,11 @@ class TestCompositionRootErrorHandling:
         """Should handle missing database file gracefully."""
         # Test what happens when database file doesn't exist
         # Should either create it or give clear error
-        pass
 
     def test_invalid_configuration_handling(self) -> None:
         """Should validate configuration and give clear errors."""
         # Test invalid database paths, missing permissions, etc.
-        pass
 
     def test_partial_registration_failure(self) -> None:
         """Should handle partial registration failures clearly."""
         # Test what happens if some registrations fail
-        pass

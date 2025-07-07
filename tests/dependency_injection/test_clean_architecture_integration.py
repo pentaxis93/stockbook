@@ -25,19 +25,14 @@ class TestCleanArchitectureWiring:
         # Infrastructure should only depend on domain/application interfaces
         # Presentation should only depend on application layer
 
-        pass
-
     def test_interface_segregation(self) -> None:
         """Should wire interfaces correctly, not concrete types."""
         # Application service should depend on IUnitOfWork, not SQLiteUnitOfWork
-        pass
 
     def test_domain_isolation(self) -> None:
         """Should ensure domain layer has no external dependencies."""
         # Domain entities should be created without DI container
         # They should not depend on infrastructure or presentation
-
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -52,7 +47,6 @@ class TestEndToEndWorkflow:
         # Act - simulate stock creation workflow
 
         # Assert
-        pass
 
     @patch("infrastructure.persistence.database_connection.DatabaseConnection")
     def test_stock_list_workflow(self, mock_db: Mock) -> None:
@@ -62,14 +56,12 @@ class TestEndToEndWorkflow:
         # Act
 
         # Assert
-        pass
 
     def test_error_propagation_through_layers(self) -> None:
         """Should properly propagate errors through all layers."""
         # Test that domain validation errors bubble up correctly
         # Test that infrastructure errors are handled appropriately
         # Test that presentation layer gets meaningful error messages
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -79,12 +71,8 @@ class TestLayerIsolationTesting:
     def test_mock_infrastructure_layer(self) -> None:
         """Should allow mocking infrastructure layer for testing."""
 
-        pass
-
     def test_mock_application_layer(self) -> None:
         """Should allow mocking application layer for presentation testing."""
-
-        pass
 
     def test_integration_test_configuration(self) -> None:
         """Should support integration test configuration."""
@@ -92,7 +80,6 @@ class TestLayerIsolationTesting:
         # with real database but isolated from production data
 
         # Should work with in-memory database for testing
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -102,16 +89,13 @@ class TestPerformanceWithDI:
     def test_resolution_performance(self) -> None:
         """Should resolve dependencies quickly."""
         # Resolution should be fast (< 1ms per resolution)
-        pass
 
     def test_memory_usage(self) -> None:
         """Should not cause memory leaks."""
         # Test that repeated resolutions don't accumulate memory
         # Test that singletons are properly reused
         # Test that transients are garbage collected
-        pass
 
     def test_singleton_creation_overhead(self) -> None:
         """Should create singletons only once."""
         # Track creation calls to ensure singletons created once
-        pass

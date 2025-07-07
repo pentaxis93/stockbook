@@ -22,13 +22,9 @@ from typing import Any
 class ConfigError(Exception):
     """Base exception for configuration errors."""
 
-    pass
-
 
 class ValidationError(ConfigError):
     """Exception raised when configuration validation fails."""
-
-    pass
 
 
 class Config:

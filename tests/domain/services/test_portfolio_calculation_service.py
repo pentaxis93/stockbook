@@ -91,8 +91,6 @@ class TestPortfolioValueCalculations:
     def test_calculate_portfolio_with_different_currencies(self) -> None:
         """Should handle multi-currency portfolios."""
 
-        pass
-
     def test_calculate_portfolio_value_with_zero_positions(self) -> None:
         """Should handle empty portfolio."""
         service = PortfolioCalculationService()
@@ -398,8 +396,6 @@ class TestPortfolioAllocationAnalysis:
     def test_identify_concentration_risks(self) -> None:
         """Should identify positions that are overly concentrated."""
 
-        pass
-
 
 @pytest.mark.skip(reason="TDD - implementation pending")
 class TestPortfolioPerformanceMetrics:
@@ -408,12 +404,8 @@ class TestPortfolioPerformanceMetrics:
     def test_calculate_portfolio_risk_metrics(self) -> None:
         """Should calculate comprehensive risk metrics."""
 
-        pass
-
     def test_calculate_growth_vs_value_allocation(self) -> None:
         """Should analyze growth vs value stock allocation."""
-
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -423,17 +415,11 @@ class TestPortfolioRebalancingAnalysis:
     def test_suggest_rebalancing_for_overweight_positions(self) -> None:
         """Should suggest rebalancing when positions become overweight."""
 
-        pass
-
     def test_calculate_rebalancing_trades(self) -> None:
         """Should calculate specific trades needed for rebalancing."""
 
-        pass
-
     def test_calculate_tax_efficient_rebalancing(self) -> None:
         """Should consider tax implications in rebalancing suggestions."""
-
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -443,12 +429,8 @@ class TestPortfolioReporting:
     def test_generate_allocation_report(self) -> None:
         """Should generate detailed allocation breakdown report."""
 
-        pass
-
     def test_generate_performance_metrics_report(self) -> None:
         """Should generate performance and risk metrics report."""
-
-        pass
 
 
 @pytest.mark.skip(reason="TDD - implementation pending")
@@ -458,14 +440,8 @@ class TestPortfolioCalculationServiceConfiguration:
     def test_service_with_custom_calculation_rules(self) -> None:
         """Should allow custom calculation rule configuration."""
 
-        pass
-
     def test_handle_calculation_errors_gracefully(self) -> None:
         """Should handle edge cases and errors gracefully."""
 
-        pass
-
     def test_service_performance_with_large_portfolios(self) -> None:
         """Should handle large portfolios efficiently."""
-
-        pass

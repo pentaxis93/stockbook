@@ -281,7 +281,6 @@ class UpdateStockCommand:
     def _validate_name(name: str | None) -> None:
         """Validate company name."""
         # Name is now optional, so no validation needed
-        pass
 
     @staticmethod
     def _validate_grade(grade: str | None) -> None:

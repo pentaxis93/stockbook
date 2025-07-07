@@ -26,7 +26,6 @@ class IPortfolioBalanceRepository(ABC):
             ValidationError: If balance data is invalid
             DatabaseError: If operation fails
         """
-        pass
 
     @abstractmethod
     def get_by_id(self, balance_id: str) -> PortfolioBalance | None:
@@ -38,7 +37,6 @@ class IPortfolioBalanceRepository(ABC):
         Returns:
             PortfolioBalance domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_by_portfolio_and_date(
@@ -53,7 +51,6 @@ class IPortfolioBalanceRepository(ABC):
         Returns:
             PortfolioBalance domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_history(
@@ -68,7 +65,6 @@ class IPortfolioBalanceRepository(ABC):
         Returns:
             List of PortfolioBalance domain models, ordered by date (newest first)
         """
-        pass
 
     @abstractmethod
     def get_latest_balance(self, portfolio_id: str) -> PortfolioBalance | None:
@@ -80,4 +76,3 @@ class IPortfolioBalanceRepository(ABC):
         Returns:
             Latest PortfolioBalance domain model or None if not found
         """
-        pass

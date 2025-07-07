@@ -10,8 +10,6 @@ from typing import Any
 class DependencyInjectionError(Exception):
     """Base exception for all dependency injection errors."""
 
-    pass
-
 
 class DependencyResolutionError(DependencyInjectionError):
     """Raised when a dependency cannot be resolved."""

@@ -26,7 +26,6 @@ class IStockRepository(ABC):
             ValidationError: If stock data is invalid
             DatabaseError: If creation fails
         """
-        pass
 
     @abstractmethod
     def get_by_id(self, stock_id: str) -> Stock | None:
@@ -38,7 +37,6 @@ class IStockRepository(ABC):
         Returns:
             Stock domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_by_symbol(self, symbol: StockSymbol) -> Stock | None:
@@ -50,7 +48,6 @@ class IStockRepository(ABC):
         Returns:
             Stock domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_all(self) -> list[Stock]:
@@ -59,7 +56,6 @@ class IStockRepository(ABC):
         Returns:
             List of Stock domain models
         """
-        pass
 
     @abstractmethod
     def update(self, stock_id: str, stock: Stock) -> bool:
@@ -76,7 +72,6 @@ class IStockRepository(ABC):
             ValidationError: If stock data is invalid
             DatabaseError: If update fails
         """
-        pass
 
     @abstractmethod
     def delete(self, stock_id: str) -> bool:
@@ -92,7 +87,6 @@ class IStockRepository(ABC):
             BusinessLogicError: If stock has dependent records
             DatabaseError: If deletion fails
         """
-        pass
 
     @abstractmethod
     def exists_by_symbol(self, symbol: StockSymbol) -> bool:
@@ -104,7 +98,6 @@ class IStockRepository(ABC):
         Returns:
             True if stock exists, False otherwise
         """
-        pass
 
     @abstractmethod
     def search_stocks(
@@ -125,4 +118,3 @@ class IStockRepository(ABC):
         Returns:
             List of Stock domain models matching the criteria
         """
-        pass

@@ -19,8 +19,6 @@ if TYPE_CHECKING:
 class MockService:
     """Mock service for testing."""
 
-    pass
-
 
 def test_non_callable_factory_error() -> None:
     """Should raise error when factory is not callable."""

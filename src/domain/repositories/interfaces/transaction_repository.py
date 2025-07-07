@@ -27,7 +27,6 @@ class ITransactionRepository(ABC):
             BusinessLogicError: If transaction violates business rules
             DatabaseError: If creation fails
         """
-        pass
 
     @abstractmethod
     def get_by_id(self, transaction_id: str) -> Transaction | None:
@@ -39,7 +38,6 @@ class ITransactionRepository(ABC):
         Returns:
             Transaction domain model or None if not found
         """
-        pass
 
     @abstractmethod
     def get_by_portfolio(
@@ -54,7 +52,6 @@ class ITransactionRepository(ABC):
         Returns:
             List of Transaction domain models, ordered by date (newest first)
         """
-        pass
 
     @abstractmethod
     def get_by_stock(
@@ -69,7 +66,6 @@ class ITransactionRepository(ABC):
         Returns:
             List of Transaction domain models
         """
-        pass
 
     @abstractmethod
     def get_by_date_range(
@@ -85,7 +81,6 @@ class ITransactionRepository(ABC):
         Returns:
             List of Transaction domain models
         """
-        pass
 
     @abstractmethod
     def update(self, transaction_id: str, transaction: Transaction) -> bool:
@@ -103,7 +98,6 @@ class ITransactionRepository(ABC):
             BusinessLogicError: If update violates business rules
             DatabaseError: If update fails
         """
-        pass
 
     @abstractmethod
     def delete(self, transaction_id: str) -> bool:
@@ -118,4 +112,3 @@ class ITransactionRepository(ABC):
         Raises:
             DatabaseError: If deletion fails
         """
-        pass
