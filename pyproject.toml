@@ -18,6 +18,7 @@ select = [
   "FURB",  # refurb (modernize Python code)
   "I",     # isort (import sorting)
   "LOG",   # flake8-logging (logging best practices)
+  "N",     # pep8-naming (naming conventions)
   "PERF",  # Perflint (performance anti-patterns)
   "PLC",   # Pylint Convention rules
   "PLE",   # Pylint Error rules

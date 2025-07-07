@@ -332,8 +332,8 @@ class TestSqlAlchemyUnitOfWorkTransactionMethods:
         # Use the unit of work in context manager to test commit
         with patch(
             "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection"
-        ) as MockConn:
-            MockConn.return_value = mock_db_connection
+        ) as mock_conn:
+            mock_conn.return_value = mock_db_connection
             mock_connection.__exit__ = Mock(return_value=None)
 
             with uow:
@@ -359,8 +359,8 @@ class TestSqlAlchemyUnitOfWorkTransactionMethods:
         # Use the unit of work in context manager to test rollback
         with patch(
             "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection"
-        ) as MockConn:
-            MockConn.return_value = mock_db_connection
+        ) as mock_conn:
+            mock_conn.return_value = mock_db_connection
             mock_connection.__exit__ = Mock(return_value=None)
 
             with uow:
@@ -477,9 +477,9 @@ class TestSqlAlchemyUnitOfWorkErrorHandling:
         # Act & Assert
         with patch(
             "src.infrastructure.persistence.unit_of_work.SqlAlchemyConnection"
-        ) as MockConn:
+        ) as mock_conn:
             mock_db_connection = Mock(spec=SqlAlchemyConnection)
-            MockConn.return_value = mock_db_connection
+            mock_conn.return_value = mock_db_connection
 
             with uow:
                 with pytest.raises(
