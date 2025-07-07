@@ -54,10 +54,11 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
         fastapi_app.state.di_container = di_container
         logger.info("Dependency injection configured")
 
-    except Exception as e:  # pylint: disable=broad-exception-caught
-        # Rationale: We catch all exceptions during startup to ensure the application
-        # can start even if database initialization fails. This allows for graceful
-        # degradation and debugging of initialization issues.
+    except (ValueError, TypeError, OSError, RuntimeError) as e:
+        # These are the exceptions that could be raised during database initialization:
+        # - ValueError/TypeError from database_factory validation
+        # - OSError from file system operations
+        # - RuntimeError from SQLAlchemy configuration issues
         logger.error("Database initialization failed: %s", str(e))
         logger.warning("Application starting without database initialization")
 

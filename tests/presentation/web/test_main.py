@@ -82,7 +82,7 @@ class TestMainApp:
         the app."""
         with patch("src.presentation.web.main.initialize_database") as mock_init:
             # Make the initializer raise an exception
-            mock_init.side_effect = Exception("Database connection failed")
+            mock_init.side_effect = RuntimeError("Database connection failed")
 
             # Import should still succeed
             from src.presentation.web.main import app

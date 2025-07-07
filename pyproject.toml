@@ -11,6 +11,7 @@ select = [
   "ANN",   # flake8-annotations (type annotations)
   "ARG",   # flake8-unused-arguments (unused arguments)
   "B",     # flake8-bugbear (common bugs)
+  "BLE",   # flake8-blind-except (blind except)
   "C",     # flake8-comprehensions (list/dict/set comprehensions)
   "COM",   # flake8-commas (trailing commas)
   "D",     # pydocstyle (docstring checks)
