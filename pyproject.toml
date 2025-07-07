@@ -34,6 +34,7 @@ select = [
   "RSE",   # flake8-raise (raise Exception)
   "RUF",   # Ruff-specific rules
   "S",     # flake8-bandit (security)
+  "T",     # flake8-print (print statements)
   "SIM",   # flake8-simplify (code simplification)
   "SLF",   # flake8-self (private member access)
   "TCH",   # flake8-type-checking (type checking imports)

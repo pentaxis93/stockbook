@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Unified quality check script for the project."""
 
+import logging
 import subprocess
 import sys
 
@@ -12,28 +13,45 @@ YELLOW = "\033[1;33m"
 NC = "\033[0m"  # No Color
 
 
+# Configure logging with color support
+class ColoredFormatter(logging.Formatter):
+    """Custom formatter that preserves color codes."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format the log record without stripping color codes."""
+        return record.getMessage()
+
+
+# Set up logger
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler(sys.stdout)
+handler.setFormatter(ColoredFormatter())
+logger.addHandler(handler)
+
+
 def run_command(cmd: list[str], description: str) -> tuple[int, str]:
     """Run a command and return its exit code and output."""
-    print(f"\n{BLUE}[{description}] Running...{NC}")
+    logger.info("\n%s[%s] Running...%s", BLUE, description, NC)
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
         if result.returncode == 0:
-            print(f"{GREEN}[{description}] ✓ Passed{NC}")
+            logger.info("%s[%s] ✓ Passed%s", GREEN, description, NC)
         else:
-            print(f"{RED}[{description}] ✗ Failed{NC}")
+            logger.error("%s[%s] ✗ Failed%s", RED, description, NC)
             if result.stdout:
-                print(result.stdout)
+                logger.error(result.stdout)
             if result.stderr:
-                print(result.stderr)
+                logger.error(result.stderr)
         return result.returncode, result.stdout + result.stderr
     except Exception as e:
-        print(f"{RED}[{description}] ✗ Error: {e}{NC}")
+        logger.error("%s[%s] ✗ Error: %s%s", RED, description, e, NC)
         return 1, str(e)
 
 
 def main() -> None:
     """Run all quality checks."""
-    print(f"{YELLOW}Running all quality checks...{NC}")
+    logger.info("%sRunning all quality checks...%s", YELLOW, NC)
 
     # Define all checks in order
     checks = [
@@ -75,12 +93,12 @@ def main() -> None:
             failed = True
 
     # Final result
-    print()
+    logger.info("")
     if failed:
-        print(f"{RED}❌ One or more quality checks failed{NC}")
+        logger.error("%s❌ One or more quality checks failed%s", RED, NC)
         sys.exit(1)
     else:
-        print(f"{GREEN}✅ All quality checks passed!{NC}")
+        logger.info("%s✅ All quality checks passed!%s", GREEN, NC)
         sys.exit(0)
 
 

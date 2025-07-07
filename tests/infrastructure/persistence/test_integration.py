@@ -97,9 +97,7 @@ class TestUnitOfWorkIntegration:
         # Act
         try:
             stock_dto = stock_service.create_stock(command)
-            print(f"Stock DTO created: {stock_dto}")
-        except Exception as e:
-            print(f"Error creating stock: {e}")
+        except Exception:
             raise
 
         # Assert - Verify stock was returned
