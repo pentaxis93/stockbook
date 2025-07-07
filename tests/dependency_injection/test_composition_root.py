@@ -7,8 +7,6 @@ our clean architecture layers together.
 
 from unittest.mock import patch
 
-import pytest
-
 # These imports now exist after implementation
 from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
@@ -122,62 +120,3 @@ class TestCompositionRoot:
         # Assert - services and UoW should be transient
         assert service1 is not service2
         assert uow1 is not uow2
-
-
-@pytest.mark.skip(reason="TDD - implementation pending")
-class TestCompositionRootConfiguration:
-    """Test configuration options and customization."""
-
-    def test_configure_with_test_database(self) -> None:
-        """Should allow configuration with test database."""
-        # Act
-
-        # Assert
-
-    def test_configure_with_custom_config(self) -> None:
-        """Should allow custom configuration overrides."""
-        # Arrange
-
-        # Act
-
-        # Assert
-
-    def test_register_additional_services(self) -> None:
-        """Should allow registering additional services."""
-        # Arrange
-
-        # Act
-
-        # Assert
-
-
-@pytest.mark.skip(reason="TDD - implementation pending")
-class TestBootstrapIntegration:
-    """Test integration with application bootstrap."""
-
-    def test_bootstrap_app_with_di(self) -> None:
-        """Should bootstrap complete application with DI."""
-        # This tests the main app.py integration point
-
-    def test_fastapi_integration_ready(self) -> None:
-        """Should provide components ready for FastAPI integration."""
-        # Test that service can be used in FastAPI context
-        # This validates the wiring is correct for actual usage
-
-
-@pytest.mark.skip(reason="TDD - implementation pending")
-class TestCompositionRootErrorHandling:
-    """Test error handling in composition root."""
-
-    def test_missing_database_file_handling(self) -> None:
-        """Should handle missing database file gracefully."""
-        # Test what happens when database file doesn't exist
-        # Should either create it or give clear error
-
-    def test_invalid_configuration_handling(self) -> None:
-        """Should validate configuration and give clear errors."""
-        # Test invalid database paths, missing permissions, etc.
-
-    def test_partial_registration_failure(self) -> None:
-        """Should handle partial registration failures clearly."""
-        # Test what happens if some registrations fail
