@@ -20,6 +20,7 @@ select = [
   "G",     # flake8-logging-format (logging format)
   "I",     # isort (import sorting)
   "ICN",   # flake8-import-conventions (import conventions)
+  "INP",   # flake8-no-pep420 (module imports)
   "LOG",   # flake8-logging (logging best practices)
   "N",     # pep8-naming (naming conventions)
   "PERF",  # Perflint (performance anti-patterns)
