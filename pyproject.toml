@@ -179,12 +179,33 @@ reportImplicitStringConcatenation = true
 [tool.importlinter]
 root_package = "src"
 
+# Contract 1: Domain layer must be completely independent
 [[tool.importlinter.contracts]]
 name = "Domain layer independence"
 type = "independence"
 modules = ["src.domain"]
 
+# Contract 2: Enforce layered architecture dependencies
 [[tool.importlinter.contracts]]
 name = "Layered architecture"
 type = "layers"
-layers = ["src.infrastructure", "src.application", "src.domain"]
+layers = [
+  "src.presentation",
+  "src.infrastructure",
+  "src.application",
+  "src.domain",
+]
+
+# Contract 3: Application layer should not depend on infrastructure
+[[tool.importlinter.contracts]]
+name = "Application layer independence from infrastructure"
+type = "forbidden"
+source_modules = ["src.application"]
+forbidden_modules = ["src.infrastructure"]
+
+# Contract 4: Application layer should not depend on presentation
+[[tool.importlinter.contracts]]
+name = "Application layer independence from presentation"
+type = "forbidden"
+source_modules = ["src.application"]
+forbidden_modules = ["src.presentation"]
