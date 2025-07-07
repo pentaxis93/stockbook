@@ -39,6 +39,11 @@ test: ## Run all tests, quality checks, and coverage (blocks on any failure)
 	@echo "$(BLUE)Running all tests and quality checks...$(NC)"
 	$(PYTHON) scripts/test_all.py
 
+.PHONY: run
+run: ## Run the development server with auto-reload
+	@echo "$(BLUE)Starting development server...$(NC)"
+	uvicorn src.presentation.web.main:app --reload --host 0.0.0.0 --port 8000
+
 .PHONY: clean
 clean: ## Remove generated files and caches
 	@echo "$(BLUE)Cleaning up generated files...$(NC)"
