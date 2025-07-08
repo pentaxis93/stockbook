@@ -189,13 +189,15 @@ include_external_packages = true
 # development (TDD) practices.
 #
 # Contract Organization:
-# 1. Core Architecture - Fundamental layered architecture rules
-# 2. Domain Layer - Domain purity and internal structure
-# 3. Application Layer - Use cases and application services
-# 4. Infrastructure Layer - External concerns and implementations
-# 5. Presentation Layer - User interface and external APIs
-# 6. Cross-Cutting Concerns - Patterns that span multiple layers
-# 7. Test Organization - Testing structure and boundaries
+# 1. Core Architecture - Fundamental layered architecture rules (Contracts 1-4)
+# 2. Domain Layer - Domain purity and internal structure (Contracts 5-13)
+# 3. Application Layer - Use cases and application services (Contracts 14-18, 20)
+# 4. Infrastructure Layer - External concerns and implementations (Contracts 21)
+# 5. Presentation Layer - User interface and external APIs (Contracts 22)
+# 6. Cross-Cutting Concerns - Patterns that span multiple layers (Contracts 23)
+# 7. Test Organization - Testing structure and boundaries (Contracts 24)
+#
+# Total: 24 enforced contracts (removed 4 placeholder/informational contracts)
 # ================================================================================
 
 # ===== 1. CORE ARCHITECTURE CONTRACTS =====
@@ -326,10 +328,6 @@ modules = [
   "src.domain.services.risk_assessment_service",
 ]
 
-# Contract 11: Validation services independence
-# Note: This contract is reserved for future validation services.
-# When validation services are added, they should not depend on other
-# domain services to ensure validation logic remains pure and reusable.
 
 # Contract 12: Aggregate root boundaries
 # Entities should not directly reference other aggregate roots.
@@ -406,11 +404,6 @@ name = "Application services independence"
 type = "independence"
 modules = ["src.application.services"]
 
-# Contract 19: Interface segregation in application layer
-# Note: Application interfaces may legitimately import command types for
-# method signatures in CQRS patterns. This is acceptable as interfaces
-# define contracts that include command parameters. The restriction is
-# on implementation details, not type definitions.
 
 # Contract 20: Commands should not directly use DTOs
 # Commands should work with domain objects rather than DTOs to maintain
@@ -455,14 +448,8 @@ source_modules = [
 ]
 forbidden_modules = ["src.infrastructure.repositories"]
 
-# Contract 24: Repository implementations can use persistence
-# Repository implementations are allowed to use persistence components
-# as they need database access. This is a legitimate dependency.
-# Note: This contract is informational and doesn't restrict anything.
-# The restriction is handled by other contracts preventing other layers
-# from accessing infrastructure directly.
 
-# Contract 25: Repository implementations stay in infrastructure
+# Contract 21: Repository implementations stay in infrastructure
 # Repository implementations should not be used outside of infrastructure
 # except through proper dependency injection.
 [[tool.importlinter.contracts]]
@@ -478,7 +465,7 @@ forbidden_modules = ["src.infrastructure.repositories"]
 # ===== 5. PRESENTATION LAYER CONTRACTS =====
 # These contracts ensure proper presentation layer organization and boundaries.
 
-# Contract 26: Presentation must not use repositories directly
+# Contract 22: Presentation must not use repositories directly
 # Presentation should only use application services, not repositories.
 # This ensures proper layering and separation of concerns.
 [[tool.importlinter.contracts]]
@@ -493,7 +480,7 @@ forbidden_modules = [
 # ===== 6. CROSS-CUTTING CONCERNS =====
 # These contracts handle patterns that span multiple layers.
 
-# Contract 27: Domain events stay in domain and application
+# Contract 23: Domain events stay in domain and application
 # Domain events should only be used by domain and application layers.
 # Infrastructure and presentation should not directly handle domain events.
 [[tool.importlinter.contracts]]
@@ -508,7 +495,7 @@ forbidden_modules = ["src.domain.events"]
 # ===== 7. TEST ORGANIZATION CONTRACTS =====
 # These contracts ensure proper test organization and boundaries.
 
-# Contract 28: Source code independence from tests
+# Contract 24: Source code independence from tests
 # Source code should never import from test modules. This prevents
 # test code from becoming part of the production codebase.
 [[tool.importlinter.contracts]]
@@ -517,8 +504,3 @@ type = "forbidden"
 source_modules = ["src"]
 forbidden_modules = ["tests", "fixtures"]
 
-# Contract 29: Domain tests should use only domain code
-# Note: This contract is documented but cannot be enforced since tests
-# are outside the root_package scope. Consider manual review during PR.
-# Domain tests should only import from src.domain to ensure they test
-# domain logic in isolation without external dependencies.
