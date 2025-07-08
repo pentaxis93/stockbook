@@ -180,15 +180,39 @@ reportImplicitStringConcatenation = true
 root_package = "src"
 include_external_packages = true
 
-# ===== CORE ARCHITECTURE CONTRACTS =====
+# ================================================================================
+# IMPORT LINTER CONTRACTS FOR CLEAN ARCHITECTURE, DDD, AND TDD
+# ================================================================================
+# 
+# This configuration enforces architectural boundaries and dependencies to maintain
+# clean architecture principles, domain-driven design (DDD), and test-driven
+# development (TDD) practices.
+#
+# Contract Organization:
+# 1. Core Architecture - Fundamental layered architecture rules
+# 2. Domain Layer - Domain purity and internal structure
+# 3. Application Layer - Use cases and application services
+# 4. Infrastructure Layer - External concerns and implementations
+# 5. Presentation Layer - User interface and external APIs
+# 6. Cross-Cutting Concerns - Patterns that span multiple layers
+# 7. Test Organization - Testing structure and boundaries
+# ================================================================================
+
+# ===== 1. CORE ARCHITECTURE CONTRACTS =====
+# These contracts establish the fundamental layered architecture and ensure
+# proper dependency direction from outer layers to inner layers.
 
 # Contract 1: Domain layer must be completely independent
+# The domain layer is the core of the application and should have no dependencies
+# on any other layer. This ensures the business logic remains pure and testable.
 [[tool.importlinter.contracts]]
 name = "Domain layer independence"
 type = "independence"
 modules = ["src.domain"]
 
 # Contract 2: Enforce layered architecture dependencies
+# Establishes the onion architecture with proper dependency direction:
+# Presentation → Infrastructure → Application → Domain
 [[tool.importlinter.contracts]]
 name = "Layered architecture"
 type = "layers"
@@ -199,23 +223,31 @@ layers = [
   "src.domain",
 ]
 
-# Contract 3: Application layer should not depend on infrastructure
+# Contract 3: Application layer independence from infrastructure
+# Application layer should not depend on infrastructure implementations.
+# This enables easier testing and allows infrastructure to be swapped out.
 [[tool.importlinter.contracts]]
 name = "Application layer independence from infrastructure"
 type = "forbidden"
 source_modules = ["src.application"]
 forbidden_modules = ["src.infrastructure"]
 
-# Contract 4: Application layer should not depend on presentation
+# Contract 4: Application layer independence from presentation
+# Application layer should not depend on presentation concerns.
+# This ensures use cases are independent of delivery mechanisms.
 [[tool.importlinter.contracts]]
 name = "Application layer independence from presentation"
 type = "forbidden"
 source_modules = ["src.application"]
 forbidden_modules = ["src.presentation"]
 
-# ===== DOMAIN PURITY CONTRACTS =====
+# ===== 2. DOMAIN LAYER CONTRACTS =====
+# These contracts ensure domain purity and proper internal structure
+# following domain-driven design principles.
 
-# Contract 5: Domain should not use external libraries directly
+# Contract 5: Domain purity - no framework dependencies
+# Domain should not use external libraries directly to maintain purity
+# and ensure business logic is not coupled to technical concerns.
 [[tool.importlinter.contracts]]
 name = "Domain purity - no framework dependencies"
 type = "forbidden"
@@ -243,32 +275,9 @@ forbidden_modules = [
   "dependency_injection",
 ]
 
-# ===== APPLICATION LAYER CONTRACTS =====
-
-# Contract 6: Application must not import concrete repositories from infrastructure
-[[tool.importlinter.contracts]]
-name = "Application uses repository interfaces only"
-type = "forbidden"
-source_modules = ["src.application"]
-forbidden_modules = ["src.infrastructure.repositories"]
-# Application should depend on domain interfaces, not infrastructure implementations
-
-# ===== PRESENTATION LAYER CONTRACTS =====
-
-# Contract 7: Presentation must not import repositories directly
-[[tool.importlinter.contracts]]
-name = "Presentation must not use repositories directly"
-type = "forbidden"
-source_modules = ["src.presentation"]
-forbidden_modules = [
-  "src.domain.repositories",
-  "src.infrastructure.repositories",
-]
-# Presentation should only use application services, not repositories
-
-# ===== DOMAIN INTERNAL STRUCTURE CONTRACTS =====
-
-# Contract 8: Value objects must be independent (foundation layer)
+# Contract 6: Value objects independence (foundation layer)
+# Value objects are the foundation of the domain and should not depend
+# on entities, services, or repositories. They represent immutable concepts.
 [[tool.importlinter.contracts]]
 name = "Value objects independence"
 type = "forbidden"
@@ -279,15 +288,36 @@ forbidden_modules = [
   "src.domain.repositories",
 ]
 
-# Contract 9: Entities can only depend on value objects
+# Contract 7: Entities only use value objects
+# Entities can use value objects but should not depend on services
+# or repositories to maintain proper layering within the domain.
 [[tool.importlinter.contracts]]
 name = "Entities only use value objects"
 type = "forbidden"
 source_modules = ["src.domain.entities"]
 forbidden_modules = ["src.domain.services", "src.domain.repositories"]
-# Entities can use value objects, but not services or repositories
 
-# Contract 10: Services should not have circular dependencies with each other
+# Contract 8: Entity independence from services
+# Entities should not depend on domain services. Services should
+# operate on entities, not the other way around.
+[[tool.importlinter.contracts]]
+name = "Entity independence from services"
+type = "forbidden"
+source_modules = ["src.domain.entities"]
+forbidden_modules = ["src.domain.services"]
+
+# Contract 9: Repository interfaces independence
+# Repository interfaces should not depend on domain services.
+# They define contracts for persistence without business logic.
+[[tool.importlinter.contracts]]
+name = "Repository interfaces independence"
+type = "forbidden"
+source_modules = ["src.domain.repositories"]
+forbidden_modules = ["src.domain.services"]
+
+# Contract 10: No circular dependencies between domain services
+# Domain services should not have circular dependencies with each other.
+# This prevents complex coupling and ensures clear service boundaries.
 [[tool.importlinter.contracts]]
 name = "No circular dependencies between domain services"
 type = "independence"
@@ -295,46 +325,31 @@ modules = [
   "src.domain.services.portfolio_calculation_service",
   "src.domain.services.risk_assessment_service",
 ]
-# List specific service modules to prevent circular deps between services
 
-# Contract 11: Repository interfaces should not depend on services
+# ===== 3. APPLICATION LAYER CONTRACTS =====
+# These contracts ensure proper use case implementation and CQRS patterns.
+
+# Contract 11: Application uses repository interfaces only
+# Application should depend on domain interfaces, not infrastructure
+# implementations. This enables dependency inversion and easier testing.
 [[tool.importlinter.contracts]]
-name = "Repository interfaces independence"
+name = "Application uses repository interfaces only"
 type = "forbidden"
-source_modules = ["src.domain.repositories"]
-forbidden_modules = ["src.domain.services"]
-# Repository interfaces can use entities and value objects, but not services
+source_modules = ["src.application"]
+forbidden_modules = ["src.infrastructure.repositories"]
 
-# Contract 12: Entities should not depend on services
-[[tool.importlinter.contracts]]
-name = "Entity independence from services"
-type = "forbidden"
-source_modules = ["src.domain.entities"]
-forbidden_modules = ["src.domain.services"]
-
-# ===== TEST ORGANIZATION CONTRACTS =====
-
-# Contract 13: Source code should not import from tests
-[[tool.importlinter.contracts]]
-name = "Source code independence from tests"
-type = "forbidden"
-source_modules = ["src"]
-forbidden_modules = ["tests", "fixtures"]
-
-# Contract 14: Domain tests should use only domain code
-# Note: This contract is documented but cannot be enforced since tests
-# are outside the root_package scope. Consider manual review during PR.
-
-# ===== CQRS AND COMMAND PATTERN CONTRACTS =====
-
-# Contract 15: DTOs should not be used in domain layer
+# Contract 12: Domain independence from DTOs
+# Domain should not depend on application DTOs. DTOs are for data transfer
+# between layers, not for domain logic.
 [[tool.importlinter.contracts]]
 name = "Domain independence from DTOs"
 type = "forbidden"
 source_modules = ["src.domain"]
 forbidden_modules = ["src.application.dto"]
 
-# Contract 16: Commands should not directly access repositories
+# Contract 13: Commands use services not repositories
+# Commands should work through domain services rather than directly
+# accessing repositories. This ensures business logic stays in domain.
 [[tool.importlinter.contracts]]
 name = "Commands use services not repositories"
 type = "forbidden"
@@ -344,7 +359,9 @@ forbidden_modules = [
   "src.infrastructure.repositories",
 ]
 
-# Contract 17: Domain and infrastructure should not use commands
+# Contract 14: Commands not used in domain or infrastructure
+# Commands are application-layer concerns and should not be used
+# in domain or infrastructure layers.
 [[tool.importlinter.contracts]]
 name = "Commands not used in domain or infrastructure"
 type = "forbidden"
@@ -353,24 +370,63 @@ source_modules = [
   "src.infrastructure",
 ]
 forbidden_modules = ["src.application.commands"]
-# Presentation can use commands to create them for the application layer
 
-# ===== EVENT-DRIVEN ARCHITECTURE CONTRACTS =====
+# ===== 4. INFRASTRUCTURE LAYER CONTRACTS =====
+# These contracts ensure proper infrastructure organization and boundaries.
 
-# Contract 18: Domain events should stay within domain layer
+# Contract 15: Infrastructure cannot raise domain events
+# Infrastructure should not raise domain events directly. Events should
+# be raised by domain entities or services.
 [[tool.importlinter.contracts]]
-name = "Domain events stay in domain"
+name = "Infrastructure cannot raise domain events"
+type = "forbidden"
+source_modules = ["src.infrastructure"]
+forbidden_modules = ["src.domain.events"]
+
+# ===== 5. PRESENTATION LAYER CONTRACTS =====
+# These contracts ensure proper presentation layer organization and boundaries.
+
+# Contract 16: Presentation must not use repositories directly
+# Presentation should only use application services, not repositories.
+# This ensures proper layering and separation of concerns.
+[[tool.importlinter.contracts]]
+name = "Presentation must not use repositories directly"
+type = "forbidden"
+source_modules = ["src.presentation"]
+forbidden_modules = [
+  "src.domain.repositories",
+  "src.infrastructure.repositories",
+]
+
+# ===== 6. CROSS-CUTTING CONCERNS =====
+# These contracts handle patterns that span multiple layers.
+
+# Contract 17: Domain events stay in domain and application
+# Domain events should only be used by domain and application layers.
+# Infrastructure and presentation should not directly handle domain events.
+[[tool.importlinter.contracts]]
+name = "Domain events stay in domain and application"
 type = "forbidden"
 source_modules = [
   "src.infrastructure",
   "src.presentation",
 ]
 forbidden_modules = ["src.domain.events"]
-# Only domain and application layers should work with domain events
 
-# Contract 19: Infrastructure should not raise domain events
+# ===== 7. TEST ORGANIZATION CONTRACTS =====
+# These contracts ensure proper test organization and boundaries.
+
+# Contract 18: Source code independence from tests
+# Source code should never import from test modules. This prevents
+# test code from becoming part of the production codebase.
 [[tool.importlinter.contracts]]
-name = "Infrastructure cannot raise domain events"
+name = "Source code independence from tests"
 type = "forbidden"
-source_modules = ["src.infrastructure"]
-forbidden_modules = ["src.domain.events"]
+source_modules = ["src"]
+forbidden_modules = ["tests", "fixtures"]
+
+# Contract 19: Domain tests should use only domain code
+# Note: This contract is documented but cannot be enforced since tests
+# are outside the root_package scope. Consider manual review during PR.
+# Domain tests should only import from src.domain to ensure they test
+# domain logic in isolation without external dependencies.
