@@ -312,3 +312,17 @@ type = "forbidden"
 source_modules = ["src.domain.entities"]
 forbidden_modules = ["src.domain.services"]
 
+# ===== TEST ORGANIZATION CONTRACTS =====
+
+# Contract 13: Source code should not import from tests
+[[tool.importlinter.contracts]]
+name = "Source code independence from tests"
+type = "forbidden"
+source_modules = ["src"]
+forbidden_modules = ["tests", "fixtures"]
+
+# Contract 14: Domain tests should use only domain code
+# Note: This contract is documented but cannot be enforced since tests
+# are outside the root_package scope. Consider manual review during PR.
+
+
