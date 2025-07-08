@@ -87,7 +87,7 @@ class TestSqlAlchemyPositionRepository:
         mock_connection.execute.side_effect = IntegrityError(
             "statement",
             "params",
-            "uq_portfolio_stock_position violation",
+            Exception("uq_portfolio_stock_position violation"),
         )
 
         with pytest.raises(
@@ -110,7 +110,7 @@ class TestSqlAlchemyPositionRepository:
         mock_connection.execute.side_effect = IntegrityError(
             "statement",
             "params",
-            "some other constraint violation",
+            Exception("some other constraint violation"),
         )
 
         with pytest.raises(IntegrityError):
@@ -160,7 +160,7 @@ class TestSqlAlchemyPositionRepository:
         mock_connection.execute.side_effect = IntegrityError(
             "statement",
             "params",
-            "uq_portfolio_stock_position violation",
+            Exception("uq_portfolio_stock_position violation"),
         )
 
         with pytest.raises(
@@ -183,7 +183,7 @@ class TestSqlAlchemyPositionRepository:
         mock_connection.execute.side_effect = IntegrityError(
             "statement",
             "params",
-            "some other constraint violation",
+            Exception("some other constraint violation"),
         )
 
         with pytest.raises(IntegrityError):
