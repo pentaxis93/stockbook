@@ -5,11 +5,11 @@
 from datetime import UTC, datetime
 from decimal import Decimal
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 from unittest.mock import Mock
 
 import pytest
-from sqlalchemy.engine import Connection, Engine
+from sqlalchemy.engine import Engine
 from sqlalchemy.exc import IntegrityError
 
 from src.domain.entities.position import Position
@@ -633,10 +633,9 @@ class TestSqlAlchemyPositionRepositoryIntegration:
         from src.infrastructure.persistence.tables.stock_table import stock_table
 
         with engine.connect() as conn:
-            conn = cast(Connection, conn)
             with conn.begin():
                 # Insert required portfolio
-                conn.execute(
+                _ = conn.execute(
                     portfolio_table.insert().values(
                         id="portfolio-456",
                         name="Test Portfolio",
@@ -645,7 +644,7 @@ class TestSqlAlchemyPositionRepositoryIntegration:
                 )
 
                 # Insert another portfolio for multi-portfolio tests
-                conn.execute(
+                _ = conn.execute(
                     portfolio_table.insert().values(
                         id="portfolio-789",
                         name="Another Portfolio",
@@ -654,7 +653,7 @@ class TestSqlAlchemyPositionRepositoryIntegration:
                 )
 
                 # Insert required stocks
-                conn.execute(
+                _ = conn.execute(
                     stock_table.insert().values(
                         id="stock-789",
                         symbol="AAPL",
@@ -662,7 +661,7 @@ class TestSqlAlchemyPositionRepositoryIntegration:
                     ),
                 )
 
-                conn.execute(
+                _ = conn.execute(
                     stock_table.insert().values(
                         id="stock-abc",
                         symbol="GOOGL",
