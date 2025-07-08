@@ -16,6 +16,7 @@ from src.domain.repositories.interfaces import (
     IJournalRepository,
     IPortfolioBalanceRepository,
     IPortfolioRepository,
+    IPositionRepository,
     IStockBookUnitOfWork,
     IStockRepository,
     ITargetRepository,
@@ -223,6 +224,11 @@ class TestRepositoryContractDefinitions:
         with pytest.raises(TypeError):
             IJournalRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
 
+    def test_position_repository_is_abstract(self) -> None:
+        """Should not be able to instantiate IPositionRepository directly."""
+        with pytest.raises(TypeError):
+            IPositionRepository()  # type: ignore  # pylint: disable=abstract-class-instantiated
+
     def test_unit_of_work_is_abstract(self) -> None:
         """Should not be able to instantiate IUnitOfWork directly."""
         with pytest.raises(TypeError):
@@ -242,6 +248,7 @@ class TestRepositoryContractDefinitions:
             ITargetRepository,
             IPortfolioBalanceRepository,
             IJournalRepository,
+            IPositionRepository,
             IUnitOfWork,
             IStockBookUnitOfWork,
         ]
@@ -764,6 +771,7 @@ class TestAbstractMethodCoverage:
             IPortfolioBalanceRepository,
             ITargetRepository,
             IJournalRepository,
+            IPositionRepository,
             IUnitOfWork,
             IStockBookUnitOfWork,
         ]
@@ -793,6 +801,7 @@ class TestAbstractMethodCoverage:
             IPortfolioBalanceRepository,
             ITargetRepository,
             IJournalRepository,
+            IPositionRepository,
             IUnitOfWork,
             IStockBookUnitOfWork,
         ]:

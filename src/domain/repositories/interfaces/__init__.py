@@ -7,6 +7,7 @@ for each aggregate root in the domain model, following Interface Segregation Pri
 from .journal_repository import IJournalRepository
 from .portfolio_balance_repository import IPortfolioBalanceRepository
 from .portfolio_repository import IPortfolioRepository
+from .position_repository import IPositionRepository
 from .stock_repository import IStockRepository
 from .target_repository import ITargetRepository
 from .transaction_repository import ITransactionRepository
@@ -16,6 +17,7 @@ __all__ = [
     "IJournalRepository",
     "IPortfolioBalanceRepository",
     "IPortfolioRepository",
+    "IPositionRepository",
     "IStockBookUnitOfWork",
     "IStockRepository",
     "ITargetRepository",
