@@ -354,3 +354,23 @@ source_modules = [
 ]
 forbidden_modules = ["src.application.commands"]
 # Presentation can use commands to create them for the application layer
+
+# ===== EVENT-DRIVEN ARCHITECTURE CONTRACTS =====
+
+# Contract 18: Domain events should stay within domain layer
+[[tool.importlinter.contracts]]
+name = "Domain events stay in domain"
+type = "forbidden"
+source_modules = [
+  "src.infrastructure",
+  "src.presentation",
+]
+forbidden_modules = ["src.domain.events"]
+# Only domain and application layers should work with domain events
+
+# Contract 19: Infrastructure should not raise domain events
+[[tool.importlinter.contracts]]
+name = "Infrastructure cannot raise domain events"
+type = "forbidden"
+source_modules = ["src.infrastructure"]
+forbidden_modules = ["src.domain.events"]
