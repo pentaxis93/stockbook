@@ -21,18 +21,36 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: '3.12'
           cache: 'pip'
+      
+      - name: Debug - Check Python version
+        run: |
+          python --version
+          which python
+          pip --version
       
       - name: Install dependencies
         run: |
+          set -e  # Exit on error
+          echo "Installing pip..."
           python -m pip install --upgrade pip
+          echo "Installing requirements..."
           pip install -r requirements.txt
-          # Install the package in editable mode for import resolution
+          echo "Installing package in editable mode..."
           pip install -e .
+          echo "Dependencies installed successfully"
+      
+      - name: Debug - Verify installation
+        run: |
+          pip list
+          python -c "import src; print('Package imported successfully')"
       
       - name: Run all quality checks
-        run: python scripts/test_all.py
+        run: |
+          set -e
+          echo "Running test_all.py..."
+          python scripts/test_all.py
         env:
           # Ensure the script has access to all tools
           PYTHONPATH: ${{ github.workspace }}

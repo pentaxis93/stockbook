@@ -74,8 +74,8 @@ class TestSetupConfiguration:
         setup_path = Path("setup.py")
         content = setup_path.read_text(encoding="utf-8")
 
-        # Should require Python 3.13 or higher based on the file content
-        assert 'python_requires=">=3.13"' in content
+        # Should require Python 3.12 or higher based on the file content
+        assert 'python_requires=">=3.12"' in content
 
     @patch("setuptools.setup")
     @patch("setuptools.find_packages")
@@ -106,7 +106,7 @@ class TestSetupConfiguration:
         assert call_args["name"] == "stockbook"
         assert call_args["version"] == "0.1.0"
         assert call_args["packages"] == ["src", "src.domain", "src.application"]
-        assert call_args["python_requires"] == ">=3.13"
+        assert call_args["python_requires"] == ">=3.12"
         assert "install_requires" in call_args
 
     def test_setup_executable(self) -> None:

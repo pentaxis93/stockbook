@@ -9,6 +9,6 @@ if __name__ == "__main__":
         name="stockbook",
         version="0.1.0",
         packages=find_packages(),
-        python_requires=">=3.13",
+        python_requires=">=3.12",
         install_requires=[],  # Dependencies are managed in requirements.txt
     )
