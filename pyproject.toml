@@ -227,6 +227,20 @@ forbidden_modules = [
   "pytest",
   "httpx",
   "requests",
+  "alembic",
+  "redis",
+  "celery",
+  "django",
+  "flask",
+  "boto3",
+  "psycopg2",
+  "pymongo",
+  "elasticsearch",
+  "kafka",
+  "rabbitmq",
+  "grpc",
+  "graphql",
+  "dependency_injection",
 ]
 
 # ===== APPLICATION LAYER CONTRACTS =====
