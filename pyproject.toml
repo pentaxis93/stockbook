@@ -224,3 +224,11 @@ forbidden_modules = [
   "httpx",
   "requests",
 ]
+
+# Contract 6: Application must not import concrete repositories from infrastructure
+[[tool.importlinter.contracts]]
+name = "Application uses repository interfaces only"
+type = "forbidden"
+source_modules = ["src.application"]
+forbidden_modules = ["src.infrastructure.repositories"]
+# Application should depend on domain interfaces, not infrastructure implementations
