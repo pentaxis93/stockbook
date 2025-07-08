@@ -190,14 +190,14 @@ include_external_packages = true
 #
 # Contract Organization:
 # 1. Core Architecture - Fundamental layered architecture rules (Contracts 1-4)
-# 2. Domain Layer - Domain purity and internal structure (Contracts 5-15)
-# 3. Application Layer - Use cases and application services (Contracts 16-21)
-# 4. Infrastructure Layer - External concerns and implementations (Contracts 22-28)
-# 5. Presentation Layer - User interface and external APIs (Contracts 29-32)
-# 6. Cross-Cutting Concerns - Patterns that span multiple layers (Contracts 33-34)
-# 7. Test Organization - Testing structure and boundaries (Contracts 35)
+# 2. Domain Layer - Domain purity and internal structure (Contracts 5-17)
+# 3. Application Layer - Use cases and application services (Contracts 18-23)
+# 4. Infrastructure Layer - External concerns and implementations (Contracts 24-30)
+# 5. Presentation Layer - User interface and external APIs (Contracts 31-34)
+# 6. Cross-Cutting Concerns - Patterns that span multiple layers (Contracts 35-36)
+# 7. Test Organization - Testing structure and boundaries (Contracts 37)
 #
-# Total: 35 enforced contracts (added 3 factory + 2 event-driven + 3 presentation + 3 infrastructure + 2 service config contracts)
+# Total: 37 enforced contracts (added 3 factory + 2 event-driven + 3 presentation + 3 infrastructure + 2 service config + 2 advanced DDD contracts)
 # ================================================================================
 
 # ===== 1. CORE ARCHITECTURE CONTRACTS =====
@@ -378,10 +378,31 @@ modules = [
   "src.domain.services.risk_assessment_service",
 ]
 
+# Contract 16: Advanced aggregate isolation
+# Aggregates should not directly reference other aggregates' internals.
+# This enforces proper aggregate boundaries and data consistency.
+[[tool.importlinter.contracts]]
+name = "Advanced aggregate isolation"
+type = "forbidden"
+source_modules = ["src.domain.entities.portfolio"]
+forbidden_modules = [
+  "src.domain.entities.stock",
+  "src.domain.entities.journal_entry",
+]
+
+# Contract 17: Value object immutability boundaries
+# Value objects should not depend on mutable domain services.
+# This ensures value objects remain pure and immutable.
+[[tool.importlinter.contracts]]
+name = "Value object immutability boundaries"
+type = "forbidden"
+source_modules = ["src.domain.value_objects"]
+forbidden_modules = ["src.domain.services"]
+
 # ===== 3. APPLICATION LAYER CONTRACTS =====
 # These contracts ensure proper use case implementation and CQRS patterns.
 
-# Contract 16: Application uses repository interfaces only
+# Contract 18: Application uses repository interfaces only
 # Application should depend on domain interfaces, not infrastructure
 # implementations. This enables dependency inversion and easier testing.
 [[tool.importlinter.contracts]]
@@ -390,7 +411,7 @@ type = "forbidden"
 source_modules = ["src.application"]
 forbidden_modules = ["src.infrastructure.repositories"]
 
-# Contract 17: Domain independence from DTOs
+# Contract 19: Domain independence from DTOs
 # Domain should not depend on application DTOs. DTOs are for data transfer
 # between layers, not for domain logic.
 [[tool.importlinter.contracts]]
@@ -399,7 +420,7 @@ type = "forbidden"
 source_modules = ["src.domain"]
 forbidden_modules = ["src.application.dto"]
 
-# Contract 18: Commands use services not repositories
+# Contract 20: Commands use services not repositories
 # Commands should work through domain services rather than directly
 # accessing repositories. This ensures business logic stays in domain.
 [[tool.importlinter.contracts]]
@@ -411,7 +432,7 @@ forbidden_modules = [
   "src.infrastructure.repositories",
 ]
 
-# Contract 19: Commands not used in domain or infrastructure
+# Contract 21: Commands not used in domain or infrastructure
 # Commands are application-layer concerns and should not be used
 # in domain or infrastructure layers.
 [[tool.importlinter.contracts]]
@@ -423,7 +444,7 @@ source_modules = [
 ]
 forbidden_modules = ["src.application.commands"]
 
-# Contract 20: Application services should not cross-reference
+# Contract 22: Application services should not cross-reference
 # Application services should operate independently to maintain
 # proper separation of use cases and prevent tight coupling.
 [[tool.importlinter.contracts]]
@@ -432,7 +453,7 @@ type = "independence"
 modules = ["src.application.services"]
 
 
-# Contract 21: Commands should not directly use DTOs
+# Contract 23: Commands should not directly use DTOs
 # Commands should work with domain objects rather than DTOs to maintain
 # proper separation between data transfer and business logic.
 [[tool.importlinter.contracts]]
@@ -444,7 +465,7 @@ forbidden_modules = ["src.application.dto"]
 # ===== 4. INFRASTRUCTURE LAYER CONTRACTS =====
 # These contracts ensure proper infrastructure organization and boundaries.
 
-# Contract 22: Infrastructure cannot raise domain events
+# Contract 24: Infrastructure cannot raise domain events
 # Infrastructure should not raise domain events directly. Events should
 # be raised by domain entities or services.
 [[tool.importlinter.contracts]]
@@ -453,7 +474,7 @@ type = "forbidden"
 source_modules = ["src.infrastructure"]
 forbidden_modules = ["src.domain.events"]
 
-# Contract 23: Persistence tables independence
+# Contract 25: Persistence tables independence
 # Persistence table definitions should not depend on repository implementations.
 # This ensures clean separation of data models from business logic.
 [[tool.importlinter.contracts]]
@@ -462,7 +483,7 @@ type = "forbidden"
 source_modules = ["src.infrastructure.persistence.tables"]
 forbidden_modules = ["src.infrastructure.repositories"]
 
-# Contract 24: Database connection independence
+# Contract 26: Database connection independence
 # Database connection and factory should not depend on repositories.
 # This maintains proper layering within infrastructure.
 [[tool.importlinter.contracts]]
@@ -509,7 +530,7 @@ forbidden_modules = [
   "src.infrastructure.persistence.unit_of_work",
 ]
 
-# Contract 25: Database factory independence from business logic
+# Contract 27: Database factory independence from business logic
 # Database factories should not depend on domain or application layers.
 # This ensures factories remain pure infrastructure concerns.
 [[tool.importlinter.contracts]]
@@ -521,7 +542,7 @@ forbidden_modules = [
   "src.application",
 ]
 
-# Contract 26: Unit of work pattern boundaries
+# Contract 28: Unit of work pattern boundaries
 # Unit of work should not depend on higher-level application services.
 # This ensures UoW remains focused on transaction management.
 [[tool.importlinter.contracts]]
@@ -534,7 +555,7 @@ forbidden_modules = [
   "src.presentation",
 ]
 
-# Contract 27: Table definition isolation
+# Contract 29: Table definition isolation
 # Database table definitions should not depend on repositories or services.
 # This ensures clean separation between schema and business logic.
 [[tool.importlinter.contracts]]
@@ -548,7 +569,7 @@ forbidden_modules = [
   "src.presentation",
 ]
 
-# Contract 28: Database initialization boundaries
+# Contract 30: Database initialization boundaries
 # Database initialization should not depend on business logic.
 # This ensures initialization remains pure infrastructure concern.
 [[tool.importlinter.contracts]]
@@ -564,7 +585,7 @@ forbidden_modules = [
 # ===== 5. PRESENTATION LAYER CONTRACTS =====
 # These contracts ensure proper presentation layer organization and boundaries.
 
-# Contract 29: Presentation must not use repositories directly
+# Contract 31: Presentation must not use repositories directly
 # Presentation should only use application services, not repositories.
 # This ensures proper layering and separation of concerns.
 [[tool.importlinter.contracts]]
@@ -576,7 +597,7 @@ forbidden_modules = [
   "src.infrastructure.repositories",
 ]
 
-# Contract 30: Web models isolation
+# Contract 32: Web models isolation
 # Web models should not be used outside the presentation layer.
 # This prevents presentation concerns from leaking into business logic.
 [[tool.importlinter.contracts]]
@@ -589,7 +610,7 @@ source_modules = [
 ]
 forbidden_modules = ["src.presentation.web.models"]
 
-# Contract 31: Middleware boundaries
+# Contract 33: Middleware boundaries
 # Middleware should not access domain or infrastructure directly.
 # This ensures middleware remains focused on cross-cutting presentation concerns.
 [[tool.importlinter.contracts]]
@@ -602,7 +623,7 @@ forbidden_modules = [
   "src.infrastructure.persistence",
 ]
 
-# Contract 32: Router independence from domain services and repositories
+# Contract 34: Router independence from domain services and repositories
 # Routers should not directly access domain services or repositories.
 # This enforces proper layering through application services.
 # Note: Domain entities access through DTOs is legitimate.
@@ -623,7 +644,7 @@ forbidden_modules = [
 # This contract ensures application-level event handling stays independent.
 # Note: Contracts 26-27 reserved for future event handler implementation.
 
-# Contract 33: Event publishing boundaries
+# Contract 35: Event publishing boundaries
 # Only domain entities and application services should publish events.
 # This ensures events originate from appropriate business contexts.
 [[tool.importlinter.contracts]]
@@ -635,7 +656,7 @@ source_modules = [
 ]
 forbidden_modules = ["src.domain.events"]
 
-# Contract 34: Domain events stay in domain and application
+# Contract 36: Domain events stay in domain and application
 # Domain events should only be used by domain and application layers.
 # Infrastructure and presentation should not directly handle domain events.
 [[tool.importlinter.contracts]]
@@ -650,7 +671,7 @@ forbidden_modules = ["src.domain.events"]
 # ===== 7. TEST ORGANIZATION CONTRACTS =====
 # These contracts ensure proper test organization and boundaries.
 
-# Contract 35: Source code independence from tests
+# Contract 37: Source code independence from tests
 # Source code should never import from test modules. This prevents
 # test code from becoming part of the production codebase.
 [[tool.importlinter.contracts]]
