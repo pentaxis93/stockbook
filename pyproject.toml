@@ -194,10 +194,10 @@ include_external_packages = true
 # 3. Application Layer - Use cases and application services (Contracts 14-18, 20)
 # 4. Infrastructure Layer - External concerns and implementations (Contracts 21-24)
 # 5. Presentation Layer - User interface and external APIs (Contracts 25)
-# 6. Cross-Cutting Concerns - Patterns that span multiple layers (Contracts 26)
-# 7. Test Organization - Testing structure and boundaries (Contracts 27)
+# 6. Cross-Cutting Concerns - Patterns that span multiple layers (Contracts 26-27)
+# 7. Test Organization - Testing structure and boundaries (Contracts 28)
 #
-# Total: 27 enforced contracts (added 3 factory pattern contracts)
+# Total: 28 enforced contracts (added 3 factory + 2 event-driven contracts)
 # ================================================================================
 
 # ===== 1. CORE ARCHITECTURE CONTRACTS =====
@@ -512,7 +512,24 @@ forbidden_modules = [
 # ===== 6. CROSS-CUTTING CONCERNS =====
 # These contracts handle patterns that span multiple layers.
 
-# Contract 26: Domain events stay in domain and application
+# Contract 26: Event handling patterns (future-proofing)
+# When event handlers are implemented, they should follow proper boundaries.
+# This contract ensures application-level event handling stays independent.
+# Note: Contracts 26-27 reserved for future event handler implementation.
+
+# Contract 26: Event publishing boundaries
+# Only domain entities and application services should publish events.
+# This ensures events originate from appropriate business contexts.
+[[tool.importlinter.contracts]]
+name = "Event publishing boundaries"
+type = "forbidden"
+source_modules = [
+  "src.infrastructure",
+  "src.presentation",
+]
+forbidden_modules = ["src.domain.events"]
+
+# Contract 27: Domain events stay in domain and application
 # Domain events should only be used by domain and application layers.
 # Infrastructure and presentation should not directly handle domain events.
 [[tool.importlinter.contracts]]
@@ -527,7 +544,7 @@ forbidden_modules = ["src.domain.events"]
 # ===== 7. TEST ORGANIZATION CONTRACTS =====
 # These contracts ensure proper test organization and boundaries.
 
-# Contract 27: Source code independence from tests
+# Contract 28: Source code independence from tests
 # Source code should never import from test modules. This prevents
 # test code from becoming part of the production codebase.
 [[tool.importlinter.contracts]]
