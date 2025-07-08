@@ -18,6 +18,7 @@ from src.infrastructure.persistence.tables import (
     metadata,
     portfolio_balance_table,
     portfolio_table,
+    position_table,
     stock_table,
     target_table,
     transaction_table,
@@ -27,6 +28,7 @@ from src.infrastructure.persistence.tables import (
 _ = journal_entry_table
 _ = portfolio_balance_table
 _ = portfolio_table
+_ = position_table
 _ = stock_table
 _ = target_table
 _ = transaction_table

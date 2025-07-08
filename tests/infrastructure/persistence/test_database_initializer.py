@@ -58,6 +58,7 @@ class TestDatabaseInitializer:
             "targets",
             "transactions",
             "portfolio_balances",
+            "positions",
             "journal_entries",
         }
         assert set(table_names) == expected_tables
@@ -82,6 +83,7 @@ class TestDatabaseInitializer:
             "targets",
             "transactions",
             "portfolio_balances",
+            "positions",
             "journal_entries",
         }
         assert set(table_names) == expected_tables
