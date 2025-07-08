@@ -13,6 +13,7 @@ from sqlalchemy.engine import Engine
 from config import Config
 
 # Application layer imports
+from src.application.interfaces.stock_service import IStockApplicationService
 from src.application.services.stock_application_service import StockApplicationService
 from src.domain.repositories.interfaces import IStockBookUnitOfWork
 from src.infrastructure.persistence.database_factory import create_engine
@@ -101,8 +102,9 @@ class CompositionRoot:
     def _configure_application_layer(cls, container: DIContainer) -> None:
         """Configure application layer dependencies."""
         # Application services - transient to avoid state issues
+        # Register the interface with its implementation
         container.register_factory(
-            StockApplicationService,
+            IStockApplicationService,
             lambda: StockApplicationService(container.resolve(IStockBookUnitOfWork)),
         )
 

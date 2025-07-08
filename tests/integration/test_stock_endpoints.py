@@ -13,7 +13,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 
 from src.application.dto.stock_dto import StockDto
-from src.application.services.stock_application_service import StockApplicationService
+from src.application.interfaces.stock_service import IStockApplicationService
 
 
 class TestStockEndpoints:
@@ -23,7 +23,7 @@ class TestStockEndpoints:
     def mock_stock_service(self) -> Generator[Mock, None, None]:
         """Mock the stock application service."""
         # Since the endpoint doesn't exist yet, we'll mock at the router level
-        return Mock(spec=StockApplicationService)
+        return Mock(spec=IStockApplicationService)
 
     @pytest.fixture
     def client(self, mock_stock_service: Mock) -> Generator[TestClient, None, None]:

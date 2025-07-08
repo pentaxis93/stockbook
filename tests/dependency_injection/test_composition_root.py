@@ -10,6 +10,7 @@ from unittest.mock import patch
 # These imports now exist after implementation
 from dependency_injection.composition_root import CompositionRoot
 from dependency_injection.di_container import DIContainer
+from src.application.services.stock_application_service import StockApplicationService
 
 # Additional imports needed for tests
 from src.domain.repositories.interfaces import IStockBookUnitOfWork
@@ -50,15 +51,13 @@ class TestCompositionRoot:
 
     def test_configure_application_layer(self) -> None:
         """Should configure application services correctly."""
-        from src.application.services.stock_application_service import (
-            StockApplicationService,
-        )
+        from src.application.interfaces.stock_service import IStockApplicationService
 
         # Arrange
         container = CompositionRoot.configure(database_path=":memory:")
 
         # Act
-        stock_service = container.resolve(StockApplicationService)
+        stock_service = container.resolve(IStockApplicationService)
 
         # Assert
         assert isinstance(stock_service, StockApplicationService)
@@ -104,16 +103,14 @@ class TestCompositionRoot:
 
     def test_transient_configuration(self) -> None:
         """Should configure transient lifetimes correctly."""
-        from src.application.services.stock_application_service import (
-            StockApplicationService,
-        )
+        from src.application.interfaces.stock_service import IStockApplicationService
 
         # Arrange
         container = CompositionRoot.configure(database_path=":memory:")
 
         # Act
-        service1 = container.resolve(StockApplicationService)
-        service2 = container.resolve(StockApplicationService)
+        service1 = container.resolve(IStockApplicationService)
+        service2 = container.resolve(IStockApplicationService)
         uow1 = container.resolve(IStockBookUnitOfWork)
         uow2 = container.resolve(IStockBookUnitOfWork)
 

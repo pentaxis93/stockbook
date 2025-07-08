@@ -11,7 +11,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from src.application.dto.stock_dto import StockDto
-from src.application.services.stock_application_service import StockApplicationService
+from src.application.interfaces.stock_service import IStockApplicationService
 from src.presentation.web.routers import stock_router
 
 
@@ -21,7 +21,7 @@ class TestStockRouter:
     @pytest.fixture
     def mock_service(self) -> Mock:
         """Create a mock stock application service."""
-        return Mock(spec=StockApplicationService)
+        return Mock(spec=IStockApplicationService)
 
     @pytest.fixture
     def sample_stock_dtos(self) -> list[StockDto]:

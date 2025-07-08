@@ -232,3 +232,14 @@ type = "forbidden"
 source_modules = ["src.application"]
 forbidden_modules = ["src.infrastructure.repositories"]
 # Application should depend on domain interfaces, not infrastructure implementations
+
+# Contract 7: Presentation must not import repositories directly
+[[tool.importlinter.contracts]]
+name = "Presentation must not use repositories directly"
+type = "forbidden"
+source_modules = ["src.presentation"]
+forbidden_modules = [
+  "src.domain.repositories",
+  "src.infrastructure.repositories",
+]
+# Presentation should only use application services, not repositories

@@ -9,6 +9,7 @@ from src.application.commands.stock import (
     UpdateStockCommand,
 )
 from src.application.dto.stock_dto import StockDto
+from src.application.interfaces.stock_service import IStockApplicationService
 from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import IStockBookUnitOfWork
 from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
@@ -16,7 +17,7 @@ from src.domain.value_objects.sector import Sector
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 
-class StockApplicationService:
+class StockApplicationService(IStockApplicationService):
     """Application service for stock operations.
 
     Provides high-level use case operations for stock management,

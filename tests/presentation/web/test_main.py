@@ -152,13 +152,11 @@ class TestMainApp:
         from fastapi import Request
 
         from dependency_injection.di_container import DIContainer
-        from src.application.services.stock_application_service import (
-            StockApplicationService,
-        )
+        from src.application.interfaces.stock_service import IStockApplicationService
         from src.presentation.web.routers.stock_router import get_stock_service
 
         # Create mocks
-        mock_service = Mock(spec=StockApplicationService)
+        mock_service = Mock(spec=IStockApplicationService)
         mock_container = Mock(spec=DIContainer)
         mock_container.resolve.return_value = mock_service
 
@@ -173,4 +171,4 @@ class TestMainApp:
 
         # Verify it returns the service from the container
         assert result is mock_service
-        mock_container.resolve.assert_called_once_with(StockApplicationService)
+        mock_container.resolve.assert_called_once_with(IStockApplicationService)

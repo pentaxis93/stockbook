@@ -16,6 +16,7 @@ from sqlalchemy.engine import Engine
 
 from dependency_injection.composition_root import CompositionRoot
 from src.application.commands.stock import CreateStockCommand, CreateStockInputs
+from src.application.interfaces.stock_service import IStockApplicationService
 from src.application.services.stock_application_service import StockApplicationService
 from src.domain.entities.stock import Stock
 from src.domain.repositories.interfaces import (
@@ -45,7 +46,7 @@ def unit_of_work(test_engine: Engine) -> IStockBookUnitOfWork:
 
 
 @pytest.fixture
-def stock_service(unit_of_work: IStockBookUnitOfWork) -> StockApplicationService:
+def stock_service(unit_of_work: IStockBookUnitOfWork) -> IStockApplicationService:
     """Create stock application service with unit of work."""
     return StockApplicationService(unit_of_work)
 
@@ -81,7 +82,7 @@ class TestUnitOfWorkIntegration:
 
     def test_create_stock_commits_to_database(
         self,
-        stock_service: StockApplicationService,
+        stock_service: IStockApplicationService,
         test_engine: Engine,
     ) -> None:
         """Should create stock and commit to database."""
@@ -262,7 +263,7 @@ class TestDependencyInjectionIntegration:
         container = CompositionRoot.configure(database_path=":memory:")
 
         # Act - Resolve application service
-        service = container.resolve(StockApplicationService)
+        service = container.resolve(IStockApplicationService)
 
         # Assert
         assert isinstance(service, StockApplicationService)
@@ -281,7 +282,7 @@ class TestDependencyInjectionIntegration:
         container = CompositionRoot.configure(database_path=":memory:")
         engine = container.resolve(Engine)
         metadata.create_all(engine)
-        service = container.resolve(StockApplicationService)
+        service = container.resolve(IStockApplicationService)
 
         # Act
         inputs = CreateStockInputs(

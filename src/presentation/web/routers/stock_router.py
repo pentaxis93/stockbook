@@ -9,7 +9,7 @@ from typing import Annotated, NoReturn
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
-from src.application.services.stock_application_service import StockApplicationService
+from src.application.interfaces.stock_service import IStockApplicationService
 from src.presentation.web.middleware import handle_stock_errors
 from src.presentation.web.models.stock_models import (
     StockListResponse,
@@ -47,14 +47,14 @@ router = APIRouter(
 # Service dependency is retrieved from app state via FastAPI's dependency injection
 
 
-def get_stock_service(request: Request) -> StockApplicationService:
-    """Dependency function to get StockApplicationService instance from app state.
+def get_stock_service(request: Request) -> IStockApplicationService:
+    """Dependency function to get IStockApplicationService instance from app state.
 
     Args:
         request: FastAPI request object containing app state
 
     Returns:
-        StockApplicationService instance
+        IStockApplicationService instance
 
     Raises:
         RuntimeError: If DI container not configured in app state
@@ -62,8 +62,8 @@ def get_stock_service(request: Request) -> StockApplicationService:
     if not hasattr(request.app.state, "di_container"):
         msg = "DI container not configured in app state"
         raise RuntimeError(msg)
-    service: StockApplicationService = request.app.state.di_container.resolve(
-        StockApplicationService,
+    service: IStockApplicationService = request.app.state.di_container.resolve(
+        IStockApplicationService,
     )
     return service
 
@@ -79,7 +79,7 @@ async def get_stocks(
         str | None,
         Query(description="Filter by stock symbol (partial match)"),
     ] = None,
-    service: StockApplicationService = stock_service_dependency,
+    service: IStockApplicationService = stock_service_dependency,
 ) -> StockListResponse:
     """Get list of stocks with optional filtering.
 
@@ -118,7 +118,7 @@ async def get_stocks(
 @router.get("/{stock_id}", response_model=StockResponse)
 async def get_stock_by_id(
     stock_id: str,
-    service: StockApplicationService = stock_service_dependency,
+    service: IStockApplicationService = stock_service_dependency,
 ) -> StockResponse:
     """Get a specific stock by its ID.
 
@@ -159,7 +159,7 @@ async def get_stock_by_id(
 @handle_stock_errors
 async def create_stock(
     stock_request: StockRequest,
-    service: StockApplicationService = stock_service_dependency,
+    service: IStockApplicationService = stock_service_dependency,
 ) -> StockResponse:
     """Create a new stock.
 
@@ -193,7 +193,7 @@ async def create_stock(
 async def update_stock(
     stock_id: str,
     stock_update: StockUpdateRequest,
-    service: StockApplicationService = stock_service_dependency,
+    service: IStockApplicationService = stock_service_dependency,
 ) -> StockResponse:
     """Update an existing stock.
 
