@@ -8,6 +8,7 @@ from .entity import Entity
 from .journal_entry import JournalEntry
 from .portfolio import Portfolio
 from .portfolio_balance import PortfolioBalance
+from .position import Position
 from .stock import Stock
 from .target import Target
 from .transaction import Transaction
@@ -17,6 +18,7 @@ __all__ = [
     "JournalEntry",
     "Portfolio",
     "PortfolioBalance",
+    "Position",
     "Stock",
     "Target",
     "Transaction",
