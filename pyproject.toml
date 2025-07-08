@@ -325,4 +325,32 @@ forbidden_modules = ["tests", "fixtures"]
 # Note: This contract is documented but cannot be enforced since tests
 # are outside the root_package scope. Consider manual review during PR.
 
+# ===== CQRS AND COMMAND PATTERN CONTRACTS =====
 
+# Contract 15: DTOs should not be used in domain layer
+[[tool.importlinter.contracts]]
+name = "Domain independence from DTOs"
+type = "forbidden"
+source_modules = ["src.domain"]
+forbidden_modules = ["src.application.dto"]
+
+# Contract 16: Commands should not directly access repositories
+[[tool.importlinter.contracts]]
+name = "Commands use services not repositories"
+type = "forbidden"
+source_modules = ["src.application.commands"]
+forbidden_modules = [
+  "src.domain.repositories",
+  "src.infrastructure.repositories",
+]
+
+# Contract 17: Domain and infrastructure should not use commands
+[[tool.importlinter.contracts]]
+name = "Commands not used in domain or infrastructure"
+type = "forbidden"
+source_modules = [
+  "src.domain",
+  "src.infrastructure",
+]
+forbidden_modules = ["src.application.commands"]
+# Presentation can use commands to create them for the application layer
