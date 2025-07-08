@@ -37,11 +37,12 @@ class TestSectorValueObject:
         with pytest.raises(ValueError, match="Sector cannot exceed 100 characters"):
             _ = Sector(long_sector)
 
-    def test_sector_creation_with_max_length_value_succeeds(self) -> None:
-        """Test sector creation with exactly max length succeeds."""
-        max_length_sector = "a" * 100
-        sector = Sector(max_length_sector)
-        assert sector.value == max_length_sector
+    def test_sector_creation_with_arbitrary_value_raises_error(self) -> None:
+        """Test sector creation with arbitrary values raises error."""
+        # Only valid sectors from our mapping are allowed
+        invalid_sector = "InvalidSectorName"
+        with pytest.raises(ValueError, match="Invalid sector"):
+            _ = Sector(invalid_sector)
 
     def test_sector_equality(self) -> None:
         """Test sector equality comparison."""
@@ -105,3 +106,52 @@ class TestSectorValueObject:
             sector.value = "Healthcare"  # type: ignore[misc] - Testing immutability
 
         # Note: Internal state protection verified through public interface above
+
+    def test_sector_knows_valid_industry_groups(self) -> None:
+        """Test that sectors can validate their industry groups."""
+        tech_sector = Sector("Technology")
+        assert tech_sector.is_valid_industry_group("Software")
+        assert tech_sector.is_valid_industry_group("Hardware")
+        assert not tech_sector.is_valid_industry_group("Pharmaceuticals")
+
+        healthcare_sector = Sector("Healthcare")
+        assert healthcare_sector.is_valid_industry_group("Pharmaceuticals")
+        assert healthcare_sector.is_valid_industry_group("Biotechnology")
+        assert not healthcare_sector.is_valid_industry_group("Software")
+
+    def test_sector_can_list_industry_groups(self) -> None:
+        """Test that sectors can list their valid industry groups."""
+        tech_sector = Sector("Technology")
+        industries = tech_sector.get_industry_groups()
+        assert "Software" in industries
+        assert "Hardware" in industries
+        assert "Semiconductors" in industries
+        assert "Pharmaceuticals" not in industries
+
+        healthcare_sector = Sector("Healthcare")
+        healthcare_industries = healthcare_sector.get_industry_groups()
+        assert "Pharmaceuticals" in healthcare_industries
+        assert "Biotechnology" in healthcare_industries
+        assert "Software" not in healthcare_industries
+
+    def test_invalid_sector_raises_error(self) -> None:
+        """Test that invalid sectors raise an error."""
+        with pytest.raises(ValueError, match="Invalid sector 'InvalidSector'"):
+            _ = Sector("InvalidSector")
+
+    def test_sector_with_valid_mapping(self) -> None:
+        """Test various valid sectors from the mapping."""
+        valid_sectors = [
+            "Technology",
+            "Healthcare",
+            "Financial Services",
+            "Consumer Goods",
+            "Energy",
+            "Industrial",
+        ]
+
+        for sector_name in valid_sectors:
+            sector = Sector(sector_name)
+            assert sector.value == sector_name
+            # Should have industry groups
+            assert len(sector.get_industry_groups()) > 0

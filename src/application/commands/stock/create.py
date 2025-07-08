@@ -7,7 +7,7 @@ with all necessary validation and normalization.
 from dataclasses import dataclass
 from typing import Any
 
-from src.domain.services.sector_industry_service import SectorIndustryService
+from src.domain.value_objects import IndustryGroup
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 
@@ -243,6 +243,7 @@ class CreateStockCommand:
             msg = "Sector must be provided when industry_group is specified"
             raise ValueError(msg)
 
-        # Validate the combination using domain service
-        service = SectorIndustryService()
-        service.validate_sector_industry_combination_strict(sector, industry_group)
+        # The validation is now handled by the IndustryGroup value object itself
+        # When we create an IndustryGroup with a sector parameter, it validates
+        # that the combination is valid
+        _ = IndustryGroup(industry_group, sector=sector)

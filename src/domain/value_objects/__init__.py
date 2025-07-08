@@ -12,6 +12,15 @@ from .grade import Grade
 from .index_change import IndexChange
 from .industry_group import IndustryGroup
 from .journal_content import JournalContent
+from .metrics import (
+    PortfolioAllocation,
+    PortfolioMetrics,
+    PositionAllocation,
+    PriceAnalysis,
+    RiskAssessment,
+    RiskLevel,
+    TrendDirection,
+)
 from .money import Money
 from .notes import Notes
 from .portfolio_name import PortfolioName
@@ -29,10 +38,17 @@ __all__ = [
     "JournalContent",
     "Money",
     "Notes",
+    "PortfolioAllocation",
+    "PortfolioMetrics",
     "PortfolioName",
+    "PositionAllocation",
+    "PriceAnalysis",
     "Quantity",
+    "RiskAssessment",
+    "RiskLevel",
     "Sector",
     "StockSymbol",
     "TargetStatus",
     "TransactionType",
+    "TrendDirection",
 ]

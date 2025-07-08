@@ -5,6 +5,11 @@ Represents a sector classification with validation rules and immutability.
 
 from typing import Any
 
+from src.domain.value_objects.sector_industry_data import (
+    SECTOR_INDUSTRY_MAPPING,
+    get_all_valid_sectors,
+)
+
 
 class Sector:
     """Value object representing a sector.
@@ -22,7 +27,7 @@ class Sector:
             value: The sector string
 
         Raises:
-            ValueError: If sector exceeds maximum length or is empty
+            ValueError: If sector exceeds maximum length, is empty, or is invalid
         """
         # Strip whitespace
         normalized_value = value.strip()
@@ -35,6 +40,11 @@ class Sector:
         # Validate length
         if len(normalized_value) > self.MAX_LENGTH:
             msg = f"Sector cannot exceed {self.MAX_LENGTH} characters"
+            raise ValueError(msg)
+
+        # Validate that the sector exists in our domain mapping
+        if normalized_value not in get_all_valid_sectors():
+            msg = f"Invalid sector '{normalized_value}'"
             raise ValueError(msg)
 
         # Store as private attribute to prevent mutation
@@ -69,3 +79,22 @@ class Sector:
             msg = "Sector is immutable"
             raise AttributeError(msg)
         super().__setattr__(name, value)
+
+    def is_valid_industry_group(self, industry_group: str) -> bool:
+        """Check if an industry group is valid for this sector.
+
+        Args:
+            industry_group: The industry group to check
+
+        Returns:
+            True if the industry group belongs to this sector, False otherwise
+        """
+        return industry_group in SECTOR_INDUSTRY_MAPPING.get(self._value, [])
+
+    def get_industry_groups(self) -> list[str]:
+        """Get the list of valid industry groups for this sector.
+
+        Returns:
+            List of industry group names that belong to this sector
+        """
+        return SECTOR_INDUSTRY_MAPPING.get(self._value, [])

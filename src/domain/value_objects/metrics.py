@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from enum import Enum
 
-from src.domain.value_objects import Money
+from src.domain.value_objects.money import Money
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 

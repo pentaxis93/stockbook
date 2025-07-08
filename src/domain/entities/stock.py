@@ -106,14 +106,6 @@ class Stock(Entity):
             msg = "Symbol is required"
             raise ValueError(msg)
 
-        # Initialize sector industry service for validation
-        # (import here to avoid circular imports)
-        from src.domain.services.sector_industry_service import (  # pylint: disable=import-outside-toplevel; Rationale: This import must be inside the method to prevent circular dependencies; between domain entities and domain services. The Stock entity needs SectorIndustryService; for validation, but the service may also reference Stock, creating a circular import.
-            SectorIndustryService,
-        )
-
-        self._sector_industry_service = SectorIndustryService()
-
         # Initialize parent
         super().__init__(id=entity_id)
 
@@ -309,14 +301,17 @@ class Stock(Entity):
         new_sector: str | None,
     ) -> bool:
         """Check if current industry group should be cleared for new sector."""
-        return (
-            self.industry_group is not None
-            and new_sector is not None
-            and not self._sector_industry_service.validate_sector_industry_combination(
-                new_sector,
-                self.industry_group.value,
-            )
-        )
+        if self.industry_group is None or new_sector is None:
+            return False
+
+        # Try to create an IndustryGroup with the new sector
+        # If it raises ValueError, the combination is invalid
+        try:
+            _ = IndustryGroup(self.industry_group.value, sector=new_sector)
+        except ValueError:
+            return True  # Invalid combination, should clear
+        else:
+            return False  # Valid combination, no need to clear
 
     def _apply_field_updates(self, temp_values: dict[str, Any]) -> None:
         """Apply validated field updates to the entity."""
@@ -358,8 +353,7 @@ class Stock(Entity):
             msg = "Sector must be provided when industry_group is specified"
             raise ValueError(msg)
 
-        # Validate the combination using domain service
-        self._sector_industry_service.validate_sector_industry_combination_strict(
-            sector,
-            industry_group,
-        )
+        # The validation is now handled by the IndustryGroup value object itself
+        # When we create an IndustryGroup with a sector parameter, it validates
+        # that the combination is valid
+        _ = IndustryGroup(industry_group, sector=sector)

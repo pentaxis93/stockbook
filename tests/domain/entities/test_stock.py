@@ -659,8 +659,8 @@ class TestStock:
         with pytest.raises(
             ValueError,
             match=(
-                "Industry group 'Pharmaceuticals' is not valid for sector "
-                "'Technology'"
+                "Industry Group 'Pharmaceuticals' belongs to sector 'Healthcare', "
+                "not 'Technology'"
             ),
         ):
             _ = (
@@ -749,8 +749,8 @@ class TestStock:
         with pytest.raises(
             ValueError,
             match=(
-                "Industry group 'Pharmaceuticals' is not valid for sector "
-                "'Technology'"
+                "Industry Group 'Pharmaceuticals' belongs to sector 'Healthcare', "
+                "not 'Technology'"
             ),
         ):
             stock.update_fields(
@@ -815,6 +815,43 @@ class TestStock:
         assert stock.sector is not None
         assert stock.sector.value == "Healthcare"
         assert stock.industry_group is None  # Should be cleared
+
+    def test_update_fields_change_sector_keeps_compatible_industry_group(self) -> None:
+        """Should keep industry_group when changing to compatible sector.
+
+        This tests the else block in _should_clear_industry_group_for_new_sector
+        where the industry group is valid for the new sector.
+        """
+        # Create a stock with a cross-sector industry group
+        # For this test, we need an industry group that exists in multiple sectors
+        # Looking at the mapping, let's use a simple example
+        symbol = StockSymbol("TEST")
+        company_name = CompanyName("Test Company")
+
+        # First create with Banks (Financial Services)
+        stock = (
+            Stock.Builder()
+            .with_symbol(symbol)
+            .with_company_name(company_name)
+            .with_sector(Sector("Financial Services"))
+            .with_industry_group(IndustryGroup("Banks"))
+            .build()
+        )
+
+        assert stock.sector is not None
+        assert stock.sector.value == "Financial Services"
+        assert stock.industry_group is not None
+        assert stock.industry_group.value == "Banks"
+
+        # Now change to a different value that's still Financial Services
+        # This simulates a case where the validation succeeds
+        stock.update_fields(sector="Financial Services")
+
+        # Industry group should remain because it's still valid
+        assert stock.sector is not None
+        assert stock.sector.value == "Financial Services"
+        assert stock.industry_group is not None
+        assert stock.industry_group.value == "Banks"
 
     def test_update_fields_industry_group_without_sector_raises_error(self) -> None:
         """Should raise error when trying to set industry_group without sector."""
@@ -1095,7 +1132,10 @@ class TestStockDomainInvariants:
         # Invalid updates should fail and maintain consistency
         with pytest.raises(
             ValueError,
-            match="Industry group .* is not valid for sector",
+            match=(
+                "Industry Group 'Pharmaceuticals' belongs to sector 'Healthcare', "
+                "not 'Technology'"
+            ),
         ):
             stock.update_fields(
                 industry_group="Pharmaceuticals",

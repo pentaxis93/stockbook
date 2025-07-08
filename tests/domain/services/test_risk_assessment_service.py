@@ -15,7 +15,7 @@ from src.domain.services.risk_assessment_service import (
     RiskAssessmentConfig,
     RiskAssessmentService,
 )
-from src.domain.services.value_objects import (
+from src.domain.value_objects import (
     RiskAssessment,
     RiskLevel,
 )

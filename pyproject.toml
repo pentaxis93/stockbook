@@ -243,3 +243,46 @@ forbidden_modules = [
   "src.infrastructure.repositories",
 ]
 # Presentation should only use application services, not repositories
+
+# Contract 8: Domain internal dependencies follow DDD patterns
+# Replaced overly restrictive independence contract with proper DDD layering
+
+# Contract 8a: Value objects must be independent (foundation layer)
+[[tool.importlinter.contracts]]
+name = "Value objects independence"
+type = "forbidden"
+source_modules = ["src.domain.value_objects"]
+forbidden_modules = [
+    "src.domain.entities",
+    "src.domain.services",
+    "src.domain.repositories"
+]
+
+# Contract 8b: Entities can only depend on value objects
+[[tool.importlinter.contracts]]
+name = "Entities only use value objects"
+type = "forbidden"
+source_modules = ["src.domain.entities"]
+forbidden_modules = [
+    "src.domain.services",
+    "src.domain.repositories"
+]
+# Entities can use value objects, but not services or repositories
+
+# Contract 8c: Services should not have circular dependencies with each other
+[[tool.importlinter.contracts]]
+name = "No circular dependencies between domain services"
+type = "independence"
+modules = [
+    "src.domain.services.portfolio_calculation_service",
+    "src.domain.services.risk_assessment_service"
+]
+# List specific service modules to prevent circular deps between services
+
+# Contract 8d: Repository interfaces should not depend on services
+[[tool.importlinter.contracts]]
+name = "Repository interfaces independence"
+type = "forbidden"
+source_modules = ["src.domain.repositories"]
+forbidden_modules = ["src.domain.services"]
+# Repository interfaces can use entities and value objects, but not services

@@ -237,7 +237,9 @@
       "Bash(pkill:*)",
       "Bash(ruff check:*)",
       "Bash(ruff rule:*)",
-      "Bash(ruff format:*)"
+      "Bash(ruff format:*)",
+      "Bash(import-linter:*)",
+      "Bash(.venv/bin/import-linter:*)"
     ],
     "deny": []
   }

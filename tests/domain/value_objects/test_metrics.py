@@ -7,7 +7,8 @@ and price analysis value objects with focus on business logic validation.
 
 from decimal import Decimal
 
-from src.domain.services.value_objects.metrics import (
+from src.domain.value_objects import Money
+from src.domain.value_objects.metrics import (
     PortfolioAllocation,
     PortfolioMetrics,
     PositionAllocation,
@@ -16,7 +17,6 @@ from src.domain.services.value_objects.metrics import (
     RiskLevel,
     TrendDirection,
 )
-from src.domain.value_objects import Money
 from src.domain.value_objects.stock_symbol import StockSymbol
 
 

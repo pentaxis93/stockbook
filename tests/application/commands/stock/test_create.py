@@ -239,7 +239,7 @@ class TestCreateStockCommand:
         )
         with pytest.raises(
             ValueError,
-            match="Industry group 'Banking' is not valid for sector",
+            match="Invalid industry group 'Banking'",
         ):
             _ = CreateStockCommand(inputs)
 

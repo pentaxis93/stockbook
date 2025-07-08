@@ -8,13 +8,14 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 
 from src.domain.entities.stock import Stock
-from src.domain.value_objects import Money, Quantity
-
-from .exceptions import InsufficientDataError
-from .value_objects import (
+from src.domain.value_objects import (
+    Money,
+    Quantity,
     RiskAssessment,
     RiskLevel,
 )
+
+from .exceptions import InsufficientDataError
 
 
 @dataclass(frozen=True)
