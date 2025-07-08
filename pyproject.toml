@@ -383,10 +383,52 @@ type = "forbidden"
 source_modules = ["src.infrastructure"]
 forbidden_modules = ["src.domain.events"]
 
+# Contract 16: Persistence tables independence
+# Persistence table definitions should not depend on repository implementations.
+# This ensures clean separation of data models from business logic.
+[[tool.importlinter.contracts]]
+name = "Persistence tables independence"
+type = "forbidden"
+source_modules = ["src.infrastructure.persistence.tables"]
+forbidden_modules = ["src.infrastructure.repositories"]
+
+# Contract 17: Database connection independence
+# Database connection and factory should not depend on repositories.
+# This maintains proper layering within infrastructure.
+[[tool.importlinter.contracts]]
+name = "Database connection independence"
+type = "forbidden"
+source_modules = [
+  "src.infrastructure.persistence.database_connection",
+  "src.infrastructure.persistence.database_factory",
+  "src.infrastructure.persistence.database_initializer",
+]
+forbidden_modules = ["src.infrastructure.repositories"]
+
+# Contract 18: Repository implementations can use persistence
+# Repository implementations are allowed to use persistence components
+# as they need database access. This is a legitimate dependency.
+# Note: This contract is informational and doesn't restrict anything.
+# The restriction is handled by other contracts preventing other layers
+# from accessing infrastructure directly.
+
+# Contract 19: Repository implementations stay in infrastructure
+# Repository implementations should not be used outside of infrastructure
+# except through proper dependency injection.
+[[tool.importlinter.contracts]]
+name = "Repository implementations stay in infrastructure"
+type = "forbidden"
+source_modules = [
+  "src.domain",
+  "src.application",
+  "src.presentation",
+]
+forbidden_modules = ["src.infrastructure.repositories"]
+
 # ===== 5. PRESENTATION LAYER CONTRACTS =====
 # These contracts ensure proper presentation layer organization and boundaries.
 
-# Contract 16: Presentation must not use repositories directly
+# Contract 20: Presentation must not use repositories directly
 # Presentation should only use application services, not repositories.
 # This ensures proper layering and separation of concerns.
 [[tool.importlinter.contracts]]
@@ -401,7 +443,7 @@ forbidden_modules = [
 # ===== 6. CROSS-CUTTING CONCERNS =====
 # These contracts handle patterns that span multiple layers.
 
-# Contract 17: Domain events stay in domain and application
+# Contract 21: Domain events stay in domain and application
 # Domain events should only be used by domain and application layers.
 # Infrastructure and presentation should not directly handle domain events.
 [[tool.importlinter.contracts]]
@@ -416,7 +458,7 @@ forbidden_modules = ["src.domain.events"]
 # ===== 7. TEST ORGANIZATION CONTRACTS =====
 # These contracts ensure proper test organization and boundaries.
 
-# Contract 18: Source code independence from tests
+# Contract 22: Source code independence from tests
 # Source code should never import from test modules. This prevents
 # test code from becoming part of the production codebase.
 [[tool.importlinter.contracts]]
@@ -425,7 +467,7 @@ type = "forbidden"
 source_modules = ["src"]
 forbidden_modules = ["tests", "fixtures"]
 
-# Contract 19: Domain tests should use only domain code
+# Contract 23: Domain tests should use only domain code
 # Note: This contract is documented but cannot be enforced since tests
 # are outside the root_package scope. Consider manual review during PR.
 # Domain tests should only import from src.domain to ensure they test
