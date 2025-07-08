@@ -196,7 +196,7 @@ def main() -> None:
         (["python", "-m", "ruff", "format", "."], "Ruff Format"),
         # Then check
         (["python", "-m", "ruff", "check", "."], "Ruff Lint"),
-        (["python", "-m", "pyright"], "Type Check"),
+        (["python", "-m", "pyright", "--project", "."], "Type Check"),
         (
             ["pytest"],
             "Tests & Coverage",
