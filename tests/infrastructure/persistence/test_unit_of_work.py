@@ -18,6 +18,7 @@ from src.domain.repositories.interfaces import (
     IJournalRepository,
     IPortfolioBalanceRepository,
     IPortfolioRepository,
+    IPositionRepository,
     IStockBookUnitOfWork,
     IStockRepository,
     ITargetRepository,
@@ -25,6 +26,9 @@ from src.domain.repositories.interfaces import (
 )
 from src.infrastructure.persistence.database_connection import SqlAlchemyConnection
 from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
+from src.infrastructure.repositories.sqlalchemy_position_repository import (
+    SqlAlchemyPositionRepository,
+)
 from src.infrastructure.repositories.sqlalchemy_stock_repository import (
     SqlAlchemyStockRepository,
 )
@@ -204,6 +208,21 @@ class TestSqlAlchemyUnitOfWorkRepositoryProperties:
         assert isinstance(repository, SqlAlchemyStockRepository)
         # Should return same instance on subsequent calls
         assert active_uow.stocks is repository
+
+    def test_positions_property_returns_position_repository(
+        self,
+        active_uow: Any,
+    ) -> None:
+        """Should return IPositionRepository instance."""
+        # Act
+        repository = active_uow.positions
+
+        # Assert
+        assert repository is not None
+        assert isinstance(repository, IPositionRepository)
+        assert isinstance(repository, SqlAlchemyPositionRepository)
+        # Should return same instance on subsequent calls
+        assert active_uow.positions is repository
 
     @patch("src.infrastructure.persistence.unit_of_work._SqlAlchemyPortfolioRepository")
     def test_portfolios_property_returns_portfolio_repository(

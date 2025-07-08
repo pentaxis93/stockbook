@@ -14,6 +14,7 @@ from src.domain.repositories.interfaces import (
     IJournalRepository,
     IPortfolioBalanceRepository,
     IPortfolioRepository,
+    IPositionRepository,
     IStockBookUnitOfWork,
     IStockRepository,
     ITargetRepository,
@@ -21,6 +22,9 @@ from src.domain.repositories.interfaces import (
 )
 from src.infrastructure.persistence.database_connection import SqlAlchemyConnection
 from src.infrastructure.persistence.interfaces import IDatabaseConnection
+from src.infrastructure.repositories.sqlalchemy_position_repository import (
+    SqlAlchemyPositionRepository,
+)
 from src.infrastructure.repositories.sqlalchemy_stock_repository import (
     SqlAlchemyStockRepository,
 )
@@ -47,6 +51,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
         self._transactions: ITransactionRepository | None = None
         self._targets: ITargetRepository | None = None
         self._balances: IPortfolioBalanceRepository | None = None
+        self._positions: IPositionRepository | None = None
         self._journal: IJournalRepository | None = None
 
     def __enter__(self) -> "SqlAlchemyUnitOfWork":
@@ -106,6 +111,7 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             self._transactions = None
             self._targets = None
             self._balances = None
+            self._positions = None
             self._journal = None
 
         return None  # Propagate exceptions
@@ -178,6 +184,19 @@ class SqlAlchemyUnitOfWork(IStockBookUnitOfWork):
             # TODO: Replace with actual implementation when available
             self._balances = _SqlAlchemyBalanceRepository(self._db_connection)  # type: ignore[assignment]
         return self._balances  # type: ignore[return-value]
+
+    @property
+    def positions(self) -> IPositionRepository:
+        """Get position repository instance."""
+        self._ensure_active()
+        if self._positions is None:
+            # _ensure_active guarantees _db_connection is not None
+            # Use type guard to satisfy type checker and avoid assert
+            if self._db_connection is None:  # pragma: no cover
+                msg = "Database connection unexpectedly None"
+                raise RuntimeError(msg)
+            self._positions = SqlAlchemyPositionRepository(self._db_connection)
+        return self._positions
 
     @property
     def journal(self) -> IJournalRepository:

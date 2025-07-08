@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from .journal_repository import IJournalRepository
 from .portfolio_balance_repository import IPortfolioBalanceRepository
 from .portfolio_repository import IPortfolioRepository
+from .position_repository import IPositionRepository
 from .stock_repository import IStockRepository
 from .target_repository import ITargetRepository
 from .transaction_repository import ITransactionRepository
@@ -96,6 +97,11 @@ class IStockBookUnitOfWork(IUnitOfWork):
     @abstractmethod
     def balances(self) -> IPortfolioBalanceRepository:
         """Get portfolio balance repository instance."""
+
+    @property
+    @abstractmethod
+    def positions(self) -> IPositionRepository:
+        """Get position repository instance."""
 
     @property
     @abstractmethod
