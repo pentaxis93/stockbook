@@ -633,14 +633,18 @@ source_modules = [
 forbidden_modules = ["src.presentation.web.models"]
 
 # Contract 36: Middleware boundaries
-# Middleware should not access domain or infrastructure directly.
+# Middleware should not access domain or infrastructure directly, except for domain exceptions.
 # This ensures middleware remains focused on cross-cutting presentation concerns.
+# Exception handling middleware needs access to domain exceptions for proper HTTP mapping.
 [[tool.importlinter.contracts]]
 name = "Middleware boundaries"
 type = "forbidden"
 source_modules = ["src.presentation.web.middleware"]
 forbidden_modules = [
-  "src.domain",
+  "src.domain.entities",
+  "src.domain.services",
+  "src.domain.repositories",
+  "src.domain.value_objects",
   "src.infrastructure.repositories",
   "src.infrastructure.persistence",
 ]
