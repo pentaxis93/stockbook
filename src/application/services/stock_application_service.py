@@ -11,7 +11,7 @@ from src.application.commands.stock import (
 from src.application.dto.stock_dto import StockDto
 from src.application.interfaces.stock_service import IStockApplicationService
 from src.domain.entities.stock import Stock
-from src.domain.exceptions.stock import (
+from src.domain.exceptions import (
     StockAlreadyExistsError,
     StockNotFoundError,
 )

@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 
 from src.application.dto.stock_dto import StockDto
 from src.application.interfaces.stock_service import IStockApplicationService
-from src.domain.exceptions.stock import (
+from src.domain.exceptions import (
     StockAlreadyExistsError,
     StockNotFoundError,
 )
@@ -55,7 +55,7 @@ class TestStockRouter:
     def app(self, mock_service: Mock) -> FastAPI:
         """Create FastAPI app with mocked DI container."""
         # Import and register exception handlers
-        from src.domain.exceptions.base import (
+        from src.domain.exceptions import (
             AlreadyExistsError,
             BusinessRuleViolationError,
             DomainError,
@@ -617,7 +617,7 @@ class TestStockRouter:
         # Arrange
         stock_id = "stock-001"
         # Use a domain-specific exception instead of ValueError
-        from src.domain.exceptions.base import BusinessRuleViolationError
+        from src.domain.exceptions import BusinessRuleViolationError
 
         mock_service.update_stock.side_effect = BusinessRuleViolationError(
             rule="sector_industry_compatibility",

@@ -8,7 +8,7 @@ import logging
 from fastapi import HTTPException, Request
 from fastapi.responses import JSONResponse
 
-from src.domain.exceptions.base import (
+from src.domain.exceptions import (
     AlreadyExistsError,
     BusinessRuleViolationError,
     DomainError,

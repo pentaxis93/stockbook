@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from dependency_injection.composition_root import CompositionRoot
-from src.domain.exceptions.base import (
+from src.domain.exceptions import (
     AlreadyExistsError,
     BusinessRuleViolationError,
     DomainError,
