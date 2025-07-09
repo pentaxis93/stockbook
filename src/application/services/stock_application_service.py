@@ -11,6 +11,10 @@ from src.application.commands.stock import (
 from src.application.dto.stock_dto import StockDto
 from src.application.interfaces.stock_service import IStockApplicationService
 from src.domain.entities.stock import Stock
+from src.domain.exceptions.stock import (
+    StockAlreadyExistsError,
+    StockNotFoundError,
+)
 from src.domain.repositories.interfaces import IStockBookUnitOfWork
 from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
 from src.domain.value_objects.sector import Sector
@@ -42,7 +46,7 @@ class StockApplicationService(IStockApplicationService):
             DTO representing the created stock
 
         Raises:
-            ValueError: If stock with symbol already exists
+            StockAlreadyExistsError: If stock with symbol already exists
         """
         try:
             with self._unit_of_work:
@@ -173,7 +177,9 @@ class StockApplicationService(IStockApplicationService):
             DTO representing the updated stock
 
         Raises:
-            ValueError: If stock not found or no fields to update
+            StockNotFoundError: If stock not found
+            StockAlreadyExistsError: If updating symbol to one that already exists
+            ValueError: If no fields to update
         """
         try:
             with self._unit_of_work:
@@ -201,8 +207,7 @@ class StockApplicationService(IStockApplicationService):
         stock_entity = self._unit_of_work.stocks.get_by_id(command.stock_id)
 
         if stock_entity is None:
-            msg = f"Stock with ID {command.stock_id} not found"
-            raise ValueError(msg)
+            raise StockNotFoundError(identifier=command.stock_id)
 
         # Validate that there are fields to update
         if not command.has_updates():
@@ -214,8 +219,7 @@ class StockApplicationService(IStockApplicationService):
             symbol_vo = StockSymbol(command.symbol)
             existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
             if existing_stock is not None and existing_stock.id != command.stock_id:
-                msg = f"Stock with symbol {command.symbol} already exists"
-                raise ValueError(msg)
+                raise StockAlreadyExistsError(symbol=command.symbol)
 
         return stock_entity
 
@@ -244,9 +248,8 @@ class StockApplicationService(IStockApplicationService):
             symbol: The symbol string for error message
 
         Raises:
-            ValueError: If stock with symbol already exists
+            StockAlreadyExistsError: If stock with symbol already exists
         """
         existing_stock = self._unit_of_work.stocks.get_by_symbol(symbol_vo)
         if existing_stock is not None:
-            msg = f"Stock with symbol {symbol} already exists"
-            raise ValueError(msg)
+            raise StockAlreadyExistsError(symbol=symbol)

@@ -18,6 +18,10 @@ from src.application.commands.stock import (
 from src.application.dto.stock_dto import StockDto
 from src.application.services.stock_application_service import StockApplicationService
 from src.domain.entities.stock import Stock
+from src.domain.exceptions.stock import (
+    StockAlreadyExistsError,
+    StockNotFoundError,
+)
 from src.domain.repositories.interfaces import IStockBookUnitOfWork, IStockRepository
 from src.domain.value_objects import CompanyName, Grade, IndustryGroup, Notes
 from src.domain.value_objects.sector import Sector
@@ -129,7 +133,7 @@ class TestStockApplicationService:
         self.mock_stock_repository.get_by_symbol.return_value = existing_stock
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Stock with symbol AAPL already exists"):
+        with pytest.raises(StockAlreadyExistsError):
             _ = self.service.create_stock(command)
 
         # Verify no creation was attempted
@@ -471,7 +475,7 @@ class TestStockApplicationService:
         self.mock_stock_repository.get_by_id.return_value = None
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Stock with ID stock-999 not found"):
+        with pytest.raises(StockNotFoundError):
             _ = self.service.update_stock(command)
 
         # Verify rollback was called
@@ -564,7 +568,7 @@ class TestStockApplicationService:
         self.mock_stock_repository.get_by_symbol.return_value = another_stock
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Stock with symbol MSFT already exists"):
+        with pytest.raises(StockAlreadyExistsError):
             _ = self.service.update_stock(command)
 
         # Verify rollback was called
@@ -699,7 +703,7 @@ class TestStockApplicationService:
         self.mock_stock_repository.get_by_id.return_value = None
 
         # Act & Assert
-        with pytest.raises(ValueError, match="Stock with ID stock-999 not found"):
+        with pytest.raises(StockNotFoundError):
             _ = self.service.update_stock(command)
 
     def test_update_stock_raises_when_no_fields_to_update(self) -> None:
