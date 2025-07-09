@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 async def not_found_exception_handler(
     _request: Request,
-    exception: NotFoundError,
+    exception: Exception,
 ) -> JSONResponse:
     """Handle NotFoundError exceptions.
 
@@ -33,6 +33,9 @@ async def not_found_exception_handler(
     Returns:
         JSONResponse with 404 status code
     """
+    if not isinstance(exception, NotFoundError):
+        msg = f"Expected NotFoundError but got {type(exception).__name__}"
+        raise TypeError(msg)
     return JSONResponse(
         status_code=404,
         content={"detail": str(exception)},
@@ -41,7 +44,7 @@ async def not_found_exception_handler(
 
 async def already_exists_exception_handler(
     _request: Request,
-    exception: AlreadyExistsError,
+    exception: Exception,
 ) -> JSONResponse:
     """Handle AlreadyExistsError exceptions.
 
@@ -54,6 +57,9 @@ async def already_exists_exception_handler(
     Returns:
         JSONResponse with 409 status code
     """
+    if not isinstance(exception, AlreadyExistsError):
+        msg = f"Expected AlreadyExistsError but got {type(exception).__name__}"
+        raise TypeError(msg)
     return JSONResponse(
         status_code=409,
         content={"detail": str(exception)},
@@ -62,7 +68,7 @@ async def already_exists_exception_handler(
 
 async def business_rule_violation_exception_handler(
     _request: Request,
-    exception: BusinessRuleViolationError,
+    exception: Exception,
 ) -> JSONResponse:
     """Handle BusinessRuleViolationError exceptions.
 
@@ -75,6 +81,9 @@ async def business_rule_violation_exception_handler(
     Returns:
         JSONResponse with 422 status code
     """
+    if not isinstance(exception, BusinessRuleViolationError):
+        msg = f"Expected BusinessRuleViolationError but got {type(exception).__name__}"
+        raise TypeError(msg)
     return JSONResponse(
         status_code=422,
         content={"detail": str(exception)},
@@ -83,7 +92,7 @@ async def business_rule_violation_exception_handler(
 
 async def domain_exception_handler(
     _request: Request,
-    exception: DomainError,
+    exception: Exception,
 ) -> JSONResponse:
     """Handle generic DomainError exceptions.
 
@@ -96,6 +105,9 @@ async def domain_exception_handler(
     Returns:
         JSONResponse with 400 status code
     """
+    if not isinstance(exception, DomainError):
+        msg = f"Expected DomainError but got {type(exception).__name__}"
+        raise TypeError(msg)
     return JSONResponse(
         status_code=400,
         content={"detail": str(exception)},
@@ -104,7 +116,7 @@ async def domain_exception_handler(
 
 async def http_exception_handler(
     _request: Request,
-    exception: HTTPException,
+    exception: Exception,
 ) -> JSONResponse:
     """Handle HTTPException pass-through.
 
@@ -117,6 +129,9 @@ async def http_exception_handler(
     Returns:
         JSONResponse with the original status code and detail
     """
+    if not isinstance(exception, HTTPException):
+        msg = f"Expected HTTPException but got {type(exception).__name__}"
+        raise TypeError(msg)
     return JSONResponse(
         status_code=exception.status_code,
         content={"detail": exception.detail},

@@ -316,9 +316,9 @@ class TestExceptionResponseFormat:
             # Suppress logger for generic handler
             if handler == generic_exception_handler:
                 with patch("src.presentation.web.middleware.exception_handler.logger"):
-                    response = await handler(request, exception)  # type: ignore[arg-type]
+                    response = await handler(request, exception)
             else:
-                response = await handler(request, exception)  # type: ignore[arg-type]
+                response = await handler(request, exception)
 
             # All responses should have 'detail' field
             assert (
@@ -336,6 +336,73 @@ class TestExceptionResponseFormat:
 
         # Check content type
         assert response.media_type == "application/json"
+
+
+class TestExceptionHandlerTypeGuards:
+    """Test the type guard error handling in exception handlers."""
+
+    @pytest.mark.anyio
+    async def test_not_found_handler_with_wrong_exception_type(self) -> None:
+        """Should raise TypeError if wrong exception type is passed."""
+        request = Mock(spec=Request)
+        wrong_exception = ValueError("Not a NotFoundError")
+
+        with pytest.raises(
+            TypeError,
+            match="Expected NotFoundError but got ValueError",
+        ):
+            _ = await not_found_exception_handler(request, wrong_exception)
+
+    @pytest.mark.anyio
+    async def test_already_exists_handler_with_wrong_exception_type(self) -> None:
+        """Should raise TypeError if wrong exception type is passed."""
+        request = Mock(spec=Request)
+        wrong_exception = RuntimeError("Not an AlreadyExistsError")
+
+        with pytest.raises(
+            TypeError,
+            match="Expected AlreadyExistsError but got RuntimeError",
+        ):
+            _ = await already_exists_exception_handler(request, wrong_exception)
+
+    @pytest.mark.anyio
+    async def test_business_rule_handler_with_wrong_exception_type(self) -> None:
+        """Should raise TypeError if wrong exception type is passed."""
+        request = Mock(spec=Request)
+        wrong_exception = KeyError("Not a BusinessRuleViolationError")
+
+        with pytest.raises(
+            TypeError,
+            match="Expected BusinessRuleViolationError but got KeyError",
+        ):
+            _ = await business_rule_violation_exception_handler(
+                request,
+                wrong_exception,
+            )
+
+    @pytest.mark.anyio
+    async def test_domain_handler_with_wrong_exception_type(self) -> None:
+        """Should raise TypeError if wrong exception type is passed."""
+        request = Mock(spec=Request)
+        wrong_exception = AttributeError("Not a DomainError")
+
+        with pytest.raises(
+            TypeError,
+            match="Expected DomainError but got AttributeError",
+        ):
+            _ = await domain_exception_handler(request, wrong_exception)
+
+    @pytest.mark.anyio
+    async def test_http_handler_with_wrong_exception_type(self) -> None:
+        """Should raise TypeError if wrong exception type is passed."""
+        request = Mock(spec=Request)
+        wrong_exception = IndexError("Not an HTTPException")
+
+        with pytest.raises(
+            TypeError,
+            match="Expected HTTPException but got IndexError",
+        ):
+            _ = await http_exception_handler(request, wrong_exception)
 
 
 class TestExceptionHandlerIntegration:
@@ -397,7 +464,7 @@ class TestExceptionHandlerIntegration:
         handler = handler_map.get(type(exception))  # type: ignore[arg-type]
         assert handler is not None, f"No handler for {type(exception)}"
 
-        response = await handler(request, exception)  # type: ignore[arg-type]
+        response = await handler(request, exception)
 
         assert response.status_code == expected_status
         assert expected_detail_contains.encode() in response.body

@@ -14,7 +14,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from dependency_injection.composition_root import CompositionRoot
+from src.domain.exceptions.base import (
+    AlreadyExistsError,
+    BusinessRuleViolationError,
+    DomainError,
+    NotFoundError,
+)
 from src.infrastructure.persistence.database_initializer import initialize_database
+from src.presentation.web.middleware.exception_handler import (
+    already_exists_exception_handler,
+    business_rule_violation_exception_handler,
+    domain_exception_handler,
+    generic_exception_handler,
+    not_found_exception_handler,
+)
 from src.presentation.web.routers import stock_router
 
 logger = logging.getLogger(__name__)
@@ -85,6 +98,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Register exception handlers
+app.add_exception_handler(NotFoundError, not_found_exception_handler)
+app.add_exception_handler(AlreadyExistsError, already_exists_exception_handler)
+app.add_exception_handler(
+    BusinessRuleViolationError,
+    business_rule_violation_exception_handler,
+)
+app.add_exception_handler(DomainError, domain_exception_handler)
+app.add_exception_handler(Exception, generic_exception_handler)
 
 # Include routers
 app.include_router(stock_router.router)
