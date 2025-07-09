@@ -6,6 +6,12 @@ from .base import (
     DomainError,
     NotFoundError,
 )
+from .portfolio import (
+    InactivePortfolioError,
+    PortfolioAlreadyExistsError,
+    PortfolioBalanceError,
+    PortfolioNotFoundError,
+)
 from .stock import (
     InvalidStockGradeError,
     InvalidStockSymbolError,
@@ -17,9 +23,13 @@ __all__ = [
     "AlreadyExistsError",
     "BusinessRuleViolationError",
     "DomainError",
+    "InactivePortfolioError",
     "InvalidStockGradeError",
     "InvalidStockSymbolError",
     "NotFoundError",
+    "PortfolioAlreadyExistsError",
+    "PortfolioBalanceError",
+    "PortfolioNotFoundError",
     "StockAlreadyExistsError",
     "StockNotFoundError",
 ]
