@@ -10,7 +10,6 @@ from typing import Annotated, NoReturn
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 
 from src.application.interfaces.stock_service import IStockApplicationService
-from src.presentation.web.middleware import handle_stock_errors
 from src.presentation.web.models.stock_models import (
     StockListResponse,
     StockRequest,
@@ -73,7 +72,6 @@ stock_service_dependency = Depends(get_stock_service)
 
 
 @router.get("", response_model=StockListResponse)
-@handle_stock_errors
 async def get_stocks(
     symbol: Annotated[
         str | None,
@@ -130,33 +128,21 @@ async def get_stock_by_id(
         StockResponse containing the stock information
 
     Raises:
-        HTTPException: 404 if stock not found, 500 for server errors
+        HTTPException: 404 if stock not found
     """
-    try:
-        # Get stock from service
-        stock_dto = service.get_stock_by_id(stock_id)
+    # Get stock from service
+    stock_dto = service.get_stock_by_id(stock_id)
 
-        # Check if stock exists
-        if stock_dto is None:
-            logger.warning("Stock with ID %s not found", stock_id)
-            _raise_not_found(stock_id)
+    # Check if stock exists
+    if stock_dto is None:
+        logger.warning("Stock with ID %s not found", stock_id)
+        _raise_not_found(stock_id)
 
-        # Convert DTO to response model
-        return StockResponse.from_dto(stock_dto)
-
-    except HTTPException:
-        # Re-raise HTTP exceptions as-is
-        raise
-    except Exception as e:
-        logger.exception("Error retrieving stock %s", stock_id)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to retrieve stock",
-        ) from e
+    # Convert DTO to response model
+    return StockResponse.from_dto(stock_dto)
 
 
 @router.post("", response_model=StockResponse, status_code=status.HTTP_201_CREATED)
-@handle_stock_errors
 async def create_stock(
     stock_request: StockRequest,
     service: IStockApplicationService = stock_service_dependency,
@@ -189,7 +175,6 @@ async def create_stock(
 
 
 @router.put("/{stock_id}", response_model=StockResponse)
-@handle_stock_errors
 async def update_stock(
     stock_id: str,
     stock_update: StockUpdateRequest,

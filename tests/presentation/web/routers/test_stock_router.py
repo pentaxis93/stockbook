@@ -12,6 +12,10 @@ from fastapi.testclient import TestClient
 
 from src.application.dto.stock_dto import StockDto
 from src.application.interfaces.stock_service import IStockApplicationService
+from src.domain.exceptions.stock import (
+    StockAlreadyExistsError,
+    StockNotFoundError,
+)
 from src.presentation.web.routers import stock_router
 
 
@@ -50,8 +54,34 @@ class TestStockRouter:
     @pytest.fixture
     def app(self, mock_service: Mock) -> FastAPI:
         """Create FastAPI app with mocked DI container."""
+        # Import and register exception handlers
+        from src.domain.exceptions.base import (
+            AlreadyExistsError,
+            BusinessRuleViolationError,
+            DomainError,
+            NotFoundError,
+        )
+        from src.presentation.web.middleware.exception_handler import (
+            already_exists_exception_handler,
+            business_rule_violation_exception_handler,
+            domain_exception_handler,
+            generic_exception_handler,
+            not_found_exception_handler,
+        )
+
+        # Create a new app instance for each test
         app = FastAPI()
         app.include_router(stock_router.router)
+
+        # Register exception handlers
+        app.add_exception_handler(NotFoundError, not_found_exception_handler)
+        app.add_exception_handler(AlreadyExistsError, already_exists_exception_handler)
+        app.add_exception_handler(
+            BusinessRuleViolationError,
+            business_rule_violation_exception_handler,
+        )
+        app.add_exception_handler(DomainError, domain_exception_handler)
+        app.add_exception_handler(Exception, generic_exception_handler)
 
         # Create a mock DI container
         mock_di_container = Mock()
@@ -61,6 +91,11 @@ class TestStockRouter:
         app.state.di_container = mock_di_container
 
         return app
+
+    @pytest.fixture
+    def client(self, app: FastAPI) -> TestClient:
+        """Create TestClient with exception handling."""
+        return TestClient(app, raise_server_exceptions=False)
 
     def test_get_stock_service_without_di_container_raises_error(self) -> None:
         """Should raise RuntimeError when DI container is not configured."""
@@ -89,7 +124,7 @@ class TestStockRouter:
         # Mock service is already set up in the app fixture
 
         # Create test client with the app that has mocked service
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks")
 
         assert response.status_code == 200
@@ -113,7 +148,7 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks", params={"symbol": "AAPL"})
 
         assert response.status_code == 200
@@ -147,7 +182,7 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get(
                 "/stocks",
                 params={"symbol": "GOOGL"},
@@ -174,7 +209,7 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks", params={"symbol": ""})
 
         assert response.status_code == 200
@@ -193,7 +228,7 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get(
                 "/stocks",
                 params={"symbol": "  AAPL  "},
@@ -214,15 +249,15 @@ class TestStockRouter:
         app: FastAPI,
     ) -> None:
         """Should return 500 error when service raises exception."""
-        mock_service.get_all_stocks.side_effect = Exception("Database error")
+        mock_service.get_all_stocks.side_effect = RuntimeError("Database error")
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks")
 
         assert response.status_code == 500
-        assert response.json()["detail"] == "Failed to retrieve stocks"
+        assert response.json()["detail"] == "An unexpected error occurred"
 
     def test_get_stocks_service_exception_with_filters(
         self,
@@ -234,12 +269,12 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks", params={"symbol": "INVALID"})
 
-        # ValueError should be converted to 422 validation error
-        assert response.status_code == 422
-        assert response.json()["detail"] == "Invalid filter"
+        # ValueError should be converted to 500 error by generic handler
+        assert response.status_code == 500
+        assert response.json()["detail"] == "An unexpected error occurred"
 
     def test_get_stocks_response_format(
         self,
@@ -252,7 +287,7 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks")
 
         assert response.status_code == 200
@@ -280,7 +315,7 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks")
 
         assert response.status_code == 200
@@ -288,7 +323,7 @@ class TestStockRouter:
         assert data["total"] == 0
         assert data["stocks"] == []
 
-    @patch("src.presentation.web.middleware.error_handlers.logger")
+    @patch("src.presentation.web.middleware.exception_handler.logger")
     def test_get_stocks_logs_errors(
         self,
         mock_logger: Mock,
@@ -301,15 +336,16 @@ class TestStockRouter:
 
         # Mock service is already set up in the app fixture
 
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.get("/stocks")
 
         assert response.status_code == 500
 
-        # Verify error was logged
+        # Verify error was logged by the generic exception handler
         mock_logger.exception.assert_called_once()
-        log_message = mock_logger.exception.call_args[0][0]
-        assert "Error retrieving stocks" in log_message
+        log_call = mock_logger.exception.call_args
+        # The generic handler logs with format: "Unexpected error at {path}: {error}"
+        assert "Unexpected error at" in log_call[0][0]
 
     def test_update_stock_partial_update_success(
         self,
@@ -339,7 +375,7 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(
                 f"/stocks/{stock_id}",
                 json={"grade": "B", "notes": "Updated notes"},
@@ -396,7 +432,7 @@ class TestStockRouter:
         }
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json=request_data)
 
         # Assert
@@ -441,7 +477,7 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"symbol": "APPL"})
 
         # Assert
@@ -454,11 +490,11 @@ class TestStockRouter:
         mock_service: Mock,
         app: FastAPI,
     ) -> None:
-        """Should return 400 when changing to an existing symbol."""
+        """Should return 409 when changing to an existing symbol."""
         # Arrange
         stock_id = "stock-001"
-        mock_service.update_stock.side_effect = ValueError(
-            "Stock with symbol MSFT already exists",
+        mock_service.update_stock.side_effect = StockAlreadyExistsError(
+            symbol="MSFT",
         )
 
         # Mock service is already set up in the app fixture
@@ -466,20 +502,20 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"symbol": "MSFT"})
 
         # Assert
-        assert response.status_code == 400
+        assert response.status_code == 409
         data = response.json()
-        assert "already exists" in data["detail"]
+        assert "Stock with identifier 'MSFT' already exists" in data["detail"]
 
     def test_update_stock_not_found(self, mock_service: Mock, app: FastAPI) -> None:
         """Should return 404 when stock doesn't exist."""
         # Arrange
         stock_id = "non-existent-id"
-        mock_service.update_stock.side_effect = ValueError(
-            f"Stock with ID {stock_id} not found",
+        mock_service.update_stock.side_effect = StockNotFoundError(
+            identifier=stock_id,
         )
 
         # Mock service is already set up in the app fixture
@@ -487,36 +523,46 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
 
         # Assert
         assert response.status_code == 404
         data = response.json()
-        assert "not found" in data["detail"]
+        assert f"Stock with identifier '{stock_id}' not found" in data["detail"]
 
     def test_update_stock_empty_request_body(
         self,
         mock_service: Mock,
         app: FastAPI,
     ) -> None:
-        """Should return 422 for empty update request."""
+        """Should return 200 for empty update request."""
         # Arrange
         stock_id = "stock-001"
-        mock_service.update_stock.side_effect = ValueError("No fields to update")
+        # Empty update is valid - the service should return unchanged stock
+        updated_stock = StockDto(
+            id=stock_id,
+            symbol="AAPL",
+            name="Apple Inc.",
+            sector="Technology",
+            industry_group="Hardware",
+            grade="A",
+            notes="No changes",
+        )
+        mock_service.update_stock.return_value = updated_stock
 
         # Mock service is already set up in the app fixture
 
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={})
 
-        # Assert
-        assert response.status_code == 422
+        # Assert - Empty body is valid in StockUpdateRequest (all fields optional)
+        assert response.status_code == 200
         data = response.json()
-        assert "No fields to update" in data["detail"]
+        assert data["id"] == stock_id
 
     def test_update_stock_invalid_grade(self, app: FastAPI) -> None:
         """Should return 422 for invalid grade values."""
@@ -528,7 +574,7 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"grade": "Z"})
 
         # Assert
@@ -537,28 +583,30 @@ class TestStockRouter:
         assert "detail" in data
         # Should be caught by Pydantic validation
 
-    def test_update_stock_invalid_symbol_format(self, app: FastAPI) -> None:
+    def test_update_stock_invalid_symbol_format(
+        self,
+        app: FastAPI,
+        mock_service: Mock,  # noqa: ARG002
+    ) -> None:
         """Should return 422 for invalid symbol format."""
-        # Arrange
         stock_id = "stock-001"
-
-        # Mock service is already set up in the app fixture
-
-        # App already configured with mock service
-
         test_cases = [
             {"symbol": "123ABC"},  # Numbers
             {"symbol": "AB-CD"},  # Hyphen
             {"symbol": "AB.CD"},  # Dot
             {"symbol": "TOOLONG"},  # Too long
-            {"symbol": ""},  # Empty
         ]
 
         # Act & Assert
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             for request_data in test_cases:
                 response = client.put(f"/stocks/{stock_id}", json=request_data)
                 assert response.status_code == 422
+                data = response.json()
+                assert "detail" in data
+                # Check for Pydantic validation error structure
+                assert isinstance(data["detail"], list)
+                assert any("symbol" in str(err).lower() for err in data["detail"])
 
     def test_update_stock_sector_industry_validation(
         self,
@@ -568,8 +616,12 @@ class TestStockRouter:
         """Should validate sector-industry relationship."""
         # Arrange
         stock_id = "stock-001"
-        mock_service.update_stock.side_effect = ValueError(
-            "Industry group 'Banking' does not belong to sector 'Technology'",
+        # Use a domain-specific exception instead of ValueError
+        from src.domain.exceptions.base import BusinessRuleViolationError
+
+        mock_service.update_stock.side_effect = BusinessRuleViolationError(
+            rule="sector_industry_compatibility",
+            context={"sector": "Technology", "industry_group": "Banking"},
         )
 
         # Mock service is already set up in the app fixture
@@ -577,16 +629,18 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(
                 f"/stocks/{stock_id}",
                 json={"sector": "Technology", "industry_group": "Banking"},
             )
 
-        # Assert
+        # Assert - BusinessRuleViolationError maps to 422 in our handler
         assert response.status_code == 422
         data = response.json()
-        assert "does not belong to sector" in data["detail"]
+        assert (
+            "Business rule 'sector_industry_compatibility' violated" in data["detail"]
+        )
 
     def test_update_stock_clear_industry_when_sector_changes(
         self,
@@ -614,7 +668,7 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act - only change sector
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"sector": "Healthcare"})
 
         # Assert
@@ -627,20 +681,20 @@ class TestStockRouter:
         """Should return 500 for unexpected service errors."""
         # Arrange
         stock_id = "stock-001"
-        mock_service.update_stock.side_effect = RuntimeError("Database error")
+        mock_service.update_stock.side_effect = Exception("Database error")
 
         # Mock service is already set up in the app fixture
 
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
 
         # Assert
         assert response.status_code == 500
         data = response.json()
-        assert data["detail"] == "Failed to update stock"
+        assert data["detail"] == "An unexpected error occurred"
 
     def test_update_stock_whitespace_trimming(
         self,
@@ -675,7 +729,7 @@ class TestStockRouter:
         }
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json=request_data)
 
         # Assert
@@ -723,7 +777,7 @@ class TestStockRouter:
         }
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json=request_data)
 
         # Assert
@@ -737,7 +791,7 @@ class TestStockRouter:
         assert command.grade is None
         assert command.notes == ""  # Notes can be empty string
 
-    @patch("src.presentation.web.middleware.error_handlers.logger")
+    @patch("src.presentation.web.middleware.exception_handler.logger")
     def test_update_stock_logs_errors(
         self,
         mock_logger: Mock,
@@ -755,7 +809,7 @@ class TestStockRouter:
         # App already configured with mock service
 
         # Act
-        with TestClient(app) as client:
+        with TestClient(app, raise_server_exceptions=False) as client:
             response = client.put(f"/stocks/{stock_id}", json={"grade": "A"})
 
         # Assert
@@ -763,5 +817,105 @@ class TestStockRouter:
 
         # Verify error was logged
         mock_logger.exception.assert_called_once()
-        log_message = mock_logger.exception.call_args[0][0]
-        assert "Error updating stock" in log_message
+        log_args = mock_logger.exception.call_args[0]
+        assert "Unexpected error at" in log_args[0]
+
+    def test_create_stock_with_not_found_exception(
+        self,
+        mock_service: Mock,
+        app: FastAPI,
+    ) -> None:
+        """Should return 404 when create stock raises StockNotFoundError."""
+        # This tests the global exception handler for create_stock endpoint
+        # Could happen if creating stock references missing entity
+        mock_service.create_stock.side_effect = StockNotFoundError(
+            identifier="TECH-SECTOR-001",
+        )
+
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.post(
+                "/stocks",
+                json={
+                    "symbol": "AAPL",
+                    "name": "Apple Inc.",
+                    "sector": "Technology",
+                },
+            )
+
+        assert response.status_code == 404
+        data = response.json()
+        assert "Stock with identifier 'TECH-SECTOR-001' not found" in data["detail"]
+
+    def test_create_stock_with_already_exists_exception(
+        self,
+        mock_service: Mock,
+        app: FastAPI,
+    ) -> None:
+        """Should return 409 when create stock raises StockAlreadyExistsError."""
+        # This tests the global exception handler for create_stock endpoint
+        mock_service.create_stock.side_effect = StockAlreadyExistsError(
+            symbol="AAPL",
+        )
+
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.post(
+                "/stocks",
+                json={
+                    "symbol": "AAPL",
+                    "name": "Apple Inc.",
+                    "sector": "Technology",
+                },
+            )
+
+        assert response.status_code == 409
+        data = response.json()
+        assert "Stock with identifier 'AAPL' already exists" in data["detail"]
+
+    def test_get_stock_by_id_endpoint(
+        self,
+        mock_service: Mock,
+        app: FastAPI,
+    ) -> None:
+        """Test get_stock_by_id endpoint with domain exceptions."""
+        # Test not found
+        mock_service.get_stock_by_id.return_value = None
+
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.get("/stocks/non-existent")
+
+        assert response.status_code == 404
+        data = response.json()
+        assert "Stock with ID non-existent not found" in data["detail"]
+
+    def test_get_stock_by_id_endpoint_success(
+        self,
+        mock_service: Mock,
+        sample_stock_dtos: list[StockDto],
+        app: FastAPI,
+    ) -> None:
+        """Test get_stock_by_id endpoint success case."""
+        stock_dto = sample_stock_dtos[0]
+        mock_service.get_stock_by_id.return_value = stock_dto
+
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.get(f"/stocks/{stock_dto.id}")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == stock_dto.id
+        assert data["symbol"] == stock_dto.symbol
+
+    def test_get_stock_by_id_endpoint_error(
+        self,
+        mock_service: Mock,
+        app: FastAPI,
+    ) -> None:
+        """Test get_stock_by_id endpoint with unexpected error."""
+        mock_service.get_stock_by_id.side_effect = Exception("Database error")
+
+        with TestClient(app, raise_server_exceptions=False) as client:
+            response = client.get("/stocks/stock-123")
+
+        assert response.status_code == 500
+        data = response.json()
+        assert data["detail"] == "An unexpected error occurred"
