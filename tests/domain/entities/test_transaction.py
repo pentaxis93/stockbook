@@ -37,7 +37,7 @@ class TestTransactionBuilder:
         assert transaction.stock_id == "stock-1"
         assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 100
-        assert transaction.price.amount == Decimal("150.25")
+        assert transaction.price.value == Decimal("150.25")
         assert transaction.transaction_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert transaction.notes.value == "Initial purchase"
         assert transaction.id == "transaction-id"
@@ -59,7 +59,7 @@ class TestTransactionBuilder:
         assert transaction.stock_id == "stock-1"
         assert transaction.transaction_type.value == "sell"
         assert transaction.quantity.value == 50
-        assert transaction.price.amount == Decimal("175.50")
+        assert transaction.price.value == Decimal("175.50")
         assert transaction.transaction_date == datetime(2024, 2, 1, tzinfo=UTC)
         assert transaction.notes.value == ""  # Default
 
@@ -272,7 +272,7 @@ class TestTransaction:
         # String access through value property
         assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 75
-        assert transaction.price.amount == Decimal("200.00")
+        assert transaction.price.value == Decimal("200.00")
         assert transaction.notes.value == "Test transaction"
 
     def test_create_transaction_with_none_notes_allowed(self) -> None:

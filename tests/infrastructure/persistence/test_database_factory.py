@@ -123,19 +123,23 @@ class TestDatabaseFactory:
 class TestDatabaseFactoryWithConfig:
     """Test database factory with configuration integration."""
 
-    @patch("src.infrastructure.persistence.database_factory.Config")
-    def test_create_engine_from_config(self, mock_config_class: Mock) -> None:
+    @patch("src.infrastructure.persistence.database_factory.app_config")
+    @patch("src.infrastructure.persistence.database_factory.database_config")
+    def test_create_engine_from_config(
+        self,
+        mock_database_config: Mock,
+        mock_app_config: Mock,
+    ) -> None:
         """Should create engine using configuration settings."""
         from src.infrastructure.persistence.database_factory import (
             create_engine_from_config,
         )
 
         # Arrange
-        mock_config = Mock()
-        mock_config.database_url = "sqlite:///configured/database.db"
-        mock_config.db_connection_timeout = 30
-        mock_config.DEBUG = False  # Add DEBUG attribute
-        mock_config_class.return_value = mock_config
+        mock_database_config.get_connection_string.return_value = (
+            "sqlite:///configured/database.db"
+        )
+        mock_app_config.DEBUG = False
 
         # Act
         engine = create_engine_from_config()
@@ -143,19 +147,25 @@ class TestDatabaseFactoryWithConfig:
         # Assert
         assert isinstance(engine, Engine)
         assert "configured/database.db" in str(engine.url)
+        mock_database_config.get_connection_string.assert_called_once_with(test=False)
 
-    @patch("src.infrastructure.persistence.database_factory.Config")
-    def test_create_test_engine_from_config(self, mock_config_class: Mock) -> None:
+    @patch("src.infrastructure.persistence.database_factory.app_config")
+    @patch("src.infrastructure.persistence.database_factory.database_config")
+    def test_create_test_engine_from_config(
+        self,
+        mock_database_config: Mock,
+        mock_app_config: Mock,
+    ) -> None:
         """Should create test engine using test database path."""
         from src.infrastructure.persistence.database_factory import (
             create_engine_from_config,
         )
 
         # Arrange
-        mock_config = Mock()
-        mock_config.test_database_url = "sqlite:///test/database.db"
-        mock_config.DEBUG = False  # Add DEBUG attribute
-        mock_config_class.return_value = mock_config
+        mock_database_config.get_connection_string.return_value = (
+            "sqlite:///test/database.db"
+        )
+        mock_app_config.DEBUG = False
 
         # Act
         engine = create_engine_from_config(use_test_db=True)
@@ -163,6 +173,7 @@ class TestDatabaseFactoryWithConfig:
         # Assert
         assert isinstance(engine, Engine)
         assert "test/database.db" in str(engine.url)
+        mock_database_config.get_connection_string.assert_called_once_with(test=True)
 
 
 class TestDatabaseFactoryErrorHandling:

@@ -34,7 +34,7 @@ class TestPositionBuilder:
         assert position.portfolio_id == "portfolio-1"
         assert position.stock_id == "stock-1"
         assert position.quantity.value == 100
-        assert position.average_cost.amount == Decimal("150.25")
+        assert position.average_cost.value == Decimal("150.25")
         assert position.last_transaction_date == last_transaction_date
         assert position.id == "position-id"
 
@@ -52,7 +52,7 @@ class TestPositionBuilder:
         assert position.portfolio_id == "portfolio-1"
         assert position.stock_id == "stock-1"
         assert position.quantity.value == 50
-        assert position.average_cost.amount == Decimal("175.50")
+        assert position.average_cost.value == Decimal("175.50")
         assert position.last_transaction_date is None
         assert position.id is not None  # Generated UUID
 
@@ -207,7 +207,7 @@ class TestPosition:
 
         # Value access through value property
         assert position.quantity.value == 75
-        assert position.average_cost.amount == Decimal("200.00")
+        assert position.average_cost.value == Decimal("200.00")
 
     def test_position_equality(self) -> None:
         """Should compare positions based on ID."""
@@ -477,7 +477,7 @@ class TestPositionBusinessMethods:
         position.add_shares(Quantity(50), Money(Decimal("200.00")))
 
         assert position.quantity.value == 150
-        assert position.average_cost.amount == Decimal("166.67")
+        assert position.average_cost.value == Decimal("166.67")
 
     def test_add_shares_updates_transaction_date(self) -> None:
         """Should update last transaction date when adding shares."""
@@ -510,7 +510,7 @@ class TestPositionBusinessMethods:
         position.remove_shares(Quantity(25))
 
         assert position.quantity.value == 75
-        assert position.average_cost.amount == Decimal("150.00")  # Unchanged
+        assert position.average_cost.value == Decimal("150.00")  # Unchanged
 
     def test_remove_shares_updates_transaction_date(self) -> None:
         """Should update last transaction date when removing shares."""
@@ -560,7 +560,7 @@ class TestPositionBusinessMethods:
         position.remove_shares(Quantity(100))
 
         assert position.quantity.value == 0
-        assert position.average_cost.amount == Decimal("150.00")  # Preserved
+        assert position.average_cost.value == Decimal("150.00")  # Preserved
 
     def test_add_zero_shares(self) -> None:
         """Should handle adding zero shares."""
@@ -576,7 +576,7 @@ class TestPositionBusinessMethods:
         position.add_shares(Quantity(0), Money(Decimal("200.00")))
 
         assert position.quantity.value == 100
-        assert position.average_cost.amount == Decimal("150.00")
+        assert position.average_cost.value == Decimal("150.00")
 
     def test_remove_zero_shares(self) -> None:
         """Should handle removing zero shares."""
@@ -592,4 +592,4 @@ class TestPositionBusinessMethods:
         position.remove_shares(Quantity(0))
 
         assert position.quantity.value == 100
-        assert position.average_cost.amount == Decimal("150.00")
+        assert position.average_cost.value == Decimal("150.00")

@@ -162,12 +162,12 @@ class Position(Entity):
     def calculate_gain_loss_percentage(self, current_price: Money) -> Decimal:
         """Calculate gain/loss percentage of position."""
         total_cost = self.calculate_total_cost()
-        if total_cost.amount == 0:
+        if total_cost.value == 0:
             msg = "Cannot calculate percentage with zero cost"
             raise ZeroDivisionError(msg)
 
         gain_loss = self.calculate_gain_loss(current_price)
-        return (gain_loss.amount / total_cost.amount) * 100
+        return (gain_loss.value / total_cost.value) * 100
 
     def is_profitable(self, current_price: Money) -> bool:
         """Check if position is profitable at current price."""

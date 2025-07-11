@@ -18,32 +18,32 @@ class TestMoneyCreation:
     def test_create_money_with_decimal_amount(self) -> None:
         """Should create Money with decimal amount."""
         money = Money(Decimal("100.50"))
-        assert money.amount == Decimal("100.50")
+        assert money.value == Decimal("100.50")
 
     def test_create_money_with_integer_amount(self) -> None:
         """Should create Money with integer amount converted to decimal."""
         money = Money(100)
-        assert money.amount == Decimal("100.00")
+        assert money.value == Decimal("100.00")
 
     def test_create_money_with_float_amount(self) -> None:
         """Should create Money with float amount converted to decimal."""
         money = Money(99.99)
-        assert money.amount == Decimal("99.99")
+        assert money.value == Decimal("99.99")
 
     def test_create_money_with_string_amount(self) -> None:
         """Should create Money with string amount converted to decimal."""
         money = Money("75.25")
-        assert money.amount == Decimal("75.25")
+        assert money.value == Decimal("75.25")
 
     def test_create_money_with_zero_amount(self) -> None:
         """Should allow zero amount."""
         money = Money(0)
-        assert money.amount == Decimal("0.00")
+        assert money.value == Decimal("0.00")
 
     def test_create_money_with_negative_amount(self) -> None:
         """Should allow negative amounts for debts/adjustments."""
         money = Money(-50.75)
-        assert money.amount == Decimal("-50.75")
+        assert money.value == Decimal("-50.75")
 
     def test_reject_invalid_amount_type(self) -> None:
         """Should reject non-numeric amount types."""
@@ -54,7 +54,7 @@ class TestMoneyCreation:
         """Should handle high-precision decimal amounts by rounding to currency
         precision."""
         money = Money(Decimal("100.123456789"))
-        assert money.amount == Decimal("100.12")  # Rounded to 2 decimal places
+        assert money.value == Decimal("100.12")  # Rounded to 2 decimal places
 
 
 # Rounded to 2 decimal places
@@ -68,32 +68,32 @@ class TestMoneyArithmetic:
         money1 = Money(100)
         money2 = Money(50)
         result = money1 + money2
-        assert result.amount == Decimal("150")
+        assert result.value == Decimal("150")
 
     def test_subtract_money(self) -> None:
         """Should subtract money amounts."""
         money1 = Money(100)
         money2 = Money(30)
         result = money1 - money2
-        assert result.amount == Decimal("70")
+        assert result.value == Decimal("70")
 
     def test_multiply_by_scalar(self) -> None:
         """Should multiply money by numeric scalar."""
         money = Money(100)
         result = money * 2.5
-        assert result.amount == Decimal("250.00")
+        assert result.value == Decimal("250.00")
 
     def test_multiply_by_decimal(self) -> None:
         """Should multiply money by decimal scalar."""
         money = Money(100)
         result = money * Decimal("1.5")
-        assert result.amount == Decimal("150.00")
+        assert result.value == Decimal("150.00")
 
     def test_divide_by_scalar(self) -> None:
         """Should divide money by numeric scalar."""
         money = Money(100)
         result = money / 4
-        assert result.amount == Decimal("25.00")
+        assert result.value == Decimal("25.00")
 
     def test_divide_by_zero_raises_error(self) -> None:
         """Should raise error when dividing by zero."""
@@ -105,13 +105,13 @@ class TestMoneyArithmetic:
         """Should negate money amount."""
         money = Money(100)
         result = -money
-        assert result.amount == Decimal("-100.00")
+        assert result.value == Decimal("-100.00")
 
     def test_absolute_value(self) -> None:
         """Should return absolute value of money."""
         money = Money(-100)
         result = abs(money)
-        assert result.amount == Decimal("100.00")
+        assert result.value == Decimal("100.00")
 
 
 class TestMoneyComparison:
@@ -222,13 +222,13 @@ class TestMoneyClassMethods:
     def test_zero_factory_method(self) -> None:
         """Should create zero money."""
         zero_money = Money.zero()
-        assert zero_money.amount == Decimal("0")
+        assert zero_money.value == Decimal("0")
         assert zero_money.is_zero()
 
     def test_from_cents_factory_method(self) -> None:
         """Should create money from cents/smallest currency unit."""
         money = Money.from_cents(12550)  # 125.50 USD
-        assert money.amount == Decimal("125.50")
+        assert money.value == Decimal("125.50")
 
     def test_to_cents_method(self) -> None:
         """Should convert money to cents."""
@@ -243,13 +243,13 @@ class TestMoneyEdgeCases:
         """Should handle very large amounts."""
         large_amount = Decimal("999999999999999.99")
         money = Money(large_amount)
-        assert money.amount == large_amount
+        assert money.value == large_amount
 
     def test_very_small_amounts(self) -> None:
         """Should handle very small amounts by rounding to currency precision."""
         small_amount = Decimal("0.00000001")
         money = Money(small_amount)
-        assert money.amount == Decimal("0.00")  # Rounded to 2 decimal places
+        assert money.value == Decimal("0.00")  # Rounded to 2 decimal places
 
     def test_immutability(self) -> None:
         """Should be immutable value object."""
@@ -257,7 +257,7 @@ class TestMoneyEdgeCases:
 
         # Should not be able to modify amount
         with pytest.raises(AttributeError):
-            money.amount = Decimal("200")  # type: ignore[misc] - Testing immutability
+            money.value = Decimal("200")  # type: ignore[misc] - Testing immutability
 
     def test_thread_safety(self) -> None:
         """Should be thread-safe as immutable value object."""
@@ -271,12 +271,12 @@ class TestMoneyEdgeCases:
         result3 = -money
 
         # Original should be unchanged
-        assert money.amount == Decimal("100.00")
+        assert money.value == Decimal("100.00")
 
         # Results should be independent
-        assert result1.amount == Decimal("150.00")
-        assert result2.amount == Decimal("200.00")
-        assert result3.amount == Decimal("-100.00")
+        assert result1.value == Decimal("150.00")
+        assert result2.value == Decimal("200.00")
+        assert result3.value == Decimal("-100.00")
 
 
 class TestBaseNumericValueObjectEdgeCases:

@@ -34,8 +34,8 @@ class TestTargetBuilder:
 
         assert target.portfolio_id == "portfolio-1"
         assert target.stock_id == "stock-1"
-        assert target.pivot_price.amount == Decimal("100.00")
-        assert target.failure_price.amount == Decimal("80.00")
+        assert target.pivot_price.value == Decimal("100.00")
+        assert target.failure_price.value == Decimal("80.00")
         assert target.status.value == "active"
         assert target.created_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert target.notes.value == "Important target"
@@ -56,8 +56,8 @@ class TestTargetBuilder:
 
         assert target.portfolio_id == "portfolio-1"
         assert target.stock_id == "stock-1"
-        assert target.pivot_price.amount == Decimal("100.00")
-        assert target.failure_price.amount == Decimal("80.00")
+        assert target.pivot_price.value == Decimal("100.00")
+        assert target.failure_price.value == Decimal("80.00")
         assert target.status.value == "active"
         assert target.created_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert target.notes.value == ""  # Default
@@ -194,8 +194,8 @@ class TestTarget:
 
         assert target.portfolio_id == "portfolio-id-1"
         assert target.stock_id == "stock-id-1"
-        assert target.pivot_price.amount == Decimal("100.00")
-        assert target.failure_price.amount == Decimal("80.00")
+        assert target.pivot_price.value == Decimal("100.00")
+        assert target.failure_price.value == Decimal("80.00")
         assert target.status.value == "active"
         assert target.created_date == datetime(2024, 1, 15, tzinfo=UTC)
         assert target.notes.value == "Important target level"
@@ -215,8 +215,8 @@ class TestTarget:
 
         assert target.portfolio_id == "portfolio-id-1"
         assert target.stock_id == "stock-id-1"
-        assert target.pivot_price.amount == Decimal("150.00")
-        assert target.failure_price.amount == Decimal("120.00")
+        assert target.pivot_price.value == Decimal("150.00")
+        assert target.failure_price.value == Decimal("120.00")
         assert target.status.value == "active"
         assert target.notes.value == ""  # Defaults to empty when not provided
 

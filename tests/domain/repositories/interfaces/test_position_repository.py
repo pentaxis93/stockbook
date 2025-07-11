@@ -227,7 +227,7 @@ class TestPositionRepositoryContractImplementation:
         retrieved_position = self.repository.get_by_id(position_id)
         assert retrieved_position is not None
         assert retrieved_position.quantity.value == 200
-        assert retrieved_position.average_cost.amount == Decimal("175.00")
+        assert retrieved_position.average_cost.value == Decimal("175.00")
 
     def test_update_returns_false_when_position_not_exists(self) -> None:
         """Should return False when updating non-existent position."""

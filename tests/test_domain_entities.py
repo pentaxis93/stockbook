@@ -175,7 +175,7 @@ class TestTransaction:
         )
         assert transaction.transaction_type.value == "buy"
         assert transaction.quantity.value == 100
-        assert transaction.price.amount == Decimal("150.25")
+        assert transaction.price.value == Decimal("150.25")
         assert transaction.transaction_date == datetime(2024, 1, 15, tzinfo=UTC)
 
     def test_valid_sell_transaction(self) -> None:
@@ -194,7 +194,7 @@ class TestTransaction:
         )
         assert transaction.transaction_type.value == "sell"
         assert transaction.quantity.value == 50
-        assert transaction.price.amount == Decimal("175.00")
+        assert transaction.price.value == Decimal("175.00")
 
     def test_invalid_transaction_type_rejected(self) -> None:
         """Test that invalid transaction types are rejected"""
@@ -258,8 +258,8 @@ class TestTarget:
         )
         assert target.portfolio_id == "portfolio-id-1"
         assert target.stock_id == "stock-id-1"
-        assert target.pivot_price.amount == Decimal("100.00")
-        assert target.failure_price.amount == Decimal("80.00")
+        assert target.pivot_price.value == Decimal("100.00")
+        assert target.failure_price.value == Decimal("80.00")
         assert target.status.value == "active"
 
 
@@ -281,9 +281,9 @@ class TestPortfolioBalance:
             .build()
         )
         assert balance.portfolio_id == "portfolio-id-1"
-        assert balance.final_balance.amount == Decimal("10000.00")
-        assert balance.deposits.amount == Decimal("1000.00")
-        assert balance.withdrawals.amount == Decimal("500.00")
+        assert balance.final_balance.value == Decimal("10000.00")
+        assert balance.deposits.value == Decimal("1000.00")
+        assert balance.withdrawals.value == Decimal("500.00")
         assert balance.index_change is not None
         assert balance.index_change.value == 5.25
 
@@ -352,7 +352,7 @@ class TestSharedKernelValueObjects:
     def test_money_creation(self) -> None:
         """Test Money value object creation"""
         money = Money(Decimal("150.25"))
-        assert money.amount == Decimal("150.25")
+        assert money.value == Decimal("150.25")
 
     def test_quantity_creation(self) -> None:
         """Test Quantity value object creation"""
@@ -383,7 +383,7 @@ class TestSharedKernelValueObjects:
         try:
             money = Money(Decimal("-150.00"))
             # If no exception, negative is allowed in this implementation
-            assert money.amount == Decimal("-150.00")
+            assert money.value == Decimal("-150.00")
         except ValueError:
             # If exception, negative is not allowed
             pass
@@ -395,7 +395,7 @@ class TestSharedKernelValueObjects:
         try:
             money = Money(Decimal("0.00"))
             # If no exception, zero is allowed in this implementation
-            assert money.amount == Decimal("0.00")
+            assert money.value == Decimal("0.00")
         except ValueError:
             # If exception, zero is not allowed
             pass

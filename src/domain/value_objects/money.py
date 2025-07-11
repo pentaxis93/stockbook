@@ -190,11 +190,6 @@ class Money(BaseNumericValueObject):
         # Round to currency precision (2 decimal places)
         self._value = self._value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
-    @property
-    def amount(self) -> Decimal:
-        """Get the monetary amount (for backward compatibility)."""
-        return self._value
-
     def __str__(self) -> str:
         """String representation for display."""
         formatted_amount = self._value.quantize(Decimal("0.01"))

@@ -223,7 +223,7 @@ class SqlAlchemyPositionRepository(IPositionRepository):
             "portfolio_id": position.portfolio_id,
             "stock_id": position.stock_id,
             "quantity": position.quantity.value,
-            "average_cost": position.average_cost.amount,
+            "average_cost": position.average_cost.value,
             "last_transaction_date": position.last_transaction_date,
             "created_at": now,
             "updated_at": now,

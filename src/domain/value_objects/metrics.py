@@ -74,7 +74,7 @@ class PortfolioMetrics:
         """Get the largest position by value."""
         if not self.position_allocations:
             return None
-        return max(self.position_allocations, key=lambda pos: pos.value.amount)
+        return max(self.position_allocations, key=lambda pos: pos.value.value)
 
     @property
     def is_well_diversified(self) -> bool:

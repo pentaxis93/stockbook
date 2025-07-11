@@ -32,9 +32,9 @@ class TestPortfolioBalance:
 
         assert balance.portfolio_id == "portfolio-id-1"
         assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
-        assert balance.withdrawals.amount == Decimal("500.00")
-        assert balance.deposits.amount == Decimal("1000.00")
-        assert balance.final_balance.amount == Decimal("10500.00")
+        assert balance.withdrawals.value == Decimal("500.00")
+        assert balance.deposits.value == Decimal("1000.00")
+        assert balance.final_balance.value == Decimal("10500.00")
         assert balance.index_change is not None
         assert balance.index_change.value == 5.25
 
@@ -50,9 +50,9 @@ class TestPortfolioBalance:
 
         assert balance.portfolio_id == "portfolio-id-1"
         assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
-        assert balance.final_balance.amount == Decimal("10000.00")
-        assert balance.withdrawals.amount == Decimal("0.00")  # Defaults to zero
-        assert balance.deposits.amount == Decimal("0.00")  # Defaults to zero
+        assert balance.final_balance.value == Decimal("10000.00")
+        assert balance.withdrawals.value == Decimal("0.00")  # Defaults to zero
+        assert balance.deposits.value == Decimal("0.00")  # Defaults to zero
         assert balance.index_change is None  # Defaults to None
 
     def test_create_portfolio_balance_with_none_optionals_allowed(self) -> None:
@@ -68,10 +68,10 @@ class TestPortfolioBalance:
             .build()
         )
 
-        assert balance.withdrawals.amount == Decimal(
+        assert balance.withdrawals.value == Decimal(
             "0.00",
         )  # Defaults to zero when None
-        assert balance.deposits.amount == Decimal("0.00")  # Defaults to zero when None
+        assert balance.deposits.value == Decimal("0.00")  # Defaults to zero when None
         assert balance.index_change is None  # Remains None
 
     def test_create_portfolio_balance_with_invalid_portfolio_id_raises_error(
@@ -233,7 +233,7 @@ class TestPortfolioBalance:
         )
 
         net_flow = balance.calculate_net_flow()
-        assert net_flow.amount == Decimal("500.00")  # 1000 - 500
+        assert net_flow.value == Decimal("500.00")  # 1000 - 500
 
     def test_portfolio_balance_has_positive_change(self) -> None:
         """Should check if portfolio has positive index change."""
@@ -467,9 +467,9 @@ class TestPortfolioBalanceBuilder:
 
         assert balance.portfolio_id == "portfolio-1"
         assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
-        assert balance.final_balance.amount == Decimal("10500.00")
-        assert balance.withdrawals.amount == Decimal("500.00")
-        assert balance.deposits.amount == Decimal("1000.00")
+        assert balance.final_balance.value == Decimal("10500.00")
+        assert balance.withdrawals.value == Decimal("500.00")
+        assert balance.deposits.value == Decimal("1000.00")
         assert balance.index_change is not None
         assert balance.index_change.value == 5.25
         assert balance.id == "balance-id"
@@ -487,9 +487,9 @@ class TestPortfolioBalanceBuilder:
 
         assert balance.portfolio_id == "portfolio-1"
         assert balance.balance_date == datetime(2024, 1, 15, tzinfo=UTC)
-        assert balance.final_balance.amount == Decimal("10000.00")
-        assert balance.withdrawals.amount == Decimal("0")  # Default
-        assert balance.deposits.amount == Decimal("0")  # Default
+        assert balance.final_balance.value == Decimal("10000.00")
+        assert balance.withdrawals.value == Decimal("0")  # Default
+        assert balance.deposits.value == Decimal("0")  # Default
         assert balance.index_change is None
 
     def test_builder_raises_error_when_required_fields_missing(self) -> None:

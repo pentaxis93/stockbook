@@ -68,7 +68,7 @@ class PortfolioCalculationService:
                 )
 
             current_price = prices[symbol_str]
-            position_value = current_price.amount * Decimal(str(quantity.value))
+            position_value = current_price.value * Decimal(str(quantity.value))
             total_amount += position_value
 
         return Money(total_amount)
@@ -80,7 +80,7 @@ class PortfolioCalculationService:
         current_price: Money,
     ) -> Money:
         """Calculate individual position value."""
-        return Money(current_price.amount * Decimal(str(quantity.value)))
+        return Money(current_price.value * Decimal(str(quantity.value)))
 
     def calculate_position_allocations(
         self,
@@ -92,7 +92,7 @@ class PortfolioCalculationService:
             return []
 
         total_value = self.calculate_total_value(portfolio, prices)
-        if total_value.amount == 0:
+        if total_value.value == 0:
             return []
 
         allocations: list[PositionAllocation] = []
@@ -118,7 +118,7 @@ class PortfolioCalculationService:
         symbol_str = str(stock.symbol)
         current_price = prices[symbol_str]
         position_value = self.calculate_position_value(stock, quantity, current_price)
-        percentage = (position_value.amount / total_value.amount) * Decimal("100")
+        percentage = (position_value.value / total_value.value) * Decimal("100")
 
         return PositionAllocation(
             symbol=stock.symbol,
@@ -165,7 +165,7 @@ class PortfolioCalculationService:
 
             if industry not in industry_values:
                 industry_values[industry] = Decimal("0")
-            industry_values[industry] += position_value.amount
+            industry_values[industry] += position_value.value
 
         return industry_values
 
@@ -178,8 +178,8 @@ class PortfolioCalculationService:
         industry_percentages: dict[str, Decimal] = {}
         for industry, value in industry_values.items():
             percentage = (
-                (value / total_value.amount) * Decimal("100")
-                if total_value.amount > 0
+                (value / total_value.value) * Decimal("100")
+                if total_value.value > 0
                 else Decimal("0")
             )
             industry_percentages[industry] = percentage

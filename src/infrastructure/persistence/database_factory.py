@@ -12,11 +12,12 @@ from urllib.parse import urlparse
 from sqlalchemy import create_engine as sqla_create_engine
 from sqlalchemy.engine import Engine
 
-from config import Config
+from src.infrastructure.config import database_config
 from src.infrastructure.persistence.dialects.sqlite import (
     configure_sqlite_engine,
     get_sqlite_engine_kwargs,
 )
+from src.shared.config import app_config
 
 
 def create_engine(
@@ -77,10 +78,9 @@ def create_engine_from_config(*, use_test_db: bool = False) -> Engine:
     Returns:
         Configured SQLAlchemy engine
     """
-    config = Config()
-    database_url = config.test_database_url if use_test_db else config.database_url
+    database_url = database_config.get_connection_string(test=use_test_db)
 
     return create_engine(
         database_url,
-        echo=config.DEBUG,
+        echo=app_config.DEBUG,
     )
