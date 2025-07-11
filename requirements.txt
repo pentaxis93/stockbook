@@ -85,6 +85,5 @@ watchdog==6.0.0
 
 # Architecture documentation and visualization
 plantuml==0.3.0
-py-structurizr==0.1.0
 graphviz==0.20.3
 pydeps==1.12.20
