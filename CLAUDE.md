@@ -27,3 +27,18 @@
 - NEVER force a commit if the pre-commit hooks fail.
 
 - NEVER use `--no-verify` to bypass pre-commit hooks. If your code does not pass tests or checks, fix it. Bypassing verification is never acceptable and will result in a rejected commit.
+
+## Version Management
+
+- Always increment the version number in `src/version.py` appropriately when making changes:
+  - **Patch version (0.0.X)**: Increment for bug fixes, documentation updates, and minor changes that don't affect functionality
+  - **Minor version (0.X.0)**: Increment for new features that are backward-compatible
+  - **Major version (X.0.0)**: Increment for breaking changes. **IMPORTANT: Always get explicit approval from a human before incrementing the major version number**
+
+- When incrementing the version:
+  1. Update `__version__` and `__version_info__` in `src/version.py`
+  2. Update `__release_date__` to the current date in YYYY-MM-DD format
+  3. Ensure all version-related tests pass
+  4. Include the version change in your commit
+
+- Version changes should be committed separately or as part of the feature/fix they accompany, with a clear commit message indicating the version bump

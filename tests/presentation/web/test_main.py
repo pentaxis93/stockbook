@@ -33,7 +33,7 @@ class TestMainApp:
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "StockBook API"
-        assert data["version"] == "1.0.0"
+        assert data["version"] == "0.2.0"
 
     def test_database_initialization_on_startup(
         self,
@@ -72,10 +72,22 @@ class TestMainApp:
 
         data = response.json()
         assert data["name"] == "StockBook API"
-        assert data["version"] == "1.0.0"
+        assert data["version"] == "0.2.0"
         assert "endpoints" in data
         assert "/health" in data["endpoints"]
         assert "/docs" in data["endpoints"]
+
+    def test_version_endpoint(self, client: TestClient) -> None:
+        """Test version endpoint returns correct version information."""
+        response = client.get("/version")
+        assert response.status_code == 200
+
+        data = response.json()
+        assert data["version"] == "0.2.0"
+        assert data["release_date"] == "2025-01-11"
+        assert data["api_version"] == "v1"
+        assert "name" in data
+        assert data["name"] == "StockBook"
 
     def test_database_initialization_error_handling(self) -> None:
         """Test that database initialization errors are logged but don't crash

@@ -74,6 +74,13 @@ class Config:
         self.app_name = self._get_env_str("STOCKBOOK_APP_NAME", "StockBook")
         self.DEBUG = self._get_env_bool("STOCKBOOK_DEBUG", default=False)
 
+        # Import version information
+        from src.version import __api_version__, __release_date__, __version__
+
+        self.app_version = __version__
+        self.app_release_date = __release_date__
+        self.api_version = __api_version__
+
     def _setup_database(self) -> None:
         """Setup database configuration."""
         self.db_path = Path(
@@ -370,6 +377,18 @@ class Config:
     def format_datetime(self, datetime_obj: datetime) -> str:
         """Format datetime according to configured format."""
         return datetime_obj.strftime(self.datetime_format)
+
+    def get_version_info(self) -> dict[str, str]:
+        """Get application version information.
+
+        Returns:
+            Dict containing version, release date, and API version.
+        """
+        return {
+            "version": self.app_version,
+            "release_date": self.app_release_date,
+            "api_version": self.api_version,
+        }
 
 
 # Global config instance

@@ -509,3 +509,18 @@ class TestConfigIntegration:
 
         formatted = config.format_datetime(test_datetime)
         assert formatted == "2023-12-25 15:30:45"
+
+    def test_get_version_info(self) -> None:
+        """Test get_version_info method returns correct version information."""
+        config = Config()
+        version_info = config.get_version_info()
+
+        # Check that all required keys are present
+        assert "version" in version_info
+        assert "release_date" in version_info
+        assert "api_version" in version_info
+
+        # Check the values match what was imported from src.version
+        assert version_info["version"] == "0.2.0"
+        assert version_info["release_date"] == "2025-01-11"
+        assert version_info["api_version"] == "v1"

@@ -9,3 +9,7 @@ This package implements a clean architecture with four distinct layers:
 The architecture enforces proper dependency directions and maintains
 separation of concerns across all layers.
 """
+
+from src.version import __api_version__, __release_date__, __version__, __version_info__
+
+__all__ = ["__api_version__", "__release_date__", "__version__", "__version_info__"]

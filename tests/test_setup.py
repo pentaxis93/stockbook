@@ -104,7 +104,9 @@ class TestSetupConfiguration:
 
         # Verify required arguments
         assert call_args["name"] == "stockbook"
-        assert call_args["version"] == "0.1.0"
+        from src.version import __version__
+
+        assert call_args["version"] == __version__
         assert call_args["packages"] == ["src", "src.domain", "src.application"]
         assert call_args["python_requires"] == ">=3.12"
         assert "install_requires" in call_args
@@ -126,16 +128,14 @@ class TestSetupConfiguration:
 
     def test_setup_version_format(self) -> None:
         """Test that the version number follows semantic versioning."""
-        setup_path = Path("setup.py")
-        content = setup_path.read_text(encoding="utf-8")
+        # Import version from module
+        from src.version import __version__
 
-        # Extract version
-        version_match = re.search(r'version="([^"]+)"', content)
-        assert version_match is not None
-
-        version = version_match.group(1)
         # Check semantic versioning format (X.Y.Z)
-        assert re.match(r"^\d+\.\d+\.\d+$", version) is not None
+        assert re.match(r"^\d+\.\d+\.\d+$", __version__) is not None
+
+        # Verify it's 0.2.0 as expected
+        assert __version__ == "0.2.0"
 
     def test_setup_install_requires_format(self) -> None:
         """Test that install_requires is properly formatted."""

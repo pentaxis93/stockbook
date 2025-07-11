@@ -29,6 +29,7 @@ from src.presentation.web.middleware.exception_handler import (
     not_found_exception_handler,
 )
 from src.presentation.web.routers import stock_router
+from src.version import __version__
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
 # Create FastAPI app with lifespan management
 app = FastAPI(
     title="StockBook API",
-    version="1.0.0",
+    version=__version__,
     description="Stock portfolio management and tracking API",
     lifespan=lifespan,
 )
@@ -122,14 +123,32 @@ async def root() -> dict[str, Any]:
     """
     return {
         "name": "StockBook API",
-        "version": "1.0.0",
+        "version": __version__,
         "endpoints": {
             "/": "API information",
+            "/version": "Version information",
             "/health": "Health check endpoint",
             "/stocks": "Stock management endpoints",
             "/docs": "Interactive API documentation",
             "/redoc": "Alternative API documentation",
         },
+    }
+
+
+@app.get("/version")
+async def version() -> dict[str, str]:
+    """Version endpoint providing detailed version information.
+
+    Returns:
+        Dict containing version, release date, API version, and application name
+    """
+    from src.version import __api_version__, __release_date__
+
+    return {
+        "name": "StockBook",
+        "version": __version__,
+        "release_date": __release_date__,
+        "api_version": __api_version__,
     }
 
 
