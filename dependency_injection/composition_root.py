@@ -9,13 +9,13 @@ from typing import Any
 
 from sqlalchemy.engine import Engine
 
-# Configuration
-from config import Config
-
 # Application layer imports
 from src.application.interfaces.stock_service import IStockApplicationService
 from src.application.services.stock_application_service import StockApplicationService
 from src.domain.repositories.interfaces import IStockBookUnitOfWork
+
+# Configuration
+from src.infrastructure.config import database_config
 from src.infrastructure.persistence.database_factory import create_engine
 from src.infrastructure.persistence.unit_of_work import SqlAlchemyUnitOfWork
 
@@ -57,9 +57,9 @@ class CompositionRoot:
         container = DIContainer()
         config = config or {}
 
-        # Use Config class database URL as default, then check overrides
+        # Use configured database URL as default, then check overrides
         if database_url is None:
-            database_url = Config().database_url
+            database_url = database_config.database_url
         db_url = config.get("database_url", database_url)
 
         # Configure infrastructure layer (database, repositories)
