@@ -8,13 +8,13 @@ from sqlalchemy import Column, DateTime, Numeric, Table, UniqueConstraint, text
 
 from src.infrastructure.persistence.tables.stock_table import metadata
 
-from .table_utils import foreign_key_column, id_column, timestamp_columns
+from .table_utils import base_columns, foreign_key_column
 
 # Define the position table using SQLAlchemy Core
 position_table: Table = Table(
     "positions",
     metadata,
-    id_column(),
+    *base_columns(),
     foreign_key_column("portfolio_id", "portfolios"),
     foreign_key_column("stock_id", "stocks"),
     Column(
@@ -37,7 +37,6 @@ position_table: Table = Table(
         DateTime,
         nullable=True,  # Can be null if no transactions yet
     ),
-    *timestamp_columns(),
     # Composite unique constraint - one position per stock per portfolio
     UniqueConstraint("portfolio_id", "stock_id", name="uq_portfolio_stock_position"),
 )

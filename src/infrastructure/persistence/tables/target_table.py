@@ -13,13 +13,13 @@ from sqlalchemy import (
 
 from src.infrastructure.persistence.tables.stock_table import metadata
 
-from .table_utils import foreign_key_column, id_column, timestamp_columns
+from .table_utils import base_columns, foreign_key_column
 
 # Define the target table using SQLAlchemy Core
 target_table: Table = Table(
     "targets",
     metadata,
-    id_column(),
+    *base_columns(),
     foreign_key_column("portfolio_id", "portfolios"),
     foreign_key_column("stock_id", "stocks"),
     Column(
@@ -27,7 +27,6 @@ target_table: Table = Table(
         Numeric(precision=5, scale=2),  # Supports 0.00 to 999.99
         nullable=False,
     ),
-    *timestamp_columns(),
     # Composite unique constraint
     UniqueConstraint("portfolio_id", "stock_id", name="uq_portfolio_stock"),
     # Check constraint for percentage

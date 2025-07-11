@@ -8,15 +8,14 @@ from sqlalchemy import Column, String, Table, text
 
 from src.infrastructure.persistence.tables.stock_table import metadata
 
-from .table_utils import id_column, timestamp_columns
+from .table_utils import base_columns
 
 # Define the portfolio table using SQLAlchemy Core
 portfolio_table: Table = Table(
     "portfolios",
     metadata,
-    id_column(),
+    *base_columns(),
     Column("name", String, nullable=False, unique=True),
     Column("description", String, nullable=True),
     Column("currency", String, nullable=False, server_default=text("'USD'")),
-    *timestamp_columns(),
 )

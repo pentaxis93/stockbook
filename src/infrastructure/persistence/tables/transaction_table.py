@@ -8,17 +8,16 @@ from sqlalchemy import Column, DateTime, Numeric, String, Table, text
 from src.infrastructure.persistence.tables.stock_table import metadata
 
 from .table_utils import (
+    base_columns,
     enum_check_constraint,
     foreign_key_column,
-    id_column,
-    timestamp_columns,
 )
 
 # Define the transaction table using SQLAlchemy Core
 transaction_table: Table = Table(
     "transactions",
     metadata,
-    id_column(),
+    *base_columns(),
     foreign_key_column("portfolio_id", "portfolios"),
     foreign_key_column("stock_id", "stocks"),
     Column("transaction_type", String, nullable=False),
@@ -43,7 +42,6 @@ transaction_table: Table = Table(
     ),
     Column("notes", String, nullable=True),
     Column("transaction_date", DateTime, nullable=False),
-    *timestamp_columns(),
     # Check constraint for transaction type
     enum_check_constraint("transaction_type", ["BUY", "SELL"], "ck_transaction_type"),
 )

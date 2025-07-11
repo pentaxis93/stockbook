@@ -6,7 +6,7 @@ Table construct (not ORM) to maintain clean architecture separation.
 
 from sqlalchemy import Column, MetaData, String, Table
 
-from .table_utils import id_column, timestamp_columns
+from .table_utils import base_columns
 
 # Create metadata instance for all tables
 metadata: MetaData = MetaData()
@@ -15,12 +15,11 @@ metadata: MetaData = MetaData()
 stock_table: Table = Table(
     "stocks",
     metadata,
-    id_column(),
+    *base_columns(),
     Column("symbol", String, nullable=False, unique=True),
     Column("company_name", String, nullable=True),
     Column("sector", String, nullable=True),
     Column("industry_group", String, nullable=True),
     Column("grade", String, nullable=True),
     Column("notes", String, nullable=True),
-    *timestamp_columns(),
 )
