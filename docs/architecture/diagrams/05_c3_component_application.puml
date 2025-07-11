@@ -1,0 +1,24 @@
+@startuml 05_c3_component_application
+skinparam backgroundColor #FEFEFE
+
+title StockBook - Application Layer Components
+
+package "Application Layer" #E6F3FF {
+    component "Stock Application Service" as stock_service
+    component "Commands" as commands
+    component "DTOs" as dto
+    component "Service Interfaces" as interfaces
+}
+
+component "Domain Layer" as domain #FFE6E6
+component "Presentation Layer" as presentation #FFFFE6
+component "Infrastructure Layer" as infrastructure #E6FFE6
+
+presentation --> stock_service : Uses
+stock_service --> commands : Executes
+stock_service --> dto : Returns
+stock_service --> domain : Uses
+stock_service ..> interfaces : Implements
+infrastructure ..> interfaces : Implements
+
+@enduml

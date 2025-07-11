@@ -1,0 +1,23 @@
+@startuml 02_c2_container
+skinparam backgroundColor #FEFEFE
+
+title StockBook - C2 Container Diagram (Clean Architecture Layers)
+
+actor "Family Member" as user
+
+rectangle "StockBook System" {
+    component "Web Application (FastAPI)" as web_app #FFFFE6
+    component "Application Layer (Python)" as app_layer #E6F3FF
+    component "Domain Layer (Python)" as domain_layer #FFE6E6
+    component "Infrastructure Layer (SQLAlchemy)" as infra_layer #E6FFE6
+    database "Database (SQLite/PostgreSQL)" as db #F0F0F0
+}
+
+user --> web_app : Uses (HTTPS)
+web_app --> app_layer : Uses
+app_layer --> domain_layer : Uses
+app_layer --> infra_layer : Uses repository interfaces
+infra_layer --> db : Reads/Writes
+infra_layer ..> domain_layer : Implements interfaces
+
+@enduml

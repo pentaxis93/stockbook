@@ -134,8 +134,10 @@ class TestSetupConfiguration:
         # Check semantic versioning format (X.Y.Z)
         assert re.match(r"^\d+\.\d+\.\d+$", __version__) is not None
 
-        # Verify it's 0.2.1 as expected
-        assert __version__ == "0.2.1"
+        # Verify version matches what's in version module
+        from src.version import __version__ as actual_version
+
+        assert __version__ == actual_version
 
     def test_setup_install_requires_format(self) -> None:
         """Test that install_requires is properly formatted."""

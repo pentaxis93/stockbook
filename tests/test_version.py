@@ -28,11 +28,17 @@ class TestVersionModule:
         pattern = r"^\d+\.\d+\.\d+$"
         assert re.match(pattern, __version__) is not None
 
-    def test_version_is_0_2_1(self) -> None:
-        """Test that current version is 0.2.1 as specified."""
-        from src.version import __version__
+    def test_version_is_current(self) -> None:
+        """Test that version is properly set and matches expected format."""
+        from src.version import __version__, __version_info__
 
-        assert __version__ == "0.2.1"
+        # Version should match the version_info tuple
+        version_from_tuple = ".".join(str(part) for part in __version_info__)
+        assert __version__ == version_from_tuple
+
+        # Version should be semantic versioning compliant
+        pattern = r"^\d+\.\d+\.\d+$"
+        assert re.match(pattern, __version__) is not None
 
     def test_version_info_tuple(self) -> None:
         """Test that version info tuple is properly formatted."""
@@ -41,7 +47,8 @@ class TestVersionModule:
         assert isinstance(__version_info__, tuple)
         assert len(__version_info__) == 3
         assert all(isinstance(part, int) for part in __version_info__)
-        assert __version_info__ == (0, 2, 1)
+        # Don't hardcode the version numbers
+        assert all(part >= 0 for part in __version_info__)
 
     def test_version_string_matches_tuple(self) -> None:
         """Test that version string matches version info tuple."""
@@ -100,44 +107,65 @@ class TestVersionModule:
 
         # Test major, minor, patch properties if they exist
         if hasattr(version, "VERSION_MAJOR"):
-            assert version.VERSION_MAJOR == 0
+            assert isinstance(version.VERSION_MAJOR, int)
+            assert version.VERSION_MAJOR >= 0
+            assert version.__version_info__[0] == version.VERSION_MAJOR
         if hasattr(version, "VERSION_MINOR"):
-            assert version.VERSION_MINOR == 2
+            assert isinstance(version.VERSION_MINOR, int)
+            assert version.VERSION_MINOR >= 0
+            assert version.__version_info__[1] == version.VERSION_MINOR
         if hasattr(version, "VERSION_PATCH"):
-            assert version.VERSION_PATCH == 1
+            assert isinstance(version.VERSION_PATCH, int)
+            assert version.VERSION_PATCH >= 0
+            assert version.__version_info__[2] == version.VERSION_PATCH
 
     def test_version_string_generation(self) -> None:
         """Test version string generation function if it exists."""
         from src import version
 
         if hasattr(version, "get_version"):
-            assert version.get_version() == "0.2.1"
+            ver = version.get_version()
+            assert isinstance(ver, str)
+            assert re.match(r"^\d+\.\d+\.\d+$", ver)
+            assert ver == version.__version__
 
         if hasattr(version, "get_full_version"):
             full_version = version.get_full_version()
-            assert "0.2.1" in full_version
+            assert "StockBook" in full_version
+            assert version.__version__ in full_version
 
     def test_get_version_function(self) -> None:
         """Test the get_version function returns correct version."""
-        from src.version import get_version
+        from src.version import __version__, get_version
 
-        assert get_version() == "0.2.1"
+        result = get_version()
+        assert result == __version__
+        assert isinstance(result, str)
+        assert re.match(r"^\d+\.\d+\.\d+$", result)
 
     def test_get_full_version_function(self) -> None:
         """Test the get_full_version function returns properly formatted string."""
-        from src.version import get_full_version
+        from src.version import __release_date__, __version__, get_full_version
 
         full_version = get_full_version()
-        assert full_version == "StockBook 0.2.1 (Released: 2025-01-11)"
+        # Check the format without hardcoding version
+        expected_format = f"StockBook {__version__} (Released: {__release_date__})"
+        assert full_version == expected_format
         assert "StockBook" in full_version
-        assert "0.2.1" in full_version
-        assert "Released: 2025-01-11" in full_version
+        assert __version__ in full_version
+        assert "Released:" in full_version
+        assert __release_date__ in full_version
 
     def test_version_import_from_src(self) -> None:
         """Test that version can be imported from src package."""
         from src import __version__
+        from src.version import __version__ as version_module_version
 
-        assert __version__ == "0.2.1"
+        # Should be able to import version from src package
+        assert isinstance(__version__, str)
+        assert re.match(r"^\d+\.\d+\.\d+$", __version__)
+        # Should match the version in the version module
+        assert __version__ == version_module_version
 
     def test_version_module_docstring(self) -> None:
         """Test that version module has proper documentation."""

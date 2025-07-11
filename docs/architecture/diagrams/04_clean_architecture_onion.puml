@@ -1,0 +1,64 @@
+@startuml 04_clean_architecture_onion
+
+!define DOMAIN_COLOR #FFE6E6
+!define APPLICATION_COLOR #E6F3FF  
+!define INFRASTRUCTURE_COLOR #E6FFE6
+!define PRESENTATION_COLOR #FFFFE6
+
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+
+title StockBook - Clean Architecture (Onion View)
+
+' Center: Domain Layer (innermost)
+storage "Domain Layer" as domain <<Layer>> DOMAIN_COLOR {
+  rectangle "Entities" as entities
+  rectangle "Value Objects" as values
+  rectangle "Domain Services" as dservices
+  rectangle "Repository\nInterfaces" as repos
+  rectangle "Domain Events" as events
+}
+
+' Application Layer (surrounding domain)
+cloud "Application Layer" as application <<Layer>> APPLICATION_COLOR {
+  rectangle "Use Cases" as usecases
+  rectangle "Commands" as commands
+  rectangle "Application\nServices" as aservices
+  rectangle "DTOs" as dtos
+}
+
+' Infrastructure Layer
+database "Infrastructure Layer" as infrastructure <<Layer>> INFRASTRUCTURE_COLOR {
+  rectangle "Repository\nImplementations" as repoimpl
+  rectangle "Database\nPersistence" as db
+  rectangle "External\nServices" as external
+  rectangle "Unit of Work" as uow
+}
+
+' Presentation Layer (outermost)
+package "Presentation Layer" as presentation <<Layer>> PRESENTATION_COLOR {
+  rectangle "REST API\n(FastAPI)" as api
+  rectangle "Request/Response\nModels" as models
+  rectangle "Exception\nHandlers" as handlers
+  rectangle "Middleware" as middleware
+}
+
+' Layout hints for concentric arrangement
+domain -[hidden]- application
+application -[hidden]- infrastructure  
+infrastructure -[hidden]- presentation
+
+' Dependency arrows (pointing inward)
+presentation ..> infrastructure : depends on
+infrastructure ..> application : depends on
+application ..> domain : depends on
+
+note bottom
+  **Onion Architecture Principles:**
+  • Dependencies point inward only
+  • Inner layers are independent
+  • Domain is the core (no dependencies)
+  • Outer layers depend on inner layers
+end note
+
+@enduml

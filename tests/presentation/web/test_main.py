@@ -1,6 +1,7 @@
 """Tests for the main FastAPI application."""
 
 import os
+import re
 from collections.abc import Iterator
 from unittest.mock import Mock, patch
 
@@ -33,7 +34,9 @@ class TestMainApp:
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "StockBook API"
-        assert data["version"] == "0.2.1"
+        # Just verify version exists, don't hardcode the value
+        assert "version" in data
+        assert isinstance(data["version"], str)
 
     def test_database_initialization_on_startup(
         self,
@@ -72,7 +75,13 @@ class TestMainApp:
 
         data = response.json()
         assert data["name"] == "StockBook API"
-        assert data["version"] == "0.2.1"
+        # Version should exist and follow semantic versioning format
+        assert "version" in data
+        assert isinstance(data["version"], str)
+        # Should match X.Y.Z format
+        import re
+
+        assert re.match(r"^\d+\.\d+\.\d+$", data["version"])
         assert "endpoints" in data
         assert "/health" in data["endpoints"]
         assert "/docs" in data["endpoints"]
@@ -83,8 +92,14 @@ class TestMainApp:
         assert response.status_code == 200
 
         data = response.json()
-        assert data["version"] == "0.2.1"
-        assert data["release_date"] == "2025-01-11"
+        # Verify version exists and has expected format
+        assert "version" in data
+        assert isinstance(data["version"], str)
+        assert re.match(r"^\d+\.\d+\.\d+$", data["version"])
+        # Verify release date exists and has expected format
+        assert "release_date" in data
+        assert isinstance(data["release_date"], str)
+        assert re.match(r"^\d{4}-\d{2}-\d{2}$", data["release_date"])
         assert data["api_version"] == "v1"
         assert "name" in data
         assert data["name"] == "StockBook"

@@ -14,8 +14,8 @@ Attributes:
     __api_version__ (str): The API version identifier.
 """
 
-__version__ = "0.2.1"
-__version_info__ = (0, 2, 1)
+__version__ = "0.3.0"
+__version_info__ = (0, 3, 0)
 __release_date__ = "2025-01-11"
 __api_version__ = "v1"
 

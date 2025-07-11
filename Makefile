@@ -44,6 +44,13 @@ run: ## Run the development server with auto-reload
 	@echo "$(BLUE)Starting development server...$(NC)"
 	uvicorn src.presentation.web.main:app --reload --host 0.0.0.0 --port 8000
 
+.PHONY: docs-arch
+docs-arch: ## Generate architecture diagrams from code
+	@echo "$(BLUE)Generating architecture diagrams...$(NC)"
+	@$(PYTHON) docs/architecture/models/generate_all.py
+	@echo "$(GREEN)✓ Architecture diagrams generated$(NC)"
+	@echo "View diagrams at: file://$(PWD)/docs/architecture/diagrams/viewer.html"
+
 .PHONY: clean
 clean: ## Remove generated files and caches
 	@echo "$(BLUE)Cleaning up generated files...$(NC)"

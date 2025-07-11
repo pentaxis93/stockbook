@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockBook Architecture Diagrams</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .diagram-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .diagram-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+        .diagram-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .diagram-container img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .format-links {
+            margin-top: 10px;
+        }
+        .format-links a {
+            margin: 0 10px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .format-links a:hover {
+            text-decoration: underline;
+        }
+        .toc {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>StockBook Architecture Diagrams</h1>
+
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#01_c1_system_context">01 C1 System Context</a></li>
+            <li><a href="#02_c2_container">02 C2 Container</a></li>
+            <li><a href="#03_clean_architecture_overview">03 Clean Architecture Overview</a></li>
+            <li><a href="#04_clean_architecture_onion">04 Clean Architecture Onion</a></li>
+            <li><a href="#05_c3_component_application">05 C3 Component Application</a></li>
+            <li><a href="#06_clean_architecture_layers">06 Clean Architecture Layers</a></li>
+            <li><a href="#07_module_dependencies">07 Module Dependencies</a></li>
+            <li><a href="#08_domain_entity_relationships">08 Domain Entity Relationships</a></li>
+            <li><a href="#09_domain_aggregate_boundaries">09 Domain Aggregate Boundaries</a></li>
+            <li><a href="#10_domain_value_objects">10 Domain Value Objects</a></li>
+            <li><a href="#11_c4_code_stock_aggregate">11 C4 Code Stock Aggregate</a></li>
+            <li><a href="#12_dependency_injection">12 Dependency Injection</a></li>
+        </ul>
+    </div>
+
+    <div class="diagram-section" id="01_c1_system_context">
+        <h2 class="diagram-title">01 C1 System Context</h2>
+        <div class="diagram-container">
+            <img src="01_c1_system_context.png" alt="01 C1 System Context">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="01_c1_system_context.png" download>PNG</a>
+            <a href="01_c1_system_context.svg" download>SVG</a>
+            <a href="01_c1_system_context.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="02_c2_container">
+        <h2 class="diagram-title">02 C2 Container</h2>
+        <div class="diagram-container">
+            <img src="02_c2_container.png" alt="02 C2 Container">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="02_c2_container.png" download>PNG</a>
+            <a href="02_c2_container.svg" download>SVG</a>
+            <a href="02_c2_container.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="03_clean_architecture_overview">
+        <h2 class="diagram-title">03 Clean Architecture Overview</h2>
+        <div class="diagram-container">
+            <img src="03_clean_architecture_overview.png" alt="03 Clean Architecture Overview">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="03_clean_architecture_overview.png" download>PNG</a>
+            <a href="03_clean_architecture_overview.svg" download>SVG</a>
+            <a href="03_clean_architecture_overview.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="04_clean_architecture_onion">
+        <h2 class="diagram-title">04 Clean Architecture Onion</h2>
+        <div class="diagram-container">
+            <img src="04_clean_architecture_onion.png" alt="04 Clean Architecture Onion">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="04_clean_architecture_onion.png" download>PNG</a>
+            <a href="04_clean_architecture_onion.svg" download>SVG</a>
+            <a href="04_clean_architecture_onion.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="05_c3_component_application">
+        <h2 class="diagram-title">05 C3 Component Application</h2>
+        <div class="diagram-container">
+            <img src="05_c3_component_application.png" alt="05 C3 Component Application">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="05_c3_component_application.png" download>PNG</a>
+            <a href="05_c3_component_application.svg" download>SVG</a>
+            <a href="05_c3_component_application.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="06_clean_architecture_layers">
+        <h2 class="diagram-title">06 Clean Architecture Layers</h2>
+        <div class="diagram-container">
+            <img src="06_clean_architecture_layers.png" alt="06 Clean Architecture Layers">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="06_clean_architecture_layers.png" download>PNG</a>
+            <a href="06_clean_architecture_layers.svg" download>SVG</a>
+            <a href="06_clean_architecture_layers.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="07_module_dependencies">
+        <h2 class="diagram-title">07 Module Dependencies</h2>
+        <div class="diagram-container">
+            <img src="07_module_dependencies.png" alt="07 Module Dependencies">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="07_module_dependencies.png" download>PNG</a>
+            <a href="07_module_dependencies.svg" download>SVG</a>
+            <a href="07_module_dependencies.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="08_domain_entity_relationships">
+        <h2 class="diagram-title">08 Domain Entity Relationships</h2>
+        <div class="diagram-container">
+            <img src="08_domain_entity_relationships.png" alt="08 Domain Entity Relationships">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="08_domain_entity_relationships.png" download>PNG</a>
+            <a href="08_domain_entity_relationships.svg" download>SVG</a>
+            <a href="08_domain_entity_relationships.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="09_domain_aggregate_boundaries">
+        <h2 class="diagram-title">09 Domain Aggregate Boundaries</h2>
+        <div class="diagram-container">
+            <img src="09_domain_aggregate_boundaries.png" alt="09 Domain Aggregate Boundaries">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="09_domain_aggregate_boundaries.png" download>PNG</a>
+            <a href="09_domain_aggregate_boundaries.svg" download>SVG</a>
+            <a href="09_domain_aggregate_boundaries.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="10_domain_value_objects">
+        <h2 class="diagram-title">10 Domain Value Objects</h2>
+        <div class="diagram-container">
+            <img src="10_domain_value_objects.png" alt="10 Domain Value Objects">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="10_domain_value_objects.png" download>PNG</a>
+            <a href="10_domain_value_objects.svg" download>SVG</a>
+            <a href="10_domain_value_objects.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="11_c4_code_stock_aggregate">
+        <h2 class="diagram-title">11 C4 Code Stock Aggregate</h2>
+        <div class="diagram-container">
+            <img src="11_c4_code_stock_aggregate.png" alt="11 C4 Code Stock Aggregate">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="11_c4_code_stock_aggregate.png" download>PNG</a>
+            <a href="11_c4_code_stock_aggregate.svg" download>SVG</a>
+            <a href="11_c4_code_stock_aggregate.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="12_dependency_injection">
+        <h2 class="diagram-title">12 Dependency Injection</h2>
+        <div class="diagram-container">
+            <img src="12_dependency_injection.png" alt="12 Dependency Injection">
+        </div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="12_dependency_injection.png" download>PNG</a>
+            <a href="12_dependency_injection.svg" download>SVG</a>
+            <a href="12_dependency_injection.puml" download>PlantUML Source</a>
+        </div>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; color: #7f8c8d;">
+        <p>Generated by StockBook Architecture Documentation</p>
+    </footer>
+</body>
+</html>

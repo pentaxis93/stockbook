@@ -1,0 +1,87 @@
+@startuml 08_domain_entity_relationships
+!define ENTITY(name,desc) class name <<Entity>> #LightBlue
+!define VALUE_OBJECT(name,desc) class name <<Value Object>> #LightGreen
+!define AGGREGATE_ROOT(name,desc) class name <<Aggregate Root>> #LightCoral
+
+title StockBook Domain Model - Entity Relationships
+
+AGGREGATE_ROOT(Stock, "Aggregate Root") {
+  - _symbol: StockSymbol
+  - _company_name: CompanyName | None
+  - _sector: Sector | None
+  - _industry_group: IndustryGroup | None
+  - _grade: Grade | None
+  ... +1 more attributes
+  --
+}
+
+ENTITY(PortfolioBalance, "Entity") {
+  --
+}
+
+AGGREGATE_ROOT(Position, "Aggregate Root") {
+  --
+}
+
+AGGREGATE_ROOT(Target, "Aggregate Root") {
+  --
+}
+
+AGGREGATE_ROOT(JournalEntry, "Aggregate Root") {
+  --
+}
+
+AGGREGATE_ROOT(Portfolio, "Aggregate Root") {
+  --
+  + name()
+  + description()
+  + created_date()
+  ... +7 more methods
+}
+
+ENTITY(Entity, "Entity") {
+  --
+  + id()
+  + from_persistence(cls, id)
+}
+
+AGGREGATE_ROOT(Transaction, "Aggregate Root") {
+  --
+}
+
+VALUE_OBJECT(Grade, "Value Object") {
+  - VALID_GRADES: ClassVar[set[str]]
+  - _value: str
+}
+
+VALUE_OBJECT(StockSymbol, "Value Object") {
+  - _value: str
+}
+
+VALUE_OBJECT(Money, "Value Object") {
+}
+
+VALUE_OBJECT(PortfolioName, "Value Object") {
+  - _value: str
+}
+
+VALUE_OBJECT(Notes, "Value Object") {
+}
+
+VALUE_OBJECT(Quantity, "Value Object") {
+}
+
+' Relationships
+Stock --> StockSymbol : has
+Stock --> Grade : has
+Portfolio --> PortfolioName : has
+Portfolio --> Position : contains *
+Position --> Stock : references
+Position --> Quantity : has
+Transaction --> Money : has
+Transaction --> Quantity : has
+Transaction --> Portfolio : belongs to
+Target --> Stock : for
+JournalEntry --> Portfolio : for
+
+@enduml

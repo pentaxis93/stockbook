@@ -1,0 +1,103 @@
+@startuml 10_domain_value_objects
+!define VALUE_OBJECT(name) class name <<Value Object>> #LightGreen
+
+title StockBook Domain Model - Value Objects
+
+abstract class BaseValueObject {
+  {abstract} + validate()
+  + __eq__()
+  + __hash__()
+}
+
+abstract class BaseNumericValueObject {
+  - value: Decimal
+  + validate()
+}
+
+abstract class BaseTextValueObject {
+  - value: str
+  + validate()
+}
+
+VALUE_OBJECT(Money) {
+  - value: Decimal
+  + validate()
+}
+
+VALUE_OBJECT(Quantity) {
+  - value: Decimal
+  + validate()
+}
+
+VALUE_OBJECT(StockSymbol) {
+  - value: str
+  + validate()
+}
+
+VALUE_OBJECT(CompanyName) {
+  - value: str
+  + validate()
+}
+
+VALUE_OBJECT(Notes) {
+  - value: str
+  + validate()
+}
+
+VALUE_OBJECT(PortfolioName) {
+  - value: str
+  + validate()
+}
+
+VALUE_OBJECT(JournalContent) {
+  - value: str
+  + validate()
+}
+
+VALUE_OBJECT(Grade) {
+  - value: str
+  + from_string()
+  + is_valid()
+}
+
+VALUE_OBJECT(TransactionType) {
+  - value: str
+  + from_string()
+  + is_valid()
+}
+
+VALUE_OBJECT(Sector) {
+  - value: str
+  + from_string()
+  + is_valid()
+}
+
+VALUE_OBJECT(IndustryGroup) {
+  - value: str
+  + from_string()
+  + is_valid()
+}
+
+VALUE_OBJECT(TargetStatus) {
+  - value: str
+  + from_string()
+  + is_valid()
+}
+
+BaseValueObject <|-- BaseNumericValueObject
+BaseValueObject <|-- BaseTextValueObject
+
+BaseNumericValueObject <|-- Money
+BaseNumericValueObject <|-- Quantity
+BaseTextValueObject <|-- StockSymbol
+BaseTextValueObject <|-- CompanyName
+BaseTextValueObject <|-- Notes
+BaseTextValueObject <|-- PortfolioName
+BaseTextValueObject <|-- JournalContent
+BaseValueObject <|-- Grade
+BaseValueObject <|-- TransactionType
+BaseValueObject <|-- Sector
+BaseValueObject <|-- IndustryGroup
+BaseValueObject <|-- TargetStatus
+
+@enduml

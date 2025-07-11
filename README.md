@@ -50,6 +50,7 @@ StockBook is a modern application built with Python to help track personal and f
 - **Dependency Injection** - Professional IoC container with composition root
 - **Testing** - Pytest with layer-specific coverage requirements
 - **Code Quality** - Ruff for fast, comprehensive linting (replaced flake8, pylint, isort, pydocstyle, bandit)
+- **Architecture Documentation** - Auto-generated visual diagrams from codebase analysis
 
 ### Planned Technologies
 - **FastAPI** - Modern async web framework (Phase 2)
@@ -170,7 +171,11 @@ stockbook/
 │   ├── ARCHITECTURE.md     # System design and architecture
 │   ├── RUFF_MIGRATION_GUIDE.md # Linting tool migration guide
 │   ├── ONBOARDING.md       # New developer guide
-│   └── API_DESIGN.md       # Planned API structure
+│   ├── API_DESIGN.md       # Planned API structure
+│   └── architecture/       # Visual architecture documentation
+│       ├── diagrams/       # Generated PlantUML diagrams
+│       ├── models/         # Python diagram generators
+│       └── README.md       # Architecture docs guide
 ├── hooks/                   # Git hooks and quality scripts
 ├── database/                # Database schema (SQLite)
 ├── docker-compose.yml       # Docker configuration
@@ -217,6 +222,26 @@ StockBook follows Clean Architecture principles with clear separation of concern
 ```
 
 For detailed architecture documentation, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+### Architecture Visualization
+
+The project includes auto-generated architecture diagrams that visualize the codebase structure:
+
+```bash
+# Generate architecture diagrams
+make docs-arch
+
+# View diagrams in browser
+# Open: file:///path/to/stockbook/docs/architecture/diagrams/viewer.html
+```
+
+The system generates 12 comprehensive diagrams including:
+- C4 Model diagrams (System Context, Container, Component, Code levels)
+- Clean Architecture visualizations (layers, onion model, dependencies)
+- Domain-Driven Design diagrams (entities, aggregates, value objects)
+- Dependency injection container structure
+
+All diagrams are automatically kept in sync with the codebase.
 
 ## Contributing
 

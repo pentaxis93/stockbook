@@ -1,0 +1,89 @@
+@startuml 03_clean_architecture_overview
+!define RECTANGLE class
+
+skinparam backgroundColor #FEFEFE
+skinparam rectangleBorderColor #000000
+skinparam rectangleBackgroundColor #FFFFCC
+
+title StockBook Clean Architecture Overview
+
+package "Domain Layer (Core)" #LightBlue {
+    RECTANGLE Entities {
+        + Stock
+        + Portfolio
+        + Transaction
+        + Position
+    }
+
+    RECTANGLE "Value Objects" {
+        + Money
+        + StockSymbol
+        + Quantity
+        + Grade
+    }
+
+    RECTANGLE "Domain Services" {
+        + PortfolioCalculationService
+        + RiskAssessmentService
+    }
+
+    RECTANGLE "Repository Interfaces" {
+        + IStockRepository
+        + IPortfolioRepository
+        + ITransactionRepository
+    }
+}
+
+package "Application Layer" #LightGreen {
+    RECTANGLE "Application Services" {
+        + StockApplicationService
+    }
+
+    RECTANGLE Commands {
+        + CreateStockCommand
+        + UpdateStockCommand
+    }
+
+    RECTANGLE DTOs {
+        + StockDto
+    }
+}
+
+package "Infrastructure Layer" #LightCoral {
+    RECTANGLE "Repository Implementations" {
+        + SqlAlchemyStockRepository
+        + SqlAlchemyPositionRepository
+    }
+
+    RECTANGLE Persistence {
+        + Database Tables
+        + Unit of Work
+        + Database Factory
+    }
+}
+
+package "Presentation Layer" #LightYellow {
+    RECTANGLE "Web API" {
+        + FastAPI Routers
+        + Request/Response Models
+        + Exception Handlers
+    }
+}
+
+note right of "Domain Layer (Core)"
+  * No external dependencies
+  * Pure business logic
+  * Framework agnostic
+end note
+
+note left of "Infrastructure Layer"
+  * Implements domain interfaces
+  * External service integrations
+  * Database access
+end note
+
+Presentation -[hidden]down-> Application
+Application -[hidden]down-> Infrastructure
+Infrastructure -[hidden]down-> Domain
+
+@enduml

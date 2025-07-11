@@ -1,0 +1,79 @@
+@startuml 09_domain_aggregate_boundaries
+
+title StockBook Domain Model - Aggregate Boundaries
+
+package "Stock Aggregate" <<Aggregate>> #DDDDDD {
+    class Stock <<Aggregate Root>> #LightCoral {
+        - id: UUID
+        - symbol: StockSymbol
+        - company_name: CompanyName
+        - grade: Grade
+    }
+
+    class StockSymbol <<Value Object>> #LightGreen {
+        - value: str
+    }
+
+    class Grade <<Value Object>> #LightGreen {
+        - value: str
+    }
+}
+
+package "Portfolio Aggregate" <<Aggregate>> #DDDDDD {
+    class Portfolio <<Aggregate Root>> #LightCoral {
+        - id: UUID
+        - name: PortfolioName
+        - owner: str
+        - is_active: bool
+    }
+
+    class Position <<Entity>> #LightBlue {
+        - id: UUID
+        - stock_id: UUID
+        - quantity: Quantity
+        - average_price: Money
+    }
+
+    class PortfolioBalance <<Entity>> #LightBlue {
+        - portfolio_id: UUID
+        - balance: Money
+        - as_of_date: datetime
+    }
+}
+
+package "Transaction Aggregate" <<Aggregate>> #DDDDDD {
+    class Transaction <<Aggregate Root>> #LightCoral {
+        - id: UUID
+        - portfolio_id: UUID
+        - stock_id: UUID
+        - type: TransactionType
+        - quantity: Quantity
+        - price: Money
+    }
+}
+
+package "Target Aggregate" <<Aggregate>> #DDDDDD {
+    class Target <<Aggregate Root>> #LightCoral {
+        - id: UUID
+        - stock_id: UUID
+        - price: Money
+        - status: TargetStatus
+    }
+}
+
+package "Journal Aggregate" <<Aggregate>> #DDDDDD {
+    class JournalEntry <<Aggregate Root>> #LightCoral {
+        - id: UUID
+        - portfolio_id: UUID
+        - content: JournalContent
+        - entry_date: datetime
+    }
+}
+
+note top : Each aggregate maintains its own consistency boundary
+
+note right of "Stock Aggregate" : Stock information is referenced by ID from other aggregates
+
+note left of "Portfolio Aggregate" : Portfolio is the main aggregate for tracking investments
+
+@enduml

@@ -1,0 +1,111 @@
+@startuml
+' StockBook PlantUML Style Template
+' Common styling for all architecture diagrams
+
+' Color scheme
+!define DOMAIN_COLOR #FFE6E6
+!define APPLICATION_COLOR #E6F3FF
+!define INFRASTRUCTURE_COLOR #E6FFE6
+!define PRESENTATION_COLOR #FFFFE6
+!define EXTERNAL_COLOR #F0F0F0
+!define ACCENT_COLOR #4A90E2
+
+' Fonts
+skinparam defaultFontName "Segoe UI, Arial, sans-serif"
+skinparam defaultFontSize 12
+skinparam defaultFontColor #333333
+
+' General styling
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam roundcorner 8
+skinparam linetype ortho
+
+' Class styling
+skinparam class {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    BorderThickness 2
+    FontSize 14
+    AttributeFontSize 12
+    StereotypeFontSize 10
+    HeaderBackgroundColor #F5F5F5
+}
+
+' Package styling
+skinparam package {
+    BorderColor #333333
+    BorderThickness 2
+    FontSize 16
+    Style frame
+}
+
+' Component styling
+skinparam component {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    BorderThickness 2
+    FontSize 14
+}
+
+' Rectangle styling
+skinparam rectangle {
+    BackgroundColor #FFFFFF
+    BorderColor #333333
+    BorderThickness 2
+    FontSize 14
+}
+
+' Note styling
+skinparam note {
+    BackgroundColor #FFFACD
+    BorderColor #333333
+    FontSize 11
+}
+
+' Arrow styling
+skinparam arrow {
+    Color #333333
+    Thickness 2
+}
+
+' Title styling
+skinparam title {
+    FontSize 20
+    FontStyle bold
+    FontColor #333333
+}
+
+' Legend styling
+skinparam legend {
+    BackgroundColor #F5F5F5
+    BorderColor #333333
+    FontSize 12
+}
+
+' Stereotypes for different layer types
+!define ENTITY(name) class name <<Entity>> #DOMAIN_COLOR
+!define VALUE_OBJECT(name) class name <<Value Object>> #DOMAIN_COLOR
+!define AGGREGATE_ROOT(name) class name <<Aggregate Root>> #DOMAIN_COLOR
+!define DOMAIN_SERVICE(name) class name <<Domain Service>> #DOMAIN_COLOR
+
+!define USE_CASE(name) class name <<Use Case>> #APPLICATION_COLOR
+!define APP_SERVICE(name) class name <<Application Service>> #APPLICATION_COLOR
+!define COMMAND(name) class name <<Command>> #APPLICATION_COLOR
+!define DTO(name) class name <<DTO>> #APPLICATION_COLOR
+
+!define REPOSITORY(name) class name <<Repository>> #INFRASTRUCTURE_COLOR
+!define PERSISTENCE(name) class name <<Persistence>> #INFRASTRUCTURE_COLOR
+!define EXTERNAL_SERVICE(name) class name <<External Service>> #INFRASTRUCTURE_COLOR
+
+!define CONTROLLER(name) class name <<Controller>> #PRESENTATION_COLOR
+!define API_MODEL(name) class name <<API Model>> #PRESENTATION_COLOR
+!define MIDDLEWARE(name) class name <<Middleware>> #PRESENTATION_COLOR
+
+' Layer packages
+!define DOMAIN_LAYER package "Domain Layer" #DOMAIN_COLOR
+!define APPLICATION_LAYER package "Application Layer" #APPLICATION_COLOR
+!define INFRASTRUCTURE_LAYER package "Infrastructure Layer" #INFRASTRUCTURE_COLOR
+!define PRESENTATION_LAYER package "Presentation Layer" #PRESENTATION_COLOR
+
+@enduml

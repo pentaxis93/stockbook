@@ -80,6 +80,10 @@ instance/
 # Sphinx documentation
 docs/_build/
 
+# Architecture diagrams - generated files
+docs/architecture/diagrams/*.png
+docs/architecture/diagrams/*.svg
+
 # PyBuilder
 .pybuilder/
 target/

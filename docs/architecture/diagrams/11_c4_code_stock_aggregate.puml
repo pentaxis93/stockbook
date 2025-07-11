@@ -1,0 +1,65 @@
+@startuml 11_c4_code_stock_aggregate
+skinparam backgroundColor #FEFEFE
+skinparam classAttributeIconSize 0
+
+title StockBook - C4 Code Level (Stock Aggregate)
+
+package "Stock Aggregate" {
+    class Stock {
+        - id: UUID
+        - symbol: StockSymbol
+        - company_name: CompanyName
+        - sector: Sector
+        - industry_group: IndustryGroup
+        - grade: Grade
+        - notes: Notes
+        + update_grade(grade: Grade)
+        + update_notes(notes: Notes)
+    }
+
+    class StockSymbol {
+        - value: str
+        + validate()
+    }
+
+    class CompanyName {
+        - value: str
+        + validate()
+    }
+
+    class Grade {
+        - value: str
+        + from_string()
+        + is_valid()
+    }
+
+    class Sector {
+        - value: str
+        + validate()
+    }
+
+    class IndustryGroup {
+        - value: str
+        + validate_with_sector()
+    }
+}
+
+Stock --> StockSymbol : has
+Stock --> CompanyName : has
+Stock --> Grade : has
+Stock --> Sector : has
+Stock --> IndustryGroup : has
+
+note right of Stock
+  Aggregate Root
+  - Ensures consistency
+  - Business rules
+end note
+
+note bottom of StockSymbol
+  Value Objects
+  - Immutable
+  - Self-validating
+end note
+
+@enduml

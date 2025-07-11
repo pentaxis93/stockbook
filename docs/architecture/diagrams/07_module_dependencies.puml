@@ -1,0 +1,47 @@
+@startuml 07_module_dependencies
+!define MODULE(name,layer,color) rectangle name <<layer>> #color
+
+title StockBook - Module Dependencies
+
+package "Domain Layer" #FFE6E6 {
+  MODULE(domain.exceptions, domain, white)
+  MODULE(domain.entities, domain, white)
+  MODULE(domain.events, domain, white)
+  MODULE(domain.value_objects, domain, white)
+  MODULE(domain.repositories, domain, white)
+  MODULE(domain.services, domain, white)
+}
+
+package "Application Layer" #E6F3FF {
+  MODULE(application.commands, application, white)
+  MODULE(application.dto, application, white)
+  MODULE(application.interfaces, application, white)
+  MODULE(application.services, application, white)
+}
+
+package "Infrastructure Layer" #E6FFE6 {
+  MODULE(infrastructure.repositories, infrastructure, white)
+  MODULE(infrastructure.persistence, infrastructure, white)
+}
+
+package "Presentation Layer" #FFFFE6 {
+  MODULE(presentation.view_models, presentation, white)
+  MODULE(presentation.adapters, presentation, white)
+  MODULE(presentation.interfaces, presentation, white)
+  MODULE(presentation.coordinators, presentation, white)
+  MODULE(presentation.web, presentation, white)
+  MODULE(presentation.controllers, presentation, white)
+}
+
+' Key Dependencies
+presentation.web -[thickness=2]-> application.services : uses
+presentation.web -[thickness=2]-> application.dto : uses
+application.services -[thickness=2]-> domain.entities : uses
+application.services -[thickness=2]-> domain.repositories : uses interfaces
+infrastructure.repositories -[thickness=2]..> domain.repositories : implements
+infrastructure.persistence -[thickness=2]-> domain.entities : persists
+
+note top of "Domain Layer" : Core business logic - no external dependencies
+note bottom of "Infrastructure Layer" : Implements domain interfaces
+
+@enduml

@@ -1,0 +1,48 @@
+@startuml 06_clean_architecture_layers
+
+skinparam packageBorderColor #333333
+skinparam packageBorderThickness 2
+
+title StockBook - Layered Architecture with Dependencies
+
+package "Presentation Layer" <<Layer>> #FFFFE6 {
+}
+note right of "Presentation Layer" : FastAPI routers, models, middleware
+
+package "Infrastructure Layer" <<Layer>> #E6FFE6 {
+}
+note right of "Infrastructure Layer" : SQLAlchemy repos, persistence, external services
+
+package "Application Layer" <<Layer>> #E6F3FF {
+}
+note right of "Application Layer" : Use cases, commands, app services, DTOs
+
+package "Domain Layer" <<Layer>> #FFE6E6 {
+}
+note right of "Domain Layer" : Entities, value objects, domain services, interfaces
+
+' Allowed dependencies (solid arrows)
+"Presentation Layer" -[#00AA00,thickness=2]-> "Application Layer" : uses
+"Presentation Layer" -[#00AA00,thickness=2]-> "Infrastructure Layer" : uses (DI)
+"Infrastructure Layer" -[#00AA00,thickness=2]-> "Application Layer" : implements interfaces
+"Infrastructure Layer" -[#00AA00,thickness=2]-> "Domain Layer" : implements interfaces
+"Application Layer" -[#00AA00,thickness=2]-> "Domain Layer" : uses
+
+' Forbidden dependencies (dashed red arrows with X)
+"Application Layer" -[#FF0000,dashed,thickness=2]-> "Infrastructure Layer" : <color:red>✗</color>
+"Application Layer" -[#FF0000,dashed,thickness=2]-> "Presentation Layer" : <color:red>✗</color>
+"Domain Layer" -[#FF0000,dashed,thickness=2]-> "Application Layer" : <color:red>✗</color>
+"Domain Layer" -[#FF0000,dashed,thickness=2]-> "Infrastructure Layer" : <color:red>✗</color>
+"Domain Layer" -[#FF0000,dashed,thickness=2]-> "Presentation Layer" : <color:red>✗</color>
+
+legend right
+  **Legend:**
+  <color:green>→ Allowed dependency</color>
+  <color:red>⇢ Forbidden dependency</color>
+
+  **Dependency Injection:**
+  Infrastructure implements
+  domain interfaces
+endlegend
+
+@enduml

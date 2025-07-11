@@ -521,6 +521,8 @@ class TestConfigIntegration:
         assert "api_version" in version_info
 
         # Check the values match what was imported from src.version
-        assert version_info["version"] == "0.2.1"
-        assert version_info["release_date"] == "2025-01-11"
-        assert version_info["api_version"] == "v1"
+        from src.version import __api_version__, __release_date__, __version__
+
+        assert version_info["version"] == __version__
+        assert version_info["release_date"] == __release_date__
+        assert version_info["api_version"] == __api_version__

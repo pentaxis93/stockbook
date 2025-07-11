@@ -1,0 +1,74 @@
+@startuml 12_dependency_injection
+!define COMPONENT(name,type,color) class name <<type>> #color
+
+title StockBook - Dependency Injection Flow
+
+package "Presentation Layer" #FFFFE6 {
+  COMPONENT(FastAPIApp, "Entry Point", white) {
+    + lifespan()
+    + setup_routes()
+  }
+
+  COMPONENT(StockRouter, "Router", white) {
+    + get_stocks()
+    + create_stock()
+  }
+}
+
+package "Dependency Injection" #F0F0F0 {
+  COMPONENT(CompositionRoot, "DI Container", white) {
+    + setup()
+    + get_stock_service()
+    + get_unit_of_work()
+  }
+
+  COMPONENT(ServiceProvider, "Provider", white) {
+    + provide_singleton()
+    + provide_scoped()
+  }
+}
+
+package "Application Layer" #E6F3FF {
+  COMPONENT(IStockApplicationService, "Interface", white)
+  COMPONENT(StockApplicationService, "Implementation", white) {
+    - unit_of_work: IUnitOfWork
+    + create_stock()
+    + get_all_stocks()
+  }
+}
+
+package "Domain Layer" #FFE6E6 {
+  COMPONENT(IStockRepository, "Interface", white)
+  COMPONENT(IUnitOfWork, "Interface", white)
+}
+
+package "Infrastructure Layer" #E6FFE6 {
+  COMPONENT(SqlAlchemyStockRepository, "Implementation", white)
+  COMPONENT(SqlAlchemyUnitOfWork, "Implementation", white)
+}
+
+' Dependency flow
+FastAPIApp --> CompositionRoot : initializes
+StockRouter --> CompositionRoot : requests dependencies
+CompositionRoot --> ServiceProvider : uses
+
+ServiceProvider ..> StockApplicationService : creates
+ServiceProvider ..> SqlAlchemyUnitOfWork : creates
+ServiceProvider ..> SqlAlchemyStockRepository : creates
+
+StockApplicationService ..|> IStockApplicationService : implements
+SqlAlchemyStockRepository ..|> IStockRepository : implements
+SqlAlchemyUnitOfWork ..|> IUnitOfWork : implements
+
+StockRouter --> IStockApplicationService : depends on
+StockApplicationService --> IUnitOfWork : depends on
+SqlAlchemyUnitOfWork --> IStockRepository : provides
+
+note right of CompositionRoot
+  Composition Root Pattern:
+  - Central configuration
+  - Wire dependencies
+  - Manage lifetimes
+end note
+
+@enduml

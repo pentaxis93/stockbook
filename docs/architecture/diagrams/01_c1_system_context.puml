@@ -1,0 +1,23 @@
+@startuml 01_c1_system_context
+skinparam backgroundColor #FEFEFE
+
+title StockBook - System Context
+
+actor "Family Member" as user
+rectangle "StockBook" as stockbook #4A90E2 {
+  [Personal stock trading tracker]
+}
+
+rectangle "Market Data Provider" as market_data #E6E6E6 {
+  [Stock prices & market info]
+}
+
+rectangle "Stock Broker" as broker #E6E6E6 {
+  [Executes trades]
+}
+
+user --> stockbook : Uses (HTTPS)
+stockbook --> market_data : Fetches market data (API)
+broker --> user : Executes trades
+
+@enduml

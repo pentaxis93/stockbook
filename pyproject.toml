@@ -90,6 +90,19 @@ convention = "google"
   "S603", # subprocess calls are intentional in this controlled script
 ]
 
+"docs/*" = [
+  "ARG001",  # Unused function arguments (visitor pattern requires specific signatures)
+  "E501",    # Line too long (PlantUML diagrams have long lines)
+  "N802",    # Function names in AST visitors must follow visitor pattern (visit_ClassDef)
+  "PERF401", # Use of list comprehension (performance not critical for doc generation)
+  "PLC0206", # Dictionary iteration is intentional and clear
+  "PLR2004", # Magic values are fine in documentation scripts
+  "PTH123",  # Use of open() instead of Path.open() is acceptable
+  "S603",    # Subprocess calls for PlantUML generation are intentional
+  "S607",    # Starting process with partial path is acceptable for plantuml command
+  "TRY300",  # Consider else block (not needed for simple error handling)
+]
+
 [tool.pytest.ini_options]
 python_files = "test_*.py"
 python_classes = "Test*"

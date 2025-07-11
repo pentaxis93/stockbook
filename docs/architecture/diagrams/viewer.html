@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockBook Architecture Diagrams</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .info-box {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+        }
+        .diagram-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .diagram-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #34495e;
+        }
+        .diagram-image {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .diagram-image img {
+            max-width: 100%;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .plantuml-code {
+            background: #f6f8fa;
+            border: 1px solid #d1d5da;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre;
+            display: none;
+        }
+        .format-links {
+            margin-top: 10px;
+        }
+        .format-links a {
+            margin: 0 10px;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .format-links a:hover {
+            text-decoration: underline;
+        }
+        code {
+            background: #f6f8fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+        }
+        .toc {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .toc a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .toggle-source {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+        }
+        .toggle-source:hover {
+            background: #2980b9;
+        }
+    </style>
+    <script>
+        function toggleSource(id) {
+            const codeBlock = document.querySelector(`#${id} .plantuml-code`);
+            const button = document.querySelector(`#${id} .toggle-source`);
+            
+            if (codeBlock.style.display === 'none' || codeBlock.style.display === '') {
+                codeBlock.style.display = 'block';
+                button.textContent = 'Hide Source';
+            } else {
+                codeBlock.style.display = 'none';
+                button.textContent = 'View Source';
+            }
+        }
+        
+        function loadDiagram(filename) {
+            const basename = filename.replace('.puml', '');
+            const element = document.getElementById(basename);
+            
+            if (!element) return;
+            
+            // Check if PNG exists
+            const img = new Image();
+            img.onload = function() {
+                // PNG exists, show it
+                const imageDiv = element.querySelector('.diagram-image');
+                imageDiv.innerHTML = `<img src="${basename}.png" alt="${basename} diagram">`;
+                
+                // Show success message
+                document.getElementById('status-message').className = 'success-box';
+                document.getElementById('status-message').innerHTML = '<strong>✅ Diagrams Rendered Successfully</strong><br>All architecture diagrams have been generated as images.';
+            };
+            
+            img.onerror = function() {
+                // PNG doesn't exist, hide image container
+                const imageDiv = element.querySelector('.diagram-image');
+                imageDiv.style.display = 'none';
+                
+                // Show PlantUML code by default
+                const codeBlock = element.querySelector('.plantuml-code');
+                codeBlock.style.display = 'block';
+                
+                // Hide toggle button
+                const toggleBtn = element.querySelector('.toggle-source');
+                if (toggleBtn) toggleBtn.style.display = 'none';
+            };
+            
+            img.src = basename + '.png';
+            
+            // Load PlantUML source
+            fetch(filename)
+                .then(response => response.text())
+                .then(data => {
+                    element.querySelector('.plantuml-code').textContent = data;
+                })
+                .catch(error => console.error('Error loading diagram:', error));
+        }
+        
+        window.onload = function() {
+            // Load all diagrams in logical sequence
+            const files = [
+                '01_c1_system_context.puml',
+                '02_c2_container.puml',
+                '03_clean_architecture_overview.puml',
+                '04_clean_architecture_onion.puml',
+                '05_c3_component_application.puml',
+                '06_clean_architecture_layers.puml',
+                '07_module_dependencies.puml',
+                '08_domain_entity_relationships.puml',
+                '09_domain_aggregate_boundaries.puml',
+                '10_domain_value_objects.puml',
+                '11_c4_code_stock_aggregate.puml',
+                '12_dependency_injection.puml'
+            ];
+            
+            files.forEach(file => loadDiagram(file));
+        };
+    </script>
+</head>
+<body>
+    <h1>StockBook Architecture Diagrams</h1>
+    
+    <div id="status-message" class="warning-box">
+        <strong>⚠️ Checking for rendered diagrams...</strong><br>
+        Loading architecture diagrams...
+    </div>
+    
+    <div class="toc">
+        <h2>Table of Contents</h2>
+        <ul>
+            <li><a href="#01_c1_system_context">1. C1 System Context</a></li>
+            <li><a href="#02_c2_container">2. C2 Container Diagram</a></li>
+            <li><a href="#03_clean_architecture_overview">3. Clean Architecture Overview</a></li>
+            <li><a href="#04_clean_architecture_onion">4. Clean Architecture Onion View</a></li>
+            <li><a href="#05_c3_component_application">5. C3 Component Diagram (Application Layer)</a></li>
+            <li><a href="#06_clean_architecture_layers">6. Clean Architecture Layer Dependencies</a></li>
+            <li><a href="#07_module_dependencies">7. Module Dependencies</a></li>
+            <li><a href="#08_domain_entity_relationships">8. Domain Entity Relationships</a></li>
+            <li><a href="#09_domain_aggregate_boundaries">9. Domain Aggregate Boundaries</a></li>
+            <li><a href="#10_domain_value_objects">10. Domain Value Objects</a></li>
+            <li><a href="#11_c4_code_stock_aggregate">11. C4 Code Level (Stock Aggregate)</a></li>
+            <li><a href="#12_dependency_injection">12. Dependency Injection Flow</a></li>
+        </ul>
+    </div>
+
+    <div class="diagram-section" id="01_c1_system_context">
+        <h2 class="diagram-title">1. C1 System Context</h2>
+        <p>Shows StockBook in its environment with external systems and actors.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="01_c1_system_context.png" download>PNG</a> |
+            <a href="01_c1_system_context.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('01_c1_system_context')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="02_c2_container">
+        <h2 class="diagram-title">2. C2 Container Diagram</h2>
+        <p>Shows the main technical building blocks and architectural layers.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="02_c2_container.png" download>PNG</a> |
+            <a href="02_c2_container.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('02_c2_container')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="03_clean_architecture_overview">
+        <h2 class="diagram-title">3. Clean Architecture Overview</h2>
+        <p>Shows all layers and their key components in Clean Architecture.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="03_clean_architecture_overview.png" download>PNG</a> |
+            <a href="03_clean_architecture_overview.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('03_clean_architecture_overview')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="04_clean_architecture_onion">
+        <h2 class="diagram-title">4. Clean Architecture Onion View</h2>
+        <p>Concentric view showing dependency rule (dependencies point inward).</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="04_clean_architecture_onion.png" download>PNG</a> |
+            <a href="04_clean_architecture_onion.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('04_clean_architecture_onion')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="05_c3_component_application">
+        <h2 class="diagram-title">5. C3 Component Diagram (Application Layer)</h2>
+        <p>Details the components within the Application layer.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="05_c3_component_application.png" download>PNG</a> |
+            <a href="05_c3_component_application.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('05_c3_component_application')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="06_clean_architecture_layers">
+        <h2 class="diagram-title">6. Clean Architecture Layer Dependencies</h2>
+        <p>Shows allowed and forbidden dependencies between layers.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="06_clean_architecture_layers.png" download>PNG</a> |
+            <a href="06_clean_architecture_layers.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('06_clean_architecture_layers')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="07_module_dependencies">
+        <h2 class="diagram-title">7. Module Dependencies</h2>
+        <p>Detailed module-level dependencies within each layer.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="07_module_dependencies.png" download>PNG</a> |
+            <a href="07_module_dependencies.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('07_module_dependencies')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="08_domain_entity_relationships">
+        <h2 class="diagram-title">8. Domain Entity Relationships</h2>
+        <p>Shows relationships between domain entities and key value objects.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="08_domain_entity_relationships.png" download>PNG</a> |
+            <a href="08_domain_entity_relationships.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('08_domain_entity_relationships')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="09_domain_aggregate_boundaries">
+        <h2 class="diagram-title">9. Domain Aggregate Boundaries</h2>
+        <p>Shows DDD aggregate boundaries and consistency boundaries.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="09_domain_aggregate_boundaries.png" download>PNG</a> |
+            <a href="09_domain_aggregate_boundaries.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('09_domain_aggregate_boundaries')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="10_domain_value_objects">
+        <h2 class="diagram-title">10. Domain Value Objects</h2>
+        <p>Hierarchy and types of value objects in the domain.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="10_domain_value_objects.png" download>PNG</a> |
+            <a href="10_domain_value_objects.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('10_domain_value_objects')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="11_c4_code_stock_aggregate">
+        <h2 class="diagram-title">11. C4 Code Level (Stock Aggregate)</h2>
+        <p>Detailed view of the Stock aggregate with its value objects at code level.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="11_c4_code_stock_aggregate.png" download>PNG</a> |
+            <a href="11_c4_code_stock_aggregate.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('11_c4_code_stock_aggregate')">View Source</button>
+        </div>
+    </div>
+
+    <div class="diagram-section" id="12_dependency_injection">
+        <h2 class="diagram-title">12. Dependency Injection Flow</h2>
+        <p>Shows how dependency injection and composition root work.</p>
+        <div class="diagram-image"></div>
+        <div class="plantuml-code">Loading...</div>
+        <div class="format-links">
+            <strong>Download:</strong>
+            <a href="12_dependency_injection.png" download>PNG</a> |
+            <a href="12_dependency_injection.puml" download>PlantUML Source</a>
+            <button class="toggle-source" onclick="toggleSource('12_dependency_injection')">View Source</button>
+        </div>
+    </div>
+
+    <footer style="text-align: center; margin-top: 50px; color: #7f8c8d;">
+        <p>Generated by StockBook Architecture Documentation</p>
+        <p>Last updated: <script>document.write(new Date().toLocaleDateString());</script></p>
+    </footer>
+</body>
+</html>
