@@ -33,7 +33,7 @@ class TestMainApp:
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "StockBook API"
-        assert data["version"] == "0.2.0"
+        assert data["version"] == "0.2.1"
 
     def test_database_initialization_on_startup(
         self,
@@ -72,7 +72,7 @@ class TestMainApp:
 
         data = response.json()
         assert data["name"] == "StockBook API"
-        assert data["version"] == "0.2.0"
+        assert data["version"] == "0.2.1"
         assert "endpoints" in data
         assert "/health" in data["endpoints"]
         assert "/docs" in data["endpoints"]
@@ -83,7 +83,7 @@ class TestMainApp:
         assert response.status_code == 200
 
         data = response.json()
-        assert data["version"] == "0.2.0"
+        assert data["version"] == "0.2.1"
         assert data["release_date"] == "2025-01-11"
         assert data["api_version"] == "v1"
         assert "name" in data

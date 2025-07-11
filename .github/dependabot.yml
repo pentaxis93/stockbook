@@ -1,0 +1,134 @@
+# Dependabot configuration for automated dependency updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "UTC"
+    # Limit the number of open pull requests for version updates
+    open-pull-requests-limit: 5
+    # Allow both direct and indirect (transitive) dependency updates
+    allow:
+      - dependency-type: "all"
+    # Commit message preferences
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
+    # Labels to automatically apply to PRs
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+    # Milestone to associate PRs with (optional - uncomment if you use milestones)
+    # milestone: 1
+    # Pull request branch name separator (default is "/")
+    pull-request-branch-name:
+      separator: "/"
+    # Rebase strategy when there are conflicts
+    rebase-strategy: "auto"
+    # Group dependency updates to reduce noise
+    groups:
+      # Group all development dependencies together
+      development-dependencies:
+        patterns:
+          - "black"
+          - "mypy*"
+          - "pytest*"
+          - "coverage*"
+          - "ruff"
+          - "pyright"
+          - "pre-commit"
+          - "pip-audit"
+          - "docstr-coverage"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group all testing related dependencies
+      testing:
+        patterns:
+          - "pytest*"
+          - "coverage*"
+          - "httpx"
+          - "tenacity"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group linting and formatting tools
+      linting:
+        patterns:
+          - "black"
+          - "ruff"
+          - "mypy*"
+          - "pyright"
+          - "import-linter"
+          - "grimp"
+        update-types:
+          - "minor"
+          - "patch"
+      # Group type stubs and typing related packages
+      typing:
+        patterns:
+          - "types-*"
+          - "typing*"
+          - "mypy*"
+          - "sqlalchemy-stubs"
+        update-types:
+          - "minor"
+          - "patch"
+    # Version requirement updates
+    versioning-strategy: "increase-if-necessary"
+    # Ignore specific dependencies or versions (examples below - uncomment as needed)
+    # ignore:
+    #   - dependency-name: "sqlalchemy"
+    #     versions: ["2.1.x", "2.2.x"]  # Example: if these versions have breaking changes
+    #   - dependency-name: "fastapi"
+    #     update-types: ["version-update:semver-major"]  # Ignore major version updates
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    # Group all GitHub Actions updates together
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker base images (if you plan to use specific base images in the future)
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "build"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"

@@ -17,6 +17,7 @@ StockBook is a modern application built with Python to help track personal and f
 - ✅ Professional dependency injection container
 - ✅ Comprehensive test suite (100% coverage on critical layers)
 - ✅ Development tooling (Docker, Makefile, pre-commit hooks)
+- ✅ Automated dependency updates with Dependabot
 
 ### What's Coming Next
 - 🔄 Infrastructure layer (database, repositories)

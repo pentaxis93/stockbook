@@ -28,11 +28,11 @@ class TestVersionModule:
         pattern = r"^\d+\.\d+\.\d+$"
         assert re.match(pattern, __version__) is not None
 
-    def test_version_is_0_2_0(self) -> None:
-        """Test that current version is 0.2.0 as specified."""
+    def test_version_is_0_2_1(self) -> None:
+        """Test that current version is 0.2.1 as specified."""
         from src.version import __version__
 
-        assert __version__ == "0.2.0"
+        assert __version__ == "0.2.1"
 
     def test_version_info_tuple(self) -> None:
         """Test that version info tuple is properly formatted."""
@@ -41,7 +41,7 @@ class TestVersionModule:
         assert isinstance(__version_info__, tuple)
         assert len(__version_info__) == 3
         assert all(isinstance(part, int) for part in __version_info__)
-        assert __version_info__ == (0, 2, 0)
+        assert __version_info__ == (0, 2, 1)
 
     def test_version_string_matches_tuple(self) -> None:
         """Test that version string matches version info tuple."""
@@ -104,40 +104,40 @@ class TestVersionModule:
         if hasattr(version, "VERSION_MINOR"):
             assert version.VERSION_MINOR == 2
         if hasattr(version, "VERSION_PATCH"):
-            assert version.VERSION_PATCH == 0
+            assert version.VERSION_PATCH == 1
 
     def test_version_string_generation(self) -> None:
         """Test version string generation function if it exists."""
         from src import version
 
         if hasattr(version, "get_version"):
-            assert version.get_version() == "0.2.0"
+            assert version.get_version() == "0.2.1"
 
         if hasattr(version, "get_full_version"):
             full_version = version.get_full_version()
-            assert "0.2.0" in full_version
+            assert "0.2.1" in full_version
 
     def test_get_version_function(self) -> None:
         """Test the get_version function returns correct version."""
         from src.version import get_version
 
-        assert get_version() == "0.2.0"
+        assert get_version() == "0.2.1"
 
     def test_get_full_version_function(self) -> None:
         """Test the get_full_version function returns properly formatted string."""
         from src.version import get_full_version
 
         full_version = get_full_version()
-        assert full_version == "StockBook 0.2.0 (Released: 2025-01-11)"
+        assert full_version == "StockBook 0.2.1 (Released: 2025-01-11)"
         assert "StockBook" in full_version
-        assert "0.2.0" in full_version
+        assert "0.2.1" in full_version
         assert "Released: 2025-01-11" in full_version
 
     def test_version_import_from_src(self) -> None:
         """Test that version can be imported from src package."""
         from src import __version__
 
-        assert __version__ == "0.2.0"
+        assert __version__ == "0.2.1"
 
     def test_version_module_docstring(self) -> None:
         """Test that version module has proper documentation."""
