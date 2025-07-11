@@ -56,9 +56,10 @@ class TestMainApp:
             assert len(call_args) == 1
 
             # Should be called with the database URL from environment or config
-            from src.infrastructure.config import database_config
+            from config import Config
 
-            expected_url = os.getenv("DATABASE_URL", database_config.database_url)
+            config = Config()
+            expected_url = os.getenv("DATABASE_URL", config.database_url)
             assert call_args[0] == expected_url
 
     def test_health_check_endpoint(self, client: TestClient) -> None:

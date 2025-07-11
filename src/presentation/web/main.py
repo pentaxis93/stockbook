@@ -13,6 +13,7 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from config import Config
 from dependency_injection.composition_root import CompositionRoot
 from src.domain.exceptions import (
     AlreadyExistsError,
@@ -20,7 +21,6 @@ from src.domain.exceptions import (
     DomainError,
     NotFoundError,
 )
-from src.infrastructure.config import database_config
 from src.infrastructure.persistence.database_initializer import initialize_database
 from src.presentation.web.middleware.exception_handler import (
     already_exists_exception_handler,
@@ -54,7 +54,8 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup
     try:
         # Get database URL from environment or use default from config
-        database_url = os.getenv("DATABASE_URL", database_config.database_url)
+        config = Config()
+        database_url = os.getenv("DATABASE_URL", config.database_url)
 
         # Initialize database on startup
         logger.info("Starting database initialization...")
