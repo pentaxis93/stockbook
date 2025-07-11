@@ -1,36 +1,34 @@
 """Database engine factory for SQLAlchemy.
 
 This module provides factory functions for creating SQLAlchemy engines
-with appropriate configuration for SQLite databases.
+with appropriate configuration based on the database URL.
 """
 
 # pyright: reportUnknownMemberType=false, reportUntypedFunctionDecorator=false
 
-from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
-from sqlalchemy import (
-    create_engine as sqla_create_engine,
-)
-from sqlalchemy import (
-    event,
-)
+from sqlalchemy import create_engine as sqla_create_engine
 from sqlalchemy.engine import Engine
-from sqlalchemy.pool import StaticPool
 
 from config import Config
+from src.infrastructure.persistence.dialects.sqlite import (
+    configure_sqlite_engine,
+    get_sqlite_engine_kwargs,
+)
 
 
 def create_engine(
-    db_path: str | Path,
+    database_url: str,
     *,
     echo: bool = False,
     **kwargs: Any,
 ) -> Engine:
-    """Create a SQLAlchemy engine for SQLite database.
+    """Create a SQLAlchemy engine based on database URL.
 
     Args:
-        db_path: Path to the database file or ":memory:" for in-memory
+        database_url: Database URL (e.g., "sqlite:///path/to/db.db")
         echo: Whether to log SQL statements
         **kwargs: Additional arguments passed to create_engine
 
@@ -38,49 +36,34 @@ def create_engine(
         Configured SQLAlchemy engine
 
     Raises:
-        TypeError: If db_path is not a string or Path
-        ValueError: If db_path is empty
+        ValueError: If database_url is empty or unsupported
     """
-    # Validate input type (needed for runtime safety even though type checker
-    # knows the types)
-    if not isinstance(db_path, str | Path):  # pyright: ignore[reportUnnecessaryIsInstance]
-        msg = "Database path must be a string or Path object"
-        raise TypeError(msg)
-
-    db_path_str = str(db_path)
-    if not db_path_str:
-        msg = "Database path cannot be empty"
+    if not database_url:
+        msg = "Database URL cannot be empty"
         raise ValueError(msg)
 
-    # Build database URL
-    url = get_database_url(db_path_str)
+    # Parse the URL to determine database type
+    parsed = urlparse(database_url)
+    scheme = parsed.scheme
 
-    # Configure connection arguments
-    connect_args = {"check_same_thread": False}
-
-    # Special configuration for in-memory databases
-    if db_path_str == ":memory:":
-        # Use StaticPool for in-memory databases to share connection
-        kwargs["poolclass"] = StaticPool
+    # Get dialect-specific configuration
+    if scheme == "sqlite":
+        dialect_kwargs = get_sqlite_engine_kwargs(database_url)
+        kwargs.update(dialect_kwargs)
+    else:
+        msg = f"Unsupported database scheme: {scheme}"
+        raise ValueError(msg)
 
     # Create engine
     engine = sqla_create_engine(
-        url,
+        database_url,
         echo=echo,
-        connect_args=connect_args,
         **kwargs,
     )
 
-    # Configure SQLite pragmas
-    @event.listens_for(engine, "connect")
-    def set_sqlite_pragma(dbapi_conn: Any, connection_record: Any) -> None:
-        """Configure SQLite pragmas on each connection."""
-        # connection_record is required by SQLAlchemy but not used
-        _ = connection_record
-        configure_sqlite_pragmas(dbapi_conn, enable_foreign_keys=True)
-
-    # Mark function as used by SQLAlchemy event system
-    _ = set_sqlite_pragma
+    # Apply dialect-specific configuration
+    if scheme == "sqlite":
+        configure_sqlite_engine(engine)
 
     return engine
 
@@ -89,56 +72,15 @@ def create_engine_from_config(*, use_test_db: bool = False) -> Engine:
     """Create a SQLAlchemy engine using application configuration.
 
     Args:
-        use_test_db: Whether to use test database path
+        use_test_db: Whether to use test database URL
 
     Returns:
         Configured SQLAlchemy engine
     """
     config = Config()
-    db_path = config.test_db_path if use_test_db else config.db_path
+    database_url = config.test_database_url if use_test_db else config.database_url
 
-    # The timeout will be passed as part of the connect_args in create_engine
     return create_engine(
-        db_path,
+        database_url,
         echo=config.DEBUG,
     )
-
-
-def get_database_url(db_path: str | Path) -> str:
-    """Construct SQLite database URL from path.
-
-    Args:
-        db_path: Database file path
-
-    Returns:
-        SQLite URL string
-    """
-    return f"sqlite:///{db_path}"
-
-
-def configure_sqlite_pragmas(
-    connection: Any,
-    *,
-    enable_foreign_keys: bool = True,
-    journal_mode: str | None = None,
-) -> None:
-    """Configure SQLite PRAGMA settings on a connection.
-
-    Args:
-        connection: SQLite database connection
-        enable_foreign_keys: Whether to enable foreign key constraints
-        journal_mode: Journal mode (e.g., "WAL", "DELETE")
-    """
-    cursor = connection.cursor()
-
-    if enable_foreign_keys:
-        # NOTE: Raw SQL is necessary here because SQLAlchemy doesn't provide
-        # a built-in abstraction for SQLite PRAGMA commands. These are SQLite-specific
-        # configuration commands that must be executed as raw SQL.
-        cursor.execute("PRAGMA foreign_keys = ON")
-
-    if journal_mode:
-        # NOTE: Raw SQL is necessary for PRAGMA commands (see comment above)
-        cursor.execute(f"PRAGMA journal_mode = {journal_mode}")
-
-    cursor.close()

@@ -21,7 +21,7 @@ def test_configure_with_extra_registrations() -> None:
 
     # Configure with extra registrations
     container = CompositionRoot.configure(
-        database_path=":memory:",
+        database_url="sqlite:///:memory:",
         extra_registrations=extra_registrations,
     )
 

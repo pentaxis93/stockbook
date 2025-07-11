@@ -260,7 +260,7 @@ class TestDependencyInjectionIntegration:
     def test_complete_di_configuration(self) -> None:
         """Should wire up complete application with DI."""
         # Arrange
-        container = CompositionRoot.configure(database_path=":memory:")
+        container = CompositionRoot.configure(database_url="sqlite:///:memory:")
 
         # Act - Resolve application service
         service = container.resolve(IStockApplicationService)
@@ -279,7 +279,7 @@ class TestDependencyInjectionIntegration:
     def test_end_to_end_stock_creation_with_di(self) -> None:
         """Should create stock through DI-configured service."""
         # Arrange
-        container = CompositionRoot.configure(database_path=":memory:")
+        container = CompositionRoot.configure(database_url="sqlite:///:memory:")
         engine = container.resolve(Engine)
         metadata.create_all(engine)
         service = container.resolve(IStockApplicationService)

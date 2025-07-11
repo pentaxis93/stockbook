@@ -40,14 +40,14 @@ class CompositionRoot:
     @classmethod
     def configure(
         cls,
-        database_path: str | None = None,
+        database_url: str | None = None,
         config: dict[str, Any] | None = None,
         extra_registrations: Callable[[DIContainer], None] | None = None,
     ) -> DIContainer:
         """Configure the complete application dependency graph.
 
         Args:
-            database_path: Path to the SQLite database file (defaults to Config.db_path)
+            database_url: Database URL (defaults to Config.database_url)
             config: Optional configuration overrides
             extra_registrations: Optional function to register additional services
 
@@ -57,13 +57,13 @@ class CompositionRoot:
         container = DIContainer()
         config = config or {}
 
-        # Use Config class database path as default, then check overrides
-        if database_path is None:
-            database_path = str(Config().db_path)
-        db_path = config.get("database_path", database_path)
+        # Use Config class database URL as default, then check overrides
+        if database_url is None:
+            database_url = Config().database_url
+        db_url = config.get("database_url", database_url)
 
         # Configure infrastructure layer (database, repositories)
-        cls._configure_infrastructure_layer(container, db_path)
+        cls._configure_infrastructure_layer(container, db_url)
 
         # Configure application layer (business logic)
         cls._configure_application_layer(container)
@@ -80,16 +80,16 @@ class CompositionRoot:
     def _configure_infrastructure_layer(
         cls,
         container: DIContainer,
-        db_path: str,
+        db_url: str,
     ) -> None:
         """Configure infrastructure layer dependencies.
 
         Args:
             container: DI container to configure
-            db_path: Path to the database file
+            db_url: Database URL
         """
         # Database engine - singleton
-        engine = create_engine(db_path)
+        engine = create_engine(db_url)
         container.register_instance(Engine, engine)
 
         # Unit of Work - transient for transaction isolation

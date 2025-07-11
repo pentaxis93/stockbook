@@ -13,6 +13,7 @@ from typing import Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from config import Config
 from dependency_injection.composition_root import CompositionRoot
 from src.domain.exceptions import (
     AlreadyExistsError,
@@ -52,17 +53,18 @@ async def lifespan(fastapi_app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Startup
     try:
-        # Get database path from environment or use default
-        database_path = os.getenv("DATABASE_PATH", "/app/data/database/stockbook.db")
+        # Get database URL from environment or use default from config
+        config = Config()
+        database_url = os.getenv("DATABASE_URL", config.database_url)
 
         # Initialize database on startup
         logger.info("Starting database initialization...")
-        initialize_database(database_path)
+        initialize_database(database_url)
         logger.info("Database initialization completed")
 
         # Configure dependency injection
         logger.info("Configuring dependency injection...")
-        di_container = CompositionRoot.configure(database_path=database_path)
+        di_container = CompositionRoot.configure(database_url=database_url)
 
         # Store DI container in app state for access in dependencies
         fastapi_app.state.di_container = di_container

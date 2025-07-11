@@ -58,25 +58,19 @@ def _create_tables_if_not_exist(engine: Engine, table_metadata: MetaData) -> Non
     logger.info("Created/verified %d tables", len(table_metadata.tables))
 
 
-def _extract_db_path(database_url: str) -> str:
-    """Extract database path from URL or return path as-is."""
-    if "://" in database_url:
-        # It's a URL
-        if database_url.startswith("sqlite:///"):
-            return database_url.replace("sqlite:///", "")
-        # For non-SQLite databases or invalid URLs
-        msg = f"Unsupported database URL: {database_url}"
-        raise ValueError(msg)
-    # It's a file path
-    return database_url
+def _ensure_db_directory_exists(database_url: str) -> None:
+    """Create database directory if it doesn't exist for file-based databases.
 
-
-def _ensure_db_directory_exists(db_path: str) -> None:
-    """Create database directory if it doesn't exist."""
-    path = Path(db_path)
-    parent_dir = path.parent
-    if parent_dir != Path():
-        parent_dir.mkdir(parents=True, exist_ok=True)
+    Args:
+        database_url: Database URL
+    """
+    # Only create directories for SQLite file-based databases
+    if database_url.startswith("sqlite:///") and database_url != "sqlite:///:memory:":
+        db_path = database_url.replace("sqlite:///", "")
+        path = Path(db_path)
+        parent_dir = path.parent
+        if parent_dir != Path():
+            parent_dir.mkdir(parents=True, exist_ok=True)
 
 
 def initialize_database(
@@ -88,7 +82,7 @@ def initialize_database(
     and will only create tables that don't already exist.
 
     Args:
-        database_url: Database connection URL or file path
+        database_url: Database connection URL
 
     Raises:
         Exception: If database initialization fails
@@ -96,14 +90,11 @@ def initialize_database(
     try:
         logger.info("Initializing database: %s", database_url)
 
-        # Extract database path from URL
-        db_path = _extract_db_path(database_url)
-
         # Ensure directory exists
-        _ensure_db_directory_exists(db_path)
+        _ensure_db_directory_exists(database_url)
 
-        # Create engine using the factory which expects a path
-        engine = create_engine(db_path)
+        # Create engine using the factory
+        engine = create_engine(database_url)
 
         # Collect all metadata
         all_metadata = _collect_all_metadata()

@@ -140,8 +140,8 @@ class TestStockTableDefinition:
         # Create a new metadata instance
         test_metadata = MetaData()
 
-        # Use tometadata() instead of manually copying columns
-        copied_table = stock_table.tometadata(test_metadata)
+        # Use to_metadata() instead of manually copying columns
+        copied_table = stock_table.to_metadata(test_metadata)  # pyright: ignore[reportAttributeAccessIssue, reportUnknownMemberType, reportUnknownVariableType]
 
-        assert copied_table.name == "stocks"
-        assert len(copied_table.columns) == len(stock_table.columns)
+        assert copied_table.name == "stocks"  # pyright: ignore[reportUnknownMemberType]
+        assert len(copied_table.columns) == len(stock_table.columns)  # pyright: ignore[reportUnknownMemberType, reportUnknownArgumentType]

@@ -45,9 +45,10 @@ class TestConfigInitialization:
         config = Config()
 
         # Database configuration
+        assert config.database_url == "sqlite:///data/database/stockbook.db"
+        assert config.test_database_url == "sqlite:///:memory:"
         assert config.db_path == Path("data/database/stockbook.db")
-        assert config.schema_path == Path("data/database/schema.sql")
-        assert config.test_db_path == Path("data/database/test_stockbook.db")
+        assert config.test_db_path == Path(":memory:")
 
         # File paths
         assert config.app_name == "StockBook"
@@ -80,13 +81,16 @@ class TestConfigInitialization:
         with patch.dict(
             os.environ,
             {
-                "STOCKBOOK_DB_PATH": "custom/path/stockbook.db",
+                "DATABASE_URL": "sqlite:///custom/path/stockbook.db",
+                "TEST_DATABASE_URL": "sqlite:///custom/test.db",
                 "STOCKBOOK_DATE_FORMAT": "%m/%d/%Y",
                 "STOCKBOOK_MAX_POSITIONS": "15",
             },
         ):
             config = Config()
 
+            assert config.database_url == "sqlite:///custom/path/stockbook.db"
+            assert config.test_database_url == "sqlite:///custom/test.db"
             assert str(config.db_path) == "custom/path/stockbook.db"
             assert config.date_format == "%m/%d/%Y"
             assert config.portfolio_defaults["max_positions"] == 15
@@ -109,8 +113,9 @@ class TestDatabaseConfiguration:
         config = Config()
 
         assert isinstance(config.db_path, Path)
-        assert isinstance(config.schema_path, Path)
         assert isinstance(config.test_db_path, Path)
+        assert isinstance(config.database_url, str)
+        assert isinstance(config.test_database_url, str)
 
     def test_database_directory_creation(self) -> None:
         """Test that database directory gets created if it doesn't exist."""
@@ -299,16 +304,6 @@ class TestDisplayConfiguration:
 class TestConfigValidation:
     """Test configuration validation and error handling."""
 
-    def test_validate_raises_on_invalid_paths(self) -> None:
-        """Test validation fails for invalid file paths."""
-        config = Config()
-
-        # Set invalid schema path
-        config.schema_path = Path("/nonexistent/path/schema.sql")
-
-        with pytest.raises(ValidationError, match="Schema file does not exist"):
-            config.validate()
-
     def test_validate_raises_on_invalid_values(self) -> None:
         """Test validation fails for invalid configuration values."""
         config = Config()
@@ -319,19 +314,19 @@ class TestConfigValidation:
             ValidationError,
             match="decimal_places must be non-negative",
         ):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
         # Invalid max positions
         config.decimal_places = 2  # Reset to valid
         config.portfolio_defaults["max_positions"] = 0
         with pytest.raises(ValidationError, match="max_positions must be positive"):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
         # Invalid min_price
         config.portfolio_defaults["max_positions"] = 10  # Reset to valid
         config.min_price = 0
         with pytest.raises(ValidationError, match="min_price must be positive"):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
         # Invalid max_price
         config.min_price = 0.01  # Reset to valid
@@ -340,19 +335,19 @@ class TestConfigValidation:
             ValidationError,
             match="max_price must be greater than min_price",
         ):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
         # Invalid min_quantity
         config.max_price = 100000.0  # Reset to valid
         config.min_quantity = 0
         with pytest.raises(ValidationError, match="min_quantity must be positive"):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
         # Invalid table_page_size
         config.min_quantity = 1  # Reset to valid
         config.table_page_size = 0
         with pytest.raises(ValidationError, match="table_page_size must be positive"):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
         # Invalid max_rows_display
         config.table_page_size = 20  # Reset to valid
@@ -361,7 +356,7 @@ class TestConfigValidation:
             ValidationError,
             match="max_rows_display must be >= table_page_size",
         ):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
     def test_validate_raises_on_invalid_patterns(self) -> None:
         """Test validation fails for invalid regex patterns."""
@@ -371,7 +366,7 @@ class TestConfigValidation:
         config.stock_symbol_pattern = "[invalid"
 
         with pytest.raises(ValidationError, match="Invalid regex pattern"):
-            config.validate(skip_file_checks=True)
+            config.validate()
 
 
 class TestConfigEnvironmentOverrides:
@@ -444,7 +439,7 @@ class TestConfigMethods:
         config = Config()
 
         conn_str = config.get_db_connection_string()
-        assert str(config.db_path) in conn_str
+        assert conn_str == config.database_url
 
     def test_ensure_directories_creates_paths(self) -> None:
         """Test that ensure_directories creates necessary directories."""
@@ -492,7 +487,6 @@ class TestConfigIntegration:
 
         # Verify paths are accessible
         assert config.db_path.name == "stockbook.db"
-        assert config.schema_path.name == "schema.sql"
 
     def test_format_date_method(self) -> None:
         """Test format_date method."""
@@ -526,3 +520,11 @@ class TestConfigIntegration:
         assert version_info["version"] == __version__
         assert version_info["release_date"] == __release_date__
         assert version_info["api_version"] == __api_version__
+
+    def test_extract_path_from_unsupported_url(self) -> None:
+        """Test _extract_path_from_url raises error for unsupported URLs."""
+        config = Config()
+
+        # Test with non-SQLite URL
+        with pytest.raises(ValueError, match="Unsupported database URL format"):
+            _ = config._extract_path_from_url("postgresql://localhost/db")  # noqa: SLF001  # pyright: ignore[reportPrivateUsage]

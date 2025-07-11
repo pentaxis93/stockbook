@@ -15,8 +15,6 @@ from typing import Any
 
 import pytest
 
-from config import config
-
 # Domain imports removed - will be used when infrastructure is rebuilt
 # Infrastructure imports removed - will be rebuilt later
 
@@ -41,10 +39,6 @@ def test_db() -> Generator[Path, None, None]:
     with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
         test_db_path = Path(f.name)
 
-    # Also update the config for consistency
-    original_config_path = config.db_path
-    config.db_path = test_db_path
-
     # Database initialization removed - infrastructure layer will be rebuilt later
     # For now, just create an empty database file
 
@@ -52,9 +46,6 @@ def test_db() -> Generator[Path, None, None]:
     yield test_db_path
 
     # Cleanup: This runs after the test completes
-    # Restore the original database path
-    config.db_path = original_config_path
-
     # Delete the temporary test database
     if test_db_path.exists():
         test_db_path.unlink()

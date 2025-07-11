@@ -83,18 +83,23 @@ class Config:
 
     def _setup_database(self) -> None:
         """Setup database configuration."""
-        self.db_path = Path(
-            self._get_env_str("STOCKBOOK_DB_PATH", "data/database/stockbook.db"),
+        # Support DATABASE_URL for modern configuration
+        self.database_url = self._get_env_str(
+            "DATABASE_URL",
+            "sqlite:///data/database/stockbook.db",
         )
-        self.schema_path = Path(
-            self._get_env_str("STOCKBOOK_SCHEMA_PATH", "data/database/schema.sql"),
+
+        # Support TEST_DATABASE_URL for test configuration
+        self.test_database_url = self._get_env_str(
+            "TEST_DATABASE_URL",
+            "sqlite:///:memory:",
         )
-        self.test_db_path = Path(
-            self._get_env_str(
-                "STOCKBOOK_TEST_DB_PATH",
-                "data/database/test_stockbook.db",
-            ),
-        )
+
+        # Extract path from URL for backward compatibility
+        self.db_path = self._extract_path_from_url(self.database_url)
+        self.test_db_path = self._extract_path_from_url(self.test_database_url)
+
+        # Connection configuration
         self.db_connection_timeout = self._get_env_int("STOCKBOOK_DB_TIMEOUT", 30)
         self.db_foreign_keys_enabled = self._get_env_bool(
             "STOCKBOOK_DB_FOREIGN_KEYS",
@@ -256,26 +261,14 @@ class Config:
             return default
         return [item.strip() for item in value.split(",")]
 
-    def validate(self, *, skip_file_checks: bool = False) -> None:
+    def validate(self) -> None:
         """Validate configuration settings.
-
-        Args:
-            skip_file_checks: Skip file existence checks (useful for testing)
 
         Raises:
             ValidationError: If any configuration value is invalid
         """
         self._validate_values()
         self._validate_patterns()
-        if not skip_file_checks:
-            self._validate_paths()
-
-    def _validate_paths(self) -> None:
-        """Validate file and directory paths."""
-        # Schema file must exist
-        if not self.schema_path.exists():
-            msg = f"Schema file does not exist: {self.schema_path}"
-            raise ValidationError(msg)
 
     def _validate_values(self) -> None:
         """Validate configuration values."""
@@ -322,9 +315,27 @@ class Config:
             msg = f"Invalid regex pattern for stock symbols: {e}"
             raise ValidationError(msg) from e
 
+    def _extract_path_from_url(self, database_url: str) -> Path:
+        """Extract file path from SQLite URL.
+
+        Args:
+            database_url: SQLite URL (e.g., "sqlite:///path/to/db.db")
+
+        Returns:
+            Path object for the database file
+        """
+        if database_url == "sqlite:///:memory:":
+            return Path(":memory:")
+
+        if database_url.startswith("sqlite:///"):
+            return Path(database_url.replace("sqlite:///", ""))
+
+        msg = f"Unsupported database URL format: {database_url}"
+        raise ValueError(msg)
+
     def get_db_connection_string(self) -> str:
         """Get database connection string."""
-        return f"sqlite:///{self.db_path}"
+        return self.database_url
 
     def ensure_directories(self) -> None:
         """Create necessary directories if they don't exist."""

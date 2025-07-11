@@ -5,7 +5,6 @@ Tests the creation and configuration of SQLAlchemy engines
 for database connections.
 """
 
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -22,7 +21,7 @@ class TestDatabaseFactory:
         from src.infrastructure.persistence.database_factory import create_engine
 
         # Act
-        engine = create_engine("test.db")
+        engine = create_engine("sqlite:///test.db")
 
         # Assert
         assert isinstance(engine, Engine)
@@ -32,7 +31,7 @@ class TestDatabaseFactory:
         from src.infrastructure.persistence.database_factory import create_engine
 
         # Act
-        engine = create_engine("database/test.db")
+        engine = create_engine("sqlite:///database/test.db")
 
         # Assert
         assert str(engine.url) == "sqlite:///database/test.db"
@@ -43,32 +42,33 @@ class TestDatabaseFactory:
 
         # Arrange
         absolute_path = "/tmp/test_stockbook.db"
+        database_url = f"sqlite:///{absolute_path}"
 
         # Act
-        engine = create_engine(absolute_path)
+        engine = create_engine(database_url)
 
         # Assert
-        assert str(engine.url) == f"sqlite:///{absolute_path}"
+        assert str(engine.url) == database_url
 
-    def test_create_engine_with_pathlib_path(self) -> None:
-        """Should accept pathlib Path objects."""
+    def test_create_engine_with_relative_path(self) -> None:
+        """Should handle relative paths correctly."""
         from src.infrastructure.persistence.database_factory import create_engine
 
         # Arrange
-        path = Path("database/test.db")
+        database_url = "sqlite:///database/test.db"
 
         # Act
-        engine = create_engine(path)
+        engine = create_engine(database_url)
 
         # Assert
-        assert str(engine.url) == "sqlite:///database/test.db"
+        assert str(engine.url) == database_url
 
     def test_create_in_memory_engine(self) -> None:
         """Should create in-memory database for testing."""
         from src.infrastructure.persistence.database_factory import create_engine
 
         # Act
-        engine = create_engine(":memory:")
+        engine = create_engine("sqlite:///:memory:")
 
         # Assert
         assert str(engine.url) == "sqlite:///:memory:"
@@ -80,7 +80,7 @@ class TestDatabaseFactory:
         from src.infrastructure.persistence.database_factory import create_engine
 
         # Act
-        engine = create_engine("test.db")
+        engine = create_engine("sqlite:///test.db")
 
         # Assert - verify connect_args are set
         connect_args = engine.dialect.create_connect_args(engine.url)[1]
@@ -98,7 +98,7 @@ class TestDatabaseFactory:
         mock_create_engine.return_value = mock_engine
 
         # Act
-        _ = create_engine("test.db", echo=True)
+        _ = create_engine("sqlite:///test.db", echo=True)
 
         # Assert
         mock_create_engine.assert_called_once()
@@ -113,7 +113,7 @@ class TestDatabaseFactory:
 
         # This will test that the engine is configured to enable foreign keys
         # We'll need to check the event listeners or execution options
-        engine = create_engine("test.db")
+        engine = create_engine("sqlite:///test.db")
 
         # The implementation should register an event listener to enable foreign keys
         # We'll verify this in the implementation
@@ -132,7 +132,7 @@ class TestDatabaseFactoryWithConfig:
 
         # Arrange
         mock_config = Mock()
-        mock_config.db_path = Path("configured/database.db")
+        mock_config.database_url = "sqlite:///configured/database.db"
         mock_config.db_connection_timeout = 30
         mock_config.DEBUG = False  # Add DEBUG attribute
         mock_config_class.return_value = mock_config
@@ -153,7 +153,7 @@ class TestDatabaseFactoryWithConfig:
 
         # Arrange
         mock_config = Mock()
-        mock_config.test_db_path = Path("test/database.db")
+        mock_config.test_database_url = "sqlite:///test/database.db"
         mock_config.DEBUG = False  # Add DEBUG attribute
         mock_config_class.return_value = mock_config
 
@@ -168,20 +168,20 @@ class TestDatabaseFactoryWithConfig:
 class TestDatabaseFactoryErrorHandling:
     """Test error handling in database factory."""
 
-    def test_create_engine_with_invalid_path_type(self) -> None:
-        """Should raise appropriate error for invalid path types."""
+    def test_create_engine_with_invalid_url(self) -> None:
+        """Should raise appropriate error for invalid URL."""
+        from src.infrastructure.persistence.database_factory import create_engine
+
+        # Act & Assert - non-SQLite URL
+        with pytest.raises(ValueError, match="Unsupported database scheme"):
+            _ = create_engine("postgresql://localhost/db")
+
+    def test_create_engine_with_empty_url(self) -> None:
+        """Should raise error for empty database URL."""
         from src.infrastructure.persistence.database_factory import create_engine
 
         # Act & Assert
-        with pytest.raises(TypeError, match="Database path must be"):
-            create_engine(123)  # type: ignore
-
-    def test_create_engine_with_empty_path(self) -> None:
-        """Should raise error for empty database path."""
-        from src.infrastructure.persistence.database_factory import create_engine
-
-        # Act & Assert
-        with pytest.raises(ValueError, match="Database path cannot be empty"):
+        with pytest.raises(ValueError, match="Database URL cannot be empty"):
             _ = create_engine("")
 
     @patch("src.infrastructure.persistence.database_factory.sqla_create_engine")
@@ -194,16 +194,16 @@ class TestDatabaseFactoryErrorHandling:
 
         # Act & Assert
         with pytest.raises(Exception, match="Connection failed"):
-            _ = create_engine("test.db")
+            _ = create_engine("sqlite:///test.db")
 
 
-class TestDatabaseFactoryHelpers:
-    """Test helper functions in database factory."""
+class TestSQLiteDialect:
+    """Test SQLite dialect specific functions."""
 
-    def test_configure_sqlite_pragmas(self) -> None:
+    def test_configure_sqlite_connection(self) -> None:
         """Should configure SQLite pragmas on connection."""
-        from src.infrastructure.persistence.database_factory import (
-            configure_sqlite_pragmas,
+        from src.infrastructure.persistence.dialects.sqlite import (
+            configure_sqlite_connection,
         )
 
         # Arrange
@@ -212,7 +212,7 @@ class TestDatabaseFactoryHelpers:
         mock_connection.cursor.return_value = mock_cursor
 
         # Act
-        configure_sqlite_pragmas(
+        configure_sqlite_connection(
             mock_connection,
             enable_foreign_keys=True,
             journal_mode="WAL",
@@ -223,11 +223,19 @@ class TestDatabaseFactoryHelpers:
         mock_cursor.execute.assert_any_call("PRAGMA journal_mode = WAL")
         mock_cursor.close.assert_called_once()
 
-    def test_get_database_url(self) -> None:
-        """Should construct proper database URL from path."""
-        from src.infrastructure.persistence.database_factory import get_database_url
+    def test_get_sqlite_engine_kwargs(self) -> None:
+        """Should return appropriate SQLite engine kwargs."""
+        from src.infrastructure.persistence.dialects.sqlite import (
+            get_sqlite_engine_kwargs,
+        )
 
-        # Test various path formats
-        assert get_database_url("test.db") == "sqlite:///test.db"
-        assert get_database_url(":memory:") == "sqlite:///:memory:"
-        assert get_database_url(Path("data/test.db")) == "sqlite:///data/test.db"
+        # Test file-based database
+        kwargs = get_sqlite_engine_kwargs("sqlite:///test.db")
+        assert "connect_args" in kwargs
+        assert kwargs["connect_args"]["check_same_thread"] is False
+        assert "poolclass" not in kwargs
+
+        # Test in-memory database
+        kwargs = get_sqlite_engine_kwargs("sqlite:///:memory:")
+        assert "poolclass" in kwargs
+        assert kwargs["poolclass"] is StaticPool

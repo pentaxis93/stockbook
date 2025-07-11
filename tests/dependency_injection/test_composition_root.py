@@ -36,7 +36,7 @@ class TestCompositionRoot:
         from src.domain.repositories.interfaces import IStockBookUnitOfWork
 
         # Arrange & Act
-        container = CompositionRoot.configure(database_path=":memory:")
+        container = CompositionRoot.configure(database_url="sqlite:///:memory:")
 
         # Assert - Engine should be registered
         assert container.is_registered(Engine)
@@ -54,7 +54,7 @@ class TestCompositionRoot:
         from src.application.interfaces.stock_service import IStockApplicationService
 
         # Arrange
-        container = CompositionRoot.configure(database_path=":memory:")
+        container = CompositionRoot.configure(database_url="sqlite:///:memory:")
 
         # Act
         stock_service = container.resolve(IStockApplicationService)
@@ -92,7 +92,7 @@ class TestCompositionRoot:
         from sqlalchemy.engine import Engine
 
         # Arrange
-        container = CompositionRoot.configure(database_path=":memory:")
+        container = CompositionRoot.configure(database_url="sqlite:///:memory:")
 
         # Act
         engine1 = container.resolve(Engine)
@@ -106,7 +106,7 @@ class TestCompositionRoot:
         from src.application.interfaces.stock_service import IStockApplicationService
 
         # Arrange
-        container = CompositionRoot.configure(database_path=":memory:")
+        container = CompositionRoot.configure(database_url="sqlite:///:memory:")
 
         # Act
         service1 = container.resolve(IStockApplicationService)

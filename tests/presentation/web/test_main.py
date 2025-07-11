@@ -55,12 +55,12 @@ class TestMainApp:
             call_args = mock_database_initializer.call_args[0]
             assert len(call_args) == 1
 
-            # Should be called with the database path from environment
-            expected_path = os.getenv(
-                "DATABASE_PATH",
-                "/app/data/database/stockbook.db",
-            )
-            assert call_args[0] == expected_path
+            # Should be called with the database URL from environment or config
+            from config import Config
+
+            config = Config()
+            expected_url = os.getenv("DATABASE_URL", config.database_url)
+            assert call_args[0] == expected_url
 
     def test_health_check_endpoint(self, client: TestClient) -> None:
         """Test the health check endpoint returns successful response."""

@@ -90,16 +90,17 @@ class TestDatabaseInitializer:
 
     def test_initialize_database_with_invalid_url(self) -> None:
         """Test that initialize_database handles invalid database URLs gracefully."""
-        with pytest.raises(ValueError, match="Unsupported database URL"):
-            initialize_database("invalid://url")
+        with pytest.raises(ValueError, match="Unsupported database scheme"):
+            initialize_database("postgresql://invalid/url")
 
     def test_initialize_database_with_existing_data(self, temp_db_path: str) -> None:
         """Test that initialize_database preserves existing data."""
+        db_url = f"sqlite:///{temp_db_path}"
         # First initialize the database
-        initialize_database(temp_db_path)
+        initialize_database(db_url)
 
         # Insert some test data
-        engine = sa.create_engine(f"sqlite:///{temp_db_path}")
+        engine = sa.create_engine(db_url)
         with engine.begin() as conn:
             assert isinstance(conn, Connection)
             _ = conn.execute(
@@ -108,7 +109,7 @@ class TestDatabaseInitializer:
             )
 
         # Initialize again
-        initialize_database(temp_db_path)
+        initialize_database(db_url)
 
         # Verify data is still there
         with engine.connect() as conn:
@@ -138,23 +139,18 @@ class TestDatabaseInitializer:
     @patch("src.infrastructure.persistence.database_initializer.logger")
     def test_initialize_database_logs_errors(self, mock_logger: Mock) -> None:
         """Test that initialization errors are logged."""
-        with pytest.raises(ValueError, match="Unsupported database URL"):
-            initialize_database("invalid://url")
+        with pytest.raises(ValueError, match="Unsupported database scheme"):
+            initialize_database("postgresql://invalid/url")
 
         # Should log the error
         mock_logger.exception.assert_called_once()
         error_message = mock_logger.exception.call_args[0][0]
         assert "failed" in error_message.lower()
 
-    def test_initialize_database_with_file_url(self, temp_db_path: str) -> None:
-        """Test initialization with a file path instead of URL."""
-        # Should convert file path to SQLite URL
-        initialize_database(temp_db_path)
+    def test_initialize_database_with_memory_url(self) -> None:
+        """Test initialization with in-memory database."""
+        # Initialize in-memory database
+        initialize_database("sqlite:///:memory:")
 
-        # Verify database was created
-        assert Path(temp_db_path).exists()
-
-        # Verify tables were created
-        engine = sa.create_engine(f"sqlite:///{temp_db_path}")
-        inspector = inspect(engine)
-        assert len(inspector.get_table_names()) > 0
+        # No file should be created for memory databases
+        # Just verify it doesn't raise an error
