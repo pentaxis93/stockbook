@@ -544,3 +544,11 @@ class TestPortfolioBalanceBuilder:
         assert builder.with_deposits(Money(Decimal("1000.00"))) is builder
         assert builder.with_index_change(IndexChange(5.25)) is builder
         assert builder.with_id("id1") is builder
+
+    def test_portfolio_balance_constructor_requires_builder(self) -> None:
+        """Test that PortfolioBalance constructor requires a builder instance."""
+        with pytest.raises(
+            ValueError,
+            match="PortfolioBalance must be created through Builder",
+        ):
+            _ = PortfolioBalance(_builder_instance=None)

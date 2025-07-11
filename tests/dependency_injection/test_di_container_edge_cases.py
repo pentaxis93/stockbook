@@ -7,9 +7,11 @@ Tests exception handling and other edge cases not covered in main tests.
 from unittest.mock import patch
 
 import pytest
+from dependency_injector.errors import Error as DIError
 
 from dependency_injection.di_container import DIContainer
 from dependency_injection.exceptions import (
+    DependencyResolutionError,
     DuplicateRegistrationError,
     InvalidRegistrationError,
 )
@@ -234,3 +236,60 @@ class TestContainerState:
         # Container should not have the failed registration
         assert not container.is_registered(MockService)
         assert MockService not in container.get_registrations()
+
+    def test_non_callable_factory_error(self) -> None:
+        """Should raise error when factory is not callable."""
+        container = DIContainer()
+        not_callable = "not a function"  # String is not callable
+
+        with pytest.raises(InvalidRegistrationError) as exc_info:
+            container.register_factory(MockService, not_callable)  # type: ignore[arg-type]
+
+        assert "Factory for MockService is not callable" in str(exc_info.value)
+
+    def test_forward_reference_not_found(self) -> None:
+        """Should raise error when forward reference cannot be resolved."""
+        from typing import Any
+
+        # Use quotes to create a forward reference to a non-existent type
+        class ServiceWithForwardRef:
+            def __init__(self, dependency: Any) -> None:
+                # This is testing forward reference resolution
+                self.dependency = dependency
+
+        # Manually set the annotation to simulate forward reference
+        ServiceWithForwardRef.__init__.__annotations__["dependency"] = "UnknownService"
+
+        container = DIContainer()
+        container.register_transient(ServiceWithForwardRef)
+
+        # Try to resolve - will fail because UnknownService is not registered
+        with pytest.raises(DependencyResolutionError) as exc_info:
+            _ = container.resolve(ServiceWithForwardRef)
+
+        assert "No registered type found for forward reference 'UnknownService'" in str(
+            exc_info.value,
+        )
+
+    def test_provider_di_error_wrapped(self) -> None:
+        """Test that DIError from provider is properly wrapped."""
+
+        class FailingService:
+            """Service that fails during injection."""
+
+            def __init__(self) -> None:
+                msg = "Injection failed during construction"
+                raise DIError(msg)
+
+        container = DIContainer()
+
+        # Register a service that will fail with DIError during construction
+        container.register_transient(FailingService)
+
+        # When we try to resolve it, the DIError should be caught and wrapped
+        with pytest.raises(DependencyResolutionError) as exc_info:
+            _ = container.resolve(FailingService)
+
+        # Check that the error was properly wrapped
+        assert "Failed to resolve FailingService" in str(exc_info.value)
+        assert "Injection failed during construction" in str(exc_info.value)

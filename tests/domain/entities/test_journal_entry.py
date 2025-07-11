@@ -528,3 +528,11 @@ class TestJournalEntryBuilder:
         assert builder.with_stock_id("s1") is builder
         assert builder.with_transaction_id("t1") is builder
         assert builder.with_id("id1") is builder
+
+    def test_journal_entry_constructor_requires_builder(self) -> None:
+        """Test that JournalEntry constructor requires a builder instance."""
+        with pytest.raises(
+            ValueError,
+            match="JournalEntry must be created through Builder",
+        ):
+            _ = JournalEntry(_builder_instance=None)
