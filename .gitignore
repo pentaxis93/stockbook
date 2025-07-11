@@ -81,8 +81,7 @@ instance/
 docs/_build/
 
 # Architecture diagrams - generated files
-docs/architecture/diagrams/*.png
-docs/architecture/diagrams/*.svg
+docs/architecture/diagrams/
 
 # PyBuilder
 .pybuilder/
